@@ -1,0 +1,15 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "The settings window renders, listens, and may ask the OS for a folder path; it runs no command and reaches no file. `dialog:allow-open` returns a string a person chose in the native picker \u2014 it grants no read or write, and the engine performs every filesystem operation. The autostart permissions toggle the LaunchAgent from the settings page. The engine is spawned from Rust, which this access control list does not gate, so no shell permission is granted.",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "dialog:allow-open",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled"
+  ]
+}

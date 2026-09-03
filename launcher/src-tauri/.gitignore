@@ -1,0 +1,5 @@
+# Rust build output.
+/target/
+
+# Written by the Tauri build from the capability files beside them. Regenerated, not authored.
+/gen/schemas/

@@ -1,0 +1,16 @@
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+dist/
+src-tauri/target/
+
+# Oxfmt owns JS/TS formatting; Prettier keeps every other file type.
+*.js
+*.jsx
+*.ts
+*.tsx
+*.mjs
+*.cjs
+*.mts
+*.cts

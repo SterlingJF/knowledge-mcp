@@ -1,0 +1,6 @@
+/* File: launcher/src/ui-consumer.css */
+
+/* https://stackoverflow.com/questions/79646666/how-can-i-include-external-package-sources-using-the-css-first-configuration-no */
+@source "./";
+
+@import './ui.css';

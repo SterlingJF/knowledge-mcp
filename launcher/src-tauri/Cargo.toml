@@ -1,0 +1,36 @@
+[package]
+name = "knowledge-mcp-desktop"
+version = "0.1.0"
+description = "The Knowledge MCP desktop shell."
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "km_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+# The shell declares the engine port once and the content security policy has to repeat it, because
+# a Tauri policy is static. The build compares the two rather than trusting them to stay in step.
+serde_json = "1"
+
+[dependencies]
+tauri = { version = "2", features = ["devtools", "tray-icon", "image-png"] }
+# Sidecars are spawned from Rust. The webview is granted no shell permission.
+tauri-plugin-shell = "2"
+# The folder picker. Grants the window a path from the OS, not access to what is at it.
+tauri-plugin-dialog = "2"
+# Vault windows remember their geometry. The switcher is denylisted — it has one fixed size.
+tauri-plugin-autostart = "2"
+# Shows a folder in the OS file manager. Driven from Rust only, so no window is granted it.
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+# Event payloads arrive as JSON strings; `open-vault` carries which vault to show.
+serde_json = "1"
+# `CommandChild::kill` sends SIGKILL, which a frozen binary's bootloader does not forward to the
+# process it supervises. A graceful stop has to start with SIGTERM, which needs libc.
+libc = "0.2"
+
+[features]
+default = []

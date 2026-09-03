@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "yarn.lock",
+    "dist/",
+    "src-tauri/target/",
+    "**/*.css",
+    "**/*.md",
+    "**/*.json",
+    "**/*.jsonc",
+    "**/*.html",
+    "**/*.yaml",
+    "**/*.yml"
+  ],
+  "sortImports": {
+    "groups": [
+      "builtin",
+      "external",
+      "internal",
+      "parent",
+      "sibling",
+      "index",
+      "type"
+    ],
+    "internalPattern": [
+      "^@/.*"
+    ],
+    "ignoreCase": false
+  }
+}

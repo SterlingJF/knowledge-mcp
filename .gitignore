@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+dist/
+build/
+node_modules/
+launcher/src-tauri/target/
+launcher/src-tauri/gen/
+launcher/src-tauri/binaries/
+.DS_Store

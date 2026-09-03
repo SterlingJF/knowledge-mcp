@@ -1,0 +1,8 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "knowledge-mcp",
+  "version": "0.1.0",
+  "description": "A knowledge base's artifacts and universes as tools, over the local knowledge-mcp engine.",
+  "license": "MIT",
+  "keywords": ["knowledge-mcp", "knowledge-base", "artifacts", "mcp"]
+}

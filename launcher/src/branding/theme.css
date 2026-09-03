@@ -1,0 +1,41 @@
+/* File: launcher/src/branding/theme.css */
+/* --color-brand-* is a stable light-family compatibility alias. */
+@import './tokens.css';
+
+@theme inline {
+  --color-brand-50: var(--brand-light-50);
+  --color-brand-100: var(--brand-light-100);
+  --color-brand-200: var(--brand-light-200);
+  --color-brand-300: var(--brand-light-300);
+  --color-brand-400: var(--brand-light-400);
+  --color-brand-500: var(--brand-light-500);
+  --color-brand-600: var(--brand-light-600);
+  --color-brand-700: var(--brand-light-700);
+  --color-brand-800: var(--brand-light-800);
+  --color-brand-900: var(--brand-light-900);
+  --color-brand-950: var(--brand-light-950);
+
+  --color-brand-light-50: var(--brand-light-50);
+  --color-brand-light-100: var(--brand-light-100);
+  --color-brand-light-200: var(--brand-light-200);
+  --color-brand-light-300: var(--brand-light-300);
+  --color-brand-light-400: var(--brand-light-400);
+  --color-brand-light-500: var(--brand-light-500);
+  --color-brand-light-600: var(--brand-light-600);
+  --color-brand-light-700: var(--brand-light-700);
+  --color-brand-light-800: var(--brand-light-800);
+  --color-brand-light-900: var(--brand-light-900);
+  --color-brand-light-950: var(--brand-light-950);
+
+  --color-brand-dark-50: var(--brand-dark-50);
+  --color-brand-dark-100: var(--brand-dark-100);
+  --color-brand-dark-200: var(--brand-dark-200);
+  --color-brand-dark-300: var(--brand-dark-300);
+  --color-brand-dark-400: var(--brand-dark-400);
+  --color-brand-dark-500: var(--brand-dark-500);
+  --color-brand-dark-600: var(--brand-dark-600);
+  --color-brand-dark-700: var(--brand-dark-700);
+  --color-brand-dark-800: var(--brand-dark-800);
+  --color-brand-dark-900: var(--brand-dark-900);
+  --color-brand-dark-950: var(--brand-dark-950);
+}
