@@ -1,11 +1,39 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Build output
+dist/
+build/
+
+# Caches
 __pycache__/
 *.pyc
 .pytest_cache/
-.venv/
-dist/
-build/
-node_modules/
-launcher/src-tauri/target/
-launcher/src-tauri/gen/
-launcher/src-tauri/binaries/
+.ruff_cache/
+.uv-cache/
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Logs
+*.log
+
+# Editor and OS files
 .DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.sw?
+
+# Claude Code
+.claude/worktrees/
+.claude/settings.local.json
+
+# Local evidence archive; only its README is tracked
+/.evidence/*
+!/.evidence/README.md

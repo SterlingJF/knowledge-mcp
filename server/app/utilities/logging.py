@@ -13,24 +13,24 @@ if TYPE_CHECKING:
 
     from app.settings import Settings
 
-APP_LOGGER_NAMESPACE = 'km-server'
+APP_LOGGER_NAMESPACE = "km-server"
 
 
 def get_app_logger(name: str | None = None) -> structlog.stdlib.BoundLogger:
     if name:
-        return structlog.get_logger(f'{APP_LOGGER_NAMESPACE}.{name}')
+        return structlog.get_logger(f"{APP_LOGGER_NAMESPACE}.{name}")
 
     frame = inspect.currentframe()
     caller = frame.f_back if frame else None
     module_name = (
-        caller.f_globals.get('__name__', 'unknown_module')
+        caller.f_globals.get("__name__", "unknown_module")
         if caller
-        else 'unknown_caller'
+        else "unknown_caller"
     )
-    bare = module_name.split('.')[-1]
-    if bare == '__main__':
-        bare = 'main_script'
-    return structlog.get_logger(f'{APP_LOGGER_NAMESPACE}.{bare}')
+    bare = module_name.split(".")[-1]
+    if bare == "__main__":
+        bare = "main_script"
+    return structlog.get_logger(f"{APP_LOGGER_NAMESPACE}.{bare}")
 
 
 def configure_logging_on_startup(settings: Settings) -> None:
@@ -45,7 +45,7 @@ def configure_logging_on_startup(settings: Settings) -> None:
         structlog.processors.StackInfoRenderer(),
         structlog.dev.set_exc_info,
         structlog.processors.format_exc_info,
-        structlog.processors.TimeStamper(fmt='iso', utc=True),
+        structlog.processors.TimeStamper(fmt="iso", utc=True),
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
     ]
 
@@ -76,14 +76,14 @@ def configure_logging_on_startup(settings: Settings) -> None:
     root.propagate = False
 
     # Request logs come from middleware (server/app/middleware/logging_middleware.py).
-    for silenced in ('uvicorn.error', 'uvicorn.access'):
+    for silenced in ("uvicorn.error", "uvicorn.access"):
         logging.getLogger(silenced).handlers = []
         logging.getLogger(silenced).propagate = False
-    logging.getLogger('uvicorn.asgi').handlers = []
-    logging.getLogger('uvicorn.asgi').propagate = True
+    logging.getLogger("uvicorn.asgi").handlers = []
+    logging.getLogger("uvicorn.asgi").propagate = True
 
-    get_app_logger('config.logging').info(
-        'Application logging configured.',
+    get_app_logger("config.logging").info(
+        "Application logging configured.",
         log_level=level_name,
         json_output=as_json,
         tty_detected=is_tty,

@@ -1,9 +1,7 @@
 /* File: launcher/src/styles.css */
-/* Import order: local UI roles, then Knowledge MCP theme overrides. */
+/* The Tailwind entry, tokens and shell styles come from components; this window fills the viewport. */
 
-@import 'tailwindcss';
-@import './ui-consumer.css';
-@import './ui-theme.css';
+@import 'components/styles.css';
 
 html,
 body,

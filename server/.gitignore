@@ -1,6 +1,4 @@
-# PyInstaller work and output directories. Both are produced by freezing the engine, and the spec
-# file PyInstaller writes into build/ carries absolute paths from the machine that produced it, so
-# neither is reproducible across checkouts and neither belongs in the tree.
+# PyInstaller work and output directories, written when km-server.spec is frozen.
 build/
 dist/
 

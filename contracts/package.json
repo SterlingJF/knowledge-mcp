@@ -1,0 +1,12 @@
+{
+  "name": "contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "files=$(find . -name '*.openapi.yaml' -not -path './node_modules/*' -not -path '*/upstream/*'); if [ -n \"$files\" ]; then redocly lint --config redocly.yaml $files; else echo 'No OpenAPI files to lint.'; fi"
+  },
+  "devDependencies": {
+    "@redocly/cli": "2.53.3"
+  }
+}

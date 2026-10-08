@@ -11,14 +11,14 @@ if TYPE_CHECKING:
     from app.settings import Role
 
 API_ROUTERS: dict[str, list[APIRouter]] = {
-    'desktop': [artifacts.router, files.router, universes.router, vaults.router],
+    "desktop": [artifacts.router, files.router, universes.router, vaults.router],
 }
 
 ROOT_ROUTERS: list[APIRouter] = [health.router]
 
-# Desktop storage routes are absent from `api-specs/v1/vault.rest.openapi.yaml`.
+# Desktop storage routes are absent from `contracts/project/v1/vault.rest.openapi.yaml`.
 ROLE_ROOT_ROUTERS: dict[str, list[APIRouter]] = {
-    'desktop': [storage.router],
+    "desktop": [storage.router],
 }
 
 

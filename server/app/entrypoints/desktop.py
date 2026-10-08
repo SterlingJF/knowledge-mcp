@@ -16,28 +16,28 @@ DEFAULT_PORT = 8000
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        prog='km-server', description='Pd·flow desktop backend'
+        prog="km-server", description="Pd·flow desktop backend"
     )
-    parser.add_argument('--port', type=int, default=None)
-    parser.add_argument('--host', type=str, default=None)
+    parser.add_argument("--port", type=int, default=None)
+    parser.add_argument("--host", type=str, default=None)
     parser.add_argument(
-        '--store-root',
+        "--store-root",
         type=Path,
         default=None,
-        help='The folder holding the artifacts. May be unset; the app reports not-ready.',
+        help="The folder holding the artifacts. May be unset; the app reports not-ready.",
     )
     parser.add_argument(
-        '--principal-id',
+        "--principal-id",
         type=str,
         default=None,
-        help='Who the local person is. Defaults to the OS login name.',
+        help="Who the local person is. Defaults to the OS login name.",
     )
-    parser.add_argument('--knowledge-model-dir', type=Path, default=None)
+    parser.add_argument("--knowledge-model-dir", type=Path, default=None)
     parser.add_argument(
-        '--parent-pid',
+        "--parent-pid",
         type=int,
         default=None,
-        help='Exit when this process goes away. The desktop shell passes its own pid.',
+        help="Exit when this process goes away. The desktop shell passes its own pid.",
     )
     return parser.parse_args()
 
@@ -47,7 +47,7 @@ def main() -> None:
     args = _parse_args()
 
     settings = load_settings(
-        ROLE='desktop',
+        ROLE="desktop",
         PORT=args.port,
         HOST=args.host,
         STORE_ROOT=args.store_root,
@@ -55,7 +55,7 @@ def main() -> None:
         KNOWLEDGE_MODEL_DIR=args.knowledge_model_dir,
     )
 
-    watch_parent(args.parent_pid, 'km-server')
+    watch_parent(args.parent_pid, "km-server")
 
     uvicorn.run(
         create_app(settings),
@@ -66,5 +66,5 @@ def main() -> None:
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -10,12 +10,12 @@ from app.api_models_auto import ErrorResponse
 from app.dependencies import FileStoreDep
 from app.store.file_store import StoredFile
 
-router = APIRouter(tags=['Files'])
+router = APIRouter(tags=["Files"])
 
 ERROR_RESPONSES: dict[int | str, dict[str, Any]] = {
-    404: {'model': ErrorResponse},
-    422: {'model': ErrorResponse},
-    503: {'model': ErrorResponse},
+    404: {"model": ErrorResponse},
+    422: {"model": ErrorResponse},
+    503: {"model": ErrorResponse},
 }
 
 
@@ -32,29 +32,29 @@ class FileContent(FileSummary):
 
 def _summary(stored: StoredFile) -> dict[str, Any]:
     return {
-        'path': stored.relative_path,
-        'absolutePath': str(stored.path.absolute()),
-        'size': stored.size,
-        'modifiedAt': stored.modified_at,
+        "path": stored.relative_path,
+        "absolutePath": str(stored.path.absolute()),
+        "size": stored.size,
+        "modifiedAt": stored.modified_at,
     }
 
 
 @router.get(
-    '/files',
+    "/files",
     response_model=list[FileSummary],
     responses=ERROR_RESPONSES,
-    summary='List vault files',
+    summary="List vault files",
 )
 async def list_files(store: FileStoreDep) -> Any:
     return [_summary(stored) for stored in store.files()]
 
 
 @router.get(
-    '/files/{filePath:path}',
+    "/files/{filePath:path}",
     response_model=FileContent,
     responses=ERROR_RESPONSES,
-    summary='Read a vault file',
+    summary="Read a vault file",
 )
-async def read_file(filePath: str, store: FileStoreDep) -> Any:  # noqa: N803
+async def read_file(filePath: str, store: FileStoreDep) -> Any:
     stored, content = store.read_file(filePath)
-    return {**_summary(stored), 'content': content}
+    return {**_summary(stored), "content": content}

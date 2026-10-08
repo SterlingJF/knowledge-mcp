@@ -1,0 +1,32 @@
+[project]
+name = "mcp-server"
+version = "0.1.0"
+description = "The knowledge-mcp MCP server: agent tools over the engine's HTTP API"
+authors = [
+    {name = "Sterling Freeman",email = "sterling.j.freeman@gmail.com"}
+]
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "httpx==0.28.1",
+    # Pinned exactly: an mcp release can change the served MCP revision or reopen the pre-2026
+    # handshake the front door refuses.
+    "mcp==2.0.0",
+    "pydantic==2.13.4",
+    "pydantic-settings==2.15.0",
+    "uvicorn==0.34.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+]
+build = [
+    "pyinstaller==6.22.2",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["error::DeprecationWarning:app.*"]

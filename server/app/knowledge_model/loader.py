@@ -13,9 +13,9 @@ from app.utilities.logging import get_app_logger
 if TYPE_CHECKING:
     from pathlib import Path
 
-logger = get_app_logger('knowledge_model')
+logger = get_app_logger("knowledge_model")
 
-DOCUMENT_KINDS = ('universe', 'guidance')
+DOCUMENT_KINDS = ("universe", "guidance")
 
 
 def _as_version_string(raw: object) -> str:
@@ -23,7 +23,7 @@ def _as_version_string(raw: object) -> str:
     if isinstance(raw, str):
         return raw
     if isinstance(raw, float):
-        return f'{raw:g}'
+        return f"{raw:g}"
     return str(raw)
 
 
@@ -77,14 +77,14 @@ class UniverseIndex:
         return frozenset(values)
 
     def summary(self) -> dict[str, Any]:
-        header = dict(self.document['universe'])
-        header.pop('overview', None)
-        header['version'] = self.version
+        header = dict(self.document["universe"])
+        header.pop("overview", None)
+        header["version"] = self.version
         return header
 
     def served_document(self) -> dict[str, Any]:
         served = dict(self.document)
-        served['universe'] = {**self.document['universe'], 'version': self.version}
+        served["universe"] = {**self.document["universe"], "version": self.version}
         return served
 
 
@@ -97,69 +97,69 @@ class GuidanceIndex:
 
     def served_document(self) -> dict[str, Any]:
         served = dict(self.document)
-        served['guidance'] = {**self.document['guidance'], 'version': self.version}
+        served["guidance"] = {**self.document["guidance"], "version": self.version}
         return served
 
 
 def _entry(raw: object) -> CompositionEntry | None:
     if isinstance(raw, str):
-        return CompositionEntry(element_id=raw, mode='owns', when=None)
-    if isinstance(raw, dict) and 'element' in raw:
+        return CompositionEntry(element_id=raw, mode="owns", when=None)
+    if isinstance(raw, dict) and "element" in raw:
         return CompositionEntry(
-            element_id=str(raw['element']),
-            mode=str(raw.get('mode', 'owns')),
-            when=raw.get('when'),
+            element_id=str(raw["element"]),
+            mode=str(raw.get("mode", "owns")),
+            when=raw.get("when"),
         )
     return None
 
 
 def _index_universe(document: dict[str, Any]) -> UniverseIndex:
-    header = document['universe']
-    ordering_frame = str(header['ordering_frame'])
+    header = document["universe"]
+    ordering_frame = str(header["ordering_frame"])
     index = UniverseIndex(
-        universe_id=str(header['id']),
-        version=_as_version_string(header.get('version')),
+        universe_id=str(header["id"]),
+        version=_as_version_string(header.get("version")),
         ordering_frame=ordering_frame,
         document=document,
-        statuses=frozenset(str(value) for value in (document.get('statuses') or [])),
+        statuses=frozenset(str(value) for value in (document.get("statuses") or [])),
     )
 
-    for raw in document.get('elements') or []:
-        if not isinstance(raw, dict) or 'code' not in raw:
+    for raw in document.get("elements") or []:
+        if not isinstance(raw, dict) or "code" not in raw:
             continue
         element = ElementIndex(
-            element_id=str(raw.get('id', '')),
-            code=str(raw['code']),
-            cardinality=raw.get('cardinality'),
+            element_id=str(raw.get("id", "")),
+            code=str(raw["code"]),
+            cardinality=raw.get("cardinality"),
             ordering_value=raw.get(ordering_frame),
             # `closable: false` triggers refusal (app.store.validation.validate_records).
-            closable=raw.get('closable'),
-            gate=raw.get('gate'),
+            closable=raw.get("closable"),
+            gate=raw.get("gate"),
         )
         index.elements_by_code[element.code] = element
         if element.element_id:
             index.elements_by_id[element.element_id] = element
 
-    for raw in document.get('artifacts') or []:
-        if not isinstance(raw, dict) or 'code' not in raw:
+    for raw in document.get("artifacts") or []:
+        if not isinstance(raw, dict) or "code" not in raw:
             continue
-        composition = raw.get('composition') or {}
+        composition = raw.get("composition") or {}
         core = tuple(
             entry
-            for candidate in (composition.get('core') or [])
+            for candidate in (composition.get("core") or [])
             if (entry := _entry(candidate)) is not None
         )
         situational = tuple(
             entry
-            for candidate in (composition.get('situational') or [])
+            for candidate in (composition.get("situational") or [])
             if (entry := _entry(candidate)) is not None
         )
         artifact_type = ArtifactTypeIndex(
-            type_id=str(raw.get('id', '')),
-            code=str(raw['code']),
+            type_id=str(raw.get("id", "")),
+            code=str(raw["code"]),
             core=core,
             situational=situational,
-            disabled_when=raw.get('disabled_when'),
+            disabled_when=raw.get("disabled_when"),
         )
         index.types_by_code[artifact_type.code] = artifact_type
 
@@ -168,16 +168,16 @@ def _index_universe(document: dict[str, Any]) -> UniverseIndex:
 
 def _read_documents(directory: Path) -> list[tuple[str, str, dict[str, Any]]]:
     documents: list[tuple[str, str, dict[str, Any]]] = []
-    for path in sorted(glob.glob(os.path.join(str(directory), '*.kbp.yaml'))):
-        with open(path, encoding='utf-8') as handle:
+    for path in sorted(glob.glob(os.path.join(str(directory), "*.kbp.yaml"))):
+        with open(path, encoding="utf-8") as handle:
             document = yaml.safe_load(handle)
         name = os.path.basename(path)
         if not isinstance(document, dict):
-            logger.warning('Skipping non-mapping document', file=name)
+            logger.warning("Skipping non-mapping document", file=name)
             continue
         kind = next((key for key in DOCUMENT_KINDS if key in document), None)
         if kind is None:
-            logger.warning('Skipping document with no known header key', file=name)
+            logger.warning("Skipping document with no known header key", file=name)
             continue
         documents.append((name, kind, document))
     return documents
@@ -201,30 +201,30 @@ class KnowledgeModel:
         documents = _read_documents(directory)
 
         for name, kind, document in documents:
-            if kind != 'universe':
+            if kind != "universe":
                 continue
             index = _index_universe(document)
             if index.universe_id in universes:
                 logger.warning(
-                    'Duplicate universe id; the later document wins',
+                    "Duplicate universe id; the later document wins",
                     universe=index.universe_id,
                     file=name,
                 )
             universes[index.universe_id] = index
 
         for name, kind, document in documents:
-            if kind != 'guidance':
+            if kind != "guidance":
                 continue
-            header = document['guidance']
+            header = document["guidance"]
             index = GuidanceIndex(
-                guidance_id=str(header['id']),
-                guides=str(header['guides']),
-                version=_as_version_string(header.get('version')),
+                guidance_id=str(header["id"]),
+                guides=str(header["guides"]),
+                version=_as_version_string(header.get("version")),
                 document=document,
             )
             if index.guides not in universes:
                 logger.warning(
-                    'Guidance guides a universe this image does not carry',
+                    "Guidance guides a universe this image does not carry",
                     guidance=index.guidance_id,
                     guides=index.guides,
                     file=name,
@@ -234,7 +234,7 @@ class KnowledgeModel:
         model = cls(universes=universes, guidance=guidance, source=directory)
         for universe in universes.values():
             logger.info(
-                'Universe loaded',
+                "Universe loaded",
                 universe=universe.universe_id,
                 version=universe.version,
                 elements=len(universe.elements_by_code),
@@ -243,7 +243,7 @@ class KnowledgeModel:
                 guidance=universe.universe_id in guidance,
             )
         if not universes:
-            logger.error('No universe documents found', directory=str(directory))
+            logger.error("No universe documents found", directory=str(directory))
         return model
 
     def universe(self, universe_id: str) -> UniverseIndex | None:

@@ -18,12 +18,12 @@ from app.api_models_auto import (
 from app.store.vaults import VaultStores
 from app.vault import service
 
-router = APIRouter(tags=['Vaults'])
+router = APIRouter(tags=["Vaults"])
 
 
 def _refused(response: Response, path: Path, reason: str) -> VaultRefusal:
     """Refusal with contract status."""
-    response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    response.status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
     return VaultRefusal(path=str(path), reason=reason)
 
 
@@ -33,13 +33,13 @@ def _activate(request: Request, path: Path) -> None:
     vaults.set_default_root(path.resolve())
 
 
-@router.get('/vaults')
+@router.get("/vaults")
 async def list_vaults() -> list[Vault]:
     """Every remembered vault, most recently opened first."""
     return service.listed()
 
 
-@router.post('/vaults', status_code=status.HTTP_201_CREATED)
+@router.post("/vaults", status_code=status.HTTP_201_CREATED)
 async def create_vault(
     creation: VaultCreation,
     request: Request,
@@ -59,7 +59,7 @@ async def create_vault(
         return _refused(
             response,
             parent / name,
-            f'The vault could not be created: {error.strerror}',
+            f"The vault could not be created: {error.strerror}",
         )
 
     _, vault = service.remember(target)
@@ -67,7 +67,7 @@ async def create_vault(
     return vault
 
 
-@router.post('/vaults/open')
+@router.post("/vaults/open")
 async def open_vault(
     selection: VaultSelection,
     request: Request,
@@ -85,7 +85,7 @@ async def open_vault(
     return vault
 
 
-@router.get('/vaults/{vault_id}')
+@router.get("/vaults/{vault_id}")
 async def get_vault_by_id(vault_id: str, response: Response) -> Any:
     """One vault, or 404."""
     vault = service.one(vault_id)
@@ -95,7 +95,7 @@ async def get_vault_by_id(vault_id: str, response: Response) -> Any:
     return vault
 
 
-@router.patch('/vaults/{vault_id}')
+@router.patch("/vaults/{vault_id}")
 async def change_vault(
     vault_id: str,
     change: VaultChange,
@@ -118,7 +118,7 @@ async def change_vault(
     target = parent / name if name else parent
 
     refusal = (
-        'A vault change has to say what to change'
+        "A vault change has to say what to change"
         if change.name is None and change.parent is None
         else service.why_a_name_is_unusable(name)
         or service.why_a_vault_cannot_move(source, target)
@@ -130,7 +130,7 @@ async def change_vault(
         vault = service.move(vault_id, source, target)
     except OSError as error:
         return _refused(
-            response, target, f'The vault could not be moved: {error.strerror}'
+            response, target, f"The vault could not be moved: {error.strerror}"
         )
 
     vaults: VaultStores = request.app.state.vaults
@@ -138,7 +138,7 @@ async def change_vault(
     return vault
 
 
-@router.delete('/vaults/{vault_id}')
+@router.delete("/vaults/{vault_id}")
 async def forget_vault(vault_id: str, request: Request) -> Response:
     """Drop a vault from the list. Nothing on disk is touched."""
     entry = service.one(vault_id)

@@ -20,11 +20,11 @@ from app.dependencies import FileStoreDep
 from app.store.file_store import FileStore
 from app.store.vaults import VaultStores
 
-router = APIRouter(tags=['Storage'])
+router = APIRouter(tags=["Storage"])
 
 # `pdcp-0026` appends here.
 STORAGE_OPTIONS: tuple[dict[str, Any], ...] = (
-    {'type': 'filesystem', 'label': 'A folder on this computer'},
+    {"type": "filesystem", "label": "A folder on this computer"},
 )
 
 
@@ -52,12 +52,12 @@ def _vaults() -> list[dict[str, Any]]:
     )
     return [
         {
-            'id': identifier,
-            'name': entry.display_name,
-            'path': str(entry.path),
-            'lastOpened': entry.last_opened,
-            'open': entry.open,
-            'available': FileStore(entry.path).is_ready()[0],
+            "id": identifier,
+            "name": entry.display_name,
+            "path": str(entry.path),
+            "lastOpened": entry.last_opened,
+            "open": entry.open,
+            "available": FileStore(entry.path).is_ready()[0],
         }
         for identifier, entry in entries
     ]
@@ -67,23 +67,23 @@ def _state(store: FileStore) -> dict[str, Any]:
     ready, reason = store.is_ready()
     root = store.root
     return {
-        'storageRoot': str(root) if root else None,
-        'storageName': root.name if root else None,
-        'storageReady': ready,
-        'storageDetail': reason,
-        'options': list(STORAGE_OPTIONS),
-        'vaults': _vaults(),
+        "storageRoot": str(root) if root else None,
+        "storageName": root.name if root else None,
+        "storageReady": ready,
+        "storageDetail": reason,
+        "options": list(STORAGE_OPTIONS),
+        "vaults": _vaults(),
     }
 
 
 def _refusal(path: Path, reason: str | None) -> dict[str, Any]:
     return {
-        'storageRoot': str(path),
-        'storageName': path.name or None,
-        'storageReady': False,
-        'storageDetail': reason,
-        'options': list(STORAGE_OPTIONS),
-        'vaults': _vaults(),
+        "storageRoot": str(path),
+        "storageName": path.name or None,
+        "storageReady": False,
+        "storageDetail": reason,
+        "options": list(STORAGE_OPTIONS),
+        "vaults": _vaults(),
     }
 
 
@@ -99,10 +99,10 @@ def _why_a_name_is_unusable(name: str) -> str | None:
     """Shared name check for create and rename."""
     separators = {os.sep, os.altsep} - {None}
     checks: tuple[tuple[bool, str], ...] = (
-        (not name, 'A vault needs a name'),
+        (not name, "A vault needs a name"),
         (
-            name in {'.', '..'} or any(sep in name for sep in separators),
-            'A vault name cannot contain a path separator',
+            name in {".", ".."} or any(sep in name for sep in separators),
+            "A vault name cannot contain a path separator",
         ),
     )
     return next((reason for failed, reason in checks if failed), None)
@@ -113,16 +113,16 @@ def _why_a_vault_cannot_be_made(parent: Path, name: str) -> str | None:
     if name_fault is not None:
         return name_fault
     checks: tuple[tuple[bool, str], ...] = (
-        (not parent.exists(), f'The folder to create it in does not exist: {parent}'),
+        (not parent.exists(), f"The folder to create it in does not exist: {parent}"),
         (
             not parent.is_dir(),
-            f'The folder to create it in is not a directory: {parent}',
+            f"The folder to create it in is not a directory: {parent}",
         ),
         (
             not os.access(parent, os.W_OK),
-            f'The folder to create it in is not writable: {parent}',
+            f"The folder to create it in is not writable: {parent}",
         ),
-        ((parent / name).exists(), f'Something called {name} is already here'),
+        ((parent / name).exists(), f"Something called {name} is already here"),
     )
     return next((reason for failed, reason in checks if failed), None)
 
@@ -133,36 +133,36 @@ def _why_a_vault_cannot_move(source: Path, target: Path) -> str | None:
         (not source.exists(), f"This vault's folder is not there any more: {source}"),
         (
             not os.access(source.parent, os.W_OK),
-            f'The folder holding this vault is not writable: {source.parent}',
+            f"The folder holding this vault is not writable: {source.parent}",
         ),
-        (not parent.exists(), f'The folder to move it into does not exist: {parent}'),
+        (not parent.exists(), f"The folder to move it into does not exist: {parent}"),
         (
             not parent.is_dir(),
-            f'The folder to move it into is not a directory: {parent}',
+            f"The folder to move it into is not a directory: {parent}",
         ),
         (
             not os.access(parent, os.W_OK),
-            f'The folder to move it into is not writable: {parent}',
+            f"The folder to move it into is not writable: {parent}",
         ),
         (
             target != source and target.exists(),
-            f'Something called {target.name} is already here',
+            f"Something called {target.name} is already here",
         ),
         (
             source in target.parents,
-            'A vault cannot be moved inside itself',
+            "A vault cannot be moved inside itself",
         ),
     )
     return next((reason for failed, reason in checks if failed), None)
 
 
-@router.get('/storage', include_in_schema=False)
+@router.get("/storage", include_in_schema=False)
 async def get_storage(store: FileStoreDep) -> dict[str, Any]:
     """Current storage state."""
     return _state(store)
 
 
-@router.put('/storage', include_in_schema=False)
+@router.put("/storage", include_in_schema=False)
 async def put_storage(
     selection: StorageSelection,
     request: Request,
@@ -173,13 +173,13 @@ async def put_storage(
     ready, reason = FileStore(candidate).is_ready()
 
     if not ready:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        response.status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
         return _refusal(candidate, reason)
 
     return _open(request, candidate)
 
 
-@router.post('/storage/vaults', include_in_schema=False)
+@router.post("/storage/vaults", include_in_schema=False)
 async def create_vault(
     creation: VaultCreation,
     request: Request,
@@ -192,19 +192,19 @@ async def create_vault(
 
     refusal = _why_a_vault_cannot_be_made(parent, name)
     if refusal is not None:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        response.status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
         return _refusal(target, refusal)
 
     try:
         target.mkdir(parents=False)
     except OSError as error:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        return _refusal(target, f'The vault could not be created: {error.strerror}')
+        response.status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
+        return _refusal(target, f"The vault could not be created: {error.strerror}")
 
     return _open(request, target)
 
 
-@router.patch('/storage/vaults/{vault_id}', include_in_schema=False)
+@router.patch("/storage/vaults/{vault_id}", include_in_schema=False)
 async def change_vault(
     vault_id: str,
     change: VaultChange,
@@ -214,8 +214,8 @@ async def change_vault(
     """Rename a vault's folder, move it, or both. Its id does not change."""
     entry = read_config().stores.get(vault_id)
     if entry is None:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        return _refusal(Path(vault_id), f'No vault with id {vault_id}')
+        response.status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
+        return _refusal(Path(vault_id), f"No vault with id {vault_id}")
 
     source = entry.path
     name = (change.name if change.name is not None else source.name).strip()
@@ -227,19 +227,19 @@ async def change_vault(
     target = parent / name if name else parent
 
     refusal = (
-        'A vault change has to say what to change'
+        "A vault change has to say what to change"
         if change.name is None and change.parent is None
         else _why_a_name_is_unusable(name) or _why_a_vault_cannot_move(source, target)
     )
     if refusal is not None:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        response.status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
         return _refusal(target, refusal)
 
     try:
         source.rename(target)
     except OSError as error:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        return _refusal(target, f'The vault could not be moved: {error.strerror}')
+        response.status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
+        return _refusal(target, f"The vault could not be moved: {error.strerror}")
 
     update_store_path(vault_id, target)
     vaults: VaultStores = request.app.state.vaults
@@ -247,7 +247,7 @@ async def change_vault(
     return _state(vaults.for_root(target))
 
 
-@router.delete('/storage/vaults/{vault_id}', include_in_schema=False)
+@router.delete("/storage/vaults/{vault_id}", include_in_schema=False)
 async def remove_vault(
     vault_id: str,
     request: Request,
@@ -256,8 +256,8 @@ async def remove_vault(
     """Drop a vault from the list. Nothing on disk is touched."""
     entry = read_config().stores.get(vault_id)
     if entry is None:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        return _refusal(Path(vault_id), f'No vault with id {vault_id}')
+        response.status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
+        return _refusal(Path(vault_id), f"No vault with id {vault_id}")
 
     forget_store(vault_id)
     vaults: VaultStores = request.app.state.vaults

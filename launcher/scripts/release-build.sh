@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # File: launcher/scripts/release-build.sh
 #
+# Builds, signs, notarizes and verifies the macOS bundle. The sidecars must already be in
+# src-tauri/binaries/ as `<name>-<target triple>`; the root `build_sidecars` recipe writes them.
 #
 # Setup, once per release machine: an Apple Developer Program membership, a "Developer ID
 # Application" certificate in the login keychain, and stored notary credentials:
@@ -10,6 +12,28 @@ set -euo pipefail
 
 LAUNCHER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROFILE="${KM_NOTARY_PROFILE:-knowledge-mcp}"
+SIDECARS=(km-server km-mcp)
+
+# Homebrew rustup may be absent from PATH. rustc supplies the target triple.
+if ! command -v rustc >/dev/null 2>&1 && [[ -d /opt/homebrew/opt/rustup/bin ]]; then
+  export PATH="/opt/homebrew/opt/rustup/bin:${PATH}"
+fi
+
+require_sidecars() {
+  command -v rustc >/dev/null 2>&1 || {
+    echo "ERROR: rustc is not on PATH, so the target triple cannot be resolved." >&2
+    exit 2
+  }
+  local triple binary
+  triple="$(rustc --print host-tuple)"
+  for name in "${SIDECARS[@]}"; do
+    binary="${LAUNCHER_DIR}/src-tauri/binaries/${name}-${triple}"
+    if [[ ! -x "${binary}" ]]; then
+      echo "ERROR: ${binary} is missing. Build the sidecars first (just build_sidecars)." >&2
+      exit 2
+    fi
+  done
+}
 
 signing_identity() {
   security find-identity -v -p codesigning \
@@ -32,7 +56,6 @@ require_credentials() {
 }
 
 build() {
-  bash scripts/build-sidecars.sh
   # Tauri signs app and sidecars with hardened runtime and tauri.conf.json entitlements.
   APPLE_SIGNING_IDENTITY="${IDENTITY}" APPLE_TEAM_ID="${TEAM_ID}" \
     pnpm exec tauri build --bundles app,dmg
@@ -51,6 +74,7 @@ verify() {
 }
 
 main() {
+  require_sidecars
   require_credentials
   echo ">>> Signing as: ${IDENTITY}"
   cd "${LAUNCHER_DIR}"

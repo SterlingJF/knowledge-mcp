@@ -2,14 +2,14 @@
 
 ## The six folders
 
-| Folder | What it holds |
-| --- | --- |
-| `+` | Capture and conventions — what enters the vault before it has a home. |
-| `Atlas` | Knowledge that isn't bound to time — the space of ideas and assets. |
-| `Calendar` | Moments in time — daily notes, meeting notes. |
-| `Efforts` | Time-bound work — projects that open, evolve, and close. |
-| `x` | Everything outside the other three — files, media, raw source content, templates. |
-| `.knowledge-mcp` | The vault's own configuration. Created empty today; reserved. |
+| Folder           | What it holds                                                                     |
+| ---------------- | --------------------------------------------------------------------------------- |
+| `+`              | Capture and conventions — what enters the vault before it has a home.             |
+| `Atlas`          | Knowledge that isn't bound to time — the space of ideas and assets.               |
+| `Calendar`       | Moments in time — daily notes, meeting notes.                                     |
+| `Efforts`        | Time-bound work — projects that open, evolve, and close.                          |
+| `x`              | Everything outside the other three — files, media, raw source content, templates. |
+| `.knowledge-mcp` | The vault's own configuration. Created empty today; reserved.                     |
 
 ## Becoming a vault
 

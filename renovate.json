@@ -1,0 +1,77 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "osvVulnerabilityAlerts": true,
+  "minimumReleaseAge": "7 days",
+  "rangeStrategy": "pin",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "description": "Minor and patch updates merge once CI passes; majors wait for review.",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "description": "Peer dependency ranges stay ranges and widen for a new major.",
+      "matchDepTypes": ["peerDependencies"],
+      "rangeStrategy": "widen"
+    },
+    {
+      "description": "Cargo has no release-age gate for indirect dependencies, so Cargo.lock moves only with direct updates.",
+      "matchManagers": ["cargo"],
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "enabled": false
+    },
+    {
+      "description": "mcp updates wait for review. Any mcp release can change the MCP revision mcp-server serves.",
+      "matchPackageNames": ["mcp"],
+      "automerge": false
+    },
+    {
+      "groupName": "react",
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ]
+    },
+    {
+      "description": "The npm packages and the crates move in one update, so @tauri-apps/cli stays in step with the tauri crate.",
+      "groupName": "tauri",
+      "matchPackageNames": [
+        "@tauri-apps/**",
+        "tauri",
+        "tauri-build",
+        "tauri-plugin-*"
+      ]
+    },
+    {
+      "groupName": "vite",
+      "matchPackageNames": ["vite", "vitest", "@vitejs/plugin-react"]
+    },
+    {
+      "groupName": "oxc",
+      "matchPackageNames": ["oxlint", "oxfmt", "oxlint-tsgolint", "oxc-parser"]
+    },
+    {
+      "groupName": "tailwind",
+      "matchPackageNames": ["tailwindcss", "@tailwindcss/vite"]
+    },
+    {
+      "groupName": "fastapi",
+      "matchPackageNames": ["fastapi", "starlette", "uvicorn"]
+    },
+    {
+      "groupName": "pydantic",
+      "matchPackageNames": ["pydantic", "pydantic-settings"]
+    },
+    {
+      "groupName": "pytest",
+      "matchPackageNames": ["pytest"]
+    }
+  ]
+}

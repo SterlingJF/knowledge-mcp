@@ -25,14 +25,14 @@ from app.utilities.logging import get_app_logger
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-logger = get_app_logger('store')
+logger = get_app_logger("store")
 
 SKIPPED_DIRECTORIES = frozenset(
-    {'node_modules', '.git', '.obsidian', '.knowledge-mcp', '.trash', '__pycache__'}
+    {"node_modules", ".git", ".obsidian", ".knowledge-mcp", ".trash", "__pycache__"}
 )
 
 CONTENT_FOLDERS: tuple[str, ...] = tuple(
-    folder.value for folder in VaultFolderName if not folder.value.startswith('.')
+    folder.value for folder in VaultFolderName if not folder.value.startswith(".")
 )
 
 
@@ -71,19 +71,19 @@ class FileStore:
 
     def is_ready(self) -> tuple[bool, str | None]:
         if self._root is None:
-            return False, 'No storage root is configured'
+            return False, "No storage root is configured"
         if not self._root.exists():
-            return False, f'Storage root does not exist: {self._root}'
+            return False, f"Storage root does not exist: {self._root}"
         if not self._root.is_dir():
-            return False, f'Storage root is not a directory: {self._root}'
+            return False, f"Storage root is not a directory: {self._root}"
         if not os.access(self._root, os.R_OK | os.W_OK):
-            return False, f'Storage root is not readable and writable: {self._root}'
+            return False, f"Storage root is not readable and writable: {self._root}"
         return True, None
 
     def _require_root(self) -> Path:
         ready, reason = self.is_ready()
         if not ready or self._root is None:
-            raise StoreUnavailableError(reason or 'Storage root unavailable')
+            raise StoreUnavailableError(reason or "Storage root unavailable")
         return self._root
 
     def lock_for(self, artifact_id: str) -> asyncio.Lock:
@@ -113,7 +113,7 @@ class FileStore:
         try:
             if entry.is_dir(follow_symlinks=True):
                 if (
-                    not entry.name.startswith('.')
+                    not entry.name.startswith(".")
                     and entry.name not in SKIPPED_DIRECTORIES
                 ):
                     yield from self._walk_directory(path, ancestors)
@@ -172,13 +172,13 @@ class FileStore:
         for stored in self.files():
             if stored.relative_path != vault_path:
                 continue
-            if not stored.path.name.endswith('.md'):
+            if not stored.path.name.endswith(".md"):
                 return stored, None
             try:
-                return stored, stored.path.read_text(encoding='utf-8')
-            except (OSError, UnicodeDecodeError):
+                return stored, stored.path.read_text(encoding="utf-8")
+            except OSError, UnicodeDecodeError:
                 return stored, None
-        msg = f'No vault file at {vault_path}'
+        msg = f"No vault file at {vault_path}"
         raise NotFoundError(msg)
 
     def _load(self, path: Path) -> StoredArtifact | None:
@@ -196,15 +196,15 @@ class FileStore:
         try:
             raw = path.read_bytes()
             artifact, prose_keys, coercions = codec.from_bytes(raw)
-        except Exception as error:  # noqa: BLE001 - a broken file must not crash the scan
+        except Exception as error:  # a broken file must not crash the scan
             logger.warning(
-                'Skipping unparseable file', path=str(path), error=str(error)
+                "Skipping unparseable file", path=str(path), error=str(error)
             )
             self._cache.pop(path, None)
             return None
 
-        if not artifact.get('id'):
-            logger.warning('Skipping file with no artifact id', path=str(path))
+        if not artifact.get("id"):
+            logger.warning("Skipping file with no artifact id", path=str(path))
             self._cache.pop(path, None)
             return None
 
@@ -223,15 +223,15 @@ class FileStore:
         root = self._require_root()
         seen: dict[str, StoredArtifact] = {}
         for path in sorted(
-            path for path in self._walk(root) if path.name.endswith('.md')
+            path for path in self._walk(root) if path.name.endswith(".md")
         ):
             stored = self._load(path)
             if stored is None:
                 continue
-            artifact_id = str(stored.artifact['id'])
+            artifact_id = str(stored.artifact["id"])
             if artifact_id in seen:
                 logger.warning(
-                    'Duplicate artifact id on disk; the first path wins',
+                    "Duplicate artifact id on disk; the first path wins",
                     artifact_id=artifact_id,
                     kept=str(seen[artifact_id].path),
                     ignored=str(path),
@@ -242,34 +242,34 @@ class FileStore:
 
     def get(self, artifact_id: str) -> StoredArtifact:
         for stored in self.scan():
-            if str(stored.artifact['id']) == artifact_id:
+            if str(stored.artifact["id"]) == artifact_id:
                 return stored
-        msg = f'No artifact with id {artifact_id}'
+        msg = f"No artifact with id {artifact_id}"
         raise NotFoundError(msg)
 
     def find(self, artifact_id: str) -> StoredArtifact | None:
         try:
             return self.get(artifact_id)
-        except (NotFoundError, StoreUnavailableError):
+        except NotFoundError, StoreUnavailableError:
             return None
 
     def resolve_new(self, vault_path: str) -> Path:
         root = self._require_root().absolute()
         relative = Path(vault_path)
 
-        if relative.is_absolute() or '..' in relative.parts:
-            msg = f'That path leaves the vault: {vault_path}'
+        if relative.is_absolute() or ".." in relative.parts:
+            msg = f"That path leaves the vault: {vault_path}"
             raise UnusablePathError(msg)
 
         parts = relative.parts
         if not parts or parts[0] not in CONTENT_FOLDERS:
-            declared = ', '.join(CONTENT_FOLDERS)
-            msg = f'A path has to start with one of {declared}: {vault_path}'
+            declared = ", ".join(CONTENT_FOLDERS)
+            msg = f"A path has to start with one of {declared}: {vault_path}"
             raise UnusablePathError(msg)
 
         candidate = root / relative
         if candidate.exists() or candidate.is_symlink():
-            msg = f'Something is already at that path: {vault_path}'
+            msg = f"Something is already at that path: {vault_path}"
             raise ConflictError(msg)
 
         return candidate
@@ -288,14 +288,14 @@ class FileStore:
             current = codec.compute_etag(path.read_bytes())
             if current != expected_etag:
                 msg = (
-                    'The file changed between read and write; re-read it and try again'
+                    "The file changed between read and write; re-read it and try again"
                 )
                 raise ConflictError(
                     msg,
                     fields={
-                        'path': path.name,
-                        'expectedEtag': expected_etag,
-                        'actualEtag': current,
+                        "path": path.name,
+                        "expectedEtag": expected_etag,
+                        "actualEtag": current,
                     },
                 )
 
@@ -305,7 +305,7 @@ class FileStore:
         self._cache.pop(write_path, None)
         stored = self._load(path)
         if stored is None:  # pragma: no cover - post-write invariant
-            msg = 'The artifact could not be re-read after writing'
+            msg = "The artifact could not be re-read after writing"
             raise ConflictError(msg)
         return stored
 
@@ -314,6 +314,6 @@ class FileStore:
         try:
             path.unlink()
         except FileNotFoundError as error:
-            msg = 'The artifact file is already gone'
+            msg = "The artifact file is already gone"
             raise NotFoundError(msg) from error
         self._cache.pop(path, None)

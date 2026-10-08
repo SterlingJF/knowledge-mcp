@@ -1,0 +1,6 @@
+# PyInstaller work and output directories, written when km-mcp.spec is frozen.
+build/
+dist/
+
+.venv/
+__pycache__/

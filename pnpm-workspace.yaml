@@ -1,0 +1,20 @@
+---
+packages:
+  - components
+  - contracts
+  - launcher
+
+# One week, in minutes.
+minimumReleaseAge: 10080
+
+# esbuild's install script fetches a binary its optional deps already ship.
+allowBuilds:
+  esbuild: false
+
+# Patched transitive dependencies; drop each once its parent requires the fix.
+overrides:
+  # markdownlint-cli2 0.23.3 pins 1.8.0; GHSA-r4xh-jqrq-34v2 is fixed in 1.9.0.
+  smol-toml: 1.9.0
+  # micromark-extension-math 3.1.0 (through markdownlint) allows ^0.16.0;
+  # GHSA-238p-pmpm-9mq7 is fixed in 0.18.2.
+  micromark-extension-math>katex: 0.18.7

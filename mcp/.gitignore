@@ -1,8 +1,0 @@
-# PyInstaller work and output directories. Both are produced by freezing the server, and the spec
-# file PyInstaller writes into build/ carries absolute paths from the machine that produced it, so
-# neither is reproducible across checkouts and neither belongs in the tree.
-build/
-dist/
-
-.venv/
-__pycache__/

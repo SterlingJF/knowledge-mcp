@@ -1,0 +1,8 @@
+extend-exclude = ["server/app/api_models_auto.py", "mcp-server/app/api_models_auto.py"]
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
+
+[lint.isort]
+known-first-party = ["app"]

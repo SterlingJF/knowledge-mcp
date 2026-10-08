@@ -1,0 +1,23 @@
+# uv workspace root only; the Python modules are its members.
+[project]
+name = "workspace"
+version = "0.1.0"
+requires-python = ">=3.14,<3.15"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pre-commit==4.6.2",
+    "ruff==0.16.9",
+    "yamllint==1.38.0",
+]
+
+[tool.uv]
+package = false
+# Oldest uv that reads uv.lock; CI pins its exact uv in .github/workflows/ci.yml.
+required-version = ">=0.12.17"
+# One week, like pnpm's minimumReleaseAge.
+exclude-newer = "7 days"
+
+[tool.uv.workspace]
+members = ["server", "mcp-server"]

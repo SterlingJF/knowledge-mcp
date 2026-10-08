@@ -30,7 +30,7 @@ def _watch(parent_pid: int, name: str) -> None:
         # Signal before best-effort stdout notice.
         os.kill(os.getpid(), signal.SIGTERM)
         with contextlib.suppress(OSError):
-            print(f'[{name}] parent {parent_pid} is gone -> shutting down', flush=True)
+            print(f"[{name}] parent {parent_pid} is gone -> shutting down", flush=True)
 
         time.sleep(GRACE_SECONDS)
         os._exit(0)
@@ -40,6 +40,6 @@ def watch_parent(parent_pid: int | None, name: str) -> None:
     if not parent_pid:
         return
     thread = threading.Thread(
-        target=_watch, args=(parent_pid, name), name='parent-watchdog', daemon=True
+        target=_watch, args=(parent_pid, name), name="parent-watchdog", daemon=True
     )
     thread.start()

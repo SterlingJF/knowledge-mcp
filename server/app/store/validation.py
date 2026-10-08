@@ -20,18 +20,18 @@ if TYPE_CHECKING:
     from app.store.file_store import StoredArtifact
 
 # Report-only finding kinds.
-COMPOSITION_CORE_MISSING = 'composition-core-missing'
-COMPOSITION_MODE = 'composition-mode'
-COMPOSITION_UNDECLARED_ELEMENT = 'composition-undeclared-element'
-GATE_UNEVALUATED = 'gate-unevaluated'
-OWNERSHIP_SHARED = 'ownership-shared'
-DANGLING_LINK = 'dangling-link'
-HISTORY_DROPPED = 'history-dropped'
-UNIVERSE_VERSION = 'universe-version'
-COERCED = 'coerced'
+COMPOSITION_CORE_MISSING = "composition-core-missing"
+COMPOSITION_MODE = "composition-mode"
+COMPOSITION_UNDECLARED_ELEMENT = "composition-undeclared-element"
+GATE_UNEVALUATED = "gate-unevaluated"
+OWNERSHIP_SHARED = "ownership-shared"
+DANGLING_LINK = "dangling-link"
+HISTORY_DROPPED = "history-dropped"
+UNIVERSE_VERSION = "universe-version"
+COERCED = "coerced"
 
-SEVERITY_INFO = 'info'
-SEVERITY_WARNING = 'warning'
+SEVERITY_INFO = "info"
+SEVERITY_WARNING = "warning"
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,30 +44,30 @@ class Finding:
 
     def as_dict(self) -> dict[str, Any]:
         return {
-            'kind': self.kind,
-            'severity': self.severity,
-            'message': self.message,
-            'element': self.element,
-            'instanceId': self.instanceId,
+            "kind": self.kind,
+            "severity": self.severity,
+            "message": self.message,
+            "element": self.element,
+            "instanceId": self.instanceId,
         }
 
 
 def _live_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     superseded = {
-        record.get('supersedes') for record in records if record.get('supersedes')
+        record.get("supersedes") for record in records if record.get("supersedes")
     }
-    return [record for record in records if record.get('id') not in superseded]
+    return [record for record in records if record.get("id") not in superseded]
 
 
 def resolve_universe(model: KnowledgeModel, reference: dict[str, Any]) -> UniverseIndex:
     """Universe version mismatch does not block resolution."""
-    universe_id = str(reference.get('id', ''))
+    universe_id = str(reference.get("id", ""))
     universe = model.universe(universe_id)
     if universe is None:
-        msg = f'This image carries no universe with id {universe_id!r}'
+        msg = f"This image carries no universe with id {universe_id!r}"
         raise UnknownUniverseError(
             msg,
-            fields={'universe.id': universe_id},
+            fields={"universe.id": universe_id},
         )
     return universe
 
@@ -80,62 +80,62 @@ def validate_records(
         element = universe.elements_by_code.get(code)
         if element is None:
             msg = (
-                f'Element code {code!r} does not resolve in universe '
-                f'{universe.universe_id} {universe.version}'
+                f"Element code {code!r} does not resolve in universe "
+                f"{universe.universe_id} {universe.version}"
             )
             raise UnresolvedElementError(
                 msg,
-                fields={'data': code},
+                fields={"data": code},
             )
 
-        ids_in_element = {str(record['id']) for record in records if record.get('id')}
+        ids_in_element = {str(record["id"]) for record in records if record.get("id")}
         triples: set[tuple[str, str, str]] = set()
 
         for record in records:
-            status = str(record.get('status', ''))
+            status = str(record.get("status", ""))
             if status not in universe.statuses:
-                msg = f'Universe {universe.universe_id} does not declare status {status!r}'
+                msg = f"Universe {universe.universe_id} does not declare status {status!r}"
                 raise UndeclaredStatusError(
                     msg,
-                    fields={f'data.{code}.status': status},
+                    fields={f"data.{code}.status": status},
                 )
 
-            if record.get('exhaustive') is True and element.closable is False:
+            if record.get("exhaustive") is True and element.closable is False:
                 msg = (
-                    f'Element {code!r} is declared closable: false, so a set of its instances '
-                    f'cannot be exhaustive'
+                    f"Element {code!r} is declared closable: false, so a set of its instances "
+                    f"cannot be exhaustive"
                 )
                 raise ExhaustiveOnUnclosableError(
                     msg,
-                    fields={f'data.{code}.exhaustive': 'true'},
+                    fields={f"data.{code}.exhaustive": "true"},
                 )
 
-            supersedes = record.get('supersedes')
+            supersedes = record.get("supersedes")
             if supersedes and str(supersedes) not in ids_in_element:
                 msg = (
-                    f'supersedes {supersedes!r} names no record of element {code!r} in this '
-                    f'artifact'
+                    f"supersedes {supersedes!r} names no record of element {code!r} in this "
+                    f"artifact"
                 )
                 raise UnresolvedSupersedesError(
                     msg,
-                    fields={f'data.{code}.supersedes': str(supersedes)},
+                    fields={f"data.{code}.supersedes": str(supersedes)},
                 )
 
         for record in _live_records(records):
             triple = (
                 code,
-                str(record.get('status', '')),
-                str(record.get('asserted_by', '')),
+                str(record.get("status", "")),
+                str(record.get("asserted_by", "")),
             )
             if triple in triples:
                 msg = (
-                    'More than one un-superseded record for '
-                    f'[{triple[0]}, {triple[1]}, {triple[2]}]; correct the earlier one by '
-                    'naming it in supersedes'
+                    "More than one un-superseded record for "
+                    f"[{triple[0]}, {triple[1]}, {triple[2]}]; correct the earlier one by "
+                    "naming it in supersedes"
                 )
                 raise DuplicateLiveInstanceError(
                     msg,
-                    fields={f'data.{code}': f'{triple[1]}/{triple[2]}'},
+                    fields={f"data.{code}": f"{triple[1]}/{triple[2]}"},
                 )
             triples.add(triple)
 
@@ -144,7 +144,7 @@ def _composition_findings(
     artifact: dict[str, Any],
     universe: UniverseIndex,
 ) -> list[Finding]:
-    type_code = str(artifact.get('artifactType', ''))
+    type_code = str(artifact.get("artifactType", ""))
     artifact_type = universe.types_by_code.get(type_code)
     if artifact_type is None:
         return [
@@ -152,15 +152,15 @@ def _composition_findings(
                 kind=COMPOSITION_UNDECLARED_ELEMENT,
                 severity=SEVERITY_WARNING,
                 message=(
-                    f'Artifact type {type_code!r} does not resolve in universe '
-                    f'{universe.universe_id} {universe.version}, so composition cannot be checked'
+                    f"Artifact type {type_code!r} does not resolve in universe "
+                    f"{universe.universe_id} {universe.version}, so composition cannot be checked"
                 ),
             )
         ]
 
     findings: list[Finding] = []
-    data = artifact.get('data') or {}
-    links = artifact.get('links') or {}
+    data = artifact.get("data") or {}
+    links = artifact.get("links") or {}
 
     gated = 0
     for entry in artifact_type.core:
@@ -169,14 +169,14 @@ def _composition_findings(
             continue
         answered = bool(data.get(element.code)) or bool(links.get(element.code))
         if answered:
-            if entry.mode == 'links' and data.get(element.code):
+            if entry.mode == "links" and data.get(element.code):
                 findings.append(
                     Finding(
                         kind=COMPOSITION_MODE,
                         severity=SEVERITY_INFO,
                         message=(
-                            f'This type links {entry.element_id!r} rather than owning it; this '
-                            f'artifact holds an instance of it'
+                            f"This type links {entry.element_id!r} rather than owning it; this "
+                            f"artifact holds an instance of it"
                         ),
                         element=element.code,
                     )
@@ -189,7 +189,7 @@ def _composition_findings(
             Finding(
                 kind=COMPOSITION_CORE_MISSING,
                 severity=SEVERITY_INFO,
-                message=f'Core element {entry.element_id!r} has no instance and no link yet',
+                message=f"Core element {entry.element_id!r} has no instance and no link yet",
                 element=element.code,
             )
         )
@@ -201,8 +201,8 @@ def _composition_findings(
                 kind=GATE_UNEVALUATED,
                 severity=SEVERITY_INFO,
                 message=(
-                    f'{gated} core element(s) are behind a frame condition this image cannot '
-                    f'evaluate, because nothing resolves frame values at the local end yet'
+                    f"{gated} core element(s) are behind a frame condition this image cannot "
+                    f"evaluate, because nothing resolves frame values at the local end yet"
                 ),
             )
         )
@@ -215,30 +215,30 @@ def _link_findings(
     others: list[StoredArtifact],
 ) -> list[Finding]:
     findings: list[Finding] = []
-    links = artifact.get('links') or {}
+    links = artifact.get("links") or {}
     if not links:
         return findings
 
-    by_artifact = {str(stored.artifact['id']): stored for stored in others}
+    by_artifact = {str(stored.artifact["id"]): stored for stored in others}
     for code, references in links.items():
         for reference in references or []:
-            target_id = str(reference.get('artifactId', ''))
-            instance_id = str(reference.get('instanceId', ''))
+            target_id = str(reference.get("artifactId", ""))
+            instance_id = str(reference.get("instanceId", ""))
             target = by_artifact.get(target_id)
             if target is None:
                 findings.append(
                     Finding(
                         kind=DANGLING_LINK,
                         severity=SEVERITY_INFO,
-                        message=f'Link points at artifact {target_id}, which is not in this store',
+                        message=f"Link points at artifact {target_id}, which is not in this store",
                         element=code,
                         instanceId=instance_id,
                     )
                 )
                 continue
             target_ids = {
-                str(record.get('id'))
-                for records in (target.artifact.get('data') or {}).values()
+                str(record.get("id"))
+                for records in (target.artifact.get("data") or {}).values()
                 for record in records or []
             }
             if instance_id not in target_ids:
@@ -247,8 +247,8 @@ def _link_findings(
                         kind=DANGLING_LINK,
                         severity=SEVERITY_INFO,
                         message=(
-                            f'Link points at instance {instance_id}, which artifact {target_id} '
-                            f'does not hold'
+                            f"Link points at instance {instance_id}, which artifact {target_id} "
+                            f"does not hold"
                         ),
                         element=code,
                         instanceId=instance_id,
@@ -261,32 +261,32 @@ def _ownership_findings(
     artifact: dict[str, Any],
     others: list[StoredArtifact],
 ) -> list[Finding]:
-    artifact_id = str(artifact.get('id', ''))
+    artifact_id = str(artifact.get("id", ""))
     mine = {
-        str(record.get('id')): code
-        for code, records in (artifact.get('data') or {}).items()
+        str(record.get("id")): code
+        for code, records in (artifact.get("data") or {}).items()
         for record in records or []
-        if record.get('id')
+        if record.get("id")
     }
     if not mine:
         return []
 
     findings: list[Finding] = []
     for stored in others:
-        if str(stored.artifact['id']) == artifact_id:
+        if str(stored.artifact["id"]) == artifact_id:
             continue
-        for code, records in (stored.artifact.get('data') or {}).items():
+        for code, records in (stored.artifact.get("data") or {}).items():
             for record in records or []:
-                instance_id = str(record.get('id', ''))
+                instance_id = str(record.get("id", ""))
                 if instance_id in mine:
                     findings.append(
                         Finding(
                             kind=OWNERSHIP_SHARED,
                             severity=SEVERITY_WARNING,
                             message=(
-                                f'Instance {instance_id} is also held by artifact '
-                                f'{stored.artifact["id"]}; exactly one artifact should own it '
-                                f'and the other should link'
+                                f"Instance {instance_id} is also held by artifact "
+                                f"{stored.artifact['id']}; exactly one artifact should own it "
+                                f"and the other should link"
                             ),
                             element=code,
                             instanceId=instance_id,
@@ -304,15 +304,15 @@ def build_report(
 ) -> dict[str, Any]:
     findings: list[Finding] = []
 
-    pinned = str((artifact.get('universe') or {}).get('version', ''))
+    pinned = str((artifact.get("universe") or {}).get("version", ""))
     if pinned and pinned != universe.version:
         findings.append(
             Finding(
                 kind=UNIVERSE_VERSION,
                 severity=SEVERITY_WARNING,
                 message=(
-                    f'This artifact pins {universe.universe_id} {pinned}; this image carries '
-                    f'{universe.version}. Codes were resolved against the image copy'
+                    f"This artifact pins {universe.universe_id} {pinned}; this image carries "
+                    f"{universe.version}. Codes were resolved against the image copy"
                 ),
             )
         )
@@ -327,14 +327,14 @@ def build_report(
             kind=COERCED,
             severity=SEVERITY_WARNING,
             message=(
-                f'{coercion["path"]} was read as {coercion["was"]} and re-imposed as '
-                f'{coercion["became"]}; quote the value in the file to keep it stable'
+                f"{coercion['path']} was read as {coercion['was']} and re-imposed as "
+                f"{coercion['became']}; quote the value in the file to keep it stable"
             ),
         )
         for coercion in coercions or []
     )
 
-    return {'findings': [finding.as_dict() for finding in findings]}
+    return {"findings": [finding.as_dict() for finding in findings]}
 
 
 def dropped_history_findings(
@@ -344,11 +344,11 @@ def dropped_history_findings(
     findings: list[Finding] = []
     for code, records in incoming.items():
         before = {
-            str(record.get('id'))
+            str(record.get("id"))
             for record in previous.get(code, [])
-            if record.get('id')
+            if record.get("id")
         }
-        after = {str(record.get('id')) for record in records or [] if record.get('id')}
+        after = {str(record.get("id")) for record in records or [] if record.get("id")}
         lost = before - after
         if lost:
             findings.append(
@@ -356,8 +356,8 @@ def dropped_history_findings(
                     kind=HISTORY_DROPPED,
                     severity=SEVERITY_WARNING,
                     message=(
-                        f'{len(lost)} record(s) previously held under {code} are not in this '
-                        f'update and are gone; per-code replacement replaces the whole list'
+                        f"{len(lost)} record(s) previously held under {code} are not in this "
+                        f"update and are gone; per-code replacement replaces the whole list"
                     ),
                     element=code,
                 )
