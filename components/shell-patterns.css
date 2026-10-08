@@ -1,0 +1,826 @@
+.app-shell {
+  --color-muted-foreground: var(--muted-foreground);
+
+  /* Per-side safe area uses endpoint control or docked pane. Previews and auxiliary panes reserve nothing. */
+  --app-bar-endpoint-extent: calc(
+    var(--app-bar-rail-inset) + var(--app-bar-compact-control-size)
+  );
+  --app-bar-endpoint-reservation: calc(
+    var(--app-bar-endpoint-extent) + var(--app-bar-compact-gap)
+  );
+  --app-bar-content-inset: var(--app-bar-rail-inset);
+  --top-bar-safe-trailing: var(--app-bar-endpoint-reservation);
+
+  position: relative;
+  display: grid;
+  height: 100%;
+  min-width: 0;
+  grid-template-rows: var(--app-bar-height) minmax(0, 1fr);
+  background: var(--sidebar);
+  font-family: var(--font-family-ui);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+
+.app-shell[data-right-mode="docked"] {
+  --top-bar-safe-trailing: var(--right-sidebar-width);
+}
+
+/* .app-shell cannot read custom properties published by .app-top-bar. */
+.app-top-bar {
+  --top-bar-safe-leading: calc(
+    var(--app-bar-endpoint-reservation) +
+      var(--app-bar-leading-chrome-offset, 0px) +
+      var(--app-bar-leading-contributions-offset, 0px)
+  );
+}
+
+.app-shell[data-left-mode="docked"] .app-top-bar {
+  --top-bar-safe-leading: var(--left-sidebar-width);
+}
+
+.app-top-bar {
+  position: relative;
+  min-width: 0;
+  height: var(--app-bar-height);
+}
+
+.app-top-bar::before {
+  position: absolute;
+  z-index: var(--layer-base);
+  inset: 0;
+  background: var(--background);
+  content: "";
+}
+
+.app-top-bar::after {
+  position: absolute;
+  z-index: var(--layer-divider);
+  right: var(--right-docked-width);
+  bottom: 0;
+  left: var(--left-docked-width);
+  height: var(--app-bar-divider-size);
+  background: var(--border);
+  content: "";
+  opacity: 0;
+  transition:
+    right var(--duration-shell) var(--ease-spring),
+    left var(--duration-shell) var(--ease-spring),
+    opacity var(--duration-enter) var(--ease-fade);
+}
+
+.app-top-bar[data-divider="main-region"]::after {
+  opacity: 1;
+}
+
+.app-top-bar-endpoint,
+.app-top-bar-chrome,
+.app-top-bar-left-contributions,
+.app-top-bar-command-rail,
+.app-top-bar-command-region,
+.app-top-bar-main-span,
+.app-top-bar-primary {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.app-top-bar-chrome {
+  position: absolute;
+  z-index: var(--layer-chrome);
+  inset-block: 0;
+  left: var(--app-bar-endpoint-reservation);
+  gap: var(--app-bar-compact-gap);
+  pointer-events: none;
+}
+
+.app-top-bar-chrome button {
+  pointer-events: auto;
+}
+
+.app-top-bar-endpoint {
+  position: absolute;
+  z-index: var(--layer-chrome);
+  inset-block: 0;
+  /* Pointer events reach the preview pane outside the rail control. */
+  pointer-events: none;
+}
+
+.app-top-bar-endpoint > * {
+  pointer-events: auto;
+}
+
+.app-top-bar-endpoint-left {
+  left: var(--app-bar-rail-inset);
+}
+
+.app-top-bar-endpoint-right {
+  right: var(--app-bar-rail-inset);
+}
+
+/* TopBar supplies resolved navigation-width offset (TopBar.tsx). */
+.app-top-bar-left-contributions {
+  position: absolute;
+  z-index: var(--layer-content);
+  inset-block: 0;
+  left: calc(
+    var(--app-bar-endpoint-reservation) +
+      var(--app-bar-leading-chrome-offset, 0px)
+  );
+  gap: var(--app-bar-compact-gap);
+}
+
+.app-top-bar-command-rail {
+  position: absolute;
+  z-index: var(--layer-content);
+  inset-block: 0;
+  right: var(--top-bar-safe-trailing);
+  width: var(--command-rail-width);
+  justify-content: flex-end;
+  gap: var(--app-bar-compact-gap);
+  transition: right var(--duration-shell) var(--ease-spring);
+}
+
+.app-top-bar-command-region {
+  flex: none;
+  gap: var(--app-bar-compact-gap);
+}
+
+[data-sidebar-trigger],
+.app-shell-command {
+  flex: none;
+  z-index: var(--layer-chrome);
+}
+
+[data-sidebar-trigger]:active,
+.app-shell-command:active,
+.app-sidebar-close:active {
+  transform: scale(0.96);
+  transition: transform var(--duration-press) var(--ease-spring);
+}
+
+[data-sidebar-trigger],
+.app-shell-command,
+.app-sidebar-close {
+  height: var(--app-bar-compact-control-size);
+  min-height: var(--app-bar-compact-control-size);
+  border-radius: var(--control-radius-sm);
+}
+
+[data-sidebar-trigger],
+.app-sidebar-close {
+  width: var(--app-bar-compact-control-size);
+  min-width: var(--app-bar-compact-control-size);
+}
+
+[data-sidebar-trigger] {
+  background: transparent;
+}
+
+[data-sidebar-trigger]:hover,
+[data-sidebar-trigger]:focus-visible {
+  background: color-mix(in oklab, var(--background), var(--foreground) 7%);
+}
+
+[data-sidebar-trigger] svg,
+.app-shell-command svg,
+.app-sidebar-close svg {
+  width: var(--app-bar-icon-size);
+  height: var(--app-bar-icon-size);
+  stroke-width: calc(
+    var(--icon-stroke-rendered) * var(--icon-viewbox) /
+      var(--app-bar-icon-scale)
+  );
+}
+
+.app-shell-command {
+  width: var(--shell-command-width, var(--app-bar-compact-control-size));
+  justify-content: center;
+  padding-inline: 5px;
+  font-size: var(--type-control);
+  font-weight: 400;
+  line-height: var(--leading-control);
+}
+
+.app-shell-command[data-command-presentation="compact-label"],
+.app-shell-command[data-command-presentation="label"] {
+  gap: 5px;
+}
+
+.app-shell-command[data-command-presentation="compact-label"] svg,
+.app-shell-command[data-command-presentation="label"] svg {
+  width: var(--app-bar-context-action-icon-size);
+  height: var(--app-bar-context-action-icon-size);
+  stroke-width: calc(
+    var(--icon-stroke-rendered) * var(--icon-viewbox) /
+      var(--app-bar-context-action-icon-scale)
+  );
+}
+
+.app-shell-command-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-top-bar-primary {
+  position: absolute;
+  z-index: var(--layer-content);
+  inset-block: 0;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--duration-fast) var(--ease-fade),
+    transform var(--duration-enter) var(--ease-spring);
+}
+
+.app-top-bar-primary[data-active="true"] {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+.app-top-bar-main-span {
+  position: absolute;
+  z-index: var(--layer-content);
+  inset-block: 0;
+  right: calc(
+    var(--top-bar-safe-trailing) + var(--command-rail-width) +
+      var(--app-bar-content-inset)
+  );
+  left: calc(var(--top-bar-safe-leading) + var(--app-bar-content-inset));
+  gap: var(--space-lg);
+  /* Pointer events pass through to preview panes. */
+  pointer-events: none;
+  transition: left var(--duration-shell) var(--ease-spring);
+}
+
+.app-top-bar-primary-main-start {
+  position: relative;
+  flex: 0 1 auto;
+  transform: translateY(4px);
+}
+
+.app-top-bar-main-span .app-top-bar-primary:not([data-active="true"]) {
+  position: absolute;
+  inset-inline-start: 0;
+}
+
+/* Flex containment gives inner tab strip a non-growing auto basis. */
+.app-top-bar-tabs {
+  display: block;
+  flex: 1 1 0;
+  min-width: 0;
+  pointer-events: auto;
+}
+
+/* Docked widths shift center. Preview widths stay zero. */
+.app-top-bar-primary-window-center {
+  left: var(--left-docked-width, 0px);
+  right: var(--right-docked-width, 0px);
+  justify-content: center;
+  transform: translateY(-4px);
+  transition:
+    left var(--duration-shell) var(--ease-spring),
+    right var(--duration-shell) var(--ease-spring);
+}
+
+.app-top-bar-primary-window-center > * {
+  max-width: min(420px, 100%);
+}
+
+.app-top-bar-primary-main-start[data-active="true"] {
+  transform: translateY(0);
+}
+
+.app-top-bar-primary-window-center[data-active="true"] {
+  transform: translateY(0);
+}
+
+.app-top-bar-primary-main-start > * {
+  overflow: hidden;
+  font-size: var(--type-shell-title);
+  font-weight: 500;
+  line-height: var(--leading-shell-title);
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell-body {
+  position: static;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns:
+    var(--left-docked-width) minmax(var(--main-content-min-width, 0px), 1fr)
+    var(--auxiliary-panel-width)
+    var(--right-docked-width);
+  overflow: visible;
+  transition: grid-template-columns var(--duration-shell) var(--ease-spring);
+}
+
+.app-shell-main-content {
+  min-width: 0;
+  min-height: 0;
+  grid-column: 2;
+  overflow: auto;
+  background: var(--background);
+}
+
+.app-shell[data-main-content-shape="document"]
+  > .app-shell-body
+  > .app-shell-main-content
+  > .app-document {
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+  padding: var(--space-xl) var(--space-lg) var(--space-xxl);
+}
+
+.app-shell[data-main-content-shape="document"]
+  > .app-shell-body
+  > .app-shell-main-content
+  > .app-document
+  > .app-paper {
+  flex: 1;
+  min-width: 0;
+  max-width: var(--paper-measure);
+  padding: var(--space-xl) var(--space-xl) var(--space-xxl);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-base-lg);
+  background: var(--paper);
+  color: var(--paper-foreground);
+}
+
+/* Bare keeps the geometry and drops the sheet. Text runs the full measure. */
+.app-shell[data-main-content-surface="bare"]
+  > .app-shell-body
+  > .app-shell-main-content
+  > .app-document
+  > .app-paper {
+  padding-inline: 0;
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+}
+
+.app-sidebar.app-sidebar-auxiliary {
+  z-index: var(--layer-auxiliary);
+  display: flex;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  grid-column: 3;
+  flex-direction: column;
+  overflow: hidden;
+  border-left: 1px solid var(--border);
+  background: var(--sidebar);
+  color: var(--foreground);
+}
+
+.app-sidebar-auxiliary.app-sidebar-right {
+  grid-column: 3;
+  border-left: 1px solid var(--border);
+}
+
+.app-sidebar {
+  z-index: var(--layer-docked-sidebar);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+}
+
+.app-sidebar-universal {
+  position: absolute;
+  inset-block: 0;
+}
+
+.app-sidebar-universal.app-sidebar-left {
+  left: 0;
+  width: var(--left-sidebar-width);
+  grid-column: 1;
+  border-right: 1px solid transparent;
+}
+
+.app-sidebar-universal.app-sidebar-right {
+  right: 0;
+  width: var(--right-sidebar-width);
+  grid-column: 4;
+  border-left: 1px solid transparent;
+}
+
+.app-shell[data-left-mode="preview"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left,
+.app-shell[data-right-mode="preview"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right {
+  background: var(--sidebar-preview);
+}
+
+.app-shell[data-left-mode="preview"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left {
+  border-right-color: color-mix(
+    in oklab,
+    var(--sidebar-border),
+    var(--foreground) 8%
+  );
+}
+
+.app-shell[data-right-mode="preview"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right {
+  border-left-color: color-mix(
+    in oklab,
+    var(--sidebar-border),
+    var(--foreground) 8%
+  );
+}
+
+.app-shell[data-left-mode="docked"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left {
+  border-right-color: var(--sidebar-border);
+}
+
+.app-shell[data-right-mode="docked"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right {
+  border-left-color: var(--sidebar-border);
+}
+
+.app-sidebar-content {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-sidebar-header {
+  display: flex;
+  height: var(--app-bar-height);
+  min-height: var(--app-bar-height);
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0
+    calc(
+      var(--app-bar-endpoint-extent) + var(--app-sidebar-chrome-offset, 0px) +
+        var(--app-bar-brand-gap)
+    );
+  font-size: var(--type-shell-title);
+  font-weight: 500;
+  line-height: var(--leading-shell-title);
+}
+
+.app-sidebar-heading {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-sidebar-left .app-sidebar-header {
+  padding-right: 12px;
+}
+
+.app-sidebar-right .app-sidebar-header {
+  padding-left: 12px;
+}
+
+.app-sidebar-auxiliary .app-sidebar-header {
+  padding-inline: 14px 10px;
+  border-bottom: var(--app-bar-divider-size) solid var(--border);
+  font-size: var(--type-control);
+  font-weight: 400;
+  line-height: var(--leading-control);
+}
+
+.app-sidebar-close {
+  flex: none;
+}
+
+.app-sidebar-capabilities {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px 22px;
+}
+
+.app-sidebar-capability {
+  height: 38px;
+  width: 100%;
+  gap: 10px;
+  justify-content: flex-start;
+  padding-inline: 10px;
+  font-size: var(--type-dense);
+  font-weight: 400;
+  line-height: var(--leading-dense);
+}
+
+.app-sidebar-capability:hover {
+  background: var(--sidebar-accent);
+  color: var(--sidebar-accent-foreground);
+}
+
+/* Nested control for consumer-defined menu rows. */
+.app-menu-row-action {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--control-radius-sm);
+  background: transparent;
+  height: var(--control-field-xs);
+  min-height: var(--control-field-xs);
+  width: var(--control-field-xs);
+  min-width: var(--control-field-xs);
+}
+
+.app-menu-row-action svg {
+  width: var(--control-icon-xs);
+  height: var(--control-icon-xs);
+  stroke-width: calc(
+    var(--icon-stroke-rendered) * var(--icon-viewbox) /
+      var(--control-icon-xs-scale)
+  );
+}
+
+/* 7% matches universal-trigger hover. .app-sidebar specificity overrides ghost-button hover. */
+.app-sidebar .app-menu-row-action:hover,
+.app-sidebar .app-menu-row-action:focus-visible,
+.app-sidebar .app-menu-row-action[aria-expanded="true"] {
+  background: color-mix(in oklab, var(--sidebar-accent), var(--foreground) 7%);
+  color: var(--sidebar-accent-foreground);
+}
+
+.app-sidebar-scroll-content {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+}
+
+.app-sidebar-left .app-sidebar-scroll-content {
+  padding: 20px 8px;
+}
+
+.app-sidebar-content:has(.app-sidebar-capabilities)
+  .app-sidebar-scroll-content {
+  padding-top: 0;
+}
+
+.app-sidebar-auxiliary .app-sidebar-scroll-content {
+  padding: 12px;
+}
+
+.app-shell[data-left-mode="preview"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left,
+.app-shell[data-right-mode="preview"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right,
+.app-shell[data-left-mode="closed"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left,
+.app-shell[data-right-mode="closed"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right {
+  position: absolute;
+  box-shadow: var(--shadow-overlay);
+  transition:
+    transform var(--duration-shell) var(--ease-spring),
+    opacity var(--duration-shell) var(--ease-fade);
+}
+
+.app-shell[data-left-mode="preview"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left,
+.app-shell[data-left-mode="closed"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left {
+  left: 0;
+}
+
+.app-shell[data-right-mode="preview"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right,
+.app-shell[data-right-mode="closed"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right {
+  right: 0;
+}
+
+.app-shell[data-left-mode="closed"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left {
+  transform: translateX(-18px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-shell[data-right-mode="closed"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right {
+  transform: translateX(18px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-shell[data-left-mode="closed"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left
+  .app-sidebar-content {
+  transform: translateX(-8px);
+}
+
+.app-shell[data-right-mode="closed"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right
+  .app-sidebar-content {
+  transform: translateX(8px);
+}
+
+.app-sidebar-universal .app-sidebar-content {
+  transition:
+    opacity var(--duration-fastest) var(--ease-standard),
+    transform var(--duration-press) var(--ease-spring);
+}
+
+.app-shell[data-left-mode="preview"]
+  > .app-top-bar
+  [data-sidebar-trigger="left"],
+.app-shell[data-right-mode="preview"]
+  > .app-top-bar
+  [data-sidebar-trigger="right"] {
+  background: color-mix(in oklab, var(--background), var(--foreground) 14%);
+}
+
+.app-shell[data-left-mode="docked"]
+  > .app-top-bar
+  [data-sidebar-trigger="left"]:not(:hover):not(:focus-visible),
+.app-shell[data-right-mode="docked"]
+  > .app-top-bar
+  [data-sidebar-trigger="right"]:not(:hover):not(:focus-visible) {
+  background: transparent;
+}
+
+.app-sidebar-resize-handle {
+  position: absolute;
+  inset-block: 0;
+  z-index: var(--layer-divider);
+  width: 16px;
+  outline: none;
+  pointer-events: none;
+}
+
+.app-shell[data-left-mode="docked"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left
+  > .app-sidebar-resize-handle-left,
+.app-shell[data-right-mode="docked"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right
+  > .app-sidebar-resize-handle-right {
+  cursor: col-resize;
+  pointer-events: auto;
+}
+
+.app-sidebar-resize-handle-left {
+  right: 0;
+}
+
+.app-sidebar-resize-handle-right {
+  left: 0;
+}
+
+.app-sidebar-resize-handle::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 52px;
+  border-radius: 999px;
+  background: var(--resize-handle);
+  content: "";
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity var(--duration-fast) var(--ease-fade);
+}
+
+.app-sidebar-resize-handle-left::after {
+  left: calc(100% - 1.5px);
+}
+
+.app-sidebar-resize-handle-right::after {
+  left: 1.5px;
+}
+
+.app-shell[data-left-mode="docked"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left
+  > .app-sidebar-resize-handle-left:hover::after,
+.app-shell[data-right-mode="docked"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right
+  > .app-sidebar-resize-handle-right:hover::after,
+.app-shell[data-left-mode="docked"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left
+  > .app-sidebar-resize-handle-left:focus-visible::after,
+.app-shell[data-right-mode="docked"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right
+  > .app-sidebar-resize-handle-right:focus-visible::after,
+.app-shell[data-left-resizing="true"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left
+  > .app-sidebar-resize-handle-left::after,
+.app-shell[data-right-resizing="true"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right
+  > .app-sidebar-resize-handle-right::after {
+  opacity: 1;
+}
+
+.app-sidebar-resize-handle:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--ring);
+}
+
+.app-shell[data-left-resizing="true"] > .app-shell-body,
+.app-shell[data-right-resizing="true"] > .app-shell-body {
+  transition: none;
+}
+
+.app-shell[data-left-snap="closing"] > .app-shell-body,
+.app-shell[data-right-snap="closing"] > .app-shell-body {
+  transition: grid-template-columns var(--duration-snap) var(--ease-close);
+}
+
+.app-shell[data-left-snap="recovering"] > .app-shell-body,
+.app-shell[data-right-snap="recovering"] > .app-shell-body {
+  transition: grid-template-columns var(--duration-snap) var(--ease-spring);
+}
+
+.app-shell[data-left-snap="closing"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left,
+.app-shell[data-right-snap="closing"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right {
+  transition: width var(--duration-snap) var(--ease-close);
+}
+
+.app-shell[data-left-snap="recovering"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-left,
+.app-shell[data-right-snap="recovering"]
+  > .app-shell-body
+  > .app-sidebar-universal.app-sidebar-right {
+  transition: width var(--duration-snap) var(--ease-spring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell-body,
+  .app-sidebar,
+  .app-top-bar::after,
+  .app-top-bar-command-rail,
+  .app-top-bar-main-span,
+  .app-top-bar-primary,
+  .app-sidebar-resize-handle::after {
+    transition-duration: var(--duration-reduced) !important;
+  }
+}
+
+/* Trailing boundary uses rail inset without an endpoint. Pinned panes have no handle. */
+.app-shell[data-right-chrome="none"] {
+  --top-bar-safe-trailing: var(--app-bar-rail-inset);
+}
+
+.app-shell[data-left-chrome="none"] .app-sidebar-resize-handle-left {
+  display: none;
+}
+
+/* Clearance for the window controls. No band, no hairline. */
+.app-sidebar-content[data-sidebar-header="none"] .app-sidebar-scroll-content {
+  padding-top: var(--app-bar-height);
+}
+
+.app-shell[data-top-bar="none"] {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.app-shell-window-grip {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 1;
+  block-size: var(--app-bar-height);
+}

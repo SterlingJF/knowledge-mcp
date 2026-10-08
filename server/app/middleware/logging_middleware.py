@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
     from app.settings import Settings
 
-HEADER_REQUEST_ID = 'X-Request-ID'
+HEADER_REQUEST_ID = "X-Request-ID"
 
 
 class StructlogLoggingMiddleware(BaseHTTPMiddleware):
@@ -38,17 +38,17 @@ class StructlogLoggingMiddleware(BaseHTTPMiddleware):
             request_id=request_id,
             http_method=request.method,
             http_path=str(request.url.path),
-            http_client_addr=f'{client.host}:{client.port}' if client else 'unknown',
-            km_client=request.headers.get('X-Km-Client', 'unknown'),
+            http_client_addr=f"{client.host}:{client.port}" if client else "unknown",
+            km_client=request.headers.get("X-Km-Client", "unknown"),
         )
 
-        access_logger = get_app_logger('access')
+        access_logger = get_app_logger("access")
         log = (
             access_logger.debug
             if request.url.path in self._low_noise
             else access_logger.info
         )
-        log('Request received')
+        log("Request received")
 
         started = time.perf_counter()
         try:
@@ -60,14 +60,14 @@ class StructlogLoggingMiddleware(BaseHTTPMiddleware):
                     (time.perf_counter() - started) * 1000, 2
                 ),
             )
-            access_logger.exception('Unhandled exception during request processing')
+            access_logger.exception("Unhandled exception during request processing")
             raise
 
         structlog.contextvars.bind_contextvars(
             http_status_code=response.status_code,
             http_response_duration_ms=round((time.perf_counter() - started) * 1000, 2),
         )
-        log('Request finished')
+        log("Request finished")
 
         response.headers[HEADER_REQUEST_ID] = request_id
         return response

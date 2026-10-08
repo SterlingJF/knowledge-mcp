@@ -11,9 +11,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
-logger = get_app_logger('store')
+logger = get_app_logger("store")
 
-VAULT_HEADER = 'X-Km-Vault'
+VAULT_HEADER = "X-Km-Vault"
 
 
 class VaultStores:
@@ -34,7 +34,7 @@ class VaultStores:
         self._default_root = root
 
     def for_root(self, root: Path | None) -> FileStore:
-        key = str(root) if root else ''
+        key = str(root) if root else ""
         store = self._by_root.get(key)
         if store is None:
             if root is not None:
@@ -50,7 +50,7 @@ class VaultStores:
             self._on_new_root(root)
         except OSError as error:
             logger.warning(
-                'Could not prepare the vault root',
+                "Could not prepare the vault root",
                 root=str(root),
                 reason=error.strerror,
             )
@@ -59,7 +59,7 @@ class VaultStores:
         return self.for_root(self._default_root)
 
     def forget_root(self, root: Path | None) -> None:
-        self._by_root.pop(str(root) if root else '', None)
+        self._by_root.pop(str(root) if root else "", None)
 
     def rebind(self, old_root: Path, new_root: Path) -> None:
         self.forget_root(old_root)
@@ -71,6 +71,6 @@ class VaultStores:
             return self.default()
         root = known.get(vault_id)
         if root is None:
-            msg = f'No vault with id {vault_id}'
+            msg = f"No vault with id {vault_id}"
             raise NotFoundError(msg)
         return self.for_root(root)

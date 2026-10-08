@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+.claude/
+dist/
+
+# Build output from module toolchains, at any depth.
+target/
+**/gen/schemas/
+
+# Vendored read-only from another project.
+contracts/extensions/*/upstream/

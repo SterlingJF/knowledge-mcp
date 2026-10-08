@@ -10,11 +10,11 @@ from typing import Annotated
 import structlog
 from fastapi import Depends, Header, Request
 
-AGENT_HEADER = 'X-Km-Agent'
-PERSON_PREFIX = 'local-principal:'
-AGENT_PREFIX = 'agent:'
+AGENT_HEADER = "X-Km-Agent"
+PERSON_PREFIX = "local-principal:"
+AGENT_PREFIX = "agent:"
 
-AGENT_NAME = re.compile(r'^[a-z0-9][a-z0-9-]{0,62}$')
+AGENT_NAME = re.compile(r"^[a-z0-9][a-z0-9-]{0,62}$")
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,11 +29,11 @@ class RequestContext:
 
 
 def _person(principal_id: str) -> RequestContext:
-    return RequestContext(actor=f'{PERSON_PREFIX}{principal_id}', is_agent=False)
+    return RequestContext(actor=f"{PERSON_PREFIX}{principal_id}", is_agent=False)
 
 
 def _agent(name: str) -> RequestContext:
-    return RequestContext(actor=f'{AGENT_PREFIX}{name}', is_agent=True)
+    return RequestContext(actor=f"{AGENT_PREFIX}{name}", is_agent=True)
 
 
 def resolve_context(request: Request, agent_header: str | None) -> RequestContext:

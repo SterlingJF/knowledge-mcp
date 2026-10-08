@@ -1,0 +1,121 @@
+---
+# One job per module, named after its folder; each runs `just check_<module>`.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Weekly, so the pinned set is proven even in weeks without commits.
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  root:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.12.21"
+          enable-cache: true
+      - uses: extractions/setup-just@v4
+      - run: pnpm install --frozen-lockfile --ignore-scripts --filter .
+      - run: uv sync --locked
+      - run: just check_root
+
+  components:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - uses: extractions/setup-just@v4
+      - run: >-
+          pnpm install --frozen-lockfile --ignore-scripts
+          --filter . --filter components
+      - run: just check_components
+
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - uses: extractions/setup-just@v4
+      - run: >-
+          pnpm install --frozen-lockfile --ignore-scripts
+          --filter . --filter contracts
+      - run: just check_contracts
+
+  launcher:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - uses: extractions/setup-just@v4
+      - run: >-
+          pnpm install --frozen-lockfile --ignore-scripts
+          --filter launcher...
+      - run: just check_launcher
+
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.12.21"
+          enable-cache: true
+      - uses: extractions/setup-just@v4
+      - run: uv sync --locked --package workspace --package server
+      - run: just check_server
+
+  mcp-server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.12.21"
+          enable-cache: true
+      - uses: extractions/setup-just@v4
+      - run: uv sync --locked --package workspace --package mcp-server
+      - run: just check_mcp_server

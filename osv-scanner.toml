@@ -1,0 +1,41 @@
+# Scan exceptions belong here with a vulnerability ID, reason, and expiry.
+
+[[IgnoredVulns]]
+id = "GHSA-vfj7-8cjw-p6xm"
+ignoreUntil = 2027-01-08
+reason = "braces 3.0.3: no patched release. Reached only through markdownlint-cli2 and the shadcn CLI. Both expand only glob patterns from this repo or the tools themselves."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0429"
+ignoreUntil = 2027-01-08
+reason = "glib 0.18.5: fixed in glib 0.20.0; tauri 2 requires gtk 0.18. Reached only through tauri's Linux GTK stack, absent from the macOS build."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0370"
+ignoreUntil = 2027-01-08
+reason = "proc-macro-error 1.0.4: unmaintained. A build-time dependency of glib 0.18, in tauri's Linux GTK stack, absent from the macOS build."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2025-0075"
+ignoreUntil = 2026-11-08
+reason = "unic-char-range 0.9.0: unmaintained. Reached only through urlpattern 0.3 in tauri-utils 2.9. Clears with tauri 2.12.0 and tauri-build 2.7.0; their tauri-utils 2.10 drops unic."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2025-0080"
+ignoreUntil = 2026-11-08
+reason = "unic-common 0.9.0: unmaintained. Reached only through urlpattern 0.3 in tauri-utils 2.9. Clears with tauri 2.12.0 and tauri-build 2.7.0; their tauri-utils 2.10 drops unic."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2025-0081"
+ignoreUntil = 2026-11-08
+reason = "unic-char-property 0.9.0: unmaintained. Reached only through urlpattern 0.3 in tauri-utils 2.9. Clears with tauri 2.12.0 and tauri-build 2.7.0; their tauri-utils 2.10 drops unic."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2025-0098"
+ignoreUntil = 2026-11-08
+reason = "unic-ucd-version 0.9.0: unmaintained. Reached only through urlpattern 0.3 in tauri-utils 2.9. Clears with tauri 2.12.0 and tauri-build 2.7.0; their tauri-utils 2.10 drops unic."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2025-0100"
+ignoreUntil = 2026-11-08
+reason = "unic-ucd-ident 0.9.0: unmaintained. Reached only through urlpattern 0.3 in tauri-utils 2.9. Clears with tauri 2.12.0 and tauri-build 2.7.0; their tauri-utils 2.10 drops unic."

@@ -5,16 +5,16 @@ import os
 import tempfile
 from pathlib import Path
 
-TEMP_PREFIX = '.knowledge-mcp-'
+TEMP_PREFIX = ".knowledge-mcp-"
 
 
 def write_atomic(path: Path, data: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     handle, temporary = tempfile.mkstemp(
-        dir=str(path.parent), prefix=TEMP_PREFIX, suffix='.tmp'
+        dir=str(path.parent), prefix=TEMP_PREFIX, suffix=".tmp"
     )
     try:
-        with os.fdopen(handle, 'wb') as file:
+        with os.fdopen(handle, "wb") as file:
             file.write(data)
             file.flush()
             os.fsync(file.fileno())

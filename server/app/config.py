@@ -16,21 +16,21 @@ from pydantic.alias_generators import to_camel
 from app.utilities.atomic_write import write_atomic
 from app.utilities.logging import get_app_logger
 
-logger = get_app_logger('config')
+logger = get_app_logger("config")
 
-CONFIG_DIRECTORY_NAME = 'knowledge-mcp'
-CONFIG_FILE_NAME = 'config.json'
+CONFIG_DIRECTORY_NAME = "knowledge-mcp"
+CONFIG_FILE_NAME = "config.json"
 CONFIG_VERSION = 1
 
 
 class _CamelModel(BaseModel):
     model_config = ConfigDict(
-        alias_generator=to_camel, populate_by_name=True, extra='ignore'
+        alias_generator=to_camel, populate_by_name=True, extra="ignore"
     )
 
 
 class FilesystemStore(_CamelModel):
-    type: Literal['filesystem'] = 'filesystem'
+    type: Literal["filesystem"] = "filesystem"
     path: Path
     last_opened: int = 0
     open: bool = False
@@ -41,7 +41,7 @@ class FilesystemStore(_CamelModel):
 
 
 # pdcp-0026 adds another discriminated store type here.
-StoreEntry = Annotated[FilesystemStore, Field(discriminator='type')]
+StoreEntry = Annotated[FilesystemStore, Field(discriminator="type")]
 
 
 class KmConfig(_CamelModel):
@@ -56,8 +56,8 @@ class KmConfig(_CamelModel):
 
 
 def config_home() -> Path:
-    override = os.environ.get('XDG_CONFIG_HOME')
-    base = Path(override).expanduser() if override else Path.home() / '.config'
+    override = os.environ.get("XDG_CONFIG_HOME")
+    base = Path(override).expanduser() if override else Path.home() / ".config"
     return base / CONFIG_DIRECTORY_NAME
 
 
@@ -77,7 +77,7 @@ def read_config() -> KmConfig:
         return KmConfig()
     except OSError as error:
         logger.warning(
-            'Config file could not be read', path=str(path), error=str(error)
+            "Config file could not be read", path=str(path), error=str(error)
         )
         return KmConfig()
 
@@ -85,7 +85,7 @@ def read_config() -> KmConfig:
         return KmConfig.model_validate(json.loads(raw))
     except (json.JSONDecodeError, ValidationError) as error:
         logger.warning(
-            'Config file is not valid; continuing with no stores',
+            "Config file is not valid; continuing with no stores",
             path=str(path),
             error=str(error),
         )
@@ -93,8 +93,8 @@ def read_config() -> KmConfig:
 
 
 def write_config(config: KmConfig) -> None:
-    payload = config.model_dump(mode='json', by_alias=True)
-    write_atomic(config_path(), json.dumps(payload, indent=2).encode('utf-8') + b'\n')
+    payload = config.model_dump(mode="json", by_alias=True)
+    write_atomic(config_path(), json.dumps(payload, indent=2).encode("utf-8") + b"\n")
 
 
 def _next_opened_at(config: KmConfig) -> int:

@@ -70,10 +70,10 @@ def one(identifier: str) -> VaultModel | None:
 def why_a_name_is_unusable(name: str) -> str | None:
     separators = {os.sep, os.altsep} - {None}
     checks: tuple[tuple[bool, str], ...] = (
-        (not name, 'A vault needs a name'),
+        (not name, "A vault needs a name"),
         (
-            name in {'.', '..'} or any(sep in name for sep in separators),
-            'A vault name cannot contain a path separator',
+            name in {".", ".."} or any(sep in name for sep in separators),
+            "A vault name cannot contain a path separator",
         ),
     )
     return next((reason for failed, reason in checks if failed), None)
@@ -84,27 +84,27 @@ def why_a_vault_cannot_be_made(parent: Path, name: str) -> str | None:
     if name_fault is not None:
         return name_fault
     checks: tuple[tuple[bool, str], ...] = (
-        (not parent.exists(), f'The folder to create it in does not exist: {parent}'),
+        (not parent.exists(), f"The folder to create it in does not exist: {parent}"),
         (
             not parent.is_dir(),
-            f'The folder to create it in is not a directory: {parent}',
+            f"The folder to create it in is not a directory: {parent}",
         ),
         (
             not os.access(parent, os.W_OK),
-            f'The folder to create it in is not writable: {parent}',
+            f"The folder to create it in is not writable: {parent}",
         ),
-        ((parent / name).exists(), f'Something called {name} is already here'),
+        ((parent / name).exists(), f"Something called {name} is already here"),
     )
     return next((reason for failed, reason in checks if failed), None)
 
 
 def why_a_folder_cannot_be_opened(path: Path) -> str | None:
     checks: tuple[tuple[bool, str], ...] = (
-        (not path.exists(), f'That folder does not exist: {path}'),
-        (not path.is_dir(), f'That is not a folder: {path}'),
+        (not path.exists(), f"That folder does not exist: {path}"),
+        (not path.is_dir(), f"That is not a folder: {path}"),
         (
             not os.access(path, os.R_OK | os.W_OK),
-            f'That folder is not readable and writable: {path}',
+            f"That folder is not readable and writable: {path}",
         ),
     )
     return next((reason for failed, reason in checks if failed), None)
@@ -116,22 +116,22 @@ def why_a_vault_cannot_move(source: Path, target: Path) -> str | None:
         (not source.exists(), f"This vault's folder is not there any more: {source}"),
         (
             not os.access(source.parent, os.W_OK),
-            f'The folder holding this vault is not writable: {source.parent}',
+            f"The folder holding this vault is not writable: {source.parent}",
         ),
-        (not parent.exists(), f'The folder to move it into does not exist: {parent}'),
+        (not parent.exists(), f"The folder to move it into does not exist: {parent}"),
         (
             not parent.is_dir(),
-            f'The folder to move it into is not a directory: {parent}',
+            f"The folder to move it into is not a directory: {parent}",
         ),
         (
             not os.access(parent, os.W_OK),
-            f'The folder to move it into is not writable: {parent}',
+            f"The folder to move it into is not writable: {parent}",
         ),
         (
             target != source and target.exists(),
-            f'Something called {target.name} is already here',
+            f"Something called {target.name} is already here",
         ),
-        (source in target.parents, 'A vault cannot be moved inside itself'),
+        (source in target.parents, "A vault cannot be moved inside itself"),
     )
     return next((reason for failed, reason in checks if failed), None)
 

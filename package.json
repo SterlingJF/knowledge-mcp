@@ -1,0 +1,40 @@
+{
+  "name": "knowledge-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "install:frozen": "pnpm install --frozen-lockfile",
+    "install:unlock": "pnpm install --no-frozen-lockfile",
+    "prepare": "husky",
+    "check": "pnpm run check:format && pnpm run check:justfile && pnpm run check:markdown && pnpm run check:readme-maps && pnpm run check:modules && pnpm run check:placeholders && pnpm run check:ports && pnpm run check:types && pnpm run test",
+    "check:format": "prettier --check .",
+    "check:justfile": "just check_justfile_format",
+    "check:markdown": "markdownlint-cli2 \"**/*.md\"",
+    "check:readme-maps": "just check_readme_maps",
+    "check:modules": "node tools/modules/check-modules.ts .",
+    "check:placeholders": "node tools/placeholders/check-placeholders.ts .",
+    "check:ports": "just check_ports",
+    "check:types": "tsc --noEmit -p tsconfig.json",
+    "test": "node --test \"tools/**/*.test.ts\"",
+    "format": "prettier --write .",
+    "format:markdown": "markdownlint-cli2 --fix \"**/*.md\""
+  },
+  "devDependencies": {
+    "@types/node": "26.6.3",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "husky": "9.1.7",
+    "markdownlint-cli2": "0.23.3",
+    "oxc-parser": "0.151.0",
+    "prettier": "3.9.9",
+    "shadcn": "4.19.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "yaml": "2.9.1"
+  }
+}

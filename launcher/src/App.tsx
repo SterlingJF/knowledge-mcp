@@ -1,12 +1,5 @@
 // File: launcher/src/App.tsx
 
-import { DirectionProvider } from '@/component-core/direction'
-import { toast } from '@/component-core/toast'
-import { TooltipProvider } from '@/component-core/tooltip'
-import { Toaster } from '@/component-elements/toaster'
-import { BackendUnreachableNotice } from '@/component-patterns/BackendUnreachableNotice'
-import { ThemeProvider } from '@/component-patterns/ThemeProvider'
-import { VaultSwitcher } from '@/component-patterns/VaultSwitcher'
 import {
   BackendUnreachable,
   changeVault,
@@ -28,10 +21,17 @@ import {
   revealVault,
   setAutostart,
 } from '@/lib/shell'
+import { DirectionProvider } from 'components/component-core/direction'
+import { toast } from 'components/component-core/toast'
+import { TooltipProvider } from 'components/component-core/tooltip'
+import { Toaster } from 'components/component-elements/toaster'
+import { BackendUnreachableNotice } from 'components/component-patterns/BackendUnreachableNotice'
+import { ThemeProvider } from 'components/component-patterns/ThemeProvider'
+import { VaultSwitcher } from 'components/component-patterns/VaultSwitcher'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import type { VaultAction } from '@/component-patterns/VaultRowMenu'
 import type { Readiness, Storage, Vault } from '@/lib/backend'
+import type { VaultAction } from 'components/component-patterns/VaultRowMenu'
 
 type Connection =
   | { phase: 'waiting' }

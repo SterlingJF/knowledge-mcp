@@ -12,7 +12,7 @@ import { defineConfig } from 'vite'
 const DEV_SERVER_PORT = 1420
 
 const APP_VERSION = JSON.parse(
-  readFileSync(resolve(__dirname, 'package.json'), 'utf8'),
+  readFileSync(resolve(import.meta.dirname, 'package.json'), 'utf8'),
 ).version as string
 
 export default defineConfig({
@@ -43,6 +43,6 @@ export default defineConfig({
   },
 
   resolve: {
-    alias: [{ find: '@', replacement: resolve(__dirname, './src') }],
+    alias: [{ find: '@', replacement: resolve(import.meta.dirname, './src') }],
   },
 })

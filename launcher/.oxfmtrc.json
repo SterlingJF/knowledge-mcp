@@ -29,9 +29,7 @@
       "index",
       "type"
     ],
-    "internalPattern": [
-      "^@/.*"
-    ],
+    "internalPattern": ["^@/.*"],
     "ignoreCase": false
   }
 }

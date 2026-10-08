@@ -1,0 +1,5 @@
+---
+extends: []
+
+rules:
+  no-unresolved-refs: error

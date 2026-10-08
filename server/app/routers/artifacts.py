@@ -20,29 +20,29 @@ from app.context import RequestContextDep
 from app.dependencies import ArtifactServiceDep
 from app.errors import PreconditionRequiredError
 
-router = APIRouter(tags=['Artifacts'])
+router = APIRouter(tags=["Artifacts"])
 
 ERROR_RESPONSES: dict[int | str, dict[str, Any]] = {
-    400: {'model': ErrorResponse},
-    401: {'model': ErrorResponse},
-    403: {'model': ErrorResponse},
-    404: {'model': ErrorResponse},
-    409: {'model': ErrorResponse},
-    422: {'model': ErrorResponse},
-    428: {'model': ErrorResponse},
+    400: {"model": ErrorResponse},
+    401: {"model": ErrorResponse},
+    403: {"model": ErrorResponse},
+    404: {"model": ErrorResponse},
+    409: {"model": ErrorResponse},
+    422: {"model": ErrorResponse},
+    428: {"model": ErrorResponse},
 }
 
 
 def _with_etag(response: Response, etag: str) -> None:
-    response.headers['ETag'] = etag
+    response.headers["ETag"] = etag
 
 
 @router.post(
-    '/artifacts',
+    "/artifacts",
     response_model=Artifact,
     status_code=status.HTTP_201_CREATED,
     responses=ERROR_RESPONSES,
-    summary='Create an artifact',
+    summary="Create an artifact",
 )
 async def create_artifact(
     payload: ArtifactCreationPayload,
@@ -51,24 +51,24 @@ async def create_artifact(
     response: Response,
 ) -> Any:
     artifact, etag = service.create(
-        payload.model_dump(mode='json', exclude_unset=True), context
+        payload.model_dump(mode="json", exclude_unset=True), context
     )
     _with_etag(response, etag)
     return artifact
 
 
 @router.get(
-    '/artifacts',
+    "/artifacts",
     response_model=list[ArtifactSummary],
     responses=ERROR_RESPONSES,
-    summary='List artifacts',
+    summary="List artifacts",
 )
 async def list_artifact_summaries(
     service: ArtifactServiceDep,
-    projectId: Annotated[str | None, Query()] = None,  # noqa: N803 - the wire is camelCase
-    artifactType: Annotated[str | None, Query()] = None,  # noqa: N803
-    status_filter: Annotated[ArtifactStatusEnum | None, Query(alias='status')] = None,
-    orderingFrameValue: Annotated[str | None, Query()] = None,  # noqa: N803
+    projectId: Annotated[str | None, Query()] = None,  # the wire is camelCase
+    artifactType: Annotated[str | None, Query()] = None,
+    status_filter: Annotated[ArtifactStatusEnum | None, Query(alias="status")] = None,
+    orderingFrameValue: Annotated[str | None, Query()] = None,
 ) -> Any:
     return service.list_summaries(
         project_id=projectId,
@@ -79,13 +79,13 @@ async def list_artifact_summaries(
 
 
 @router.get(
-    '/artifacts/{artifactId}',
+    "/artifacts/{artifactId}",
     response_model=Artifact,
     responses=ERROR_RESPONSES,
-    summary='Get one artifact in full',
+    summary="Get one artifact in full",
 )
 async def get_artifact_by_id(
-    artifactId: str,  # noqa: N803
+    artifactId: str,
     service: ArtifactServiceDep,
     response: Response,
 ) -> Any:
@@ -95,26 +95,26 @@ async def get_artifact_by_id(
 
 
 @router.put(
-    '/artifacts/{artifactId}',
+    "/artifacts/{artifactId}",
     response_model=Artifact,
     responses=ERROR_RESPONSES,
-    summary='Update an artifact',
+    summary="Update an artifact",
 )
 async def update_artifact(
-    artifactId: str,  # noqa: N803
+    artifactId: str,
     payload: ArtifactUpdatePayload,
     context: RequestContextDep,
     service: ArtifactServiceDep,
     response: Response,
-    if_match: Annotated[str | None, Header(alias='If-Match')] = None,
+    if_match: Annotated[str | None, Header(alias="If-Match")] = None,
 ) -> Any:
     if if_match is None:
-        msg = 'Read the artifact and send its ETag in If-Match before updating it'
+        msg = "Read the artifact and send its ETag in If-Match before updating it"
         raise PreconditionRequiredError(msg)
     async with service.store.lock_for(artifactId):
         artifact, etag = service.update(
             artifactId,
-            payload.model_dump(mode='json', exclude_unset=True),
+            payload.model_dump(mode="json", exclude_unset=True),
             context,
             if_match,
         )
@@ -123,15 +123,15 @@ async def update_artifact(
 
 
 @router.delete(
-    '/artifacts/{artifactId}',
+    "/artifacts/{artifactId}",
     status_code=status.HTTP_204_NO_CONTENT,
     # FastAPI `NoneType` response-model inference for body-less 204.
     response_model=None,
     responses=ERROR_RESPONSES,
-    summary='Delete an artifact',
+    summary="Delete an artifact",
 )
 async def delete_artifact(
-    artifactId: str,  # noqa: N803
+    artifactId: str,
     service: ArtifactServiceDep,
 ) -> None:
     async with service.store.lock_for(artifactId):
@@ -139,13 +139,13 @@ async def delete_artifact(
 
 
 @router.post(
-    '/artifacts/{artifactId}/status',
+    "/artifacts/{artifactId}/status",
     response_model=Artifact,
     responses=ERROR_RESPONSES,
-    summary='Move an artifact between draft and committed',
+    summary="Move an artifact between draft and committed",
 )
 async def transition_artifact_status(
-    artifactId: str,  # noqa: N803
+    artifactId: str,
     payload: ArtifactStatusTransitionPayload,
     context: RequestContextDep,
     service: ArtifactServiceDep,

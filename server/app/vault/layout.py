@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 VAULT_FOLDERS: tuple[str, ...] = tuple(folder.value for folder in VaultFolderName)
 
-CONFIG_FOLDER = '.knowledge-mcp'
+CONFIG_FOLDER = ".knowledge-mcp"
 
 CONTENT_FOLDERS: tuple[str, ...] = tuple(
     name for name in VAULT_FOLDERS if name != CONFIG_FOLDER

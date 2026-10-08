@@ -20,25 +20,25 @@ from app.vault import layout
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-logger = get_app_logger('factory')
+logger = get_app_logger("factory")
 
-TITLE = 'Km API'
-VERSION = 'v1.0.0'
+TITLE = "Km API"
+VERSION = "v1.0.0"
 
 
 async def _km_error_handler(_: Request, error: Exception) -> JSONResponse:
-    assert isinstance(error, KmError)  # noqa: S101
-    payload: dict[str, Any] = {'detail': error.detail, 'errorCode': error.code}
+    assert isinstance(error, KmError)
+    payload: dict[str, Any] = {"detail": error.detail, "errorCode": error.code}
     if error.fields:
-        payload['fields'] = error.fields
+        payload["fields"] = error.fields
     return JSONResponse(status_code=int(error.status), content=payload)
 
 
 async def _unhandled_error_handler(_: Request, error: Exception) -> JSONResponse:
-    logger.exception('Unhandled error', error=str(error))
+    logger.exception("Unhandled error", error=str(error))
     return JSONResponse(
         status_code=500,
-        content={'detail': 'Internal server error', 'errorCode': 'INTERNAL_ERROR'},
+        content={"detail": "Internal server error", "errorCode": "INTERNAL_ERROR"},
     )
 
 
@@ -55,7 +55,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
         ready, reason = app.state.vaults.default().is_ready()
         logger.info(
-            'Application started',
+            "Application started",
             role=settings.ROLE,
             api_prefix=settings.API_PREFIX,
             knowledge_model_dir=str(model_dir),
@@ -70,7 +70,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         title=TITLE,
         version=VERSION,
         lifespan=lifespan,
-        servers=[{'url': settings.API_PREFIX}],
+        servers=[{"url": settings.API_PREFIX}],
+        # As released: a JSON body without a Content-Type header is read as JSON.
+        strict_content_type=False,
     )
 
     # TestClient without lifespan.
@@ -80,7 +82,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
-        allow_methods=['*'],
+        allow_methods=["*"],
         allow_headers=list(ALLOWED_HEADERS),
         expose_headers=list(EXPOSED_HEADERS),
     )

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import getpass
 from pathlib import (
-    Path,  # noqa: TC003 - Pydantic resolves this field type at runtime
+    Path,  # Pydantic resolves this field type at runtime
 )
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -19,34 +19,34 @@ from app.config import read_config
 if TYPE_CHECKING:
     from pydantic.fields import FieldInfo
 
-Role = Literal['desktop']
+Role = Literal["desktop"]
 
 DESKTOP_ORIGINS: tuple[str, ...] = (
-    'tauri://localhost',
-    'http://tauri.localhost',
-    'http://localhost:1420',
-    'http://127.0.0.1:1420',
+    "tauri://localhost",
+    "http://tauri.localhost",
+    "http://localhost:1420",
+    "http://127.0.0.1:1420",
 )
 
 # ETag is not a CORS-safelisted response header.
-EXPOSED_HEADERS: tuple[str, ...] = ('ETag', 'X-Request-ID')
+EXPOSED_HEADERS: tuple[str, ...] = ("ETag", "X-Request-ID")
 
 ALLOWED_HEADERS: tuple[str, ...] = (
-    'Authorization',
-    'Content-Type',
-    'If-Match',
-    'X-Current-Org-Id',
-    'X-Km-Agent',
-    'X-Km-Client',
-    'X-Km-Vault',
-    'X-Request-ID',
+    "Authorization",
+    "Content-Type",
+    "If-Match",
+    "X-Current-Org-Id",
+    "X-Km-Agent",
+    "X-Km-Client",
+    "X-Km-Vault",
+    "X-Request-ID",
 )
 
 
 class KmConfigSource(PydanticBaseSettingsSource):
     def get_field_value(
         self,
-        field: FieldInfo,  # noqa: ARG002 - field resolution occurs in `__call__`
+        field: FieldInfo,  # field resolution occurs in `__call__`
         field_name: str,
     ) -> tuple[Any, str, bool]:
         return None, field_name, False
@@ -57,27 +57,27 @@ class KmConfigSource(PydanticBaseSettingsSource):
 
         entry = config.resolved_store()
         if entry is not None:
-            values['STORE_ROOT'] = entry.path
+            values["STORE_ROOT"] = entry.path
         if config.principal_id:
-            values['PRINCIPAL_ID'] = config.principal_id
+            values["PRINCIPAL_ID"] = config.principal_id
 
         return values
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_prefix='KM_',
-        env_file='.env',
-        env_file_encoding='utf-8',
+        env_prefix="KM_",
+        env_file=".env",
+        env_file_encoding="utf-8",
         frozen=True,
-        extra='ignore',
+        extra="ignore",
     )
 
-    APP_NAME: str = 'km-server'
-    ENVIRONMENT: str = 'local'
-    ROLE: Role = 'desktop'
+    APP_NAME: str = "km-server"
+    ENVIRONMENT: str = "local"
+    ROLE: Role = "desktop"
 
-    API_PREFIX: str = '/api/v1'
+    API_PREFIX: str = "/api/v1"
     HOST: str | None = None
     PORT: int = 8000
 
@@ -90,11 +90,11 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: tuple[str, ...] = DESKTOP_ORIGINS
 
-    LOG_LEVEL: str = 'INFO'
+    LOG_LEVEL: str = "INFO"
     FORCE_JSON_LOGS: bool = False
 
-    HEALTH_PATHS: frozenset[str] = frozenset({'/health', '/ready', '/'})
-    LOW_NOISE_PATHS: frozenset[str] = frozenset({'/health', '/ready'})
+    HEALTH_PATHS: frozenset[str] = frozenset({"/health", "/ready", "/"})
+    LOW_NOISE_PATHS: frozenset[str] = frozenset({"/health", "/ready"})
 
     @classmethod
     def settings_customise_sources(
@@ -113,11 +113,11 @@ class Settings(BaseSettings):
             file_secret_settings,
         )
 
-    @field_validator('PRINCIPAL_ID')
+    @field_validator("PRINCIPAL_ID")
     @classmethod
     def _principal_id_is_not_empty(cls, value: str) -> str:
         if not value.strip():
-            msg = 'KM_PRINCIPAL_ID must not be blank'
+            msg = "KM_PRINCIPAL_ID must not be blank"
             raise ValueError(msg)
         return value.strip()
 
@@ -125,7 +125,7 @@ class Settings(BaseSettings):
     def bind_host(self) -> str:
         if self.HOST:
             return self.HOST
-        return '127.0.0.1' if self.ROLE == 'desktop' else '0.0.0.0'  # noqa: S104
+        return "127.0.0.1" if self.ROLE == "desktop" else "0.0.0.0"
 
     @property
     def cors_origins(self) -> list[str]:

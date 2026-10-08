@@ -1,0 +1,11 @@
+{
+  "config": {
+    "MD007": { "indent": 2 },
+    "MD013": false,
+    "MD041": false,
+    "MD049": { "style": "asterisk" },
+  },
+  "gitignore": true,
+  "globs": ["**/*.md"],
+  "ignores": ["node_modules/**", ".claude/**", ".venv/**", ".evidence/**"],
+}

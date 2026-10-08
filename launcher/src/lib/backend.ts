@@ -1,6 +1,9 @@
 // File: launcher/src/lib/backend.ts
 
 import type { ProcessStatus } from '@/lib/shell'
+import type { Vault } from 'components/lib/types'
+
+export type { Vault }
 
 const DEVELOPMENT_ORIGIN =
   (import.meta.env.VITE_KM_BACKEND_ORIGIN as string | undefined) ??
@@ -16,7 +19,7 @@ export const developmentOrigin = (): string => DEVELOPMENT_ORIGIN
 export const originFromStatus = (status: ProcessStatus): string =>
   `http://127.0.0.1:${status.port}`
 
-/** /ready payload outside api-specs/v1. */
+/** /ready payload outside contracts/project/v1. */
 export type Readiness = {
   status: string
   role: string
@@ -31,18 +34,7 @@ export type StorageOption = {
   label: string
 }
 
-export type Vault = {
-  id: string
-  /** The folder's own name. A vault carries no name of its own. */
-  name: string
-  path: string
-  lastOpened: number
-  open: boolean
-  /** False when the folder has been moved or deleted since it was last opened. */
-  available: boolean
-}
-
-/** Desktop-only /storage payload outside api-specs/v1. */
+/** Desktop-only /storage payload outside contracts/project/v1. */
 export type Storage = {
   storageRoot: string | null
   storageName: string | null
