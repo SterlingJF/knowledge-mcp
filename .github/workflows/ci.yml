@@ -23,11 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
         with:
           run_install: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
           cache: pnpm
@@ -35,7 +35,7 @@ jobs:
         with:
           version: "0.12.21"
           enable-cache: true
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@v4.0.0
       - run: pnpm install --frozen-lockfile --ignore-scripts --filter .
       - run: uv sync --locked
       - run: just check_root
@@ -44,15 +44,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
         with:
           run_install: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
           cache: pnpm
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@v4.0.0
       - run: >-
           pnpm install --frozen-lockfile --ignore-scripts
           --filter . --filter components
@@ -62,15 +62,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
         with:
           run_install: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
           cache: pnpm
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@v4.0.0
       - run: >-
           pnpm install --frozen-lockfile --ignore-scripts
           --filter . --filter contracts
@@ -80,15 +80,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
         with:
           run_install: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
           cache: pnpm
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@v4.0.0
       - run: >-
           pnpm install --frozen-lockfile --ignore-scripts
           --filter launcher...
@@ -98,12 +98,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - uses: astral-sh/setup-uv@v10.2.0
         with:
           version: "0.12.21"
           enable-cache: true
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@v4.0.0
       - run: uv sync --locked --package workspace --package server
       - run: just check_server
 
@@ -111,11 +111,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - uses: astral-sh/setup-uv@v10.2.0
         with:
           version: "0.12.21"
           enable-cache: true
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@v4.0.0
       - run: uv sync --locked --package workspace --package mcp-server
       - run: just check_mcp_server
