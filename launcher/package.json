@@ -14,6 +14,7 @@
     "format": "oxfmt --ignore-path=.gitignore src/ vite.config.ts && prettier --write src/ vite.config.ts",
     "format:check": "oxfmt --check --ignore-path=.gitignore src/ vite.config.ts && prettier --check src/ vite.config.ts",
     "check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run format:check",
+    "clean:macos": "bash scripts/clean-macos-app-state.sh",
     "tauri": "tauri"
   },
   "dependencies": {

@@ -35,6 +35,10 @@ require_sidecars() {
   done
 }
 
+cleanup_generated_app() {
+  bash "${LAUNCHER_DIR}/scripts/clean-macos-app-state.sh" --generated-only
+}
+
 signing_identity() {
   security find-identity -v -p codesigning \
     | grep 'Developer ID Application' | head -1 | sed -E 's/.*"(.+)"/\1/'
@@ -76,6 +80,7 @@ verify() {
 main() {
   require_sidecars
   require_credentials
+  trap cleanup_generated_app EXIT
   echo ">>> Signing as: ${IDENTITY}"
   cd "${LAUNCHER_DIR}"
   build

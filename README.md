@@ -221,6 +221,7 @@ launcher/
 ├── prettier.config.js
 ├── .prettierignore
 ├── .gitignore
+├── scripts/clean-macos-app-state.sh  unregisters and removes apps from local builds; ejects their DMGs
 ├── scripts/release-build.sh       signs, notarizes, and verifies the DMG; expects built sidecars
 ├── src/                           the window
 │   ├── main.tsx

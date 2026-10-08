@@ -16,6 +16,7 @@ launcher/
 ├── prettier.config.js
 ├── .prettierignore
 ├── .gitignore
+├── scripts/clean-macos-app-state.sh  unregisters and removes apps from local builds; ejects their DMGs
 ├── scripts/release-build.sh       signs, notarizes, and verifies the DMG; expects built sidecars
 ├── src/                           the window
 │   ├── main.tsx
@@ -40,18 +41,20 @@ launcher/
 
 ## Commands
 
-| Command                 | Purpose                                                                            |
-| ----------------------- | ---------------------------------------------------------------------------------- |
-| `pnpm run check`        | Lint, type-check, test, and format-check                                           |
-| `just check_launcher`   | From the repo root: the same checks, as in CI                                      |
-| `pnpm run dev`          | Start the Vite dev server                                                          |
-| `pnpm run build`        | Build, then type-check                                                             |
-| `pnpm run serve`        | Preview the build                                                                  |
-| `pnpm run test`         | Run Vitest                                                                         |
-| `pnpm run typecheck`    | Type-check                                                                         |
-| `pnpm run lint`         | Lint with oxlint                                                                   |
-| `pnpm run format`       | Format with oxfmt and Prettier                                                     |
-| `pnpm run format:check` | Check formatting                                                                   |
-| `pnpm run tauri dev`    | Run the desktop app; run `just build_sidecars` first                               |
-| `just build_launcher`   | From the repo root: build the sidecars, then the app and DMG                       |
-| `just release_launcher` | From the repo root: build the sidecars, then a signed, notarized, and verified DMG |
+| Command                      | Purpose                                                                            |
+| ---------------------------- | ---------------------------------------------------------------------------------- |
+| `pnpm run check`             | Lint, type-check, test, and format-check                                           |
+| `just check_launcher`        | From the repo root: the same checks, as in CI                                      |
+| `pnpm run dev`               | Start the Vite dev server                                                          |
+| `pnpm run build`             | Build, then type-check                                                             |
+| `pnpm run serve`             | Preview the build                                                                  |
+| `pnpm run test`              | Run Vitest                                                                         |
+| `pnpm run typecheck`         | Type-check                                                                         |
+| `pnpm run lint`              | Lint with oxlint                                                                   |
+| `pnpm run format`            | Format with oxfmt and Prettier                                                     |
+| `pnpm run format:check`      | Check formatting                                                                   |
+| `pnpm run tauri dev`         | Run the desktop app; run `just build_sidecars` first                               |
+| `just build_launcher`        | From the repo root: build the sidecars, then the app and DMG                       |
+| `pnpm run clean:macos`       | Unregister and remove apps from local builds; eject their DMGs                     |
+| `just clean_macos_app_state` | From the repo root: the same                                                       |
+| `just release_launcher`      | From the repo root: build the sidecars, then a signed, notarized, and verified DMG |

@@ -187,6 +187,10 @@ build_launcher: build_sidecars
 release_launcher: build_sidecars
   bash launcher/scripts/release-build.sh
 
+# Unregister and remove the apps local builds leave, and eject their DMGs.
+clean_macos_app_state:
+  pnpm --filter launcher --fail-if-no-match run clean:macos
+
 # --- server ---------------------------------------------------------------
 
 # Lint, format-check, and test server, with the vendored knowledge model.
