@@ -1,6 +1,6 @@
 # knowledge-mcp
 
-Plain structured thinking while you work. It's free, open, and local-first.
+Plain, structured thinking while you work. It's free, open, and local-first.
 
 knowledge-mcp brings the defined questions, conditions and connections from your knowledge base into your work with AI agents. Your agent applies the guidance based on your document and situation as you ask, write or review.
 
@@ -14,7 +14,8 @@ Under the hood, [Knowledge Bus](https://github.com/SterlingJF/knowledge-bus) is 
 
 - **Structured Document context.** You and your agent share each document's purpose, reader and questions.
 - **Guided writing.** See each section's questions and catch missing answers while you write.
-- **Document import.** Turn notes and conversations into proposed updates to your documents.
+- **Structure by folder.** Set guidance for your whole knowledge base or for individual folders.
+- **Knowledge import.** Turn notes and conversations into proposed updates to your documents.
 - **Document memory.** Reuse saved document types and reader choices across sessions.
 - **Edit history.** Compare original and revised text, and undo recorded edits.
 - **Custom guidance.** Set and refine the questions and requirements for your documents.
