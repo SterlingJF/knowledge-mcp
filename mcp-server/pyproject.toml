@@ -11,7 +11,7 @@ dependencies = [
     # Pinned exactly: an mcp release can change the served MCP revision or reopen the pre-2026
     # handshake the front door refuses.
     "mcp==2.0.0",
-    "pydantic==2.13.4",
+    "pydantic==2.13.5",
     "pydantic-settings==2.15.0",
     "uvicorn==0.34.3",
 ]
