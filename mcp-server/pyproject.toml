@@ -5,7 +5,7 @@ description = "The knowledge-mcp MCP server: agent tools over the engine's HTTP 
 authors = [
     {name = "Sterling Freeman",email = "sterling.j.freeman@gmail.com"}
 ]
-requires-python = ">=3.14,<3.15"
+requires-python = "==3.14.8"
 dependencies = [
     "httpx==0.28.1",
     # Pinned exactly: an mcp release can change the served MCP revision or reopen the pre-2026
