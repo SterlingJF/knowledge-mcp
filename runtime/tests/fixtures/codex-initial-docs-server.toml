@@ -1,0 +1,8 @@
+model = "gpt-5"
+
+[mcp_servers.docs]
+command = "docs-mcp"
+args = ["--stdio"]
+
+[mcp_servers.docs.env]
+TOKEN_NAME = "DOCS"

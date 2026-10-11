@@ -1,0 +1,14 @@
+---
+# A change is one of the listed kinds.
+schema: knowledge-mcp/fit-record-update/1
+location: /kb
+based_on: >-
+  sha256:1111111111111111111111111111111111111111111111111111111111111111
+record: null
+digest: null
+changed:
+  - path: notes.md
+    change: renamed
+to_settle: []
+scopes: []
+received: []

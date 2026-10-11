@@ -1,0 +1,5 @@
+[mcp_servers.x]
+command = "y"
+
+[plugins."k@k"]
+enabled = true

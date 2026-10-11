@@ -64,7 +64,7 @@ function repo(spec: Repo = {}): string {
     ].join("\n"),
   );
   write(
-    "README.md",
+    "CONTRIBUTING.md",
     regions
       .map(
         (name) =>
@@ -216,8 +216,29 @@ test("fails when a Node module's package name differs from its folder", () => {
   assert.match(output, /web-app: package\.json name is "web", not "web-app"/);
 });
 
-test("fails when a Python module's project name differs from its folder", () => {
-  const { status, output } = run(repo({ packageNames: { "api-app": "api" } }));
+test("passes when the runtime module keeps its knowledge-mcp distribution name", () => {
+  const { status, output } = run(
+    repo({ python: ["runtime"], packageNames: { runtime: "knowledge-mcp" } }),
+  );
+  assert.equal(status, 0, output);
+  assert.match(output, /2 modules: runtime, web-app/);
+});
+
+test("fails when a Python module declares no project name", () => {
+  const dir = repo();
+  writeFileSync(
+    join(dir, "api-app/pyproject.toml"),
+    '[project]\nversion = "0.1.0"\n',
+  );
+  const { status, output } = run(dir);
   assert.equal(status, 1);
-  assert.match(output, /api-app: pyproject\.toml name is "api", not "api-app"/);
+  assert.match(output, /api-app: pyproject\.toml declares no name/);
+});
+
+test("fails when a Python module's project name is empty or whitespace", () => {
+  for (const name of ["", "   "]) {
+    const { status, output } = run(repo({ packageNames: { "api-app": name } }));
+    assert.equal(status, 1, output);
+    assert.match(output, /api-app: pyproject\.toml declares no name/);
+  }
 });

@@ -1,0 +1,7 @@
+// note
+{
+  // lead
+  "mcpServers": {
+    "x": {}, // trailing
+  },
+}

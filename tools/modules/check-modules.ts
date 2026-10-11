@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 // Checks that every module has a CI job, a check_<name> recipe run by `check`, a README, a README region,
-// and, if it is a workspace package, a package name equal to its folder (pnpm --filter matches by name).
+// and a declared package name for workspace packages. Node package names must equal their
+// folders (pnpm --filter matches by name); Python distribution names can differ.
 // A module is a workspace package, or a root folder whose README.md has a "## Layout" section.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -53,17 +54,12 @@ for (const name of nodePackages) {
   }
 }
 for (const name of pythonPackages) {
-  const declared = packageName(name, "pyproject.toml", (text) => {
+  packageName(name, "pyproject.toml", (text) => {
     const project = text
       .split(/^\[/m)
       .find((table) => table.startsWith("project]"));
     return project && /^name\s*=\s*"([^"]+)"/m.exec(project)?.[1];
   });
-  if (declared !== undefined && declared !== name) {
-    failures.push(
-      `${name}: pyproject.toml name is "${declared}", not "${name}"`,
-    );
-  }
 }
 
 for (const job of jobs) {
@@ -120,10 +116,11 @@ function packageName(
     return undefined;
   }
   const declared = read(readFileSync(path, "utf8"));
-  if (declared === undefined || declared === "") {
+  if (typeof declared !== "string" || declared.trim() === "") {
     failures.push(`${name}: ${file} declares no name`);
+    return undefined;
   }
-  return declared || undefined;
+  return declared;
 }
 
 function layoutModules(): string[] {
@@ -158,7 +155,7 @@ function justRecipes(): Map<string, string[]> {
 }
 
 function readmeRegions(): string[] {
-  const readme = readFileSync(join(root, "README.md"), "utf8");
+  const readme = readFileSync(join(root, "CONTRIBUTING.md"), "utf8");
   return [
     ...readme.matchAll(
       /<!-- BEGIN AUTO-GENERATED ([^/\s]+)\/README\.md#layout -->/g,

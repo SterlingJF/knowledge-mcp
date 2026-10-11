@@ -109,6 +109,17 @@ test("repo: passes once everything is filled in", () => {
   assert.match(output, /no placeholders left/);
 });
 
+test("ignores build output", () => {
+  const { status, output } = run(
+    repo({
+      LICENSE: "MIT\n",
+      "app/dist/index.js": `${ph("REPO_NAME")}\n`,
+      "app/build/vsix/README.md": `${ph("REPO_NAME")}\n`,
+    }),
+  );
+  assert.equal(status, 0, output);
+});
+
 test("ignores shell and GitHub expressions, dependencies and binary files", () => {
   const { status, output } = run(
     repo({

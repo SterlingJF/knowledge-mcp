@@ -1,0 +1,16 @@
+{
+  "name": "knowledge-mcp",
+  "owner": {
+    "name": "Sterling Freeman"
+  },
+  "metadata": {
+    "description": "knowledge-mcp says what each file in a knowledge base is for, and carries every knowledge-bus skill."
+  },
+  "plugins": [
+    {
+      "name": "knowledge-mcp",
+      "description": "Say what each file in a knowledge base is for, from the universe specs that apply to the file.",
+      "source": "./runtime"
+    }
+  ]
+}

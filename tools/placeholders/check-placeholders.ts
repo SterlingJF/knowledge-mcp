@@ -17,6 +17,7 @@ const skipped = new Set([
   "node_modules",
   "target",
   "dist",
+  "build",
 ]);
 
 const root = resolve(process.argv[2] ?? ".");

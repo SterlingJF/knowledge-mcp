@@ -1,0 +1,14 @@
+---
+# A file waiting to be settled names its scope.
+schema: knowledge-mcp/fit-record-update/1
+location: /kb
+based_on: >-
+  sha256:1111111111111111111111111111111111111111111111111111111111111111
+record: null
+digest: null
+changed: []
+to_settle:
+  - path: notes.md
+    candidates: []
+scopes: []
+received: []

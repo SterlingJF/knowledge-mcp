@@ -1,0 +1,38 @@
+---
+# A design proposal the agent fitted, a correction with a confirmed reader,
+# and a file that fits nowhere.
+schema: knowledge-mcp/fit-record/1
+files:
+  docs/rfcs/0042-cache.md:
+    universe_spec: codebase-recordkeeping
+    version: "0.1"
+    kind: design-proposal
+    made: fit
+    allowed_by:
+      basis: line
+      text: >-
+        Keep the fit record in .knowledge-bus/plugins/knowledge-mcp/ up to
+        date as you work.
+      location: AGENTS.md
+    fingerprint: >-
+      sha256:4f2a6c1e0d9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c5b4a3f
+    time: "2026-10-10T09:15:02.118Z"
+  docs/product/pricing.md:
+    universe_spec: product-development
+    version: "0.9"
+    kind: design-doc
+    audience:
+      value: the product lead
+      status: confirmed
+    made: correction
+    allowed_by:
+      basis: request
+      text: Pricing is a design doc for the product lead.
+    time: "2026-10-10T09:16:40.003Z"
+  vendor-quote.md:
+    no_fit: true
+    made: fit
+    allowed_by:
+      basis: request
+      text: Record what each file in docs/ is.
+    time: "2026-10-10T09:15:02.118Z"

@@ -1,0 +1,25 @@
+---
+# vendor-quote.md through a Drive link; universe spec text sent.
+schema: knowledge-mcp/fit/1
+location: https://drive.google.com/drive/folders/1AbCd/vendor-quote.md
+universe_specs:
+  - id: product-development
+    version: "0.9"
+    source: sent by the host
+    from_parent: true
+candidates: []
+every_document_type:
+  - universe_spec: product-development
+    covers: The reasoning around deliberate work.
+    covers_matched: []
+    kinds:
+      - kind: decision-record
+        action: know why a past choice was made
+        actor: future reader
+      - kind: lean-canvas
+        action: choose which assumption in a venture to test next
+        actor: whoever is starting the venture
+received:
+  - name: product-development.kbp.yaml
+    digest: >-
+      sha256:4b2a0f6c3e1d9b8a7c6f5e4d3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b

@@ -1,8 +1,6 @@
 ---
 packages:
-  - components
   - contracts
-  - launcher
 
 # One week, in minutes.
 minimumReleaseAge: 10080

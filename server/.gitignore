@@ -1,6 +1,0 @@
-# PyInstaller work and output directories, written when km-server.spec is frozen.
-build/
-dist/
-
-.venv/
-__pycache__/

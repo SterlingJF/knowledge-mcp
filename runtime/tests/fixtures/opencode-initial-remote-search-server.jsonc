@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Servers for every project
+  "mcp": {
+    "search": {
+      "type": "remote",
+      "url": "https://search.example.com/mcp",
+    },
+  },
+  "theme": "system",
+}

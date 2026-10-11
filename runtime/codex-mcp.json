@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "knowledge-mcp": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--no-project",
+        "--python",
+        "3.14",
+        "--",
+        "python",
+        "-m",
+        "knowledge_mcp.start"
+      ],
+      "cwd": ".",
+      "env_vars": ["KNOWLEDGE_MCP_STATE_DIR", "XDG_STATE_HOME"]
+    }
+  }
+}

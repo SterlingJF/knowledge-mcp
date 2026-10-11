@@ -1,0 +1,30 @@
+---
+# A pasted chat thread, marked against one bundled universe spec.
+schema: knowledge-mcp/mark/1
+location: pasted in chat
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy at d70509f35e70ac8245a873c86800f11c0ba408d2
+    from_parent: false
+    document_types:
+      - kind: roadmap
+        name: Roadmap
+        action: decide whether to contribute to the planned work
+        actor: a contributor
+        elements:
+          - element: planned-work
+            question: Which work do the maintainers plan next?
+            strength: core
+passages:
+  - id: p1
+    kind: heading
+    lines: [1, 1]
+    opening: "# #cache-rollout, Tuesday"
+    under: null
+  - id: p2
+    kind: paragraph
+    lines: [3, 4]
+    opening: "Ana: Next up for the maintainers: ship the read cache…"
+    under: p1
+received: []

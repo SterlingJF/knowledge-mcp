@@ -1,0 +1,84 @@
+---
+# A version tag builds knowledge-mcp's source archive, attaches it to the
+# GitHub release, installs and tests the generated Homebrew formula, then
+# pushes the formula to the tap. Actions are pinned by commit SHA.
+# Prettier keeps one space before the version comments.
+# yamllint disable rule:line-length rule:comments
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  formula:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          run_install: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.21"
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - name: Check the tag names the package version
+        run: |
+          version="$(sed -n 's/^version = "\(.*\)"$/\1/p' runtime/pyproject.toml | head -n 1)"
+          if [ "${TAG}" != "v${version}" ]; then
+            printf 'The tag %s differs from knowledge-mcp %s.\n' "${TAG}" "${version}" >&2
+            exit 1
+          fi
+          printf 'VERSION=%s\n' "${version}" >> "${GITHUB_ENV}"
+      - run: pnpm install --frozen-lockfile --ignore-scripts --filter .
+      - run: just build_knowledge_mcp
+      - run: just generate_formula "dist/knowledge_mcp-${VERSION}.tar.gz" dist/knowledge-mcp.rb
+      - name: Attach the source archive to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "${TAG}" > /dev/null 2>&1; then
+            gh release create "${TAG}" --verify-tag --title "${TAG}" --generate-notes
+          fi
+          gh release upload "${TAG}" "dist/knowledge_mcp-${VERSION}.tar.gz" --clobber
+      - name: Install and test the formula from a local tap
+        run: |
+          brew tap-new --no-git local/release
+          cp dist/knowledge-mcp.rb "$(brew --repository local/release)/Formula/knowledge-mcp.rb"
+          brew style local/release/knowledge-mcp
+          brew install --build-from-source local/release/knowledge-mcp
+          brew test local/release/knowledge-mcp
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: SterlingJF/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
+      - name: Push the formula to the tap
+        working-directory: tap
+        run: |
+          cp ../dist/knowledge-mcp.rb Formula/knowledge-mcp.rb
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/knowledge-mcp.rb
+          if git diff --cached --quiet; then
+            printf 'The tap already holds this formula.\n'
+            exit 0
+          fi
+          git commit -m "knowledge-mcp ${VERSION}"
+          git push

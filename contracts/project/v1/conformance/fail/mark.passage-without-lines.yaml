@@ -1,0 +1,16 @@
+---
+# Every passage names its first and last line.
+schema: knowledge-mcp/mark/1
+location: pasted in chat
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy at d70509f35e70ac8245a873c86800f11c0ba408d2
+    from_parent: false
+    document_types: []
+passages:
+  - id: p1
+    kind: paragraph
+    opening: Ana said so.
+    under: null
+received: []

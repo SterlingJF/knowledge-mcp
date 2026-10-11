@@ -1,0 +1,24 @@
+---
+# Entries changed, but the host sent no ground for saving: nothing to save.
+schema: knowledge-mcp/fit-record-update/1
+location: https://drive.google.com/drive/folders/0AbCdEf
+based_on: >-
+  sha256:1111111111111111111111111111111111111111111111111111111111111111
+record: null
+digest: null
+note: >-
+  Nothing to save until the person asks, or a standing line the person wrote
+  covers keeping the record: send that ground as `basis`.
+changed:
+  - path: notes.md
+    change: fitted
+    entry:
+      no_fit: true
+      made: fit
+      time: "2026-10-10T09:15:02.118Z"
+to_settle: []
+scopes: []
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/record.yaml
+    digest: >-
+      sha256:1111111111111111111111111111111111111111111111111111111111111111

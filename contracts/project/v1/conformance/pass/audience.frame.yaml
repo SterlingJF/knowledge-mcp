@@ -1,0 +1,25 @@
+---
+# A design doc in product-development, which declares an audience frame.
+schema: knowledge-mcp/audience/1
+location: /home/someone/codebase/docs/product/pricing.md
+universe_spec:
+  id: product-development
+  version: "0.9"
+  source: bundled copy at d70509f35e70ac8245a873c86800f11c0ba408d2
+kind: design-doc
+actor: reviewer
+frame:
+  id: audience
+  question: Who is this artifact going to?
+choices:
+  - id: self
+    label: Self
+  - id: internal
+    label: Internal
+  - id: counterparty
+    label: Counterparty
+  - id: regulator
+    label: Regulator
+  - id: public
+    label: Public
+received: []
