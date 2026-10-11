@@ -99,7 +99,7 @@ test("fails when there are no samples at all", () => {
 
 test("passes when there are no schemas and no samples", () => {
   const root = fixture({
-    "project/v1/vault.rest.openapi.yaml": "---\nopenapi: 3.1.1\n",
+    "project/v1/health.rest.openapi.yaml": "---\nopenapi: 3.1.1\n",
   });
   const { status, output } = run(root);
   assert.equal(status, 0, output);

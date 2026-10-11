@@ -1,0 +1,20 @@
+{
+  "name": "knowledge-mcp",
+  "interface": {
+    "displayName": "knowledge-mcp"
+  },
+  "plugins": [
+    {
+      "name": "knowledge-mcp",
+      "source": {
+        "source": "local",
+        "path": "./runtime"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+[project]
+name = "knowledge-mcp"
+version = "0.2.0"
+description = "Plain structured thinking while you work. It's free, open, and local-first."
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Sterling Freeman",email = "sterling.j.freeman@gmail.com"}
+]
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    # The kbp console script, from the source archive of the knowledge-bus release whose tag
+    # `just refresh_knowledge_model` copies the universe specs and skills from. uv.lock holds its hash.
+    "knowledge-bus @ https://github.com/SterlingJF/knowledge-bus/releases/download/v0.10.0/knowledge_bus-0.10.0.tar.gz",
+    # Pinned exactly: an mcp release can change the MCP revisions the server speaks.
+    "mcp==2.0.0",
+    "pydantic==2.13.4",
+    # Reads and writes the fit record, `.knowledge-bus/plugins/knowledge-mcp/record.yaml`.
+    "pyyaml==6.0.3",
+]
+
+[project.scripts]
+kb = "knowledge_mcp.cli:main"
+
+[dependency-groups]
+dev = [
+    # Checks each kb_fit answer against contracts/project/v1/fit.schema.yaml.
+    "jsonschema==4.26.0",
+    "pytest==9.1.1",
+]
+
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.sdist]
+include = ["knowledge_mcp", "knowledge-bus", "skills", "README.md", "pyproject.toml"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["knowledge_mcp"]
+
+# The bundled universe specs and skills travel inside the package, so `kb` finds them installed.
+[tool.hatch.build.targets.wheel.force-include]
+"knowledge-bus" = "knowledge_mcp/knowledge-bus"
+"skills" = "knowledge_mcp/skills"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["error::DeprecationWarning:knowledge_mcp.*"]

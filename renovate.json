@@ -21,58 +21,32 @@
       "rangeStrategy": "widen"
     },
     {
-      "description": "Cargo has no release-age gate for indirect dependencies, so Cargo.lock moves only with direct updates.",
-      "matchManagers": ["cargo"],
-      "matchUpdateTypes": ["lockFileMaintenance"],
-      "enabled": false
-    },
-    {
-      "description": "mcp updates wait for review. Any mcp release can change the MCP revision mcp-server serves.",
+      "description": "mcp updates wait for review. Any mcp release can change the MCP revisions knowledge-mcp speaks.",
       "matchPackageNames": ["mcp"],
       "automerge": false
     },
     {
-      "groupName": "react",
-      "matchPackageNames": [
-        "react",
-        "react-dom",
-        "@types/react",
-        "@types/react-dom"
-      ]
-    },
-    {
-      "description": "The npm packages and the crates move in one update, so @tauri-apps/cli stays in step with the tauri crate.",
-      "groupName": "tauri",
-      "matchPackageNames": [
-        "@tauri-apps/**",
-        "tauri",
-        "tauri-build",
-        "tauri-plugin-*"
-      ]
-    },
-    {
-      "groupName": "vite",
-      "matchPackageNames": ["vite", "vitest", "@vitejs/plugin-react"]
+      "description": "knowledge-bus moves with `just refresh_knowledge_model <tag>`, which copies the universe specs and skills at the tag of the release archive the package is pinned to.",
+      "matchPackageNames": ["knowledge-bus"],
+      "enabled": false
     },
     {
       "groupName": "oxc",
-      "matchPackageNames": ["oxlint", "oxfmt", "oxlint-tsgolint", "oxc-parser"]
-    },
-    {
-      "groupName": "tailwind",
-      "matchPackageNames": ["tailwindcss", "@tailwindcss/vite"]
-    },
-    {
-      "groupName": "fastapi",
-      "matchPackageNames": ["fastapi", "starlette", "uvicorn"]
+      "matchPackageNames": ["oxc-parser"]
     },
     {
       "groupName": "pydantic",
-      "matchPackageNames": ["pydantic", "pydantic-settings"]
+      "matchPackageNames": ["pydantic"]
     },
     {
       "groupName": "pytest",
       "matchPackageNames": ["pytest"]
+    },
+    {
+      "description": "Actions in the release workflow stay pinned by commit SHA, with the version in a comment.",
+      "matchManagers": ["github-actions"],
+      "matchFileNames": [".github/workflows/release.yml"],
+      "pinDigests": true
     }
   ],
   "timezone": "America/New_York",

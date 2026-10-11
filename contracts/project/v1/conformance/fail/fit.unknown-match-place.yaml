@@ -1,0 +1,17 @@
+---
+# matched_on is "name" or "folder".
+schema: knowledge-mcp/fit/1
+location: docs/rfcs/0042-cache.md
+universe_specs: []
+candidates:
+  - universe_spec: codebase-recordkeeping
+    kind: design-proposal
+    name: Design proposal
+    alias: null
+    action: null
+    actor: null
+    timing: null
+    matched: [rfc]
+    matched_on: path
+every_document_type: null
+received: []

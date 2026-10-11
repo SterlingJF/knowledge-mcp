@@ -23,7 +23,6 @@ contracts/
 ├── redocly.yaml                              lint policy for every OpenAPI file
 ├── project/                                  this project's own modules talk to each other
 │   └── v1/
-│       ├── vault.rest.openapi.yaml           vault lifecycle on the engine's HTTP API
 │       ├── <name>.rest.openapi.yaml          request / response
 │       ├── <name>.realtime-sse.openapi.yaml  event stream
 │       ├── <name>.schema.yaml                data shape
@@ -33,7 +32,6 @@ contracts/
 ├── plugins/<name>/                           outside code plugs into this project
 │   └── v1/                                   same shape as project/v1
 └── extensions/                               this project reaches into another project
-    ├── knowledge-bus/upstream/               protocol, universe, and type guidance, with UPSTREAM.md
     └── <target>/
         ├── upstream/                         the target's spec, vendored read-only, with UPSTREAM.md
         └── v1/                               this project's contracts for the target, same shape as project/v1
@@ -47,11 +45,10 @@ A conformance sample `<name>.<case>.yaml` is checked against `<name>.schema.yaml
 
 ## Commands
 
-| Command                              | Purpose                                                                                               |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| `pnpm run lint`                      | Lint every `*.openapi.yaml` outside `upstream/` with Redocly                                          |
-| `just check_contracts`               | From the repo root: lint, then check every conformance sample                                         |
-| `just refresh_knowledge_model <ref>` | From the repo root: copy the knowledge-bus files at `<ref>` into `extensions/knowledge-bus/upstream/` |
+| Command                | Purpose                                                       |
+| ---------------------- | ------------------------------------------------------------- |
+| `pnpm run lint`        | Lint every `*.openapi.yaml` outside `upstream/` with Redocly  |
+| `just check_contracts` | From the repo root: lint, then check every conformance sample |
 
 ## Not Here
 

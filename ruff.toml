@@ -1,8 +1,12 @@
-extend-exclude = ["server/app/api_models_auto.py", "mcp-server/app/api_models_auto.py"]
+extend-exclude = [
+    # Copied as is from knowledge-bus by `just refresh_knowledge_model`.
+    "runtime/skills/kb-*",
+    "runtime/knowledge-bus",
+]
 
 [lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 ignore = ["E501"]
 
 [lint.isort]
-known-first-party = ["app"]
+known-first-party = ["knowledge_mcp"]

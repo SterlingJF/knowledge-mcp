@@ -1,0 +1,39 @@
+---
+# README.md at the top of a folder with no .knowledge-bus/, so the bundled set
+# applies; no hat sent.
+schema: knowledge-mcp/fit/1
+location: /home/someone/codebase/README.md
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy at d70509f35e70ac8245a873c86800f11c0ba408d2
+    from_parent: false
+  - id: product-development
+    version: "0.9"
+    source: bundled copy at d70509f35e70ac8245a873c86800f11c0ba408d2
+    from_parent: false
+candidates:
+  - universe_spec: codebase-recordkeeping
+    kind: readme
+    name: Readme
+    alias:
+      form: README file at the repository root or at a package root
+      kind: descriptive
+    action: decide whether to try the project or one of its packages
+    actor: a first-time visitor
+    timing: on the first visit to the repository or package
+    matched: [readme]
+    matched_on: name
+  - universe_spec: codebase-recordkeeping
+    kind: folder-readme
+    name: Folder readme
+    alias:
+      form: README file in a sub-folder
+      kind: descriptive
+    action: find the files to read or change in a folder
+    actor: a contributor or maintainer
+    timing: on first entering the folder
+    matched: [readme]
+    matched_on: name
+every_document_type: null
+received: []

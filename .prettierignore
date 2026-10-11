@@ -2,9 +2,9 @@ pnpm-lock.yaml
 .claude/
 dist/
 
-# Build output from module toolchains, at any depth.
-target/
-**/gen/schemas/
-
 # Vendored read-only from another project.
-contracts/extensions/*/upstream/
+runtime/knowledge-bus/universes/
+runtime/skills/kb-*/
+
+# Tests depend on the exact bytes of these fixtures.
+runtime/tests/fixtures/

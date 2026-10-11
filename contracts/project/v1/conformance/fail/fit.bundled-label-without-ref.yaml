@@ -1,0 +1,12 @@
+---
+# A bundled copy must say which ref it comes from.
+schema: knowledge-mcp/fit/1
+location: README.md
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy
+    from_parent: false
+candidates: []
+every_document_type: []
+received: []

@@ -1,0 +1,73 @@
+---
+# Two moves a listing showed: a correction moved with its file; a plain fit
+# waits to be settled.
+schema: knowledge-mcp/fit-record-update/1
+location: /home/someone/codebase
+based_on: >-
+  sha256:1111111111111111111111111111111111111111111111111111111111111111
+record: |
+  schema: knowledge-mcp/fit-record/1
+  files: {}
+digest: sha256:2222222222222222222222222222222222222222222222222222222222222222
+changed:
+  - path: docs/rfcs/0042-caching.md
+    change: moved
+    old_path: docs/rfcs/0042-cache.md
+    entry:
+      universe_spec: product-development
+      version: "0.9"
+      kind: design-doc
+      made: correction
+      allowed_by:
+        basis: request
+        text: It is a design doc.
+      time: "2026-10-10T09:16:40.003Z"
+  - path: docs/decisions/0001-use-dolt.md
+    change: moved
+    old_path: docs/adr/0001-use-dolt.md
+    was:
+      universe_spec: product-development
+      version: "0.9"
+      kind: decision-record
+      made: fit
+      allowed_by:
+        basis: line
+        text: Keep the fit record.
+        location: AGENTS.md
+      time: "2026-10-10T09:15:02.118Z"
+to_settle:
+  - path: docs/decisions/0001-use-dolt.md
+    scope: 0
+    old_path: docs/adr/0001-use-dolt.md
+    candidates:
+      - universe_spec: product-development
+        kind: decision-record
+        matched: [decision]
+        matched_on: folder
+    was:
+      universe_spec: product-development
+      version: "0.9"
+      kind: decision-record
+      made: fit
+      allowed_by:
+        basis: line
+        text: Keep the fit record.
+        location: AGENTS.md
+      time: "2026-10-10T09:15:02.118Z"
+scopes:
+  - universe_specs:
+      - id: product-development
+        version: "0.9"
+        source: bundled copy at d70509f35e70ac8245a873c86800f11c0ba408d2
+        from_parent: false
+    every_document_type: null
+received: []
+listing_changes:
+  - change: moved
+    path: docs/rfcs/0042-caching.md
+    old_path: docs/rfcs/0042-cache.md
+    fingerprint: >-
+      sha256:3333333333333333333333333333333333333333333333333333333333333333
+  - change: moved
+    path: docs/decisions/0001-use-dolt.md
+    old_path: docs/adr/0001-use-dolt.md

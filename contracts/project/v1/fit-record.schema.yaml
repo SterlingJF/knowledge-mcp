@@ -1,0 +1,97 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+title: Fit record
+description: >-
+  The fit record, `.knowledge-bus/plugins/knowledge-mcp/record.yaml` in
+  the `.knowledge-bus/` at a knowledge base's top folder: one entry per
+  file, keyed by its path from the top folder, naming the file's universe
+  spec and document type, or "no fit". The host reads and writes the file,
+  creating the folders when missing; kb_fit_record returns its merged
+  text.
+type: object
+additionalProperties: false
+required: [schema, files]
+properties:
+  schema:
+    const: knowledge-mcp/fit-record/1
+  files:
+    type: object
+    propertyNames:
+      description: The path from the top folder, folders joined by "/".
+      pattern: ^(?!/)(?!.*(^|/)\.{1,2}(/|$))(?!.*//)[^\\]+$
+    additionalProperties:
+      $ref: "#/$defs/entry"
+$defs:
+  entry:
+    description: >-
+      A universe spec, its version and a document type, or `no_fit: true`.
+    type: object
+    additionalProperties: false
+    required: [made, allowed_by, time]
+    properties:
+      universe_spec:
+        type: string
+        minLength: 1
+      version:
+        type: string
+      kind:
+        type: string
+        minLength: 1
+      no_fit:
+        const: true
+      audience:
+        description: >-
+          The document's reader, and whether the person confirmed the
+          value.
+        type: object
+        additionalProperties: false
+        required: [value, status]
+        properties:
+          value:
+            type: string
+          status:
+            enum: [confirmed, guessed]
+      made:
+        description: >-
+          "fit" when the agent settled the fit; "correction" when the
+          person stated the fit or reader. A correction wins over any
+          later fit.
+        enum: [fit, correction]
+      allowed_by:
+        description: >-
+          The request, standing line or accepted change row that allowed
+          the save.
+        type: object
+        additionalProperties: false
+        required: [basis, text]
+        properties:
+          basis:
+            enum: [request, line, change_row]
+          text:
+            type: string
+          location:
+            type: string
+      fingerprint:
+        description: >-
+          Text the host chose that stays the same while the file's content
+          does; it lets a file renamed outside the agent keep its entry.
+        type: string
+      time:
+        description: UTC time of the save, ending in Z.
+        type: string
+        pattern: ^\d{4}-\d{2}-\d{2}T.*Z$
+    oneOf:
+      - type: object
+        required: [no_fit]
+        properties:
+          no_fit: true
+          universe_spec: false
+          version: false
+          kind: false
+      - type: object
+        required: [universe_spec, version, kind]
+        properties:
+          universe_spec: true
+          version: true
+          kind: true
+          no_fit: false
