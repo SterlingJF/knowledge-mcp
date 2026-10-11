@@ -17,7 +17,7 @@
 </style>
 <rect width="1280" height="640" fill="#fffaf0"/>
 
-<text x="48" y="80" class="title">Plain structured thinking while you work.</text>
+<text x="48" y="80" class="title">Plain, structured thinking while you work.</text>
 <text x="48" y="112" class="label">YOU ASK</text>
 <rect x="48" y="128" width="1184" height="112" rx="16" fill="#ffffff" stroke="#d4ddd1" stroke-width="1.5"/>
 <text x="72" y="176" class="request">Draft a proposal to move our team to a new tool.</text>
