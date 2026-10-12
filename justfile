@@ -94,13 +94,13 @@ check_runtime: check_mcp_tools_doc check_knowledge_mcp_lock
 
 # Write runtime/requirements.lock, the hashed lock the installed plugin runs from, from uv.lock.
 generate_knowledge_mcp_lock:
-  uv export --locked --quiet --package knowledge-mcp --no-dev --no-emit-workspace --no-header --format requirements-txt > runtime/requirements.lock
+  uv export --color never --locked --quiet --package knowledge-mcp --no-dev --no-emit-workspace --no-header --format requirements-txt > runtime/requirements.lock
 
 # Check runtime/requirements.lock is in step with uv.lock.
-check_knowledge_mcp_lock:
+check_knowledge_mcp_lock SOURCE='.':
   #!/usr/bin/env bash
   set -euo pipefail
-  if ! diff -u runtime/requirements.lock <(uv export --locked --quiet --package knowledge-mcp --no-dev --no-emit-workspace --no-header --format requirements-txt); then
+  if ! diff -u {{ quote(SOURCE + '/runtime/requirements.lock') }} <(uv export --color never --project {{ quote(SOURCE) }} --locked --quiet --package knowledge-mcp --no-dev --no-emit-workspace --no-header --format requirements-txt); then
     printf '\nruntime/requirements.lock is stale; run just generate_knowledge_mcp_lock.\n' >&2
     exit 1
   fi
@@ -125,6 +125,14 @@ build_knowledge_mcp SOURCE='.' OUT='dist':
 generate_formula SDIST OUT='dist/knowledge-mcp.rb' SOURCE='.':
   mkdir -p "$(dirname {{ quote(OUT) }})"
   node tools/formula/generate-formula.ts --sdist {{ quote(SDIST) }} --out {{ quote(OUT) }} --lock {{ quote(SOURCE + '/uv.lock') }} --requirements {{ quote(SOURCE + '/runtime/requirements.lock') }} --pyproject {{ quote(SOURCE + '/runtime/pyproject.toml') }}
+
+# Prepare release versions, lockfiles and changelog.
+release_prepare VERSION:
+  node tools/formula/release-metadata.ts prepare --version {{ quote(VERSION) }}
+
+# Validate release versions, notes, and locked requirements.
+release_check: check_knowledge_mcp_lock
+  node tools/formula/release-metadata.ts check
 
 # Resolve an existing stable release tag to its immutable source.
 release_target TAG REPO='SterlingJF/knowledge-mcp':

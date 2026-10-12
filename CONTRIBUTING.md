@@ -18,6 +18,8 @@ From the repo root:
 | Command                              | Purpose                                                                                                           |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | `just check`                         | Run every check CI runs; changes nothing                                                                          |
+| `just release_prepare <version>`     | Update release versions and lockfiles, and promote changelog entry                                                |
+| `just release_check`                 | Validate package and plugin versions, lockfiles and release notes                                                 |
 | `just generate_mcp_tools_doc`        | Write the intro and the tool tables in `docs/mcp-tools.md`                                                        |
 | `just refresh_knowledge_model <tag>` | Copy knowledge-bus's universe specs and skills at `<tag>`, the tag of the pinned release archive, into `runtime/` |
 | `just generate_knowledge_mcp_lock`   | Write `runtime/requirements.lock` from `uv.lock`                                                                  |
@@ -88,7 +90,7 @@ To add, rename, or remove a module, change these names and the files in its "Ref
 │   ├── dependencies/            scans the lockfiles for vulnerabilities
 │   ├── placeholders/            checks no project-template placeholder is left
 │   ├── knowledge-model/         copies knowledge-bus's universe specs and skills into runtime/
-│   └── formula/                 writes the Homebrew formula from uv.lock
+│   └── formula/                 release metadata, source archives and Homebrew bottles
 ├── contracts/                   module
 └── runtime/                     module
 ```

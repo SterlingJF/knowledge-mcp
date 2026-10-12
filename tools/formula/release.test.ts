@@ -13,7 +13,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { syncBuiltinESMExports } from "node:module";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { test } from "node:test";
 import type { TestContext } from "node:test";
 
@@ -61,10 +61,42 @@ function releasedSource(context: TestContext) {
   mkdirSync(join(checkout, "runtime"), { recursive: true });
   for (const file of [
     "uv.lock",
+    "pyproject.toml",
     "runtime/pyproject.toml",
     "runtime/requirements.lock",
-  ])
-    copyFileSync(join(projectRoot, file), join(checkout, file));
+    "package.json",
+    "runtime/.claude-plugin/plugin.json",
+    "runtime/.codex-plugin/plugin.json",
+  ]) {
+    const destination = join(checkout, file);
+    mkdirSync(dirname(destination), { recursive: true });
+    copyFileSync(join(projectRoot, file), destination);
+    if (file.endsWith(".json")) {
+      const metadata = JSON.parse(readFileSync(destination, "utf8"));
+      metadata.version = "0.2.0";
+      writeFileSync(destination, JSON.stringify(metadata, null, 2) + "\n");
+    }
+  }
+  const manifest = join(checkout, "runtime/pyproject.toml");
+  writeFileSync(
+    manifest,
+    readFileSync(manifest, "utf8").replace(
+      /^version = "[^"]+"/m,
+      'version = "0.2.0"',
+    ),
+  );
+  const lock = join(checkout, "uv.lock");
+  writeFileSync(
+    lock,
+    readFileSync(lock, "utf8").replace(
+      /(\[\[package\]\]\nname = "knowledge-mcp"\nversion = ")[^"]+/,
+      "$10.2.0",
+    ),
+  );
+  writeFileSync(
+    join(checkout, "CHANGELOG.md"),
+    "# Changelog\n\n## 0.2.0\n\n- Keep source installation available.\n",
+  );
   git(checkout, ["init", "-q"]);
   git(checkout, ["add", "."]);
   git(checkout, ["commit", "-qm", "released source"]);
@@ -130,11 +162,20 @@ test("invalid tags and package mismatches cannot produce release state", async (
 
 test("source reuses the immutable asset and generates from the released lockfiles", async (context) => {
   const fixture = releasedSource(context);
+  writeFileSync(
+    join(fixture.checkout, "CHANGELOG.md"),
+    "# Changelog\n\n## 0.2.0 (unreleased)\n\n- TODO: Legacy release notes.\n",
+  );
   const archive = Buffer.from("published source fixture\n");
   const events: Array<string> = [];
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
-    if (command === "git") return git(fixture.checkout, args);
+    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "git") {
+      // Isolate existing-archive compatibility from SOURCE provenance validation.
+      if (args[0] === "status") return "";
+      return git(fixture.checkout, args);
+    }
     if (command === "tar") return "Name: knowledge-mcp\nVersion: 0.2.0\n";
     assert.equal(command, "gh");
     if (args[0] === "api")
@@ -164,7 +205,7 @@ test("source reuses the immutable asset and generates from the released lockfile
   assert.match(formula, /knowledge_mcp-0\.2\.0\.tar\.gz/);
   assert.match(formula, /resource "knowledge-bus"/);
   assert.equal(
-    events.some((event) => event.startsWith("just ")),
+    events.some((event) => event.startsWith("just build_knowledge_mcp")),
     false,
     "published source is never rebuilt",
   );
@@ -179,6 +220,7 @@ test("source builds through the existing root recipe and refuses the wrong check
   const events: Array<string> = [];
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
+    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
     if (command === "git") return git(fixture.checkout, args);
     if (command === "tar") return "Name: knowledge-mcp\nVersion: 0.2.0\n";
     if (command === "just") {
@@ -222,6 +264,7 @@ test("source builds through the existing root recipe and refuses the wrong check
 test("a reused source archive with the wrong package identity cannot produce a formula", async (context) => {
   const fixture = releasedSource(context);
   const run: Runner = (command, args) => {
+    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
     if (command === "git") return git(fixture.checkout, args);
     if (command === "tar") return "Name: other-package\nVersion: 0.2.0\n";
     assert.equal(command, "gh");
@@ -365,6 +408,7 @@ test("tap refuses changed same-version source before copying or committing", (co
   const trusted = new Set<string>();
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
+    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
     if (command === "brew" && args[0] === "tap-new") {
       mkdirSync(
         join(
@@ -594,6 +638,7 @@ test("a structured 404 creates the release, while authentication and transport f
   let status: number | undefined = 404;
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
+    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
     if (command === "git") return git(fixture.checkout, args);
     if (command === "tar") return "Name: knowledge-mcp\nVersion: 0.2.0\n";
     if (command === "just") {
@@ -639,7 +684,7 @@ test("a structured 404 creates the release, while authentication and transport f
         (event) =>
           !event.startsWith("gh release create") &&
           !event.startsWith("gh release upload") &&
-          !event.startsWith("just "),
+          !event.startsWith("just build_knowledge_mcp"),
       ),
     );
   }
@@ -695,6 +740,7 @@ test("native build tests the installed app before staging original Homebrew meta
   let metadata = "";
   const run: Runner = (command, args, options) => {
     events.push(`${command} ${args.join(" ")}`);
+    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
     if (command === "uname") return "x86_64";
     if (command === "sw_vers") return "15.7";
     if (command === "gh") {
@@ -826,6 +872,7 @@ test("merge passes both original JSON files to Homebrew after native-pair public
   let trusted = false;
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
+    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
     if (command === "gh") {
       if (args[1] === "view") return JSON.stringify({ assets: [] });
       if (args[1] === "upload") {
@@ -989,3 +1036,229 @@ test("a failed native merge prints and logs its diagnostics once and stops the s
   assert.equal(calls.at(-1)?.startsWith("brew bottle --merge"), true);
   assert.equal(readFileSync(formula, "utf8"), "candidate formula\n");
 });
+
+for (const releaseExists of [false, true]) {
+  test(`unfinished tagged notes cannot create/upload source (release exists: ${releaseExists})`, async (context) => {
+    const fixture = releasedSource(context);
+    writeFileSync(
+      join(fixture.checkout, "CHANGELOG.md"),
+      "# Changelog\n\n## 0.2.0 (unreleased)\n\n- TODO: Finish release notes.\n",
+    );
+    const mutations: Array<string> = [];
+    const run: Runner = (command, args) => {
+      if (command === "just" && args[0] === "check_knowledge_mcp_lock")
+        return "";
+      if (command === "git") {
+        // Isolate content validation; SOURCE cleanliness has separate real-Git cases.
+        if (args[0] === "status") return "";
+        return git(fixture.checkout, args);
+      }
+      if (command === "gh") {
+        if (args[0] === "api") {
+          if (!releaseExists)
+            throw new CommandError("gh", "api", "HTTP/2.0 404 Not Found\n\n{}");
+          return "HTTP/2.0 200 OK\n\n" + JSON.stringify({ assets: [] });
+        }
+        mutations.push(args.join(" "));
+        return "";
+      }
+      if (command === "just") {
+        writeFileSync(
+          join(fixture.root, "dist/knowledge_mcp-0.2.0.tar.gz"),
+          "fixture source",
+        );
+        return "";
+      }
+      assert.equal(command, "tar");
+      return "Name: knowledge-mcp\nVersion: 0.2.0\n";
+    };
+    await assert.rejects(
+      source(
+        {
+          release: fixture.release,
+          source: fixture.checkout,
+          root: fixture.root,
+        },
+        run,
+      ),
+      /notes|changelog|unreleased/i,
+    );
+    assert.deepEqual(mutations, []);
+  });
+}
+
+test("new release uses completed tagged notes and validates locks before release creation", async (context) => {
+  const fixture = releasedSource(context);
+  const events: Array<string> = [];
+  const run: Runner = (command, args) => {
+    events.push([command, ...args].join(" "));
+    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "git") {
+      // Isolate content validation; SOURCE cleanliness has separate real-Git cases.
+      if (args[0] === "status") return "";
+      return git(fixture.checkout, args);
+    }
+    if (command === "gh") {
+      if (args[0] === "api")
+        throw new CommandError("gh", "api", "HTTP/1.1 404 Not Found\r\n\r\n{}");
+      if (args[1] === "create") {
+        assert.equal(args.includes("--generate-notes"), false);
+        const path = args[args.indexOf("--notes-file") + 1];
+        assert.equal(
+          readFileSync(path, "utf8").trim(),
+          "- Keep source installation available.",
+        );
+        assert.ok(events.some((event) => event.startsWith("tar ")));
+      }
+      return "";
+    }
+    if (command === "just") {
+      writeFileSync(
+        join(fixture.root, "dist/knowledge_mcp-0.2.0.tar.gz"),
+        "source fixture",
+      );
+      return "";
+    }
+    assert.equal(command, "tar");
+    return "Name: knowledge-mcp\nVersion: 0.2.0\n";
+  };
+  await source(
+    { release: fixture.release, source: fixture.checkout, root: fixture.root },
+    run,
+  );
+  assert.ok(events.some((event) => event.startsWith("gh release create")));
+  writeFileSync(
+    join(fixture.checkout, "runtime/requirements.lock"),
+    "invalid requirement\n",
+  );
+  events.length = 0;
+  await assert.rejects(
+    source(
+      {
+        release: fixture.release,
+        source: fixture.checkout,
+        root: fixture.root,
+      },
+      run,
+    ),
+    /requirements/i,
+  );
+  assert.ok(
+    events.every(
+      (event) =>
+        !event.startsWith("gh release create") &&
+        !event.startsWith("gh release upload"),
+    ),
+  );
+});
+
+for (const publication of [
+  "missing release",
+  "partial release",
+  "published archive",
+]) {
+  test(`stale tagged dependency locks stop ${publication} before GitHub commands`, async (context) => {
+    const fixture = releasedSource(context);
+    const check = (args: Array<string>) =>
+      execFileSync(
+        "just",
+        ["--justfile", join(projectRoot, "justfile"), ...args],
+        {
+          cwd: fixture.root,
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+          env: {
+            ...process.env,
+            FORCE_COLOR: "1",
+            CLICOLOR_FORCE: "1",
+            UV_COLOR: "always",
+            NO_COLOR: "",
+            UV_OFFLINE: "1",
+            UV_PYTHON_DOWNLOADS: "never",
+          },
+        },
+      );
+    check(["check_knowledge_mcp_lock", fixture.checkout]);
+    const path = join(fixture.checkout, "runtime/pyproject.toml");
+    writeFileSync(
+      path,
+      readFileSync(path, "utf8").replace('"mcp==2.0.0"', '"mcp==2.1.0"'),
+    );
+    const external: Array<string> = [];
+    const run: Runner = (command, args, options) => {
+      if (command === "git") {
+        // Isolate content validation; SOURCE cleanliness has separate real-Git cases.
+        if (args[0] === "status") return "";
+        return git(fixture.checkout, args);
+      }
+      if (command === "just") {
+        assert.deepEqual(args, ["check_knowledge_mcp_lock", fixture.checkout]);
+        assert.equal(options?.cwd, fixture.root);
+        return check(args);
+      }
+      if (command === "tar") return "Name: knowledge-mcp\nVersion: 0.2.0\n";
+      assert.equal(command, "gh");
+      external.push(args.join(" "));
+      if (args[0] === "api") {
+        if (publication === "missing release")
+          throw new CommandError("gh", "api", "HTTP/2.0 404 Not Found\n\n{}");
+        const assets =
+          publication === "published archive"
+            ? [{ name: "knowledge_mcp-0.2.0.tar.gz" }]
+            : [];
+        return "HTTP/2.0 200 OK\n\n" + JSON.stringify({ assets });
+      }
+      writeFileSync(
+        join(fixture.root, "dist/knowledge_mcp-0.2.0.tar.gz"),
+        "published archive",
+      );
+      return "";
+    };
+    await assert.rejects(
+      source(
+        {
+          release: fixture.release,
+          source: fixture.checkout,
+          root: fixture.root,
+        },
+        run,
+      ),
+      /lock|mcp|requirements|offline|cache/i,
+    );
+    assert.deepEqual(external, []);
+  });
+}
+
+for (const changed of ["tracked", "untracked"]) {
+  test(`source rejects ${changed} checkout changes before external operations`, async (context) => {
+    const fixture = releasedSource(context);
+    const path = join(
+      fixture.checkout,
+      changed === "tracked" ? "CHANGELOG.md" : "unexpected.py",
+    );
+    writeFileSync(path, "unreleased source content\n");
+    const external: Array<string> = [];
+    const run: Runner = (command, args, options) => {
+      if (command === "git") {
+        assert.equal(options?.cwd, fixture.checkout);
+        return git(fixture.checkout, args);
+      }
+      external.push([command, ...args].join(" "));
+      throw new Error("external operation reached dirty SOURCE");
+    };
+    await assert.rejects(
+      source(
+        {
+          release: fixture.release,
+          source: fixture.checkout,
+          root: fixture.root,
+        },
+        run,
+      ),
+      /source checkout.*clean/i,
+    );
+    assert.deepEqual(external, []);
+    assert.equal(existsSync(join(fixture.root, "dist")), false);
+    assert.equal(readFileSync(path, "utf8"), "unreleased source content\n");
+  });
+}

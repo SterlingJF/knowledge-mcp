@@ -229,3 +229,10 @@ test("refuses a release asset of another version", () => {
     new RegExp(`not the source archive of knowledge-mcp ${version}`),
   );
 });
+
+test("invalid requirements raise a library error without terminating its caller", () => {
+  assert.throws(
+    () => requirementsFor("invalid requirement\n"),
+    /requirements.lock/,
+  );
+});

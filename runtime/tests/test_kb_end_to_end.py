@@ -14,10 +14,10 @@ from importlib import metadata
 from pathlib import Path
 
 import pytest
-from knowledge_mcp import bundled
-from knowledge_mcp.main import version
 from mcp.client.stdio import StdioServerParameters
 
+from knowledge_mcp import bundled
+from knowledge_mcp.main import version
 from tests.hosts import (
     CODEBASE,
     MODULE,

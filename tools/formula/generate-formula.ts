@@ -53,16 +53,23 @@ export interface Resource {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const options = readArgs();
-  const formula = generate({
-    sdist: readFileSync(options.sdist),
-    url: options.url,
-    lock: readFileSync(options.lock, "utf8"),
-    requirements: readFileSync(options.requirements, "utf8"),
-    pyproject: readFileSync(options.pyproject, "utf8"),
-  });
-  writeFileSync(options.out, formula);
-  console.log(`wrote: ${options.out}`);
+  try {
+    const options = readArgs();
+    const formula = generate({
+      sdist: readFileSync(options.sdist),
+      url: options.url,
+      lock: readFileSync(options.lock, "utf8"),
+      requirements: readFileSync(options.requirements, "utf8"),
+      pyproject: readFileSync(options.pyproject, "utf8"),
+    });
+    writeFileSync(options.out, formula);
+    console.log(`wrote: ${options.out}`);
+  } catch (error) {
+    console.error(
+      error instanceof Error ? error.message : "Formula generation failed",
+    );
+    process.exitCode = 1;
+  }
 }
 
 function readArgs() {
@@ -84,7 +91,11 @@ function readArgs() {
     if (!values.sdist || !values.out) fail(usage);
     return values as Required<typeof values>;
   } catch (error) {
-    return fail(error instanceof Error ? `${error.message}\n${usage}` : usage);
+    return fail(
+      error instanceof Error && error.message !== usage
+        ? `${error.message}\n${usage}`
+        : usage,
+    );
   }
 }
 
@@ -340,6 +351,5 @@ end
 }
 
 function fail(message: string): never {
-  console.error(message);
-  process.exit(1);
+  throw new Error(message);
 }

@@ -177,15 +177,26 @@ export async function source(
     options.release.commit
   )
     throw new Error("source checkout differs from released tag commit");
+  if (
+    run("git", ["status", "--porcelain", "--untracked-files=normal"], {
+      cwd: checkout,
+    }).trim()
+  )
+    throw new Error("source checkout must be clean to match the released tag");
   const manifest = readFileSync(
     join(checkout, "runtime/pyproject.toml"),
     "utf8",
   );
   if ((await packageVersion(manifest)) !== options.release.version)
     throw new Error("source checkout differs from released package version");
+  const { validateMetadata, releaseNotes } =
+    await import("./release-metadata.ts");
+  validateMetadata(checkout, options.release.version);
+  run("just", ["check_knowledge_mcp_lock", checkout], { cwd: options.root });
   const dist = join(options.root, "dist");
   mkdirSync(dist, { recursive: true });
   let assets: Set<string>;
+  let releaseMissing = false;
   try {
     assets = releaseAssets(options.release, run);
   } catch (error) {
@@ -195,22 +206,16 @@ export async function source(
       error.httpStatus !== 404
     )
       throw error;
-    run("gh", [
-      "release",
-      "create",
-      options.release.tag,
-      "--repo",
-      options.release.repo,
-      "--verify-tag",
-      "--title",
-      options.release.tag,
-      "--generate-notes",
-    ]);
+    releaseMissing = true;
     assets = new Set();
   }
   const name = `knowledge_mcp-${options.release.version}.tar.gz`;
   const archive = join(dist, name);
-  if (assets.has(name))
+  const newSource = !assets.has(name);
+  const notes = newSource
+    ? releaseNotes(checkout, options.release.version)
+    : "";
+  if (!newSource)
     run("gh", [
       "release",
       "download",
@@ -251,7 +256,23 @@ export async function source(
     ),
     pyproject: manifest,
   });
-  if (!assets.has(name))
+  if (newSource) {
+    if (releaseMissing) {
+      const notesPath = join(dist, "release-notes.md");
+      writeFileSync(notesPath, `${notes}\n`);
+      run("gh", [
+        "release",
+        "create",
+        options.release.tag,
+        "--repo",
+        options.release.repo,
+        "--verify-tag",
+        "--title",
+        options.release.tag,
+        "--notes-file",
+        notesPath,
+      ]);
+    }
     run("gh", [
       "release",
       "upload",
@@ -260,6 +281,7 @@ export async function source(
       "--repo",
       options.release.repo,
     ]);
+  }
   writeFileSync(join(dist, "knowledge-mcp.rb"), formula);
   writeFileSync(
     join(dist, "release.json"),
