@@ -1,10 +1,8 @@
 {
   "name": "knowledge-mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Say what each file in a knowledge base is for, from the universe specs that apply to the file, check the card before writing, bring in documents written elsewhere passage by passage, and keep a record of each edit and of each file's fit, with every knowledge-bus skill and kbp mode.",
-  "author": {
-    "name": "Sterling Freeman"
-  },
+  "author": { "name": "Sterling Freeman" },
   "homepage": "https://github.com/SterlingJF/knowledge-mcp",
   "repository": "https://github.com/SterlingJF/knowledge-mcp",
   "license": "MIT",

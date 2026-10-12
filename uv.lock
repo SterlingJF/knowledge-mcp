@@ -284,7 +284,7 @@ sdist = { hash = "sha256:e65e008f2c4e4139548560d35654583722b7312ed0fec444b869869
 
 [[package]]
 name = "knowledge-mcp"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "runtime" }
 dependencies = [
     { name = "knowledge-bus" },
