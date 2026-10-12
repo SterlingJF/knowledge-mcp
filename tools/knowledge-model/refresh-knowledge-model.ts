@@ -59,7 +59,7 @@ if (pin !== options.ref) {
 const entries = select(untar(gunzipSync(await read())));
 const folders = Object.fromEntries(
   copied.map((area) => [area, foldersOf(area)]),
-) as Record<Area, string[]>;
+) as Record<Area, Array<string>>;
 for (const area of copied) {
   if (folders[area].length === 0)
     fail(`The archive has no folders under ${area}/.`);
@@ -141,17 +141,19 @@ async function read(): Promise<Buffer> {
     if (!response.ok) fail(`${url}: HTTP ${response.status}`);
     return Buffer.from(await response.arrayBuffer());
   }
-  const local = join(options.source, `${options.ref}.tar.gz`);
+  const archivePath = join(options.source, `${options.ref}.tar.gz`);
   try {
-    return readFileSync(local);
+    return readFileSync(archivePath);
   } catch (error) {
-    return fail(`${local}: ${(error as NodeJS.ErrnoException).code ?? error}`);
+    return fail(
+      `${archivePath}: ${(error as NodeJS.ErrnoException).code ?? error}`,
+    );
   }
 }
 
 /** Every regular file in a POSIX tar archive, with pax and GNU long names applied. */
-function untar(archive: Buffer): Entry[] {
-  const files: Entry[] = [];
+function untar(archive: Buffer): Array<Entry> {
+  const files: Array<Entry> = [];
   let offset = 0;
   let longName: string | undefined;
   while (offset + 512 <= archive.length) {
@@ -193,11 +195,14 @@ function untar(archive: Buffer): Entry[] {
 }
 
 /** Files under universes/<folder>/ and skills/<folder>/, without the archive's top folder. */
-function select(all: Entry[]): Entry[] {
-  const chosen: Entry[] = [];
+function select(all: Array<Entry>): Array<Entry> {
+  const chosen: Array<Entry> = [];
   for (const entry of all) {
     const parts = entry.path.split("/").filter(Boolean).slice(1);
-    if (parts.length < 3 || !(copied as readonly string[]).includes(parts[0])) {
+    if (
+      parts.length < 3 ||
+      !(copied as ReadonlyArray<string>).includes(parts[0])
+    ) {
       continue;
     }
     if (parts.some((part) => part === "." || part === "..")) {
@@ -209,7 +214,7 @@ function select(all: Entry[]): Entry[] {
   return chosen.sort((a, b) => a.path.localeCompare(b.path));
 }
 
-function foldersOf(area: Area): string[] {
+function foldersOf(area: Area): Array<string> {
   return [
     ...new Set(
       entries
@@ -226,7 +231,7 @@ function local(path: string): string {
 }
 
 /** Skill folders the last refresh copied, from its UPSTREAM.md. */
-function previousSkills(): string[] {
+function previousSkills(): Array<string> {
   const path = join(options.plugin, notesPath);
   if (!existsSync(path)) return [];
   return [

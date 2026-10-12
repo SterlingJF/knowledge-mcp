@@ -12,15 +12,15 @@ const script = resolve(
 );
 
 type Repo = {
-  node?: string[];
-  python?: string[];
-  data?: string[];
+  node?: Array<string>;
+  python?: Array<string>;
+  data?: Array<string>;
   packageNames?: Record<string, string>;
-  jobs?: string[];
-  recipes?: string[];
-  check?: string[];
-  regions?: string[];
-  readmes?: string[];
+  jobs?: Array<string>;
+  recipes?: Array<string>;
+  check?: Array<string>;
+  regions?: Array<string>;
+  readmes?: Array<string>;
 };
 
 function repo(spec: Repo = {}): string {

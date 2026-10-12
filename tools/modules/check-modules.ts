@@ -11,7 +11,7 @@ import { join, resolve } from "node:path";
 import { parse } from "yaml";
 
 const root = resolve(process.argv[2] ?? ".");
-const failures: string[] = [];
+const failures: Array<string> = [];
 
 const nodePackages = nodeModules();
 const pythonPackages = pythonModules();
@@ -87,16 +87,16 @@ console.log(
 );
 process.exitCode = failures.length === 0 ? 0 : 1;
 
-function nodeModules(): string[] {
+function nodeModules(): Array<string> {
   const path = join(root, "pnpm-workspace.yaml");
   if (!existsSync(path)) return [];
   const workspace = parse(readFileSync(path, "utf8")) as {
-    packages?: string[];
+    packages?: Array<string>;
   };
   return workspace.packages ?? [];
 }
 
-function pythonModules(): string[] {
+function pythonModules(): Array<string> {
   const path = join(root, "pyproject.toml");
   if (!existsSync(path)) return [];
   const members = /^members\s*=\s*\[([^\]]*)\]/m.exec(
@@ -123,7 +123,7 @@ function packageName(
   return declared;
 }
 
-function layoutModules(): string[] {
+function layoutModules(): Array<string> {
   return readdirSync(root, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
@@ -135,7 +135,7 @@ function layoutModules(): string[] {
     });
 }
 
-function ciJobs(): string[] {
+function ciJobs(): Array<string> {
   const path = join(root, ".github/workflows/ci.yml");
   if (!existsSync(path)) return [];
   const workflow = parse(readFileSync(path, "utf8")) as {
@@ -144,17 +144,17 @@ function ciJobs(): string[] {
   return Object.keys(workflow.jobs ?? {});
 }
 
-function justRecipes(): Map<string, string[]> {
-  const recipes = new Map<string, string[]>();
+function justRecipes(): Map<string, Array<string>> {
+  const found = new Map<string, Array<string>>();
   for (const line of readFileSync(join(root, "justfile"), "utf8").split("\n")) {
     const match = /^([A-Za-z_][\w-]*)(?:\s+[^:=]*)?:(?!=)(.*)$/.exec(line);
     if (match)
-      recipes.set(match[1], match[2].trim().split(/\s+/).filter(Boolean));
+      found.set(match[1], match[2].trim().split(/\s+/).filter(Boolean));
   }
-  return recipes;
+  return found;
 }
 
-function readmeRegions(): string[] {
+function readmeRegions(): Array<string> {
   const readme = readFileSync(join(root, "CONTRIBUTING.md"), "utf8");
   return [
     ...readme.matchAll(

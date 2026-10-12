@@ -22,7 +22,7 @@ const usage =
   "[--pyproject runtime/pyproject.toml]";
 
 /** Native libraries and build tools some source archives need, by package name. */
-const native: Record<string, { build?: string[]; run?: string[] }> = {
+const native: Record<string, { build?: Array<string>; run?: Array<string> }> = {
   cryptography: { build: ["pkgconf", "rust"], run: ["openssl@3"] },
   "pydantic-core": { build: ["rust"] },
   "rpds-py": { build: ["rust"] },
@@ -115,13 +115,15 @@ export function generate(input: {
 }
 
 /** The packages requirements.lock installs on macOS with CPython 3.14. */
-export function requirementsFor(text: string): Requirement[] {
-  const found: Requirement[] = [];
+export function requirementsFor(text: string): Array<Requirement> {
+  const found: Array<Requirement> = [];
   const joined = text.replace(/\\\n/g, " ");
   for (const raw of joined.split("\n")) {
     const line = raw.replace(/\s+--hash=\S+/g, "").trim();
     if (!line || line.startsWith("#")) continue;
-    const [requirement, marker] = line.split(/\s;\s/, 2);
+    const parts = line.split(/\s;\s/, 2);
+    const requirement = parts[0];
+    const marker = parts.at(1);
     if (marker !== undefined && !evaluate(marker)) continue;
     const pinned = /^([A-Za-z0-9._-]+)==(\S+)$/.exec(requirement.trim());
     const direct = /^([A-Za-z0-9._-]+)\s*@\s*(\S+)$/.exec(requirement.trim());
@@ -134,16 +136,16 @@ export function requirementsFor(text: string): Requirement[] {
 
 /** Each requirement's source archive and SHA-256, from uv.lock. */
 export function resolve(
-  requirements: Requirement[],
+  requirements: Array<Requirement>,
   lockText: string,
-): Resource[] {
+): Array<Resource> {
   const lock = parse(lockText) as {
-    package?: {
+    package?: Array<{
       name: string;
       version: string;
       source?: { url?: string };
       sdist?: { url?: string; hash?: string };
-    }[];
+    }>;
   };
   const packages = lock.package ?? [];
   return requirements
@@ -190,7 +192,7 @@ export function evaluate(marker: string): boolean {
   let at = 0;
   const peek = (): string | undefined => tokens[at];
   const next = (): string => {
-    const token = tokens[at++];
+    const token = tokens.at(at++);
     if (token === undefined) fail(`marker ends early: ${marker}`);
     return token;
   };
@@ -272,7 +274,7 @@ function versionOrder(left: string, right: string): number {
 function render(input: {
   url: string;
   sha256: string;
-  resources: Resource[];
+  resources: Array<Resource>;
 }): string {
   const build = new Set<string>();
   const run = new Set<string>(["python@3.14"]);

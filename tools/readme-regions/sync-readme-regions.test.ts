@@ -41,7 +41,7 @@ function workspace(files: Record<string, string>): string {
   return dir;
 }
 
-function run(dir: string, ...args: string[]) {
+function run(dir: string, ...args: Array<string>) {
   const result = spawnSync(process.execPath, [script, "README.md", ...args], {
     cwd: dir,
     encoding: "utf8",
@@ -147,6 +147,19 @@ test("fails when a region has no end marker", () => {
   const { status, output } = run(dir);
   assert.equal(status, 1);
   assert.match(output, /unmatched/);
+});
+
+test("an END marker before BEGIN is rejected without changing the README", () => {
+  const original =
+    "<!-- END AUTO-GENERATED alpha/README.md#layout -->\n<!-- BEGIN AUTO-GENERATED alpha/README.md#layout -->\n";
+  const dir = workspace({
+    "alpha/README.md": moduleReadme,
+    "README.md": original,
+  });
+  const { status, output, readme } = run(dir);
+  assert.equal(status, 1);
+  assert.match(output, /unmatched/);
+  assert.equal(readme, original);
 });
 
 test("fails when a file has no regions", () => {

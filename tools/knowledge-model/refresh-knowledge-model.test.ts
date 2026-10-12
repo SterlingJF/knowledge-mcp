@@ -66,7 +66,7 @@ function plugin(pin: string = commit): string {
   return dir;
 }
 
-function run(dir: string, ...args: string[]) {
+function run(dir: string, ...args: Array<string>) {
   const result = spawnSync(
     process.execPath,
     [script, "--plugin", dir, ...args],

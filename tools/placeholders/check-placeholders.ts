@@ -22,7 +22,7 @@ const skipped = new Set([
 
 const root = resolve(process.argv[2] ?? ".");
 const isTemplate = existsSync(join(root, "TEMPLATE.md"));
-const failures: string[] = [];
+const failures: Array<string> = [];
 const used = new Set<string>();
 const files = new Set<string>();
 
