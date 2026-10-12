@@ -19,7 +19,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function readLockDocuments(path: string): Record<string, unknown>[] {
+function readLockDocuments(path: string): Array<Record<string, unknown>> {
   const documents = parseAllDocuments(readFileSync(path, "utf8"));
   if (documents.length === 0) throw new Error(`${path}: no lockfile documents`);
   return documents.map((document, index) => {
@@ -69,7 +69,7 @@ function readLockDocuments(path: string): Record<string, unknown>[] {
 }
 
 /** Every Cargo.lock outside hidden, node_modules and target folders. */
-function findCargoLockfiles(directory: string): string[] {
+function findCargoLockfiles(directory: string): Array<string> {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
@@ -120,7 +120,10 @@ export function scanDependencies(
         ? 127
         : 1;
     }
-    if (result.signal) return 128 + (constants.signals[result.signal] ?? 1);
+    if (result.signal) {
+      const signals: Partial<typeof constants.signals> = constants.signals;
+      return 128 + (signals[result.signal] ?? 1);
+    }
     return result.status ?? 1;
   } finally {
     rmSync(temporary, { recursive: true, force: true });

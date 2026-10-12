@@ -12,7 +12,7 @@ import { parse } from "yaml";
 
 const addFormats = addFormatsModule.default;
 const root = resolve(process.argv[2] ?? ".");
-const failures: string[] = [];
+const failures: Array<string> = [];
 let samples = 0;
 
 for (const suite of findSuites(root)) {
@@ -62,8 +62,8 @@ function checkSample(
   }
 }
 
-function findSuites(dir: string): string[] {
-  const suites: string[] = [];
+function findSuites(dir: string): Array<string> {
+  const suites: Array<string> = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (!entry.isDirectory() || entry.name === "node_modules") continue;
     const path = join(dir, entry.name);

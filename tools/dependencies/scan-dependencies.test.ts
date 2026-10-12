@@ -9,7 +9,7 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
-import { tmpdir } from "node:os";
+import { constants, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { after, test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -38,11 +38,11 @@ const project = {
 const multiDocument = `---\n${stringify(environment)}---\n${stringify(project)}`;
 
 type Recorded = {
-  args: string[];
-  lockfiles: { path: string; contents: string }[];
+  args: Array<string>;
+  lockfiles: Array<{ path: string; contents: string }>;
 };
 
-const fixtureDirectories: string[] = [];
+const fixtureDirectories: Array<string> = [];
 after(() => {
   for (const directory of fixtureDirectories)
     rmSync(directory, { recursive: true, force: true });
@@ -141,6 +141,15 @@ test("preserves vulnerability and connectivity exit statuses and cleans on failu
     ) as Recorded;
     assert.equal(existsSync(dirname(recorded.lockfiles[0].path)), false);
   }
+});
+
+test("scanner termination returns the signal exit status", () => {
+  const input = fixture();
+  writeFileSync(
+    input.scanner,
+    '#!/usr/bin/env node\nprocess.kill(process.pid, "SIGTERM");\n',
+  );
+  assert.equal(scanDependencies(input), 128 + constants.signals.SIGTERM);
 });
 
 test("refuses parser errors, empty documents and malformed lock mappings before scanning", () => {

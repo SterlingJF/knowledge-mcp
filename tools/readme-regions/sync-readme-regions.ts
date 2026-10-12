@@ -26,7 +26,7 @@ for (const file of files) {
 }
 if (stale) process.exitCode = 1;
 
-function readArgs(): { files: string[]; check: boolean } {
+function readArgs(): { files: Array<string>; check: boolean } {
   try {
     const { positionals, values } = parseArgs({
       allowPositionals: true,
@@ -46,7 +46,7 @@ function fillRegions(file: string, text: string): string {
   let cursor = 0;
   for (let index = 0; index < markers.length; index += 2) {
     const begin = markers[index];
-    const end = markers[index + 1];
+    const end = markers.at(index + 1);
     const ref = `${begin[2]}#${begin[3]}`;
     if (
       begin[1] !== "BEGIN" ||

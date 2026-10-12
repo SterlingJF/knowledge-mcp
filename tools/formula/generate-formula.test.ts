@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
@@ -25,7 +25,7 @@ function formula(): string {
   return generate({ sdist, lock, requirements, pyproject });
 }
 
-function run(...args: string[]) {
+function run(...args: Array<string>) {
   const result = spawnSync(process.execPath, [script, ...args], {
     cwd: root,
     encoding: "utf8",
@@ -145,6 +145,34 @@ test("markers are read for CPython 3.14 on macOS", () => {
   );
   assert.equal(evaluate("python_version < '3.11'"), false);
   assert.equal(evaluate("python_version >= '3.14'"), true);
+});
+
+test("requirements without an environment marker remain included", () => {
+  assert.deepEqual(requirementsFor("example==1.2.3\n"), [
+    { name: "example", version: "1.2.3" },
+  ]);
+});
+
+test("an incomplete environment marker cannot produce a formula", () => {
+  const dir = mkdtempSync(join(tmpdir(), "formula-"));
+  const archive = join(dir, "archive.tar.gz");
+  const out = join(dir, "knowledge-mcp.rb");
+  writeFileSync(archive, sdist);
+  writeFileSync(
+    join(dir, "requirements.lock"),
+    "example==1.2.3 ; python_version >=\n",
+  );
+  const { status, output } = run(
+    "--sdist",
+    archive,
+    "--out",
+    out,
+    "--requirements",
+    join(dir, "requirements.lock"),
+  );
+  assert.equal(status, 1);
+  assert.match(output, /marker ends early/);
+  assert.equal(existsSync(out), false);
 });
 
 test("the command line writes the formula from the repo's locks", () => {
