@@ -2,7 +2,7 @@
 
 Plain, structured thinking while you work. It's free, open, and local-first.
 
-knowledge-mcp brings the defined questions, conditions and connections from your knowledge base into your work with AI agents. Your agent applies the guidance based on your document and situation as you ask, write or review.
+Knowledge-MCP brings the defined questions, conditions and connections from your knowledge base into your work with AI agents. Your agent applies the guidance based on your document and situation as you ask, write or review.
 
 Under the hood, [Knowledge Bus](https://github.com/SterlingJF/knowledge-bus) is used to codify domain knowledge as specs.
 
@@ -30,13 +30,13 @@ brew install sterlingjf/tap/knowledge-mcp
 
 Then register it with the apps you use:
 
-| App                                                             | Command                   |
-| --------------------------------------------------------------- | ------------------------- |
-| Claude Code                                                     | `kb setup claude-code`    |
-| Codex, including the ChatGPT desktop app's Codex and Work modes | `kb setup codex`          |
-| The Claude desktop app                                          | `kb setup claude-desktop` |
-| Pi                                                              | `kb setup pi`             |
-| OpenCode                                                        | `kb setup opencode`       |
+| Harness           | Command                   |
+| ----------------- | ------------------------- |
+| Claude Code (CLI) | `kb setup claude-code`    |
+| Claude (desktop)  | `kb setup claude-desktop` |
+| Codex             | `kb setup codex`          |
+| Pi                | `kb setup pi`             |
+| OpenCode          | `kb setup opencode`       |
 
 Start a new session afterward. For the Claude desktop app, also upload the included skills from the folder printed by setup. Open your document or connect its source, then try the proposal request above with your own work.
 
