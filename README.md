@@ -12,7 +12,7 @@ Under the hood, [Knowledge Bus](https://github.com/SterlingJF/knowledge-bus) is 
 
 ## Features
 
-- **Structured Document context.** You and your agent share each document's purpose, reader and questions.
+- **Structured document context.** You and your agent share each document's purpose, reader and questions.
 - **Guided writing.** See each section's questions and catch missing answers while you write.
 - **Structure by folder.** Set guidance for your whole knowledge base or for individual folders.
 - **Knowledge import.** Turn notes and conversations into proposed updates to your documents.
