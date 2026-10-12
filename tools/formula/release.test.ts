@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { execFileSync, spawnSync } from "node:child_process";
+import childProcess, { execFileSync, spawnSync } from "node:child_process";
+import type { SpawnSyncReturns } from "node:child_process";
 import {
   copyFileSync,
   existsSync,
@@ -11,6 +12,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
+import { syncBuiltinESMExports } from "node:module";
 import { basename, join, resolve } from "node:path";
 import { test } from "node:test";
 import type { TestContext } from "node:test";
@@ -323,6 +325,16 @@ test("verification uses ordinary bottle installs and keeps failures out of succe
     ["install", "--build-from-source", "local/release/knowledge-mcp"],
     ["install", "local/release/knowledge-mcp"],
   ]);
+  const trusted = lifecycle.indexOf(
+    "brew trust --formula local/release/knowledge-mcp",
+  );
+  assert.ok(trusted >= 0, "the copied local formula is explicitly trusted");
+  for (const operation of ["audit", "deps", "info"])
+    assert.ok(
+      trusted <
+        lifecycle.findIndex((call) => call.startsWith(`brew ${operation} `)),
+      "trust precedes formula loading",
+    );
   assert.ok(
     lifecycle.indexOf("brew uninstall local/release/knowledge-mcp") <
       lifecycle.indexOf(
@@ -350,6 +362,7 @@ test("tap refuses changed same-version source before copying or committing", (co
   const current = join(fixture.root, "tap/Formula/knowledge-mcp.rb");
   writeFileSync(current, "current formula\n");
   const events: Array<string> = [];
+  const trusted = new Set<string>();
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
     if (command === "brew" && args[0] === "tap-new") {
@@ -367,7 +380,25 @@ test("tap refuses changed same-version source before copying or committing", (co
         fixture.root,
         args[1] === "local/current" ? "current" : "candidate",
       );
-    if (command === "brew" && args[0] === "info")
+    if (command === "brew" && args[0] === "trust") {
+      assert.equal(args[1], "--formula");
+      trusted.add(args[2]);
+      const copied =
+        args[2] === "local/current/knowledge-mcp" ? "current" : "candidate";
+      assert.equal(
+        readFileSync(
+          join(fixture.root, copied, "Formula/knowledge-mcp.rb"),
+          "utf8",
+        ),
+        `${copied} formula\n`,
+      );
+      return "";
+    }
+    if (command === "brew" && args[0] === "info") {
+      assert.ok(
+        trusted.has(args.at(-1) ?? ""),
+        "only the copied formula is trusted before loading",
+      );
       return JSON.stringify({
         formulae: [
           {
@@ -385,6 +416,7 @@ test("tap refuses changed same-version source before copying or committing", (co
           },
         ],
       });
+    }
     throw new Error("Unexpected command before source guard");
   };
   assert.throws(
@@ -442,7 +474,7 @@ test("retrying local verification reuses the existing local tap", (context) => {
       return "";
     }
     if (args[0] === "deps") throw new Error("dependency setup failed");
-    if (args[0] === "audit") return "";
+    if (args[0] === "audit" || args[0] === "trust") return "";
     throw new Error("Unexpected command");
   };
   const options = {
@@ -455,6 +487,106 @@ test("retrying local verification reuses the existing local tap", (context) => {
   assert.throws(() => verifyInstalls(options, run), /dependency setup failed/);
   assert.throws(() => verifyInstalls(options, run), /dependency setup failed/);
 });
+
+for (const name of ["local/release", "local/candidate", "local/current"]) {
+  test(`a failed formula trust for ${name} stops before loading or updating the tap`, (context) => {
+    const root = temporary(context);
+    const release: Release = {
+      tag: "v0.2.0",
+      version: "0.2.0",
+      commit: "a".repeat(40),
+      repo: repository,
+      rootUrl: `https://github.com/${repository}/releases/download/v0.2.0`,
+    };
+    mkdirSync(join(root, "dist"));
+    writeFileSync(join(root, "dist/knowledge-mcp.rb"), "candidate formula\n");
+    const tapRoot = join(root, "tap");
+    mkdirSync(join(tapRoot, "Formula"), { recursive: true });
+    const current = join(tapRoot, "Formula/knowledge-mcp.rb");
+    writeFileSync(current, "current formula\n");
+    const calls: Array<string> = [];
+    const trusted = new Set<string>();
+    const run: Runner = (command, args, options) => {
+      calls.push(`${command} ${args.join(" ")}`);
+      if (command === "uname") return "arm64";
+      if (command === "sw_vers") return "15.7";
+      assert.equal(command, "brew");
+      if (args[0] === "--prefix") return "/opt/homebrew";
+      if (args[0] === "--repository") return join(root, args[1]);
+      if (args[0] === "tap-new") {
+        mkdirSync(join(root, args[2], "Formula"), { recursive: true });
+        return "";
+      }
+      if (args[0] === "trust") {
+        assert.deepEqual(args.slice(0, 2), ["trust", "--formula"]);
+        assert.equal(args.length, 3);
+        assert.equal(options?.log, join(root, "dist/formula-trust.log"));
+        assert.equal(
+          readFileSync(
+            join(
+              root,
+              args[2].replace(/\/knowledge-mcp$/, ""),
+              "Formula/knowledge-mcp.rb",
+            ),
+            "utf8",
+          ),
+          args[2] === "local/current/knowledge-mcp"
+            ? "current formula\n"
+            : "candidate formula\n",
+        );
+        if (args[2] === `${name}/knowledge-mcp`)
+          throw new Error("formula trust failed");
+        trusted.add(args[2]);
+        return "";
+      }
+      assert.deepEqual(args, [
+        "info",
+        "--json=v2",
+        "--formula",
+        "local/candidate/knowledge-mcp",
+      ]);
+      assert.ok(trusted.has("local/candidate/knowledge-mcp"));
+      return JSON.stringify({
+        formulae: [
+          {
+            name: "knowledge-mcp",
+            versions: { stable: release.version },
+            revision: 0,
+            urls: {
+              stable: {
+                url: `${release.rootUrl}/knowledge_mcp-${release.version}.tar.gz`,
+                checksum: "a".repeat(64),
+              },
+            },
+          },
+        ],
+      });
+    };
+    assert.throws(
+      () =>
+        name === "local/release"
+          ? verifyInstalls(
+              {
+                release,
+                root,
+                arch: "arm64",
+                prefix: "/opt/homebrew",
+                bottleTag: "arm64_sequoia",
+              },
+              run,
+            )
+          : tap({ release, root, tap: tapRoot }, run),
+      /formula trust failed/,
+    );
+    assert.equal(calls.at(-1), `brew trust --formula ${name}/knowledge-mcp`);
+    assert.equal(readFileSync(current, "utf8"), "current formula\n");
+    assert.equal(
+      readFileSync(join(root, "dist/knowledge-mcp.rb"), "utf8"),
+      "candidate formula\n",
+    );
+    assert.ok(calls.every((call) => !call.startsWith("git ")));
+  });
+}
 
 test("a structured 404 creates the release, while authentication and transport failures cannot publish", async (context) => {
   const fixture = releasedSource(context);
@@ -604,6 +736,13 @@ test("native build tests the installed app before staging original Homebrew meta
   const generated = events.findIndex((event) =>
     event.startsWith("brew bottle "),
   );
+  assert.ok(
+    events.includes("brew trust --formula local/release/knowledge-mcp"),
+  );
+  assert.ok(
+    events.indexOf("brew trust --formula local/release/knowledge-mcp") <
+      events.findIndex((event) => event.startsWith("brew style ")),
+  );
   for (const command of [
     "brew install --build-bottle",
     "brew test",
@@ -684,6 +823,7 @@ test("merge passes both original JSON files to Homebrew after native-pair public
   );
   const remote = new Map<string, string>();
   const events: Array<string> = [];
+  let trusted = false;
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
     if (command === "gh") {
@@ -703,7 +843,24 @@ test("merge passes both original JSON files to Homebrew after native-pair public
     if (args[0] === "--repository") return join(root, "local-tap");
     if (args[0] === "tap-new")
       mkdirSync(join(root, "local-tap/Formula"), { recursive: true });
+    if (args[0] === "trust") {
+      assert.deepEqual(args, [
+        "trust",
+        "--formula",
+        "local/release/knowledge-mcp",
+      ]);
+      assert.equal(
+        readFileSync(join(root, "local-tap/Formula/knowledge-mcp.rb"), "utf8"),
+        "candidate formula\n",
+      );
+      trusted = true;
+    }
     if (args[0] === "bottle") {
+      assert.equal(
+        trusted,
+        true,
+        "native merge loads only the explicitly trusted formula",
+      );
       assert.deepEqual(args, [
         "bottle",
         "--merge",
@@ -733,4 +890,102 @@ test("merge passes both original JSON files to Homebrew after native-pair public
     readFileSync(join(root, "dist/knowledge-mcp.rb"), "utf8"),
     "merged by Homebrew\n",
   );
+});
+
+test("a failed native merge prints and logs its diagnostics once and stops the stage", (context) => {
+  const root = temporary(context);
+  const release: Release = {
+    tag: "v0.2.0",
+    version: "0.2.0",
+    commit: "a".repeat(40),
+    repo: repository,
+    rootUrl: `https://github.com/${repository}/releases/download/v0.2.0`,
+  };
+  mkdirSync(join(root, "dist"));
+  const formula = join(root, "dist/knowledge-mcp.rb");
+  writeFileSync(formula, "candidate formula\n");
+  const items = ["arm64_sequoia", "sequoia"].map((tag) =>
+    nativeBottle(join(root, "bottles"), release, tag),
+  );
+  const assets = new Map(
+    items.flatMap((item) =>
+      [item.json, item.remote].map((name) => [
+        name,
+        join(root, "bottles", name),
+      ]),
+    ),
+  );
+  const calls: Array<string> = [];
+  const stdout: Array<string> = [];
+  const stderr: Array<string> = [];
+  const nativeOutput = "==> local/release/knowledge-mcp\n";
+  const nativeError = "Error: native merge diagnostic\n";
+  context.mock.method(process.stdout, "write", (chunk: string) => {
+    stdout.push(chunk);
+    return true;
+  });
+  context.mock.method(process.stderr, "write", (chunk: string) => {
+    stderr.push(chunk);
+    return true;
+  });
+  context.mock.method(
+    childProcess,
+    "spawnSync",
+    (command: string, args: Array<string>): SpawnSyncReturns<string> => {
+      calls.push(`${command} ${args.join(" ")}`);
+      const result: SpawnSyncReturns<string> = {
+        pid: 1,
+        status: 0,
+        signal: null,
+        stdout: "",
+        stderr: "",
+        output: [null, "", ""],
+      };
+      if (command === "gh") {
+        if (args[1] === "view") {
+          result.stdout = JSON.stringify({
+            assets: [...assets.keys()].map((name) => ({ name })),
+          });
+        } else {
+          assert.equal(args[1], "download");
+          const name = args[args.indexOf("--pattern") + 1];
+          const path = assets.get(name);
+          assert.ok(path);
+          copyFileSync(path, join(args[args.indexOf("--dir") + 1], name));
+        }
+      } else {
+        assert.equal(command, "brew");
+        if (args[0] === "--repository") result.stdout = join(root, "local-tap");
+        else if (args[0] === "tap-new")
+          mkdirSync(join(root, "local-tap/Formula"), { recursive: true });
+        else if (args[0] === "trust")
+          assert.deepEqual(args, [
+            "trust",
+            "--formula",
+            "local/release/knowledge-mcp",
+          ]);
+        else {
+          assert.equal(args[0], "bottle");
+          result.status = 1;
+          result.stdout = nativeOutput;
+          result.stderr = nativeError;
+        }
+      }
+      return result;
+    },
+  );
+  syncBuiltinESMExports();
+  context.after(() => {
+    context.mock.restoreAll();
+    syncBuiltinESMExports();
+  });
+  assert.throws(() => merge({ release, root }), /brew bottle failed/);
+  assert.equal(stdout.join(""), nativeOutput);
+  assert.equal(stderr.join(""), nativeError);
+  assert.equal(
+    readFileSync(join(root, "bottles/merge.log"), "utf8"),
+    nativeOutput + nativeError,
+  );
+  assert.equal(calls.at(-1)?.startsWith("brew bottle --merge"), true);
+  assert.equal(readFileSync(formula, "utf8"), "candidate formula\n");
 });

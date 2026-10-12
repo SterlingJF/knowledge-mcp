@@ -288,9 +288,17 @@ function nativeHost(options: NativeOptions, run: Runner) {
     throw new Error("runner differs from native Sequoia bottle target");
 }
 
-function localTap(root: string, run: Runner, name = "local/release"): string {
+function localTap(
+  root: string,
+  run: Runner,
+  name = "local/release",
+  sourcePath = join(root, "dist/knowledge-mcp.rb"),
+): string {
   const path = tapFile(name, run);
-  copyFileSync(join(root, "dist/knowledge-mcp.rb"), path);
+  copyFileSync(sourcePath, path);
+  run("brew", ["trust", "--formula", `${name}/knowledge-mcp`], {
+    log: join(root, "dist/formula-trust.log"),
+  });
   return path;
 }
 
@@ -372,7 +380,7 @@ export function merge(options: StageOptions, run: Runner = execute): void {
         ),
       ),
     ],
-    { cwd: dir },
+    { cwd: dir, log: join(dir, "merge.log") },
   );
   run("brew", ["style", formulaName]);
   copyFileSync(formula, join(options.root, "dist/knowledge-mcp.rb"));
@@ -491,8 +499,7 @@ export function tap(
     throw new Error("candidate differs from released version");
   const path = join(options.tap, "Formula/knowledge-mcp.rb");
   if (existsSync(path)) {
-    const currentPath = tapFile("local/current", run);
-    copyFileSync(path, currentPath);
+    localTap(options.root, run, "local/current", path);
     const current = formulaInfo("local/current/knowledge-mcp", run);
     const currentParts = stableVersion(current.version);
     const candidateParts = stableVersion(candidate.version);
