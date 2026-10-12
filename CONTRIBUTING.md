@@ -28,7 +28,7 @@ From the repo root:
 
 Each module's README lists its own commands.
 
-A tag `v<version>` matching `runtime/pyproject.toml` runs the release workflow: it attaches the source archive to the GitHub release, installs and tests the generated formula on macOS, and pushes `Formula/knowledge-mcp.rb` to [SterlingJF/homebrew-tap](https://github.com/SterlingJF/homebrew-tap) with the `HOMEBREW_TAP_TOKEN` secret, a fine-grained token with read and write access to the tap's contents alone.
+A stable tag `vX.Y.Z` matching the tagged `runtime/pyproject.toml` runs the release workflow through the root `release_*` recipes. It builds native ARM64 and Intel macOS bottles and checks bottle and source installs before updating [SterlingJF/homebrew-tap](https://github.com/SterlingJF/homebrew-tap). The `HOMEBREW_TAP_TOKEN` secret needs read and write access to the tap's contents alone. Follow [the release check](docs/release-check.md) for runners, bottle backfills for existing releases, retries, install timing and app checks.
 
 Renovate updates `uv.lock` but not `runtime/requirements.lock`, so `check_knowledge_mcp_lock` fails on its Python update PRs, the weekly lock maintenance PR included. Check out the PR branch, run `just generate_knowledge_mcp_lock`, and push the result.
 
@@ -67,7 +67,7 @@ To add, rename, or remove a module, change these names and the files in its "Ref
 ├── .husky/                      Git hooks
 ├── .pre-commit-config.yaml      large-file guard
 ├── .github/workflows/ci.yml     one job per module
-├── .github/workflows/release.yml  a version tag: source archive, release asset, Homebrew formula to the tap
+├── .github/workflows/release.yml  version tag or manual backfill: source archive, macOS bottles, validated formula to the tap
 ├── .gitignore
 ├── .prettierrc.json
 ├── .prettierignore

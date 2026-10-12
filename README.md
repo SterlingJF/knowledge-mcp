@@ -64,7 +64,7 @@ Start a new session after installation.
 
 - [Agent reference](docs/mcp-tools.md).
 - [Access and data handling](SECURITY.md).
-- [Installation, checks and removal](docs/release-check.md).
+- [Release checks for maintainers](docs/release-check.md).
 - [Contributing](CONTRIBUTING.md).
 
 ## License

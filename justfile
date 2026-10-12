@@ -118,13 +118,37 @@ check_mcp_tools_doc:
   uv run --locked --package knowledge-mcp python runtime/scripts/generate_tools_doc.py docs/mcp-tools.md --check
 
 # Build dist/knowledge_mcp-<version>.tar.gz, the source archive the Homebrew formula installs.
-build_knowledge_mcp:
-  uv build --package knowledge-mcp --sdist --out-dir dist
+build_knowledge_mcp SOURCE='.' OUT='dist':
+  uv build --project {{ quote(SOURCE) }} --package knowledge-mcp --sdist --out-dir {{ quote(OUT) }}
 
 # Write the Homebrew formula for SDIST, a built source archive, from uv.lock; nothing is published.
-generate_formula SDIST OUT='dist/knowledge-mcp.rb':
+generate_formula SDIST OUT='dist/knowledge-mcp.rb' SOURCE='.':
   mkdir -p "$(dirname {{ quote(OUT) }})"
-  node tools/formula/generate-formula.ts --sdist {{ quote(SDIST) }} --out {{ quote(OUT) }}
+  node tools/formula/generate-formula.ts --sdist {{ quote(SDIST) }} --out {{ quote(OUT) }} --lock {{ quote(SOURCE + '/uv.lock') }} --requirements {{ quote(SOURCE + '/runtime/requirements.lock') }} --pyproject {{ quote(SOURCE + '/runtime/pyproject.toml') }}
+
+# Resolve an existing stable release tag to its immutable source.
+release_target TAG REPO='SterlingJF/knowledge-mcp':
+  node tools/formula/release.ts target --tag {{ quote(TAG) }} --repo {{ quote(REPO) }}
+
+# Prepare the release source archive and formula from the tagged checkout.
+release_source SOURCE='release-source':
+  node tools/formula/release.ts source --release dist/release.json --source {{ quote(SOURCE) }}
+
+# Restore or build one native bottle.
+release_bottle ARCH PREFIX BOTTLE_TAG:
+  node tools/formula/release.ts bottle --release dist/release.json --arch {{ quote(ARCH) }} --prefix {{ quote(PREFIX) }} --bottle-tag {{ quote(BOTTLE_TAG) }}
+
+# Publish immutable native bottle pairs and merge their formula metadata.
+release_merge:
+  node tools/formula/release.ts merge --release dist/release.json
+
+# Check and time source and ordinary bottle installs on a native host.
+release_verify ARCH PREFIX BOTTLE_TAG:
+  node tools/formula/release.ts verify --release dist/release.json --arch {{ quote(ARCH) }} --prefix {{ quote(PREFIX) }} --bottle-tag {{ quote(BOTTLE_TAG) }}
+
+# Update the tap only after all release checks pass.
+release_tap TAP='tap':
+  node tools/formula/release.ts tap --release dist/release.json --tap {{ quote(TAP) }}
 
 # --- Docs -----------------------------------------------------------------
 
