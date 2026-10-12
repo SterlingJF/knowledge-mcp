@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Homebrew bottles
+
+- Add native ARM64 and Intel macOS bottles with source fallback and install checks before updating the tap. The workflow also supports adding bottles to the existing `v0.2.0` release without changing its version or tag.
+
 ## 0.2.0 (unreleased)
 
 Knowledge-MCP now provides a local stdio MCP server and the `kb` CLI. Your agent can look up each file's purpose using the document definitions for your knowledge base. One install includes knowledge-bus, which supplies the document definitions, tools and skills.
