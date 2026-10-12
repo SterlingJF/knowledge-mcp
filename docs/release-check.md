@@ -4,15 +4,16 @@ Publishing uses the GitHub release workflow. The workflow runs the native Homebr
 
 ## Publish a release
 
-1. Set the release date in the changelog entry for the version being released.
-2. Run `just check` for the repository's normal code, format and test checks.
-3. Push a stable tag `vX.Y.Z` matching the version in the tagged `runtime/pyproject.toml`. The workflow builds from that tag and its lockfiles.
-4. Wait for the workflow to finish. The tap updates only after both architectures pass all required checks. Bottle assets are uploaded before install verification; an uploaded asset alone does not mean the release passed.
-5. Inspect the release assets and tap formula as described below.
+1. Write the changes under `## X.Y.Z — unreleased` in `CHANGELOG.md`.
+2. Run `just release_prepare X.Y.Z`. Preparation updates package and plugin versions and lockfiles, then promotes that changelog heading. The changes remain unstaged.
+3. Run `just release_check` to check release metadata and notes, then `just check` for the repository's normal code, format and test checks.
+4. Commit the prepared changes, then push a stable tag `vX.Y.Z` matching `runtime/pyproject.toml`. The workflow builds from that tag and its lockfiles and uses its changelog entry for release notes.
+5. Wait for the workflow to finish. The tap updates only after both architectures pass all required checks. Bottle assets are uploaded before install verification; an uploaded asset alone does not mean the release passed.
+6. Inspect the release assets and tap formula as described below.
 
 ## Add bottles to an existing release
 
-Open Actions → Release → Run workflow and enter the existing stable release tag in the `tag` input. The tag must match the package version in the tagged `runtime/pyproject.toml`. The workflow preserves an existing source archive and uses the tagged lockfiles. Do not move the tag or change the package version or formula revision to add bottles. Wait for the checks and inspect the results before marking the backfill complete.
+Open Actions → Release → Run workflow and enter the existing stable release tag in the `tag` input. The tag must match the package version in the tagged `runtime/pyproject.toml`. The workflow reuses an existing source archive and its tagged lockfiles without rewriting the tag or release notes. A release without that archive must pass the tagged metadata and changelog checks before the workflow creates or uploads its source archive. Do not move the tag or change the package version or formula revision to add bottles. Wait for the checks and inspect the results before marking the backfill complete.
 
 Retries reuse published native bottle JSON and archives without replacing either. If a published pair is incomplete, use Actions → Re-run failed jobs to finish publication from the original retained build artifacts. A new run refuses to rebuild an incomplete pair.
 
