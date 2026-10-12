@@ -1,25 +1,21 @@
-"""`kb setup <host>`, `kb setup --remove <host>` and `kb doctor`.
+"""Manage and diagnose Knowledge-MCP setup.
 
-Setup registers the stdio server in the host's configuration (through the host's CLI when it
-has one on PATH, else by editing the file: one entry added, a backup taken first) and links the
-bundled kb-* and km-* skills into the host's skills folder. It writes down each change in
-`setup/state.json` in the state folder (`knowledge_mcp.log.directory`), and `--remove` undoes
-exactly those changes: the entry, the links no other set-up host uses, the folders setup created
-once empty, the backups and the state file itself. The answer log and the edit record stay: once
-no host is set up, `--remove` names `KNOWLEDGE_MCP_STATE_DIR` and the folder in use.
+- `kb` CLI setup
+- MCP server registration in agent apps
 """
 
 from __future__ import annotations
 
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from knowledge_mcp import bundled, configedit, log
 from knowledge_mcp.hosts import HOSTS, NAME, Env, Host, describe, server_command
@@ -38,6 +34,11 @@ class Report:
     lines: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     problems: list[str] = field(default_factory=list)
+    sections: dict[str, list[tuple[str, str | list[str]]]] = field(default_factory=dict)
+    steps: list[str] = field(default_factory=list)
+
+    def detail(self, section: str, label: str, value: str | list[str]) -> None:
+        self.sections.setdefault(section, []).append((label, value))
 
     def say(self, line: str) -> None:
         self.lines.append(line)
@@ -46,10 +47,29 @@ class Report:
         self.warnings.append(line)
 
     def text(self) -> str:
-        out = list(self.lines)
-        out += [f"warning: {line}" for line in self.warnings]
-        out += [f"problem: {line}" for line in self.problems]
-        return "\n".join(out)
+        blocks = []
+        if self.problems:
+            blocks.append("\n".join(f"problem: {line}" for line in self.problems))
+        if self.warnings:
+            blocks.append("\n".join(f"warning: {line}" for line in self.warnings))
+        if self.lines:
+            blocks.append("\n".join(self.lines))
+        for title, facts in self.sections.items():
+            if not facts:
+                continue
+            lines = [title]
+            for label, value in facts:
+                if isinstance(value, list):
+                    lines.append(f"  {label}:")
+                    lines.extend(f"    {item}" for item in value)
+                else:
+                    lines.append(f"  {label}: {value}")
+            blocks.append("\n".join(lines))
+        if self.steps:
+            blocks.append(
+                "\n".join(["Next steps", *(f"  {step}" for step in self.steps)])
+            )
+        return "\n\n".join(blocks)
 
 
 # --- State -------------------------------------------------------------------------------------
@@ -215,8 +235,18 @@ def _recorded(link: Path) -> bool:
     return link.is_symlink() and Path(os.readlink(link)).name == link.name
 
 
-def _skill_duplicates(host: Host, env: Env, linked_into: Path | None) -> list[str]:
-    """Other folders the host reads that hold skills of the same names, one line per folder."""
+@dataclass(frozen=True)
+class SkillDuplicate:
+    """A skill-name conflict in another folder the app reads."""
+
+    full: str
+    brief: str
+
+
+def _skill_duplicates(
+    host: Host, env: Env, linked_into: Path | None
+) -> list[SkillDuplicate]:
+    """Describe matching skill names from each other folder in one scan."""
     names = sorted(skill.name for skill in bundled.skills())
     found = []
     for folder in host.reads(env):
@@ -229,20 +259,34 @@ def _skill_duplicates(host: Host, env: Env, linked_into: Path | None) -> list[st
                 (ours if _ours(path) else other).append(name)
         if ours:
             found.append(
-                f"{host.title} also reads {folder}, which holds kb links for "
-                f"{', '.join(ours)}; {host.title} may list those skills twice."
+                SkillDuplicate(
+                    full=(
+                        f"{host.title} also reads {folder}, which holds kb links for "
+                        f"{', '.join(ours)}; {host.title} may list those skills twice."
+                    ),
+                    brief=f"{host.title}: duplicate kb skill links in {folder}.",
+                )
             )
         if other:
             found.append(
-                f"{host.title} also reads {folder}, where {', '.join(other)} came from another "
-                "installer, such as npx skills add; remove one copy."
+                SkillDuplicate(
+                    full=(
+                        f"{host.title} also reads {folder}, where {', '.join(other)} came from another "
+                        "installer, such as npx skills add; remove one copy."
+                    ),
+                    brief=(
+                        f"{host.title}: duplicate skill names from another installer in "
+                        f"{folder}; remove one copy."
+                    ),
+                )
             )
     return found
 
 
 def _link_skills(host: Host, env: Env, record: dict[str, Any], report: Report) -> None:
     if host.skills is None:
-        report.say(host.no_skills.format(skills=bundled.SKILLS))
+        report.detail("Skills", "Source", str(bundled.SKILLS))
+        report.steps.extend(host.no_skills)
         return
     folder = host.skills(env)
     record["created"] += _make_folder(folder)
@@ -259,7 +303,9 @@ def _link_skills(host: Host, env: Env, record: dict[str, Any], report: Report) -
         link.symlink_to(bundled.SKILLS / skill.name, target_is_directory=True)
         record["links"].append(str(link))
         linked.append(skill.name)
-    report.say(f"Linked {len(linked)} skills into {folder}: {', '.join(linked)}.")
+    report.detail("Skills", "Skill links", str(len(linked)))
+    report.detail("Skills", "Folder", str(folder))
+    report.detail("Skills", "Names", linked)
     for path in kept:
         report.warn(
             f"{path} already exists and was installed another way; kb leaves the existing path unchanged. Remove the existing copy through its installer to use the copy bundled with knowledge-mcp."
@@ -282,8 +328,9 @@ def setup(name: str, env: Env | None = None) -> Report:
     report = Report()
     state = load_state(env)
     if name in state["hosts"]:
-        report.say(
-            f"{host.title} is already set up. Run `kb setup --remove {name}` before running setup again."
+        report.say(f"{host.title} is already set up.")
+        report.steps.append(
+            f"Run `kb setup --remove {name}` before running setup again."
         )
         return report
     if (
@@ -304,22 +351,25 @@ def setup(name: str, env: Env | None = None) -> Report:
                 f"Remove that entry, then run `kb setup {name}` again."
             )
         record.update(method="present", config=str(host.config(env)))
-        report.say(
-            f"{host.config(env)} already runs {NAME}; kb keeps the existing entry unchanged."
-        )
+        report.say(f"Kept the existing {NAME} registration for {host.title}.")
     else:
         cli = _cli(host, env)
         if cli is not None and host.cli_add is not None:
             _run(cli, host.cli_add(command), env)
             record.update(method="cli", config=str(host.config(env)), cli=host.cli)
-            report.say(
-                f"Registered {NAME} with `{host.cli} {' '.join(host.cli_add(command))}`."
+            report.say(f"Registered {NAME} for {host.title}.")
+            report.detail(
+                "Registration",
+                "Registered with",
+                shlex.join([host.cli, *host.cli_add(command)]),
             )
         else:
             _edit_add(host, env, command, record)
-            report.say(f"Registered {NAME} in {host.config(env)}: {' '.join(command)}.")
-            if record["backups"]:
-                report.say(f"Backup before editing: {record['backups'][-1]}.")
+            report.say(f"Registered {NAME} for {host.title}.")
+    report.detail("Registration", "Config", str(host.config(env)))
+    report.detail("Registration", "Server", shlex.join(command))
+    for backup in record["backups"]:
+        report.detail("Registration", "Backup", backup)
     _link_skills(host, env, record, report)
     state["hosts"][name] = record
     _save_state(env, state)
@@ -330,8 +380,8 @@ def setup(name: str, env: Env | None = None) -> Report:
     for duplicate in _skill_duplicates(
         host, env, host.skills(env) if host.skills else None
     ):
-        report.warn(duplicate)
-    report.say(f"Start a new {host.title} session to load knowledge-mcp.")
+        report.warn(duplicate.full)
+    report.steps.append(f"Start a new {host.title} session.")
     return report
 
 
@@ -443,20 +493,101 @@ def _cli_remove(host: Host, env: Env, record: dict[str, Any], report: Report) ->
 # --- Doctor --------------------------------------------------------------------------------------
 
 
-def doctor(env: Env | None = None) -> Report:
+@dataclass
+class DoctorReport(Report):
+    """Check outcomes by default; installation facts when requested."""
+
+    checks: list[tuple[str, str]] = field(default_factory=list)
+    apps: dict[str, Literal["registered", "not set up", "needs attention"]] = field(
+        default_factory=dict
+    )
+
+    brief_warnings: list[str] = field(default_factory=list)
+
+    def warn(self, line: str, brief: str | None = None) -> None:
+        super().warn(line)
+        self.brief_warnings.append(line if brief is None else brief)
+
+    def repair(self, host: str) -> None:
+        for command in (f"kb setup --remove {host}", f"kb setup {host}"):
+            if command not in self.steps:
+                self.steps.append(command)
+
+    def text(self, verbose: bool = False) -> str:
+        problems = len(self.problems)
+        warnings = len(self.warnings)
+        verdict = (
+            f"Installation and registration checks: {problems} "
+            f"{'problem' if problems == 1 else 'problems'}, {warnings} "
+            f"{'warning' if warnings == 1 else 'warnings'}."
+        )
+        if verbose:
+            return verdict + "\n\n" + super().text()
+        blocks = [verdict]
+        if self.problems:
+            blocks.append("\n".join(f"problem: {line}" for line in self.problems))
+        if self.warnings:
+            blocks.append("\n".join(f"warning: {line}" for line in self.brief_warnings))
+        if self.steps:
+            blocks.append(
+                "\n".join(["Next steps", *(f"  {step}" for step in self.steps)])
+            )
+        if not self.problems:
+            blocks.append(
+                "\n".join(
+                    [
+                        "Checks",
+                        *(f"  {label}: {outcome}" for label, outcome in self.checks),
+                    ]
+                )
+            )
+        apps = [
+            f"  {name}: {outcome}"
+            for name, outcome in self.apps.items()
+            if outcome == "needs attention"
+            or (not self.problems and outcome == "registered")
+        ]
+        if not self.problems:
+            unused = sum(outcome == "not set up" for outcome in self.apps.values())
+            if unused:
+                apps.append(f"  Apps not set up: {unused}")
+        if apps:
+            blocks.append("\n".join(["Agent apps", *apps]))
+        return "\n\n".join(blocks)
+
+
+def doctor(env: Env | None = None) -> DoctorReport:
     from importlib import metadata
 
     from knowledge_mcp import kbp
     from knowledge_mcp.main import version
 
     env = env or Env.current()
-    report = Report()
-    report.say(f"kb {version()}")
+    report = DoctorReport(
+        sections={
+            "Installation": [],
+            "Agent apps": [],
+            "Bundled guidance": [],
+            "Bundled skills": [],
+            "State": [],
+        }
+    )
+    report.detail("Installation", "kb", version())
     try:
         package = metadata.version("knowledge-bus")
     except metadata.PackageNotFoundError:
         package = None
     ref = bundled.ref()
+    report.checks.append(
+        ("knowledge-bus package", "installed" if package is not None else "missing")
+    )
+    if package is not None:
+        report.checks.append(
+            (
+                "Bundled release",
+                "matches package" if ref == f"v{package}" else "mismatch",
+            )
+        )
     if package is None:
         report.problems.append("The knowledge-bus package is not installed.")
     elif ref != f"v{package}":
@@ -464,30 +595,35 @@ def doctor(env: Env | None = None) -> Report:
             f"The bundled universe specs and skills come from {ref}, but the knowledge-bus "
             f"package is {package}."
         )
-    else:
-        report.say(
-            f"knowledge-bus {package}; universe specs and skills copied at {ref}"
-        )
+    if package is not None:
+        report.detail("Installation", "knowledge-bus", package)
+    report.detail("Bundled guidance", "Release", ref)
     try:
         printed = kbp.run(["--version"], Path.cwd())
         if printed.code == 0:
-            report.say("kbp: " + "; ".join(printed.stdout.split("\n")).strip("; "))
+            report.checks.append(("kbp executable", "runs"))
+            report.detail("Installation", "kbp", printed.stdout.splitlines())
         else:
+            report.checks.append(("kbp executable", "failed"))
             report.problems.append(
                 f"`kbp --version` exits {printed.code}: {printed.stderr.strip()}"
             )
     except (OSError, RuntimeError) as error:
+        report.checks.append(("kbp executable", "failed"))
         report.problems.append(f"kbp does not run: {error}")
     specs = sorted(path.name for path in bundled.UNIVERSES.iterdir() if path.is_dir())
     skills = bundled.skills()
-    report.say(f"Bundled universe specs: {', '.join(specs)}")
-    report.say(f"Bundled skills: {', '.join(skill.name for skill in skills)}")
+    report.checks.append(
+        ("Bundled guidance and skills", "found" if specs and skills else "missing")
+    )
+    report.detail("Bundled guidance", "Definitions", specs)
+    report.detail("Bundled skills", "Names", [skill.name for skill in skills])
     if not specs or not skills:
         report.problems.append(
             f"The bundled universe specs or skills are missing from {bundled.DATA}."
         )
-    for line in history_lines(env):
-        report.say(line)
+    report.detail("State", log.VARIABLE, env.environ.get(log.VARIABLE, "") or "not set")
+    report.detail("State", "State folder", str(history_folder(env)))
     state = load_state(env)
     command = server_command(env.environ)
     for host in HOSTS.values():
@@ -496,9 +632,14 @@ def doctor(env: Env | None = None) -> Report:
 
 
 def _check_host(
-    host: Host, env: Env, state: dict[str, Any], command: list[str], report: Report
+    host: Host,
+    env: Env,
+    state: dict[str, Any],
+    command: list[str],
+    report: DoctorReport,
 ) -> None:
     record = state["hosts"].get(host.id)
+    report.apps[host.title] = "needs attention"
     try:
         entry = host.read_entry(env)
     except configedit.ConfigError as error:
@@ -507,13 +648,15 @@ def _check_host(
         )
         return
     if record is None and entry is None:
-        report.say(f"{host.title}: not set up")
+        report.apps[host.title] = "not set up"
+        report.detail("Agent apps", host.title, "not set up")
         return
     runs = command_of(entry)
     if entry is None:
         report.problems.append(
-            f"{host.title}: kb has a setup record, but {host.config(env)} has no {NAME} entry. Run `kb setup --remove {host.id}`, then `kb setup {host.id}`."
+            f"{host.title}: kb has a setup record, but {host.config(env)} has no {NAME} entry."
         )
+        report.repair(host.id)
     elif runs != command:
         report.problems.append(
             f"{host.title}: {NAME} command is {describe(runs)}; expected {describe(command)}."
@@ -521,7 +664,9 @@ def _check_host(
     elif runs and not Path(runs[0]).exists():
         report.problems.append(f"{host.title}: {runs[0]} is missing.")
     else:
-        report.say(f"{host.title}: registered in {host.config(env)}")
+        report.apps[host.title] = "registered"
+        report.detail("Agent apps", host.title, "registered")
+    report.detail("Agent apps", f"{host.title} config", str(host.config(env)))
     if record is not None and host.skills is not None:
         folder = host.skills(env)
         missing = [
@@ -532,18 +677,25 @@ def _check_host(
         ]
         broken = [link for link in record["links"] if not Path(link).exists()]
         if broken:
+            report.apps[host.title] = "needs attention"
+            report.repair(host.id)
             report.problems.append(
-                f"{host.title}: skill links or targets are missing: {', '.join(broken)}. Run `kb setup --remove {host.id}`, then `kb setup {host.id}`."
+                f"{host.title}: skill links or targets are missing: {', '.join(broken)}."
             )
         elif missing:
+            report.apps[host.title] = "needs attention"
+            report.repair(host.id)
             report.problems.append(
-                f"{host.title}: missing skill links: {', '.join(missing)}. Run `kb setup --remove {host.id}`, then `kb setup {host.id}`."
+                f"{host.title}: missing skill links: {', '.join(missing)}."
             )
         else:
-            report.say(f"{host.title}: {len(record['links'])} skill links in {folder}")
+            report.detail(
+                "Agent apps", f"{host.title} skill links", str(len(record["links"]))
+            )
+            report.detail("Agent apps", f"{host.title} skills folder", str(folder))
     for duplicate in host.duplicates(env):
         report.warn(f"{host.title}: {duplicate} is installed too.")
     for duplicate in _skill_duplicates(
         host, env, host.skills(env) if host.skills else None
     ):
-        report.warn(duplicate)
+        report.warn(duplicate.full, brief=duplicate.brief)

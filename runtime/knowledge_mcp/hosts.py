@@ -1,29 +1,4 @@
-"""The agent apps `kb setup` registers knowledge-mcp with, and where each keeps its settings.
-
-Each path comes from the host's own documentation or CLI:
-
-- Claude Code: `claude mcp add --scope user` writes `mcpServers` in `~/.claude.json`
-  (`$CLAUDE_CONFIG_DIR/.claude.json` when set); personal skills live in `~/.claude/skills/`
-  (code.claude.com/docs/en/mcp, code.claude.com/docs/en/skills).
-- Codex: `[mcp_servers.<name>]` in `$CODEX_HOME/config.toml`, by default
-  `~/.codex/config.toml`; user skills live in `~/.agents/skills/` (`codex mcp add --help`,
-  learn.chatgpt.com/docs/build-skills). The ChatGPT desktop app's Codex and Work modes read the
-  same configuration. Codex starts a server with a cleared environment but for the names in
-  `env_vars`, and `codex mcp add` sets values only (`--env KEY=VALUE`), so kb edits the file to
-  list the names that choose the state folder.
-- Claude desktop app: `mcpServers` in `~/Library/Application Support/Claude/
-  claude_desktop_config.json` (modelcontextprotocol.io/docs/develop/connect-local-servers); it
-  takes skills as uploads in its settings, never from a folder.
-- Pi: `pi mcp add` writes `mcpServers` in `<agent dir>/mcp.json`, the agent dir being
-  `$PI_CODING_AGENT_DIR` or `~/.pi/agent`; Pi reads skills from `~/.agents/skills/` too
-  (pi-mono docs: mcp.md, cli.md, configuration.md, skills.md).
-- OpenCode: a `local` entry under `mcp` in `~/.config/opencode/opencode.json`; global skills in
-  `~/.config/opencode/skills/`, `~/.claude/skills/` and `~/.agents/skills/` (opencode.ai/docs/
-  mcp-servers, opencode.ai/docs/config, opencode.ai/docs/skills). Its `mcp add` asks questions
-  interactively, so kb edits the file.
-
-Codex, Pi and OpenCode all read `~/.agents/skills/`, so kb links their skills there once.
-"""
+"""MCP host definitions used by `kb setup` and `kb doctor`."""
 
 from __future__ import annotations
 
@@ -78,7 +53,7 @@ class Host:
     skills: Callable[[Env], Path] | None
     reads: Callable[[Env], list[Path]]
     duplicates: Callable[[Env], list[str]]
-    no_skills: str = ""
+    no_skills: tuple[str, ...] = ()
 
     def read_entry(self, env: Env) -> Any:
         """knowledge-mcp's entry in the host's configuration, or None."""
@@ -244,7 +219,8 @@ HOSTS: dict[str, Host] = {
             reads=lambda env: [],
             duplicates=lambda env: [],
             no_skills=(
-                "The Claude desktop app accepts skill uploads in its settings and reads no skills folder. kb creates no skill links for the Claude desktop app. Upload the folders in {skills} through the app's settings."
+                "ZIP each skill folder.",
+                "Upload the ZIP through Customize → Skills in Claude.",
             ),
         ),
         Host(

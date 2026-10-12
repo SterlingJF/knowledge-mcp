@@ -1,12 +1,25 @@
 # Changelog
 
-## Unreleased
+## 0.2.1
+
+### CLI
+
+- Clarify command help and group setup output into registration details, skills and next steps.
+- Show installation and registration check results with `kb doctor`. Use `kb doctor --verbose` for versions, configuration paths and the bundled guidance and skills.
+- Show the app and folder in duplicate-skill warnings; keep the skill names in verbose output.
+- Show the ZIP upload steps for Claude desktop skills.
+
+### Release preparation
+
+- Update package and plugin versions and lockfiles with `just release_prepare <version>`.
+- Validate the matching changelog entry before creating a release or uploading a new source archive.
+- Use that changelog entry for the published release notes.
 
 ### Homebrew bottles
 
 - Add native ARM64 and Intel macOS bottles with source fallback and install checks before updating the tap. The workflow also supports adding bottles to the existing `v0.2.0` release without changing its version or tag.
 
-## 0.2.0 (unreleased)
+## 0.2.0
 
 Knowledge-MCP now provides a local stdio MCP server and the `kb` CLI. Your agent can look up each file's purpose using the document definitions for your knowledge base. One install includes knowledge-bus, which supplies the document definitions, tools and skills.
 

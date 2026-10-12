@@ -1,8 +1,4 @@
-"""`kb`: knowledge-mcp's one command.
-
-`kb` is the knowledge (base) tooling for day-to-day knowledge work and carries `kbp`,
-knowledge-bus's core: the protocol and the core spec contracts.
-"""
+"""Parse `kb` arguments and dispatch subcommands."""
 
 from __future__ import annotations
 
@@ -14,11 +10,7 @@ from pathlib import Path
 
 from knowledge_mcp.hosts import HOSTS
 
-DESCRIPTION = """\
-kb helps you read, write and bring in knowledge with the universe specs that apply to each file.
-Start the knowledge-mcp MCP server for agent apps, register knowledge-mcp with an
-agent app, or run kbp, knowledge-bus's protocol checker.
-"""
+DESCRIPTION = "Use document guidance while you work with AI agents."
 
 
 def _version() -> str:
@@ -37,11 +29,13 @@ def parser() -> argparse.ArgumentParser:
     main.add_argument(
         "--version", action="store_true", help="print the versions and exit"
     )
-    commands = main.add_subparsers(dest="command", metavar="<command>")
+    commands = main.add_subparsers(
+        dest="command", metavar="<command>", title="Commands"
+    )
     commands.add_parser("mcp", help="run the stdio MCP server for agent apps")
     setup = commands.add_parser(
         "setup",
-        help="register knowledge-mcp with an agent app and link the kb-* and km-* skills",
+        help="set up Knowledge-MCP in an agent app",
     )
     setup.add_argument("host", choices=list(HOSTS), help="the agent app")
     setup.add_argument(
@@ -60,9 +54,14 @@ def parser() -> argparse.ArgumentParser:
         help="knowledge base's top folder; defaults to the highest ancestor with .knowledge-bus/, then the nearest .git root, then the parent of the file's folder",
     )
     commands.add_parser("kbp", help="run kbp with the following arguments unchanged")
-    commands.add_parser(
+    doctor = commands.add_parser(
         "doctor",
-        help="check knowledge-bus, bundled universe specs and skills, and agent app setup",
+        help="check the installation and agent app registrations",
+    )
+    doctor.add_argument(
+        "--verbose",
+        action="store_true",
+        help="show versions, inventory and configuration paths",
     )
     return main
 
@@ -111,7 +110,7 @@ def main(argv: list[str] | None = None) -> None:
         from knowledge_mcp import setup as setups
 
         report = setups.doctor()
-        print(report.text())
+        print(report.text(verbose=arguments.verbose))
         sys.exit(1 if report.problems else 0)
     parser().print_help()
 

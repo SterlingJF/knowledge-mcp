@@ -1,12 +1,10 @@
-"""CLI setup, removal, fit, MCP, `kbp` delegation, diagnostics and package installation.
-
-Setup and removal use a temporary HOME and a controlled PATH. Host CLI calls use test stubs.
-"""
+"""Test `kb` CLI"""
 
 from __future__ import annotations
 
 import json
 import os
+import shlex
 import shutil
 import stat
 import subprocess
@@ -16,10 +14,10 @@ from importlib import metadata
 from pathlib import Path
 
 import pytest
-from mcp.client.stdio import StdioServerParameters
-
 from knowledge_mcp import bundled
 from knowledge_mcp.main import version
+from mcp.client.stdio import StdioServerParameters
+
 from tests.hosts import (
     CODEBASE,
     MODULE,
@@ -219,6 +217,20 @@ class TestSetup:
         done = kb(home, "setup", host)
 
         assert entry(home, host) == EXPECTED[host]
+        lines = done.stdout.splitlines()
+        assert lines[0].startswith("Registered ")
+        [config] = [line for line in lines if line.strip().startswith("Config: ")]
+        assert str(home) in config
+        [server] = [line for line in lines if line.strip().startswith("Server: ")]
+        assert shlex.split(server.strip().removeprefix("Server: ")) == [KB, "mcp"]
+        [backup] = (home / ".local/state/knowledge-mcp/setup/backups").iterdir()
+        assert f"Backup: {backup}" in [line.strip() for line in lines]
+        assert lines.index(server) < next(
+            i for i, line in enumerate(lines) if line.startswith("Next steps")
+        )
+        assert "\x1b[" not in done.stdout
+        steps = lines[lines.index("Next steps") + 1 :]
+        assert all(len(line) <= 60 for line in steps)
         if host in SKILL_FOLDER:
             folder = home / SKILL_FOLDER[host]
             for name in SKILLS:
@@ -237,7 +249,12 @@ class TestSetup:
             [guidance] = [
                 line for line in done.stdout.splitlines() if skills_path in line
             ]
-            assert "Claude desktop app" in guidance
+            assert "Claude desktop app" in done.stdout
+            assert any(line.strip().startswith("ZIP ") for line in steps)
+            [upload] = [line for line in steps if line.strip().startswith("Upload ")]
+            assert "ZIP" in upload
+            assert "Customize → Skills" in upload
+            assert guidance.strip().startswith("Source: ")
             assert not guidance.startswith(("warning: ", "problem: "))
 
         assert not any(
@@ -248,6 +265,17 @@ class TestSetup:
         kb(home, "setup", "--remove", host)
 
         assert snapshot(home) == before
+        if host == "codex":
+            executable = tmp_path / "tool folder" / "kb"
+            spaced = kb(home, "setup", host, KNOWLEDGE_MCP_COMMAND=str(executable))
+            [server] = [
+                line.strip().removeprefix("Server: ")
+                for line in spaced.stdout.splitlines()
+                if line.strip().startswith("Server: ")
+            ]
+            assert shlex.split(server) == [str(executable), "mcp"]
+            kb(home, "setup", "--remove", host)
+            assert snapshot(home) == before
 
     def test_remove_preserves_shared_links_until_last_host(self, tmp_path):
         home = fixture_home(tmp_path)
@@ -577,21 +605,44 @@ class TestSetup:
 
     def test_opencode_setup_warns_about_claude_skill_links(self, tmp_path):
         home = fixture_home(tmp_path)
-        kb(home, "setup", "claude-code")
+        executable = str(Path(sys.executable).parent / "kb")
+        kb(home, "setup", "claude-code", KNOWLEDGE_MCP_COMMAND=executable)
 
-        done = kb(home, "setup", "opencode")
+        done = kb(home, "setup", "opencode", KNOWLEDGE_MCP_COMMAND=executable)
 
         [warning] = [line for line in done.stdout.splitlines() if "warning" in line]
         assert (
             f"OpenCode also reads {home / '.claude/skills'}, which holds kb links"
             in warning
         )
+        before_check = snapshot(home)
+        for mode in ((), ("--verbose",)):
+            doctor = kb(
+                home, "doctor", *mode, check=False, KNOWLEDGE_MCP_COMMAND=executable
+            )
+            assert doctor.returncode == 0
+            assert "warning: " in doctor.stdout
+            assert "0 problems" in doctor.stdout.splitlines()[0]
+            assert "1 warning" in doctor.stdout.splitlines()[0]
+            [diagnostic] = [
+                line
+                for line in doctor.stdout.splitlines()
+                if line.startswith("warning: ")
+            ]
+            assert "OpenCode" in diagnostic
+            assert str(home / ".claude/skills") in diagnostic
+            if mode:
+                assert all(name in diagnostic for name in SKILLS)
+            else:
+                assert all(name not in diagnostic for name in SKILLS)
+        assert snapshot(home) == before_check
         kb(home, "setup", "--remove", "opencode")
         kb(home, "setup", "--remove", "claude-code")
 
     def test_doctor_reports_missing_and_mismatched_host_commands(self, tmp_path):
         home = fixture_home(tmp_path)
-        kb(home, "setup", "codex")
+        missing = tmp_path / "missing kb"
+        kb(home, "setup", "codex", KNOWLEDGE_MCP_COMMAND=str(missing))
         stable = tmp_path / "kb"
         stable.write_text("#!/bin/sh\n")
 
@@ -603,44 +654,109 @@ class TestSetup:
             if line.startswith("problem: Codex: ")
         ]
         assert "knowledge-mcp" in problem
+        assert "1 problem" in report.stdout.splitlines()[0]
+        assert "Bundled skills\n" not in report.stdout
 
-        actual = json.dumps([KB, "mcp"])
+        actual = json.dumps([str(missing), "mcp"])
         expected = json.dumps([str(stable), "mcp"])
         assert problem.count(actual) == 1
         assert problem.count(expected) == 1
         assert problem.index(actual) < problem.index(expected)
 
-        # The registered KB path is absent, so doctor reports a missing command.
-        report = kb(home, "doctor", check=False)
-        assert f"Codex: {KB} is missing." in report.stdout
-        assert (
-            "knowledge-bus 0.10.0; universe specs and skills copied at v0.10.0"
-            in report.stdout
+        # The temporary registered executable is absent, so doctor reports it missing.
+        report = kb(home, "doctor", check=False, KNOWLEDGE_MCP_COMMAND=str(missing))
+        assert f"Codex: {missing} is missing." in report.stdout
+        assert "1 problem" in report.stdout.splitlines()[0]
+        before_check = snapshot(home)
+        report = kb(
+            home, "doctor", "--verbose", check=False, KNOWLEDGE_MCP_COMMAND=str(missing)
         )
+        assert report.returncode == 1
+        assert f"Codex: {missing} is missing." in report.stdout
+        assert "knowledge-bus: 0.10.0" in report.stdout
+        assert "Release: v0.10.0" in report.stdout
         assert "Claude Code: not set up" in report.stdout
-        assert (
-            f"Codex: {len(SKILLS)} skill links in {home / '.agents/skills'}"
-            in report.stdout
-        )
-        assert "KNOWLEDGE_MCP_STATE_DIR: not set" in report.stdout.splitlines()
-        assert (
-            f"State folder: {home / '.local/state/knowledge-mcp'}"
-            in report.stdout.splitlines()
-        )
+        assert f"Codex skill links: {len(SKILLS)}" in report.stdout
+        assert f"Codex skills folder: {home / '.agents/skills'}" in report.stdout
+        assert "KNOWLEDGE_MCP_STATE_DIR: not set" in [
+            line.strip() for line in report.stdout.splitlines()
+        ]
+        assert f"State folder: {home / '.local/state/knowledge-mcp'}" in [
+            line.strip() for line in report.stdout.splitlines()
+        ]
 
+        assert snapshot(home) == before_check
+        from knowledge_mcp import configedit
+
+        config = home / ".codex/config.toml"
+        original = config.read_text()
+        config.write_text(
+            configedit.toml_remove(original, "mcp_servers", "knowledge-mcp", None)
+        )
+        drifted = snapshot(home)
+        for mode in ((), ("--verbose",)):
+            drift = kb(
+                home, "doctor", *mode, check=False, KNOWLEDGE_MCP_COMMAND=str(stable)
+            )
+            assert drift.returncode == 1
+            [problem] = [
+                line
+                for line in drift.stdout.splitlines()
+                if line.startswith("problem: Codex:")
+            ]
+            assert str(config) in problem
+            lines = [line.strip() for line in drift.stdout.splitlines()]
+            for command in ("kb setup --remove codex", "kb setup codex"):
+                assert command in lines
+                assert command not in problem
+            assert "Next steps" in drift.stdout
+        assert snapshot(home) == drifted
+        config.write_text("[mcp_servers\n")
+        invalid = kb(home, "doctor", check=False, KNOWLEDGE_MCP_COMMAND=str(stable))
+        assert invalid.returncode == 1
+        assert str(config) in invalid.stdout
+        assert "invalid configuration" in invalid.stdout
+        config.write_text(original)
         kb(home, "setup", "--remove", "codex")
 
     def test_doctor_reports_state_dir_without_creating_directory(self, tmp_path):
         home = fixture_home(tmp_path)
         chosen = tmp_path / "my history"
 
+        before_check = snapshot(home)
         report = kb(home, "doctor", check=False, KNOWLEDGE_MCP_STATE_DIR=str(chosen))
 
-        lines = report.stdout.splitlines()
+        assert report.returncode == 0
+        assert "0 problems" in report.stdout.splitlines()[0]
+        assert "0 warnings" in report.stdout.splitlines()[0]
+        unused = next(
+            line for line in report.stdout.splitlines() if "not set up" in line
+        )
+        assert unused.split()[-1] == "5"
+        assert "Bundled guidance\n" not in report.stdout
+        assert "Bundled skills\n" not in report.stdout
+        assert str(chosen) not in report.stdout
+        report = kb(
+            home,
+            "doctor",
+            "--verbose",
+            check=False,
+            KNOWLEDGE_MCP_STATE_DIR=str(chosen),
+        )
+        assert report.returncode == 0
+        assert "problem: " not in report.stdout
+        for host in ("Claude Code", "Codex", "Claude desktop app", "Pi", "OpenCode"):
+            assert f"{host}: not set up" in report.stdout
+        assert report.stdout.index("Agent apps\n") < report.stdout.index(
+            "Bundled guidance\n"
+        )
+        assert report.stdout.index("Bundled skills\n") < report.stdout.index("State\n")
+        lines = [line.strip() for line in report.stdout.splitlines()]
         assert f"KNOWLEDGE_MCP_STATE_DIR: {chosen}" in lines
         assert f"State folder: {chosen}" in lines
         # doctor reports the configured state directory without creating the directory.
         assert not chosen.exists()
+        assert snapshot(home) == before_check
 
 
 class TestCommands:
@@ -923,7 +1039,19 @@ def test_sdist_wheel_install_links_skills_via_opt_path(
 
     assert shown.stdout.startswith(f"kb {version()} (knowledge-bus 0.10.0")
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
-    assert "Bundled skills: " + ", ".join(SKILLS) in doctor.stdout
+    assert "0 problems" in doctor.stdout.splitlines()[0]
+    assert "Bundled skills\n" not in doctor.stdout
+    verbose = subprocess.run(
+        [str(kb_script), "doctor", "--verbose"],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert verbose.returncode == doctor.returncode
+    assert "Bundled skills\n" in verbose.stdout
+    for name in SKILLS:
+        assert f"    {name}" in verbose.stdout.splitlines()
     assert not (venv / "bin" / "knowledge-mcp").exists()
     # Skill links use the opt path so retargeting opt simulates an upgrade.
     [package] = venv.glob("lib/python*/site-packages/knowledge_mcp")
