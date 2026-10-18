@@ -1,9 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
 ### Added
 
+- `kb doctor` and `kb type` accept `--json`.
+- `kb --version` prints the knowledge-bus version on a second line.
+- The README gives [shell completion](README.md#shell-completion) steps for zsh, Bash and Fish.
+- The `kb_*` tools publish `outputSchema` and return validated `structuredContent`.
+- The `kb_*` tools and argument validation return RFC 9457 problem details with a `type` URI. Non-zero `kbp_*` exits preserve kbp output.
+- Session-start reviews show new, moved and deleted files with filing assessments, unresolved document types and complete counts in a 50-file preview.
 - `kb_prepare_document_moves` prepares a whole list of accepted moves at once and repairs the links between notes that move together.
 - An accepted list can be undone from the edit records; an undo that conflicts with a later change stops and lists the affected files.
 - Two moves to the same path, or a move into a path another file needs, block the list and name each affected move.
@@ -18,16 +24,6 @@
 - `kb_get_document_type` and `kb_prepare_document_types` answers include `filing`: a proposed folder and name, based on where files of the same document type already live.
 - `kb_prepare_document_move` prepares an accepted move or rename, with the new text of every note whose links change. An ambiguous link blocks the move.
 - `kb type` shows the proposed folder and name.
-
-## 0.3.0
-
-### Added
-
-- `kb doctor` and `kb type` accept `--json`.
-- `kb --version` prints the knowledge-bus version on a second line.
-- The README gives [shell completion](README.md#shell-completion) steps for zsh, Bash and Fish.
-- The six `kb_*` tools publish `outputSchema` and return validated `structuredContent`.
-- The `kb_*` tools and argument validation return RFC 9457 problem details with a `type` URI. Non-zero `kbp_*` exits preserve kbp output.
 
 ### Changed
 
