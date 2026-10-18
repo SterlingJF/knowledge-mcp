@@ -3,7 +3,7 @@ type: https://github.com/SterlingJF/knowledge-mcp/problems/argument-invalid
 title: Invalid arguments
 detail:
   kb_get_document_type takes no argument named digest. Its arguments are location,
-  name, folders, knowledge_bus_folders, role, record, record_digest and changes.
+  name, folders, knowledge_bus_folders, role, record, record_digest, changes and listing.
 errors:
   - detail: kb_get_document_type takes no argument named digest.
     pointer: "#/digest"

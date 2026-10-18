@@ -26,7 +26,7 @@ class ChangedEntry(BaseModel):
     change: Annotated[
         Literal["settled", "corrected", "moved", "deleted", "kept", "fingerprint"],
         Field(
-            description="`settled` means the agent set the entry. `corrected` means the person set the entry. A `moved` item has `entry` when the person set the entry or confirmed the reader. A typed entry also needs its universe spec to apply at the new path. Other `moved` items have `was`, and `to_settle` lists the file. `deleted` items have `was`. `fingerprint` means knowledge-mcp updated the stored fingerprint. `kept` means an entry with `set_by: person` overrode an agent entry from `entries`."
+            description="knowledge-mcp retains every classification field when the universe spec and document type apply at the destination. After a conflicting move, knowledge-mcp retains the original entry and lists the destination in to_settle. Other values name classification, deletion or fingerprint updates."
         ),
     ]
     old_path: common_schema.Path | None = None
@@ -99,6 +99,7 @@ class DocumentTypesUpdateAnswer(BaseModel):
         ),
     ]
     received: common_schema.Received
+    filing: list[common_schema.FilingAssessment]
 
 
 type KbPrepareDocumentTypesResult = Annotated[

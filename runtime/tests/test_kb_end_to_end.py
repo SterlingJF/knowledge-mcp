@@ -800,7 +800,12 @@ class TestCommands:
         async def steps(client):
             return await client.call_tool(
                 "kb_get_document_type",
-                type_arguments(root, "docs/rfcs/0042-cache.md", role="maintainer"),
+                {
+                    **type_arguments(
+                        root, "docs/rfcs/0042-cache.md", role="maintainer"
+                    ),
+                    "listing": [{"path": "docs/rfcs/0042-cache.md"}],
+                },
             )
 
         through_server = fit(session(kb_mcp(tmp_path / "state"), steps))

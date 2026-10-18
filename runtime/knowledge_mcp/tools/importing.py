@@ -14,8 +14,8 @@ from knowledge_mcp.models import ScopeRequest
 from knowledge_mcp.models_auto.import_schema import ImportAnswer
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
-from knowledge_mcp.tools.document_type import scope_specs
 from knowledge_mcp.tools.kbp import READS, KnowledgeBusFolders
+from knowledge_mcp.type_scope import scope_specs
 
 DESCRIPTION = """\
 Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`. Label each passage by following the `kb-import-document` skill. Appends the answer to `log.jsonl` and opens no knowledge-base file.

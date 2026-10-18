@@ -42,14 +42,8 @@ Write fail samples by hand as `conformance/fail/<name>.<case>.yaml`.
 
 Each successful `kb_*` result has a `schema` field with a schema ID, such as `knowledge-mcp/document-type/1`.
 The document-types file has `schema: knowledge-mcp/document-types/1`.
-Raise the schema version for a breaking change:
-
-- a field removed or renamed;
-- a narrower type or value list;
-- a new required field;
-- a field whose meaning changes.
-
-Raise the schema version before emitting a new field that older schemas reject.
+Raise the schema version when the stored file changes, or when an answer field is removed or renamed, changes meaning or becomes narrower.
+A new answer field keeps the version. Each server sends its output schema with its answers.
 
 `kb_*` tool errors include an RFC 9457 `type` field with a problem type URI.
 Give a problem type a new URI when its meaning changes.

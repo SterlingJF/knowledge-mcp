@@ -12,6 +12,7 @@ from jsonschema.exceptions import best_match
 
 # kbp_* tools return kbp's output with no output schema.
 RESULTS = {
+    "kb_prepare_document_move": "document-move",
     "kb_get_document_type": "document-type",
     "kb_list_audiences": "audiences",
     "kb_prepare_import": "import",

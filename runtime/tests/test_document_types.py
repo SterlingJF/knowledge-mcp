@@ -344,7 +344,7 @@ class TestMerge:
             kinds_at=kinds_at,
         )
 
-        assert merged.files == {}
+        assert merged.files == files
         assert merged.settle["code/a.md"].was == files["team/a.md"]
 
     def test_deleted_correction_includes_note_to_consult_user(self):

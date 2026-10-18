@@ -45,6 +45,7 @@ class DocumentTypeAnswer(BaseModel):
         ),
     ] = None
     received: common_schema.Received
+    filing: list[common_schema.FilingAssessment]
 
 
 type KbGetDocumentTypeResult = Annotated[

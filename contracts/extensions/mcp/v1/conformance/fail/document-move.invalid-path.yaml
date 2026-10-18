@@ -1,0 +1,27 @@
+---
+schema: knowledge-mcp/document-move/1
+location: vault
+old_path: a.md
+path: ../b.md
+allowed_by:
+  basis: request
+  text: Move the note.
+status: ready
+search:
+  - a
+  - b
+based_on:
+  listing_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  record_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  documents: []
+writes:
+  - old_path: a.md
+    path: b.md
+    before_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+    after_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+    text: ""
+record: ""
+digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+links: []
+issues: []
+received: []

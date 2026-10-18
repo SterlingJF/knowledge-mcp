@@ -174,13 +174,8 @@ async def _first_session(harness, base, client):
     )
     assert changes(moved) == [("moved", PRICING_MOVED), ("moved", ADR_MOVED)]
     assert moved["changed"][0]["entry"]["document_type"] == "design-doc"
-    [waiting] = moved["to_settle"]
-    assert (waiting["path"], waiting["old_path"]) == (ADR_MOVED, ADR)
-    assert waiting["was"]["document_type"] == "decision-record"
-    resettled = await harness.save(
-        client, entries=settle(moved, {ADR_MOVED: (PRODUCT, "decision-record")})
-    )
-    assert changes(resettled) == [("settled", ADR_MOVED)]
+    assert moved["to_settle"] == []
+    assert moved["changed"][1]["entry"]["document_type"] == "decision-record"
 
     base.delete(QUOTE)
     deleted = await harness.save(client, changes=[{"change": "deleted", "path": QUOTE}])
@@ -569,8 +564,9 @@ def test_kb_get_document_type_applies_pending_moves_and_deletions_without_writin
     assert renamed_answer["recorded"]["entry"]["set_by"] == "person"
     assert "recorded" not in checked(old, "document-type")
     moved_answer = checked(moved, "document-type")
-    assert "recorded" not in moved_answer
-    assert moved_answer["candidates"] or moved_answer["every_document_type"]
+    assert moved_answer["recorded"]["entry"]["document_type"] == "design-doc"
+    assert moved_answer["candidates"] == []
+    assert moved_answer["every_document_type"] is None
     assert "recorded" not in checked(deleted, "document-type")
     assert alone.is_error and "with `changes`" in texts(alone)[0]
     assert harness.record() == text

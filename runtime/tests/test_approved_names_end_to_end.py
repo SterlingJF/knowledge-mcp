@@ -120,7 +120,8 @@ def test_kb_type_and_the_get_document_type_tool_rank_by_the_role_given(tmp_path)
         found = {}
         for role in by_role:
             result = await client.call_tool(
-                "kb_get_document_type", {**type_arguments(root, RFC), "role": role}
+                "kb_get_document_type",
+                {**type_arguments(root, RFC), "role": role, "listing": [{"path": RFC}]},
             )
             assert not result.is_error, texts(result)
             found[role] = json.loads(texts(result)[0])
@@ -283,6 +284,7 @@ def test_setup_remove_restores_home_with_the_flag_on_either_side(tmp_path, remov
 
 
 APPROVED_TOOLS = {
+    "kb_prepare_document_move",
     "kb_get_document_type",
     "kb_list_audiences",
     "kb_prepare_import",
@@ -299,6 +301,7 @@ APPROVED_TOOLS = {
     "kbp_card",
 }
 NAMED_VERBS = {
+    "kb_prepare_document_move": "Prepare",
     "kb_get_document_type": "Get",
     "kb_list_audiences": "List",
     "kb_prepare_import": "Prepare",
@@ -353,6 +356,7 @@ def tool(server: dict[str, Any], name: str) -> Any:
 
 def test_mcp_lists_the_approved_tool_names(server):
     assert set(server["tools"]) == APPROVED_TOOLS
+    assert tool(server, "kb_prepare_document_move").title == "Prepare a document move"
 
 
 def test_mcp_tool_titles_are_a_verb_and_a_noun(server):

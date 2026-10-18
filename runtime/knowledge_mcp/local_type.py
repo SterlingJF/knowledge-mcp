@@ -17,7 +17,7 @@ from knowledge_mcp.errors import ToolFault, UsageFault
 from knowledge_mcp.main import build_server
 from knowledge_mcp.models import KnowledgeBusFolder, ScopeRequest
 from knowledge_mcp.scope import Workspace
-from knowledge_mcp.tools.document_type import listed_kinds
+from knowledge_mcp.type_scope import listed_kinds
 
 KNOWLEDGE_BUS = ".knowledge-bus"
 
@@ -109,16 +109,40 @@ def arguments(
         ) from None
     index = bundled.index()
     specs: list[dict[str, Any]] = []
-    for depth in range(len(folders) + 1):
-        knowledge_bus = root.joinpath(*folders[:depth], KNOWLEDGE_BUS)
-        if not knowledge_bus.is_dir():
-            continue
-        files = _spec_files(knowledge_bus, index)
-        scope: dict[str, Any] = {"folder": "/".join(folders[:depth]), "files": files}
-        workspace = knowledge_bus / "workspace.yaml"
-        if workspace.is_file():
-            scope["workspace_yaml"] = workspace.read_text(encoding="utf-8")
-        specs.append(scope)
+    inventory: list[dict[str, str]] = []
+    excluded = {
+        ".knowledge-bus",
+        ".obsidian",
+        ".git",
+        "node_modules",
+        ".venv",
+        "__pycache__",
+        ".mypy_cache",
+        ".pytest_cache",
+        ".ruff_cache",
+    }
+    for current, directories, names in os.walk(root, followlinks=False):
+        knowledge_bus = Path(current) / KNOWLEDGE_BUS
+        if KNOWLEDGE_BUS in directories:
+            files = _spec_files(knowledge_bus, index)
+            relative = Path(current).relative_to(root).as_posix()
+            scope: dict[str, Any] = {
+                "folder": "" if relative == "." else relative,
+                "files": files,
+            }
+            workspace = knowledge_bus / "workspace.yaml"
+            if workspace.is_file():
+                scope["workspace_yaml"] = workspace.read_text(encoding="utf-8")
+            specs.append(scope)
+        directories[:] = sorted(
+            d
+            for d in directories
+            if d not in excluded and not (Path(current) / d).is_symlink()
+        )
+        inventory.extend(
+            {"path": (Path(current) / n).relative_to(root).as_posix()}
+            for n in sorted(names)
+        )
     if not any(scope["files"] or "workspace_yaml" in scope for scope in specs):
         # With no spec file or workspace.yaml from the root down, kb uses the bundled universe
         # specs, so fail now if they are missing.
@@ -128,6 +152,7 @@ def arguments(
         "name": file.name,
         "folders": folders,
         "knowledge_bus_folders": specs,
+        "listing": inventory,
     }
     # knowledge-mcp 0.2.1 and earlier wrote record.yaml instead of document-types.yaml.
     # kb type writes neither file.
@@ -169,6 +194,10 @@ def type_catalog(
             knowledge_bus_folders=[
                 KnowledgeBusFolder.model_validate(folder)
                 for folder in sent["knowledge_bus_folders"]
+                if not folder["folder"]
+                or "/".join([*sent["folders"], sent["name"]]).startswith(
+                    folder["folder"] + "/"
+                )
             ],
         ),
     )

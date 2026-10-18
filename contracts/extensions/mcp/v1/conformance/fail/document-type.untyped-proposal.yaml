@@ -1,0 +1,23 @@
+---
+schema: knowledge-mcp/document-type/1
+location: vault
+universe_specs: []
+candidates: []
+every_document_type: null
+received: []
+filing:
+  - path: inbox/Note.md
+    universe_spec: null
+    document_type: decision-record
+    status: proposed
+    proposal:
+      folder: d
+      name: note.md
+      path: d/note.md
+      folder_new: false
+      name_style: unchanged
+      evidence:
+        - d/peer.md
+      folder_counts:
+        - folder: d
+          count: 1

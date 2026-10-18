@@ -164,6 +164,29 @@ def story(client: Client) -> Any:
                 "changes": [{"change": "moved", "path": MOVED, "old_path": RFC}],
             },
         )
+        move = {
+            "location": NOTES,
+            "old_path": RFC,
+            "path": MOVED,
+            "listing": [{"path": RFC}],
+            "documents": [{"path": RFC, "text": "# Cache\n"}],
+            "case_mode": "sensitive",
+            "record": record,
+            "knowledge_bus_folders": [root_folder()],
+            "allowed_by": INSTRUCTION,
+        }
+        needed = await ask(
+            "document-move.texts-needed", "kb_prepare_document_move", move
+        )
+        await ask(
+            "document-move.ready",
+            "kb_prepare_document_move",
+            {
+                **move,
+                "searched": True,
+                "search": needed["search"],
+            },
+        )
         await ask(
             "audiences.frame",
             "kb_list_audiences",
@@ -241,6 +264,9 @@ def masked(sample: str, answer: Any) -> Any:
                 and stem == "document-types-update"
                 and top
             )
+            changes |= stem == "document-move" and (
+                (top and key in ("record", "digest")) or key == "record_digest"
+            )
             changes |= key == "digest" and node.get("name") == RECORD
             found[key] = (
                 MASKED if changes and value is not None else mask(value, top=False)
@@ -269,3 +295,24 @@ def test_pass_samples_are_real_answers(tmp_path, write_snapshots):
         assert masked(sample, written) == masked(sample, answer), (
             f"{sample} is stale: {FIX}."
         )
+
+
+def test_move_snapshot_masks_record_time_and_retains_document_digests():
+    first = {
+        "record": "first timestamp",
+        "digest": "first digest",
+        "based_on": {
+            "record_digest": "first record",
+            "listing_digest": "inventory",
+            "documents": [{"path": "a.md", "digest": "content"}],
+        },
+    }
+    second = {
+        **first,
+        "record": "second timestamp",
+        "digest": "second digest",
+        "based_on": {**first["based_on"], "record_digest": "second record"},
+    }
+    assert masked("document-move.ready", first) == masked("document-move.ready", second)
+    second["based_on"]["documents"] = [{"path": "a.md", "digest": "changed content"}]
+    assert masked("document-move.ready", first) != masked("document-move.ready", second)

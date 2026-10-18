@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- `kb_get_document_type` and `kb_prepare_document_types` answers include `filing`: a proposed folder and name, based on where files of the same document type already live.
+- `kb_prepare_document_move` prepares an accepted move or rename, with the new text of every note whose links change. An ambiguous link blocks the move.
+- `kb type` shows the proposed folder and name.
+
 ## 0.3.0
 
 ### Added

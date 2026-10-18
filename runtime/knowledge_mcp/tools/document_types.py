@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import posixpath
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Annotated, Any
 
 from mcp.server import MCPServer
 from mcp.types import CallToolResult, ToolAnnotations
 from pydantic import Field
 
-from knowledge_mcp import document_type, problems
+from knowledge_mcp import document_type, filing, problems
 from knowledge_mcp import document_types as records
 from knowledge_mcp.models import (
     AllowedBy,
@@ -16,105 +16,26 @@ from knowledge_mcp.models import (
     FileChange,
     KnowledgeBusFolder,
     ListedFile,
-    ScopeRequest,
 )
 from knowledge_mcp.models_auto.document_types_update_schema import (
     DocumentTypesUpdateAnswer,
 )
-from knowledge_mcp.scope import ScopeError, Workspace
+from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
 from knowledge_mcp.tools.document_type import (
     RecordDigest,
     RecordText,
-    kinds_of,
-    listed_kinds,
-    scope_specs,
 )
+from knowledge_mcp.type_scope import Scopes
 
 DESCRIPTION = """\
-Prepare document-types text from `record` or `record_digest`, file changes and `entries`, returning changed entries and files needing a document type. Include `allowed_by` to receive text when entries change or migration requires saving. Appends the answer to `log.jsonl` and opens no knowledge-base file.
+Prepare document-types text from `record` or `record_digest`, file changes and `entries`, returning changed entries, proposed names and folders, and files needing a document type. Include `allowed_by` to receive text when entries change or migration requires saving. Appends the answer to `log.jsonl` and opens no knowledge-base file.
 """
 
 MIGRATED = (
     f"Save `record` as `{records.PLACE}` in place of `{records.OLD_PLACE}`. "
     f"Delete `{records.OLD_PLACE}` only with the person's permission."
 )
-
-
-@dataclass
-class Scope:
-    index: int
-    listing: dict[str, Any]
-    specs: list[dict[str, Any]]
-    kinds: records.Kinds
-    wants_every: bool = False
-
-
-@dataclass
-class Scopes:
-    """Run `kbp --kinds` once for each set of `.knowledge-bus/` folders that apply to a file,
-    and cache each result.
-
-    Raise ScopeError when `knowledge_bus_folders` names a folder more than once.
-    """
-
-    workspace: Workspace
-    folders: list[KnowledgeBusFolder]
-    found: dict[tuple[tuple[str, ...], ...], Scope] = field(default_factory=dict)
-    received: dict[str, dict[str, Any]] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        seen = set()
-        for index, item in enumerate(self.folders):
-            parts = _parts(item.folder, index)
-            if parts in seen:
-                msg = (
-                    f"Send each folder once in `knowledge_bus_folders`. {item.folder!r} "
-                    "appears more than once."
-                )
-                raise ScopeError(
-                    msg,
-                    pointer=problems.pointer("knowledge_bus_folders", index, "folder"),
-                )
-            seen.add(parts)
-
-    def at(self, path: str) -> Scope:
-        chain = path.split("/")[:-1]
-        applicable = sorted(
-            (
-                (_parts(item.folder, index), index, item)
-                for index, item in enumerate(self.folders)
-                if list(_parts(item.folder, index))
-                == chain[: len(_parts(item.folder, index))]
-            ),
-            key=lambda found: len(found[0]),
-        )
-        key = tuple(parts for parts, _, _ in applicable)
-        if key in self.found:
-            return self.found[key]
-        request = ScopeRequest(
-            folders=list(applicable[-1][0]) if applicable else [],
-            knowledge_bus_folders=[item for _, _, item in applicable],
-            positions=[index for _, index, _ in applicable],
-        )
-        listing, rebuilt = listed_kinds(self.workspace, request)
-        for item in rebuilt.received:
-            self.received[str(item["digest"])] = item
-        scope = Scope(
-            len(self.found), listing, scope_specs(listing, rebuilt), kinds_of(listing)
-        )
-        self.found[key] = scope
-        return scope
-
-    def kinds_at(self, path: str) -> records.Kinds:
-        return self.at(path).kinds
-
-
-def _parts(folder: str, index: int) -> tuple[str, ...]:
-    if folder in ("", "."):
-        return ()
-    pointer = problems.pointer("knowledge_bus_folders", index, "folder")
-    return tuple(records.normal_path(folder, pointer=pointer).split("/"))
 
 
 def _listing_events(
@@ -197,6 +118,29 @@ def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
         ),
     )
     to_settle = _to_settle(merged, scopes)
+    current = filing.inventory(workspace, sent.location, sent.listing, sent.changes)
+    assessments = {}
+    for path, entry in merged.files.items():
+        universe, kind, _ = records.named(entry)
+        assessments[(path, universe or "", kind or "")] = filing.assess(
+            path, (universe, kind), merged.files, listing=current, scopes=scopes
+        )
+    for item in to_settle:
+        scope = scopes.at(item["path"])
+        found = {
+            "candidates": item["candidates"],
+            "every_document_type": None
+            if any(c["matched_on"] == "name" for c in item["candidates"])
+            else document_type.every(scope.listing),
+        }
+        for universe, kind in filing.choices(found):
+            assessments[(item["path"], universe or "", kind or "")] = filing.assess(
+                item["path"],
+                (universe, kind),
+                merged.files,
+                listing=current,
+                scopes=scopes,
+            )
 
     changed = migrated or {
         path: records.plain(entry) for path, entry in merged.files.items()
@@ -214,6 +158,7 @@ def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
         "digest": records.digest(saved) if saved is not None else None,
         "changed": merged.changed,
         "to_settle": to_settle,
+        "filing": [assessments[key] for key in sorted(assessments)],
         "scopes": [
             {
                 "universe_specs": scope.specs,

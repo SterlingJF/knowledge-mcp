@@ -11,8 +11,8 @@ from knowledge_mcp.models import ScopeRequest
 from knowledge_mcp.models_auto.audiences_schema import AudiencesAnswer
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
-from knowledge_mcp.tools.document_type import scope_specs
 from knowledge_mcp.tools.kbp import READS, Folders, KnowledgeBusFolders, Location
+from knowledge_mcp.type_scope import scope_specs
 
 DESCRIPTION = """\
 List the readers you can choose for a document type. Returns the document type's `actor`, plus the audience question and its `choices` from the universe spec. Appends the answer to `log.jsonl` and opens no knowledge-base file.

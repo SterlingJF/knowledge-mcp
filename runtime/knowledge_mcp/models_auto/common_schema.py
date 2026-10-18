@@ -205,6 +205,146 @@ class FileEdited(BaseModel):
     fingerprint: Fingerprint
 
 
+class ListedFile(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: Path
+    fingerprint: Fingerprint | None = None
+
+
+class FolderCount(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    folder: str
+    count: Annotated[int, Field(ge=1)]
+
+
+class FilingProposal(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    folder: str
+    name: str
+    path: Path
+    folder_new: Literal[False]
+    name_style: Literal["lower-kebab", "lower-snake", "unchanged"]
+    evidence: list[Path]
+    folder_counts: list[FolderCount]
+
+
+class FilingProposal3(FilingProposal):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    folder: str
+    name: str
+    path: Path
+    folder_new: Literal[False]
+    name_style: Literal["lower-kebab", "lower-snake", "unchanged"]
+    evidence: list[Path]
+    folder_counts: list[FolderCount]
+
+
+type FilingProposal1 = Annotated[
+    FilingProposal3 | FilingProposal, Field(title="Filing proposal")
+]
+
+
+class FilingAssessment1(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: Path
+    universe_spec: Annotated[str, Field(min_length=1)]
+    document_type: Annotated[str, Field(min_length=1)]
+    status: Literal["proposed"]
+    proposal: Annotated[FilingProposal1 | None, Field(title="Filing proposal")]
+
+
+class FilingAssessment2(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: Path
+    universe_spec: Annotated[str, Field(min_length=1)]
+    document_type: Annotated[str, Field(min_length=1)]
+    status: Literal[
+        "proposed",
+        "already_matches",
+        "no_peers",
+        "no_document_type",
+        "document_type_needed",
+        "listing_needed",
+        "evidence_incomplete",
+        "destination_occupied",
+        "already_matches",
+        "no_peers",
+        "listing_needed",
+        "evidence_incomplete",
+        "destination_occupied",
+    ]
+    proposal: FilingProposal | None
+
+
+class FilingAssessment3(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: Path
+    universe_spec: None
+    document_type: None
+    status: Literal[
+        "proposed",
+        "already_matches",
+        "no_peers",
+        "no_document_type",
+        "document_type_needed",
+        "listing_needed",
+        "evidence_incomplete",
+        "destination_occupied",
+        "no_document_type",
+        "document_type_needed",
+    ]
+    proposal: FilingProposal | None
+
+
+type FilingAssessment = Annotated[
+    FilingAssessment1 | FilingAssessment2 | FilingAssessment3,
+    Field(title="Filing assessment"),
+]
+
+
+type MovePath = Annotated[
+    str,
+    Field(
+        description="Path relative to the knowledge-base root, with forward slashes between folders.",
+        min_length=1,
+        pattern="^[^/\\\\\\u0000]+(?:/[^/\\\\\\u0000]+)*$",
+        title="Move path",
+    ),
+]
+
+
+class MoveDocument(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: MovePath
+    text: str
+
+
+class LinkBinding(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    source_path: MovePath
+    start: Annotated[int, Field(ge=0)]
+    end: Annotated[int, Field(ge=0)]
+    target_path: MovePath
+
+
 type FileChange = Annotated[
     FileCreated | FileDeleted | FileMoved | FileEdited, Field(title="File change")
 ]

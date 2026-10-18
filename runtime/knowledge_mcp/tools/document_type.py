@@ -6,18 +6,31 @@ from mcp.server import MCPServer
 from mcp.types import CallToolResult
 from pydantic import Field
 
-from knowledge_mcp import document_type, kbp, problems
+from knowledge_mcp import document_type, filing, problems
 from knowledge_mcp import document_types as records
-from knowledge_mcp.models import FileChange, KnowledgeBusFolder, ScopeRequest
+from knowledge_mcp.models import (
+    FileChange,
+    KnowledgeBusFolder,
+    ListedFile,
+)
 from knowledge_mcp.models_auto.common_schema import Digest
 from knowledge_mcp.models_auto.document_type_schema import DocumentTypeAnswer
-from knowledge_mcp.scope import SENT, Rebuilt, Workspace
+from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
-from knowledge_mcp.tools.kbp import READS, Folders, KnowledgeBusFolders, Location
+from knowledge_mcp.tools.kbp import READS, Folders, Location
+from knowledge_mcp.type_scope import Scopes
 
 DESCRIPTION = """\
-Get a file's document type before writing or editing. Returns an applicable saved entry from `record` or `record_digest`, or ranked candidates plus every document type when no candidate matches the file name. Appends the answer to `log.jsonl` and opens no knowledge-base file.
+Get a file's document type and proposed name and folder from saved entries and the complete listing. Return saved classification or candidate document types. Appends the answer to `log.jsonl` and opens no knowledge-base file.
 """
+
+
+FilingFolders = Annotated[
+    list[KnowledgeBusFolder],
+    Field(
+        description="Every folder containing .knowledge-bus/, including peer folders. Include empty configuration folders. Classification uses the ancestors of the subject document; filing compares peers under the applicable universe specs."
+    ),
+]
 
 
 RecordText = Annotated[
@@ -53,42 +66,6 @@ Changes = Annotated[
 ]
 
 
-def kinds_of(listing: dict[str, Any]) -> records.Kinds:
-    return {
-        group["universe_spec"]["id"]: (
-            str(group["universe_spec"]["version"]),
-            frozenset(kind["kind"] for kind in group["kinds"]),
-        )
-        for group in listing.get("universe_specs", [listing])
-    }
-
-
-def scope_specs(listing: dict[str, Any], rebuilt: Rebuilt) -> list[dict[str, Any]]:
-    groups = listing.get("universe_specs", [listing])
-    parents = set(listing.get("from_parent", []))
-    return [
-        {
-            "id": spec["id"],
-            "version": spec["version"],
-            "source": rebuilt.sources.get(spec["id"], SENT),
-            "from_parent": spec["id"] in parents
-            or (rebuilt.nearest is not None and spec["id"] not in rebuilt.nearest),
-        }
-        for spec in (group["universe_spec"] for group in groups)
-    ]
-
-
-def listed_kinds(
-    workspace: Workspace, request: ScopeRequest
-) -> tuple[dict[str, Any], Rebuilt]:
-    """Raise KbpFailed when kbp exits nonzero."""
-    with workspace.rebuilt(request) as rebuilt:
-        output = kbp.run(["--kinds"], rebuilt.cwd)
-    if output.code != 0:
-        raise problems.KbpFailed(output, "kinds")
-    return kbp.parsed(output, "kinds", kbp.KINDS), rebuilt
-
-
 def _saved_files(
     workspace: Workspace,
     record: str | None,
@@ -122,25 +99,25 @@ def get_document_type(
     record: str | None,
     record_digest: str | None,
     changes: list[FileChange] | None,
+    inventory_listing: list[ListedFile] | None = None,
 ) -> dict[str, Any]:
     received: list[dict[str, Any]] = []
     files = _saved_files(workspace, record, record_digest, changes, received)
-    listing, rebuilt = listed_kinds(
-        workspace,
-        ScopeRequest(folders=folders, knowledge_bus_folders=knowledge_bus_folders),
-    )
-    specs = scope_specs(listing, rebuilt)
+    scopes = Scopes(workspace, knowledge_bus_folders)
+    subject = "/".join([*folders, name])
+    scope = scopes.at(subject)
+    listing = scope.listing
+    specs = scope.specs
     if files is not None and changes:
         # records.lookup reads only the requested file's entry, so a wrong document-type list
         # for the other changed paths does no harm.
-        kinds = kinds_of(listing)
         files = records.merge(
             files,
             records.MergeRequest(
                 events=[records.event(change) for change in changes],
                 entries=[],
                 recheck=False,
-                kinds_at=lambda _path: kinds,
+                kinds_at=scopes.kinds_at,
                 allowed_by=None,
                 fingerprints={},
             ),
@@ -175,7 +152,12 @@ def get_document_type(
                 universe_specs=specs,
             ),
         )
-    result["received"] = rebuilt.received + received
+    current = filing.inventory(workspace, location, inventory_listing, changes)
+    result["filing"] = [
+        filing.assess(subject, (u, k), files or {}, listing=current, scopes=scopes)
+        for u, k in filing.choices(result)
+    ]
+    result["received"] = list(scopes.received.values()) + received
     return result
 
 
@@ -190,11 +172,12 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
         location: Location,
         name: str,
         folders: Folders,
-        knowledge_bus_folders: KnowledgeBusFolders,
+        knowledge_bus_folders: FilingFolders,
         role: Role = None,
         record: RecordText = None,
         record_digest: RecordDigest = None,
         changes: Changes = None,
+        listing: list[ListedFile] | None = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
@@ -205,6 +188,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             record=record,
             record_digest=record_digest,
             changes=changes,
+            listing=listing,
         )
         result = get_document_type(
             workspace,
@@ -216,6 +200,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             record=record,
             record_digest=record_digest,
             changes=changes,
+            inventory_listing=listing,
         )
         return respond.answer(
             "kb_get_document_type", location, arguments, DocumentTypeAnswer, result

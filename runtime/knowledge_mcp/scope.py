@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from knowledge_mcp import bundled, log, problems
-from knowledge_mcp.models import KnowledgeBusFolder, ScopeRequest, SpecFile
+from knowledge_mcp.models import KnowledgeBusFolder, ListedFile, ScopeRequest, SpecFile
 
 SENT = "sent by the harness"
 SUFFIX = ".kbp.yaml"
@@ -46,6 +46,7 @@ class Workspace:
         self._texts: dict[str, str] = {}
         self._lock = threading.Lock()
         self.fingerprints: dict[str, dict[str, str]] = {}
+        self.inventories: dict[str, list[ListedFile]] = {}
 
     def remember(self, text: str) -> str:
         """Store `text` for this session and return its digest."""

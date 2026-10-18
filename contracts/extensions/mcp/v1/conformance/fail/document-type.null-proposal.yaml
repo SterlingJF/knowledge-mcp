@@ -1,0 +1,13 @@
+---
+schema: knowledge-mcp/document-type/1
+location: vault
+universe_specs: []
+candidates: []
+every_document_type: null
+received: []
+filing:
+  - path: inbox/Note.md
+    universe_spec: product-development
+    document_type: decision-record
+    status: proposed
+    proposal: null

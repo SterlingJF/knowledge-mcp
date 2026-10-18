@@ -207,3 +207,394 @@ scopes:
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
     digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+filing:
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: agent-instructions
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: architecture-overview
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: change-description
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: code-of-conduct
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: code-owners
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: commit-message
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: contributing-guide
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: development-guide
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: documentation-set
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: folder-readme
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: funding-file
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: issue-report
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: license-file
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: notice-file
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: readme
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: release-notes
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: release-procedure
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: roadmap
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: security-policy
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: architecture-overview
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: brand-identity-guide
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: business-model-canvas
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: competitor-analysis
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: decision-brief
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: decision-record
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: design-doc
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: experiment-plan
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: lean-canvas
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: opportunity-assessment
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: persona-profile
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: pestle-analysis
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: product-strategy-canvas
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: risk-assessment
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: scenario-walkthrough
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: startup-canvas
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: success-metrics
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: swot-analysis
+    status: no_peers
+    proposal: null
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: product-development
+    document_type: system-context-diagram
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: agent-instructions
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: architecture-overview
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: change-description
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: code-of-conduct
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: code-owners
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: commit-message
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: contributing-guide
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: development-guide
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: documentation-set
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: folder-readme
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: funding-file
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: issue-report
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: license-file
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: notice-file
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: readme
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: release-notes
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: release-procedure
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: roadmap
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: security-policy
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: architecture-overview
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: brand-identity-guide
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: business-model-canvas
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: competitor-analysis
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: decision-brief
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: decision-record
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: design-doc
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: experiment-plan
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: lean-canvas
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: opportunity-assessment
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: persona-profile
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: pestle-analysis
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: product-strategy-canvas
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: risk-assessment
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: scenario-walkthrough
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: startup-canvas
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: success-metrics
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: swot-analysis
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: system-context-diagram
+    status: no_peers
+    proposal: null

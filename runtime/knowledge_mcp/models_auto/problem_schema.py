@@ -35,6 +35,8 @@ class ProblemDetails(BaseModel):
         "https://github.com/SterlingJF/knowledge-mcp/problems/kbp-failed",
         "https://github.com/SterlingJF/knowledge-mcp/problems/kbp-version-skew",
         "https://github.com/SterlingJF/knowledge-mcp/problems/internal-error",
+        "https://github.com/SterlingJF/knowledge-mcp/problems/move-invalid",
+        "https://github.com/SterlingJF/knowledge-mcp/problems/move-input-incomplete",
     ]
     title: str
     detail: Annotated[

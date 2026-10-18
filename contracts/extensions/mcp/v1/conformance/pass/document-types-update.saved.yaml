@@ -9,11 +9,11 @@ record:
   \    universe_spec: codebase-recordkeeping\n    version: '0.1'\n    document_type:\
   \ design-proposal\n    set_by: agent\n    allowed_by:\n      basis: instruction\n\
   \      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up\
-  \ to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T07:04:56.885Z'\n\
+  \ to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T08:09:02.818Z'\n\
   \  ideas.txt:\n    no_document_type: true\n    set_by: agent\n    allowed_by:\n\
   \      basis: instruction\n      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/\
-  \ up to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T07:04:56.885Z'\n"
-digest: sha256:2cbec7c64bdc5689634c0470cc4db35ce5680f15a2ed1d4ca71a957cdc877b1f
+  \ up to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T08:09:02.818Z'\n"
+digest: sha256:681a4c67c3bce0e1e8f906ca7b2a4bb89f692bbafd4bd78dc0127a004cb04492
 changed:
   - path: docs/rfcs/0042-cache.md
     change: settled
@@ -28,7 +28,7 @@ changed:
           Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
           date as you work.
         location: AGENTS.md
-      time: "2026-10-18T07:04:56.885Z"
+      time: "2026-10-18T08:09:02.818Z"
   - path: ideas.txt
     change: settled
     entry:
@@ -40,7 +40,7 @@ changed:
           Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
           date as you work.
         location: AGENTS.md
-      time: "2026-10-18T07:04:56.885Z"
+      time: "2026-10-18T08:09:02.818Z"
 to_settle: []
 scopes:
   - universe_specs:
@@ -56,3 +56,14 @@ scopes:
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
     digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+filing:
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    status: no_peers
+    proposal: null
+  - path: ideas.txt
+    universe_spec: null
+    document_type: null
+    status: no_document_type
+    proposal: null

@@ -303,6 +303,13 @@ def as_change(event: Event) -> dict[str, str]:
     return item
 
 
+def valid_at(found: Entry, kinds: Kinds) -> bool:
+    return isinstance(found, UntypedEntry) or (
+        found.universe_spec in kinds
+        and found.document_type in kinds[found.universe_spec][1]
+    )
+
+
 def keeps_on_move(entry: Entry) -> bool:
     confirmed = entry.audience is not None and entry.audience.status == "confirmed"
     return entry.set_by == "person" or confirmed
@@ -444,16 +451,21 @@ def _move(out: Merged, event: Event, kinds_at: Callable[[str], Kinds]) -> None:
         _deleted(out, old, found)
         return
     moved = found.model_copy(update={"fingerprint": fingerprint or found.fingerprint})
-    if keeps_on_move(found) and (
-        isinstance(found, UntypedEntry) or found.universe_spec in kinds_at(path)
-    ):
+    if valid_at(found, kinds_at(path)):
         files[path] = moved
         out.changed.append(
             {"path": path, "change": "moved", "old_path": old, "entry": plain(moved)}
         )
         return
+    files[old] = found
     out.changed.append(
-        {"path": path, "change": "moved", "old_path": old, "was": plain(found)}
+        {
+            "path": path,
+            "change": "moved",
+            "old_path": old,
+            "was": plain(found),
+            "note": "The destination lacks the saved document type. Choose another folder or change the universe specs separately.",
+        }
     )
     out.settle[path] = Pending(path, was=found, old_path=old)
 

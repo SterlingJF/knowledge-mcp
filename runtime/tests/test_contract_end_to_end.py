@@ -27,6 +27,8 @@ CODES = {
     "scope-invalid",
     "digest-unknown",
     "record-invalid",
+    "move-invalid",
+    "move-input-incomplete",
     "document-type-unknown",
     "kbp-failed",
     "kbp-version-skew",
@@ -41,6 +43,7 @@ TAGS = {
     "kb_prepare_document_types": "knowledge-mcp/document-types-update/1",
     "kb_record_edit": "knowledge-mcp/edit/1",
     "kb_list_edits": "knowledge-mcp/edits/1",
+    "kb_prepare_document_move": "knowledge-mcp/document-move/1",
 }
 ISSUES = "https://github.com/SterlingJF/knowledge-mcp/issues"
 
@@ -256,6 +259,20 @@ def test_each_kb_tool_answers_with_structured_content_equal_to_its_text(tmp_path
         ("kb_prepare_document_types", update_call(listing=[{"path": RFC}])),
         ("kb_record_edit", edit_call()),
         ("kb_list_edits", {"location": at(DESIGN)}),
+        (
+            "kb_prepare_document_move",
+            {
+                "location": NOTES,
+                "old_path": RFC,
+                "path": "docs/cache.md",
+                "listing": [{"path": RFC}],
+                "documents": [{"path": RFC, "text": "# Cache\n"}],
+                "case_mode": "sensitive",
+                "record": "",
+                "knowledge_bus_folders": [root_folder()],
+                "allowed_by": ALLOWED,
+            },
+        ),
     )
 
     for tool, result in zip(TAGS, results, strict=True):
@@ -509,7 +526,9 @@ def test_an_unknown_document_type_is_document_type_unknown(tmp_path):
     ]
 
 
-def test_folders_off_the_chain_or_sent_twice_are_scope_invalid(tmp_path):
+def test_complete_folder_inventory_is_allowed_and_duplicate_folders_are_invalid(
+    tmp_path,
+):
     twice = [root_folder(), root_folder()]
     off_chain = [root_folder(), {"folder": "team", "files": []}]
     typed_twice, typed_off, prepared_twice = calls(
@@ -519,7 +538,8 @@ def test_folders_off_the_chain_or_sent_twice_are_scope_invalid(tmp_path):
         ("kb_prepare_document_types", update_call(knowledge_bus_folders=twice)),
     )
 
-    for result in (typed_twice, typed_off, prepared_twice):
+    assert not typed_off.is_error
+    for result in (typed_twice, prepared_twice):
         assert pointers(problem(result, "scope-invalid")) == [
             "#/knowledge_bus_folders/1/folder"
         ]

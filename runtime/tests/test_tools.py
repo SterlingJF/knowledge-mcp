@@ -14,6 +14,7 @@ TOOLS = {
     "kb_record_edit",
     "kb_list_edits",
     "kb_prepare_document_types",
+    "kb_prepare_document_move",
     "kbp_validate",
     "kbp_self_check",
     "kbp_version",
@@ -49,7 +50,11 @@ def test_authorization_meanings_reach_the_listed_input_schemas(tmp_path):
     )
     source = schema["$defs"]["allowed_by"]["properties"]
     for tool in listed(tmp_path):
-        if tool.name in {"kb_record_edit", "kb_prepare_document_types"}:
+        if tool.name in {
+            "kb_record_edit",
+            "kb_prepare_document_types",
+            "kb_prepare_document_move",
+        }:
             fields = tool.input_schema["$defs"]["AllowedBy"]["properties"]
             for name in ("basis", "text", "location"):
                 assert fields[name].get("description") == source[name]["description"], (

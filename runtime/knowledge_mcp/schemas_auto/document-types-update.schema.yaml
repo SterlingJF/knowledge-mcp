@@ -2,9 +2,8 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: document-types-update.schema.yaml
 title: kb_prepare_document_types result
-description: >-
-  The structuredContent of a kb_prepare_document_types result, or problem
-  details when isError is true.
+description: The structuredContent of a kb_prepare_document_types result, or problem details
+  when isError is true.
 type: object
 oneOf:
   - $ref: "#/$defs/answer"
@@ -23,37 +22,36 @@ $defs:
       - to_settle
       - scopes
       - received
+      - filing
     properties:
       schema:
         const: knowledge-mcp/document-types-update/1
       location:
         $ref: common.schema.yaml#/$defs/location
       based_on:
-        description: >-
-          Digest of the document-types text sent as `record`, or named by
-          `record_digest`.
+        description: Digest of the document-types text sent as `record`, or named by `record_digest`.
         $ref: common.schema.yaml#/$defs/digest
       record:
-        description: >-
-          The merged text for the harness to save as `document-types.yaml`.
-          Null when the call sent no `allowed_by`, or when no entry changed and
-          the text sent was not an old `record.yaml`.
-        type: [string, "null"]
+        description: The merged text for the harness to save as `document-types.yaml`. Null
+          when the call sent no `allowed_by`, or when no entry changed and the text sent was
+          not an old `record.yaml`.
+        type:
+          - string
+          - "null"
       digest:
-        description: >-
-          Digest of `record`, or null when `record` is null. Send a non-null
-          digest as `record_digest` in the next call.
-        type: [string, "null"]
+        description: Digest of `record`, or null when `record` is null. Send a non-null digest
+          as `record_digest` in the next call.
+        type:
+          - string
+          - "null"
         pattern: ^sha256:[0-9a-f]{64}$
       note:
-        description: >-
-          Present when changes or migration lack `allowed_by`, or when
-          `record` replaces an old `record.yaml`.
+        description: Present when changes or migration lack `allowed_by`, or when `record` replaces
+          an old `record.yaml`.
         type: string
       listing_changes:
-        description: >-
-          File changes that knowledge-mcp found by comparing `listing` with the
-          entries. Present only when the call sent `listing`.
+        description: File changes that knowledge-mcp found by comparing `listing` with the entries.
+          Present only when the call sent `listing`.
         type: array
         items:
           $ref: common.schema.yaml#/$defs/file_change
@@ -62,22 +60,24 @@ $defs:
         items:
           title: Changed entry
           type: object
-          required: [path, change]
+          required:
+            - path
+            - change
           properties:
             path:
               $ref: common.schema.yaml#/$defs/path
             change:
-              description: >-
-                `settled` means the agent set the entry. `corrected` means the
-                person set the entry. A `moved` item has `entry` when the person
-                set the entry or confirmed the reader. A typed entry also needs
-                its universe spec to apply at the new path. Other `moved` items
-                have `was`, and `to_settle` lists the file. `deleted` items have
-                `was`. `fingerprint` means knowledge-mcp updated the stored
-                fingerprint. `kept`
-                means an entry with `set_by: person` overrode an agent entry
-                from `entries`.
-              enum: [settled, corrected, moved, deleted, kept, fingerprint]
+              description: knowledge-mcp retains every classification field when the universe
+                spec and document type apply at the destination. After a conflicting move, knowledge-mcp
+                retains the original entry and lists the destination in to_settle. Other values
+                name classification, deletion or fingerprint updates.
+              enum:
+                - settled
+                - corrected
+                - moved
+                - deleted
+                - kept
+                - fingerprint
             old_path:
               $ref: common.schema.yaml#/$defs/path
             entry:
@@ -88,14 +88,16 @@ $defs:
               type: string
           additionalProperties: false
       to_settle:
-        description: >-
-          Files that need a document type from the agent, with candidates in
-          kb_get_document_type order.
+        description: Files that need a document type from the agent, with candidates in kb_get_document_type
+          order.
         type: array
         items:
           title: File to settle
           type: object
-          required: [path, scope, candidates]
+          required:
+            - path
+            - scope
+            - candidates
           properties:
             path:
               $ref: common.schema.yaml#/$defs/path
@@ -113,29 +115,35 @@ $defs:
               $ref: document-types.schema.yaml#/$defs/entry
           additionalProperties: false
       scopes:
-        description: >-
-          Groups of universe specs that apply, one group for each set of sent
-          `.knowledge-bus/` folders above a file.
+        description: Groups of universe specs that apply, one group for each set of sent `.knowledge-bus/`
+          folders above a file.
         type: array
         items:
           title: Scope
           type: object
-          required: [universe_specs, every_document_type]
+          required:
+            - universe_specs
+            - every_document_type
           properties:
             universe_specs:
               type: array
               items:
                 $ref: common.schema.yaml#/$defs/spec
             every_document_type:
-              description: >-
-                Null unless a `to_settle` file references this group through
-                `scope` and has no candidate matching its file name.
-              type: [array, "null"]
+              description: Null unless a `to_settle` file references this group through `scope`
+                and has no candidate matching its file name.
+              type:
+                - array
+                - "null"
               items:
                 $ref: common.schema.yaml#/$defs/type_group
           additionalProperties: false
       received:
         $ref: common.schema.yaml#/$defs/received
+      filing:
+        type: array
+        items:
+          $ref: common.schema.yaml#/$defs/filing_assessment
     additionalProperties: false
   common.schema.yaml:
     $schema: https://json-schema.org/draft/2020-12/schema
@@ -381,6 +389,196 @@ $defs:
           fingerprint:
             $ref: "#/$defs/fingerprint"
         additionalProperties: false
+      listed_file:
+        title: Listed file
+        type: object
+        required:
+          - path
+        properties:
+          path:
+            $ref: "#/$defs/path"
+          fingerprint:
+            $ref: "#/$defs/fingerprint"
+        additionalProperties: false
+      folder_count:
+        title: Folder count
+        type: object
+        required:
+          - folder
+          - count
+        properties:
+          folder:
+            type: string
+          count:
+            type: integer
+            minimum: 1
+        additionalProperties: false
+      filing_proposal:
+        title: Filing proposal
+        type: object
+        required:
+          - folder
+          - name
+          - path
+          - folder_new
+          - name_style
+          - evidence
+          - folder_counts
+        properties:
+          folder:
+            type: string
+          name:
+            type: string
+          path:
+            $ref: "#/$defs/path"
+          folder_new:
+            const: false
+          name_style:
+            enum:
+              - lower-kebab
+              - lower-snake
+              - unchanged
+          evidence:
+            type: array
+            items:
+              $ref: "#/$defs/path"
+          folder_counts:
+            type: array
+            items:
+              $ref: "#/$defs/folder_count"
+        additionalProperties: false
+      filing_assessment:
+        title: Filing assessment
+        type: object
+        oneOf:
+          - type: object
+            required:
+              - status
+              - proposal
+              - universe_spec
+              - document_type
+            properties:
+              status:
+                const: proposed
+              proposal:
+                $ref: "#/$defs/filing_proposal"
+              universe_spec:
+                type: string
+                minLength: 1
+              document_type:
+                type: string
+                minLength: 1
+          - type: object
+            required:
+              - status
+              - proposal
+              - universe_spec
+              - document_type
+            properties:
+              status:
+                enum:
+                  - already_matches
+                  - no_peers
+                  - listing_needed
+                  - evidence_incomplete
+                  - destination_occupied
+              proposal:
+                type: "null"
+              universe_spec:
+                type: string
+                minLength: 1
+              document_type:
+                type: string
+                minLength: 1
+          - type: object
+            required:
+              - status
+              - proposal
+              - universe_spec
+              - document_type
+            properties:
+              status:
+                enum:
+                  - no_document_type
+                  - document_type_needed
+              proposal:
+                type: "null"
+              universe_spec:
+                type: "null"
+              document_type:
+                type: "null"
+        required:
+          - path
+          - universe_spec
+          - document_type
+          - status
+          - proposal
+        properties:
+          path:
+            $ref: "#/$defs/path"
+          universe_spec:
+            type:
+              - string
+              - "null"
+          document_type:
+            type:
+              - string
+              - "null"
+          status:
+            enum:
+              - proposed
+              - already_matches
+              - no_peers
+              - no_document_type
+              - document_type_needed
+              - listing_needed
+              - evidence_incomplete
+              - destination_occupied
+          proposal:
+            anyOf:
+              - $ref: "#/$defs/filing_proposal"
+              - type: "null"
+        additionalProperties: false
+      move_path:
+        title: Move path
+        description: Path relative to the knowledge-base root, with forward slashes between folders.
+        type: string
+        not:
+          pattern: (^|/)\.{1,2}(/|$)
+        pattern: ^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$
+        minLength: 1
+      move_document:
+        title: Move document
+        type: object
+        required:
+          - path
+          - text
+        properties:
+          path:
+            $ref: "#/$defs/move_path"
+          text:
+            type: string
+        additionalProperties: false
+      move_binding:
+        title: Link binding
+        type: object
+        required:
+          - source_path
+          - start
+          - end
+          - target_path
+        properties:
+          source_path:
+            $ref: "#/$defs/move_path"
+          start:
+            type: integer
+            minimum: 0
+          end:
+            type: integer
+            minimum: 0
+          target_path:
+            $ref: "#/$defs/move_path"
+        additionalProperties: false
   document-types.schema.yaml:
     $schema: https://json-schema.org/draft/2020-12/schema
     $id: document-types.schema.yaml
@@ -551,6 +749,10 @@ $defs:
           - title: knowledge-mcp failed
             description: Any other failure inside knowledge-mcp.
             const: https://github.com/SterlingJF/knowledge-mcp/problems/internal-error
+          - title: Invalid document move
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/move-invalid
+          - title: Incomplete move input
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/move-input-incomplete
       title:
         type: string
       detail:

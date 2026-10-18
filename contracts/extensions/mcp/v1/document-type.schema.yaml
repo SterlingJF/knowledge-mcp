@@ -2,9 +2,9 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: document-type.schema.yaml
 title: kb_get_document_type result
-description: >-
-  The structuredContent of a kb_get_document_type result, or problem details
-  when isError is true.
+description:
+  The structuredContent of a kb_get_document_type result, or problem details when
+  isError is true.
 type: object
 oneOf:
   - $ref: "#/$defs/answer"
@@ -21,6 +21,7 @@ $defs:
       - candidates
       - every_document_type
       - received
+      - filing
     properties:
       schema:
         const: knowledge-mcp/document-type/1
@@ -31,30 +32,33 @@ $defs:
         items:
           $ref: common.schema.yaml#/$defs/spec
       candidates:
-        description: >-
-          Candidates with `role_matches` true come first. knowledge-mcp then
-          ranks more file-name matches first, followed by more words in
-          `matched`. Ties keep kbp order.
+        description:
+          Candidates with `role_matches` true come first. knowledge-mcp then ranks
+          more file-name matches first, followed by more words in `matched`. Ties keep kbp order.
         type: array
         items:
           $ref: common.schema.yaml#/$defs/candidate
       every_document_type:
-        description: >-
-          Null when `recorded` is present or a candidate matched on the file
-          name. Groups with a non-empty `covers_matched` come first.
-        type: [array, "null"]
+        description:
+          Null when `recorded` is present or a candidate matched on the file name.
+          Groups with a non-empty `covers_matched` come first.
+        type:
+          - array
+          - "null"
         items:
           $ref: common.schema.yaml#/$defs/type_group
       recorded:
         title: Recorded
-        description: >-
-          Present when a saved entry sets `no_document_type` or names an
-          applicable universe spec. Send the document-types text as `record`
-          or recall the text through `record_digest`.
-          When `recorded` is present, `candidates` is empty.
+        description:
+          Present when a saved entry sets `no_document_type` or names an applicable
+          universe spec. Send the document-types text as `record` or recall the text through
+          `record_digest`. When `recorded` is present, `candidates` is empty.
         type: object
         additionalProperties: false
-        required: [path, label, entry]
+        required:
+          - path
+          - label
+          - entry
         properties:
           path:
             $ref: common.schema.yaml#/$defs/path
@@ -64,3 +68,7 @@ $defs:
             $ref: document-types.schema.yaml#/$defs/entry
       received:
         $ref: common.schema.yaml#/$defs/received
+      filing:
+        type: array
+        items:
+          $ref: common.schema.yaml#/$defs/filing_assessment

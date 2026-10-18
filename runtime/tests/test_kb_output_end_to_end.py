@@ -106,7 +106,8 @@ def test_leaf_help_has_examples_side_effects_and_exit_codes(tmp_path, leaf):
     if leaf == "type":
         assert (
             "log.jsonl" in done.stdout
-            and "TYPE SPEC MATCHED-BY USED-BY TITLE" in done.stdout
+            and "TYPE SPEC MATCHED-BY USED-BY PROPOSED-FOLDER PROPOSED-NAME TITLE"
+            in done.stdout
         )
     if leaf == "setup":
         assert "kb backs up existing settings files" in " ".join(done.stdout.split())
@@ -333,6 +334,7 @@ def test_type_table_pipe_terminal_json_and_mcp_share_the_answer(tmp_path):
             {
                 **type_arguments(root, "docs/rfcs/design-proposal.md"),
                 "role": "maintainer",
+                "listing": [{"path": "docs/rfcs/design-proposal.md"}],
             },
         )
         assert not result.is_error
@@ -350,17 +352,21 @@ def test_type_table_pipe_terminal_json_and_mcp_share_the_answer(tmp_path):
         "SPEC",
         "MATCHED-BY",
         "USED-BY",
+        "PROPOSED-FOLDER",
+        "PROPOSED-NAME",
         "TITLE",
     ]
     rows = [line.split("\t") for line in pipe.stdout.splitlines()]
     assert len(rows) == len(answer["candidates"])
-    assert all(len(row) == 5 for row in rows)
+    assert all(len(row) == 7 for row in rows)
     for row, item in zip(rows, answer["candidates"], strict=True):
         assert row == [
             item["document_type"],
             item["universe_spec"],
             item["matched_on"],
             item["actor"] or "<unset>",
+            "<none>",
+            "<none>",
             item["name"],
         ]
         assert item["document_type"] in terminal
@@ -499,7 +505,7 @@ def test_recorded_type_table_uses_the_display_title_and_actor(tmp_path):
     assert done.returncode == 0, done.stderr
     [row] = [line.split("\t") for line in done.stdout.splitlines()]
     assert row[:3] == ["design-proposal", CODEBASE, "record"]
-    assert row[3] != "<unset>" and row[4] != "design-proposal"
+    assert row[3] != "<unset>" and row[6] != "design-proposal"
 
 
 @pytest.mark.parametrize(

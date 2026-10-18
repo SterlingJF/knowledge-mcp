@@ -316,6 +316,45 @@ def _usage_error(error: click.ClickException) -> None:
     click.echo(f"Run {command} --help for the {help_noun}.", err=True)
 
 
+def _proposal_columns(answer: dict[str, Any], rows: list[list[str]]) -> None:
+    proposals = {
+        (a["universe_spec"], a["document_type"]): a["proposal"]
+        for a in answer.get("filing", [])
+    }
+    for row in rows:
+        proposal = proposals.get((row[1], row[0]))
+        row[4:4] = (
+            [proposal["folder"], proposal["name"]] if proposal else ["<none>", "<none>"]
+        )
+
+
+def _recorded_type_rows(
+    answer: dict[str, Any], catalog: dict[tuple[str, str], dict[str, Any]]
+) -> list[list[str]]:
+    rows: list[list[str]] = []
+    recorded = answer.get("recorded")
+    if recorded and not recorded["entry"].get("no_document_type"):
+        item = recorded["entry"]
+        rows.append(
+            [
+                item["document_type"],
+                item["universe_spec"],
+                "record",
+                catalog.get((item["universe_spec"], item["document_type"]), {}).get(
+                    "actor"
+                )
+                or "<unset>",
+                catalog.get((item["universe_spec"], item["document_type"]), {}).get(
+                    "name"
+                )
+                or item["document_type"],
+            ]
+        )
+    if recorded and recorded["entry"].get("no_document_type"):
+        rows.append(["<none>", "<none>", "record", "<unset>", "No document type"])
+    return rows
+
+
 def _type_table(
     answer: dict[str, Any],
     catalog: dict[tuple[str, str], dict[str, Any]],
@@ -347,26 +386,18 @@ def _type_table(
                             ],
                         ]
                     )
-    recorded = answer.get("recorded")
-    if recorded and not recorded["entry"].get("no_document_type"):
-        item = recorded["entry"]
-        rows.append(
-            [
-                item["document_type"],
-                item["universe_spec"],
-                "record",
-                catalog.get((item["universe_spec"], item["document_type"]), {}).get(
-                    "actor"
-                )
-                or "<unset>",
-                catalog.get((item["universe_spec"], item["document_type"]), {}).get(
-                    "name"
-                )
-                or item["document_type"],
-            ]
-        )
+    rows.extend(_recorded_type_rows(answer, catalog))
+    _proposal_columns(answer, rows)
     if sys.stdout.isatty():
-        headers = ["TYPE", "SPEC", "MATCHED-BY", "USED-BY", "TITLE"]
+        headers = [
+            "TYPE",
+            "SPEC",
+            "MATCHED-BY",
+            "USED-BY",
+            "PROPOSED-FOLDER",
+            "PROPOSED-NAME",
+            "TITLE",
+        ]
         widths = [
             max(len(row[index]) for row in [headers, *rows])
             for index in range(len(headers) - 1)
@@ -521,14 +552,16 @@ def setup(harness: str, remove: bool) -> None:
     short_help="Show the document type of a file",
     help=(
         "Show the document type of a file. kb reads the .kbp.yaml files in each "
-        ".knowledge-bus/ folder from the root folder down to the file's folder. "
+        ".knowledge-bus/ folder across the knowledge-base root, including peer folders. "
         "kb uses an applicable entry from the document-types file. "
         "Otherwise, kb prints ranked candidates. When those folders contain neither "
         ".kbp.yaml files nor workspace.yaml, kb uses the bundled .kbp.yaml files. "
         "kb never opens the file, so the file can be missing. "
         "Its folder must exist. Each lookup adds a line to log.jsonl "
         "in the state folder."
-        "\n\nColumns: TYPE SPEC MATCHED-BY USED-BY TITLE."
+        "\n\nProposed folders and names follow saved files of the same document type. "
+        "Both proposal columns show <none> when no proposal applies."
+        "\n\nColumns: TYPE SPEC MATCHED-BY USED-BY PROPOSED-FOLDER PROPOSED-NAME TITLE."
     ),
     examples=[
         (

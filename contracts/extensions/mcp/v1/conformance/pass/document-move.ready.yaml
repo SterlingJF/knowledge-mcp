@@ -1,0 +1,87 @@
+---
+schema: knowledge-mcp/document-move/1
+location: ~/notes
+status: ready
+old_path: docs/rfcs/0042-cache.md
+path: docs/rfcs/0042-caching.md
+allowed_by:
+  basis: instruction
+  text:
+    Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+    as you work.
+  location: AGENTS.md
+search:
+  - "%"
+  - "%2E%2F%30%30%34%32%2D%63%61%63%68%65"
+  - "%2E%2F%30%30%34%32%2D%63%61%63%68%65%2E%6D%64"
+  - "%2E%2F%30%30%34%32%2D%63%61%63%68%69%6E%67"
+  - "%2E%2F%30%30%34%32%2D%63%61%63%68%69%6E%67%2E%6D%64"
+  - "%2E/%30%30%34%32%2D%63%61%63%68%65"
+  - "%2E/%30%30%34%32%2D%63%61%63%68%65.md"
+  - "%2E/%30%30%34%32%2D%63%61%63%68%69%6E%67"
+  - "%2E/%30%30%34%32%2D%63%61%63%68%69%6E%67.md"
+  - "%30%30%34%32%2D%63%61%63%68%65"
+  - "%30%30%34%32%2D%63%61%63%68%65%2E%6D%64"
+  - "%30%30%34%32%2D%63%61%63%68%65.md"
+  - "%30%30%34%32%2D%63%61%63%68%69%6E%67"
+  - "%30%30%34%32%2D%63%61%63%68%69%6E%67%2E%6D%64"
+  - "%30%30%34%32%2D%63%61%63%68%69%6E%67.md"
+  - "%64%6F%63%73%2F%72%66%63%73%2F%30%30%34%32%2D%63%61%63%68%65"
+  - "%64%6F%63%73%2F%72%66%63%73%2F%30%30%34%32%2D%63%61%63%68%65%2E%6D%64"
+  - "%64%6F%63%73%2F%72%66%63%73%2F%30%30%34%32%2D%63%61%63%68%69%6E%67"
+  - "%64%6F%63%73%2F%72%66%63%73%2F%30%30%34%32%2D%63%61%63%68%69%6E%67%2E%6D%64"
+  - "%64%6F%63%73/%72%66%63%73/%30%30%34%32%2D%63%61%63%68%65"
+  - "%64%6F%63%73/%72%66%63%73/%30%30%34%32%2D%63%61%63%68%65.md"
+  - "%64%6F%63%73/%72%66%63%73/%30%30%34%32%2D%63%61%63%68%69%6E%67"
+  - "%64%6F%63%73/%72%66%63%73/%30%30%34%32%2D%63%61%63%68%69%6E%67.md"
+  - ./%30%30%34%32%2D%63%61%63%68%65
+  - ./%30%30%34%32%2D%63%61%63%68%65.md
+  - ./%30%30%34%32%2D%63%61%63%68%69%6E%67
+  - ./%30%30%34%32%2D%63%61%63%68%69%6E%67.md
+  - ./0042-cache
+  - ./0042-cache.md
+  - ./0042-caching
+  - ./0042-caching.md
+  - 0042-cache
+  - 0042-cache.md
+  - 0042-caching
+  - 0042-caching.md
+  - docs/rfcs/%30%30%34%32%2D%63%61%63%68%65
+  - docs/rfcs/%30%30%34%32%2D%63%61%63%68%65.md
+  - docs/rfcs/%30%30%34%32%2D%63%61%63%68%69%6E%67
+  - docs/rfcs/%30%30%34%32%2D%63%61%63%68%69%6E%67.md
+  - docs/rfcs/0042-cache
+  - docs/rfcs/0042-cache.md
+  - docs/rfcs/0042-caching
+  - docs/rfcs/0042-caching.md
+based_on:
+  listing_digest: sha256:6cf4518aff1cfc53a8f05e71a7e7a61fafdca564b1190d6a709af6fe817da061
+  record_digest: sha256:681a4c67c3bce0e1e8f906ca7b2a4bb89f692bbafd4bd78dc0127a004cb04492
+  documents:
+    - path: docs/rfcs/0042-cache.md
+      digest: sha256:1e9c3db972db81f18382c36f930fe2e203e2270894d47024e63d7b47a6de8329
+writes:
+  - old_path: docs/rfcs/0042-cache.md
+    path: docs/rfcs/0042-caching.md
+    before_digest: sha256:1e9c3db972db81f18382c36f930fe2e203e2270894d47024e63d7b47a6de8329
+    after_digest: sha256:1e9c3db972db81f18382c36f930fe2e203e2270894d47024e63d7b47a6de8329
+    text: "# Cache
+
+      "
+record:
+  "# Your agent rewrites this file with text from knowledge-mcp when files change\
+  \ or you correct an entry.\n# An entry with `set_by: person` overrides any later\
+  \ entry by the agent.\nschema: knowledge-mcp/document-types/1\nfiles:\n  docs/rfcs/0042-caching.md:\n\
+  \    universe_spec: codebase-recordkeeping\n    version: '0.1'\n    document_type:\
+  \ design-proposal\n    set_by: agent\n    allowed_by:\n      basis: instruction\n\
+  \      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up\
+  \ to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T08:09:02.818Z'\n\
+  \  ideas.txt:\n    no_document_type: true\n    set_by: agent\n    allowed_by:\n\
+  \      basis: instruction\n      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/\
+  \ up to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T08:09:02.818Z'\n"
+digest: sha256:6b3e274f81edcd6b3751a7dc09ea072d52937db7341ff30fed425188f4ea995b
+links: []
+issues: []
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:681a4c67c3bce0e1e8f906ca7b2a4bb89f692bbafd4bd78dc0127a004cb04492

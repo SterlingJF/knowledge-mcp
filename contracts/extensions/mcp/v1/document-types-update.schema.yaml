@@ -2,9 +2,9 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: document-types-update.schema.yaml
 title: kb_prepare_document_types result
-description: >-
-  The structuredContent of a kb_prepare_document_types result, or problem
-  details when isError is true.
+description:
+  The structuredContent of a kb_prepare_document_types result, or problem details
+  when isError is true.
 type: object
 oneOf:
   - $ref: "#/$defs/answer"
@@ -24,37 +24,40 @@ $defs:
       - to_settle
       - scopes
       - received
+      - filing
     properties:
       schema:
         const: knowledge-mcp/document-types-update/1
       location:
         $ref: common.schema.yaml#/$defs/location
       based_on:
-        description: >-
-          Digest of the document-types text sent as `record`, or named by
-          `record_digest`.
+        description: Digest of the document-types text sent as `record`, or named by `record_digest`.
         $ref: common.schema.yaml#/$defs/digest
       record:
-        description: >-
-          The merged text for the harness to save as `document-types.yaml`.
-          Null when the call sent no `allowed_by`, or when no entry changed and
-          the text sent was not an old `record.yaml`.
-        type: [string, "null"]
+        description:
+          The merged text for the harness to save as `document-types.yaml`. Null
+          when the call sent no `allowed_by`, or when no entry changed and the text sent was
+          not an old `record.yaml`.
+        type:
+          - string
+          - "null"
       digest:
-        description: >-
-          Digest of `record`, or null when `record` is null. Send a non-null
-          digest as `record_digest` in the next call.
-        type: [string, "null"]
+        description:
+          Digest of `record`, or null when `record` is null. Send a non-null digest
+          as `record_digest` in the next call.
+        type:
+          - string
+          - "null"
         pattern: ^sha256:[0-9a-f]{64}$
       note:
-        description: >-
-          Present when changes or migration lack `allowed_by`, or when
-          `record` replaces an old `record.yaml`.
+        description:
+          Present when changes or migration lack `allowed_by`, or when `record` replaces
+          an old `record.yaml`.
         type: string
       listing_changes:
-        description: >-
-          File changes that knowledge-mcp found by comparing `listing` with the
-          entries. Present only when the call sent `listing`.
+        description:
+          File changes that knowledge-mcp found by comparing `listing` with the entries.
+          Present only when the call sent `listing`.
         type: array
         items:
           $ref: common.schema.yaml#/$defs/file_change
@@ -64,22 +67,25 @@ $defs:
           title: Changed entry
           type: object
           additionalProperties: false
-          required: [path, change]
+          required:
+            - path
+            - change
           properties:
             path:
               $ref: common.schema.yaml#/$defs/path
             change:
-              description: >-
-                `settled` means the agent set the entry. `corrected` means the
-                person set the entry. A `moved` item has `entry` when the person
-                set the entry or confirmed the reader. A typed entry also needs
-                its universe spec to apply at the new path. Other `moved` items
-                have `was`, and `to_settle` lists the file. `deleted` items have
-                `was`. `fingerprint` means knowledge-mcp updated the stored
-                fingerprint. `kept`
-                means an entry with `set_by: person` overrode an agent entry
-                from `entries`.
-              enum: [settled, corrected, moved, deleted, kept, fingerprint]
+              description:
+                knowledge-mcp retains every classification field when the universe
+                spec and document type apply at the destination. After a conflicting move, knowledge-mcp
+                retains the original entry and lists the destination in to_settle. Other values
+                name classification, deletion or fingerprint updates.
+              enum:
+                - settled
+                - corrected
+                - moved
+                - deleted
+                - kept
+                - fingerprint
             old_path:
               $ref: common.schema.yaml#/$defs/path
             entry:
@@ -89,15 +95,18 @@ $defs:
             note:
               type: string
       to_settle:
-        description: >-
-          Files that need a document type from the agent, with candidates in
-          kb_get_document_type order.
+        description:
+          Files that need a document type from the agent, with candidates in kb_get_document_type
+          order.
         type: array
         items:
           title: File to settle
           type: object
           additionalProperties: false
-          required: [path, scope, candidates]
+          required:
+            - path
+            - scope
+            - candidates
           properties:
             path:
               $ref: common.schema.yaml#/$defs/path
@@ -114,26 +123,34 @@ $defs:
             was:
               $ref: document-types.schema.yaml#/$defs/entry
       scopes:
-        description: >-
-          Groups of universe specs that apply, one group for each set of sent
-          `.knowledge-bus/` folders above a file.
+        description:
+          Groups of universe specs that apply, one group for each set of sent `.knowledge-bus/`
+          folders above a file.
         type: array
         items:
           title: Scope
           type: object
           additionalProperties: false
-          required: [universe_specs, every_document_type]
+          required:
+            - universe_specs
+            - every_document_type
           properties:
             universe_specs:
               type: array
               items:
                 $ref: common.schema.yaml#/$defs/spec
             every_document_type:
-              description: >-
-                Null unless a `to_settle` file references this group through
-                `scope` and has no candidate matching its file name.
-              type: [array, "null"]
+              description:
+                Null unless a `to_settle` file references this group through `scope`
+                and has no candidate matching its file name.
+              type:
+                - array
+                - "null"
               items:
                 $ref: common.schema.yaml#/$defs/type_group
       received:
         $ref: common.schema.yaml#/$defs/received
+      filing:
+        type: array
+        items:
+          $ref: common.schema.yaml#/$defs/filing_assessment

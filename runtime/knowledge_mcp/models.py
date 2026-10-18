@@ -4,7 +4,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from knowledge_mcp.models_auto.common_schema import FileChange
+from knowledge_mcp.models_auto.common_schema import FileChange, ListedFile
 from knowledge_mcp.models_auto.document_types_schema import AllowedBy, Audience, SetBy
 
 __all__ = [
@@ -91,22 +91,10 @@ KNOWLEDGE_BUS_FOLDERS = (
     "entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. "
     "kbp_validate returns an error instead."
 )
-FINGERPRINT = (
-    "A value that changes only when the file content changes, such as `sha256:<hex digest>` "
-    "or Drive's `md5Checksum`. knowledge-mcp uses fingerprints to detect moves in `listing` "
-    "and keep entries under new paths in the document-types file."
-)
 RECORD_PATH = (
     "Path from the knowledge-base root, folders joined by `/`, such as "
     "`docs/rfcs/0042-cache.md`."
 )
-
-
-class ListedFile(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    path: str = Field(description=RECORD_PATH)
-    fingerprint: str | None = Field(default=None, description=FINGERPRINT)
 
 
 class EntryItem(BaseModel):

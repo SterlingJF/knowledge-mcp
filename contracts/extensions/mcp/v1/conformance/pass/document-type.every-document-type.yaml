@@ -163,3 +163,199 @@ every_document_type:
         action: commit to a test's prediction and its measures in advance
         actor: whoever runs the test
 received: []
+filing:
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: agent-instructions
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: architecture-overview
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: change-description
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: code-of-conduct
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: code-owners
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: commit-message
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: contributing-guide
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: development-guide
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: documentation-set
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: folder-readme
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: funding-file
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: issue-report
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: license-file
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: notice-file
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: readme
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: release-notes
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: release-procedure
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: roadmap
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: codebase-recordkeeping
+    document_type: security-policy
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: architecture-overview
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: brand-identity-guide
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: business-model-canvas
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: competitor-analysis
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: decision-brief
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: decision-record
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: design-doc
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: experiment-plan
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: lean-canvas
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: opportunity-assessment
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: persona-profile
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: pestle-analysis
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: product-strategy-canvas
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: risk-assessment
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: scenario-walkthrough
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: startup-canvas
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: success-metrics
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: swot-analysis
+    status: listing_needed
+    proposal: null
+  - path: ideas.txt
+    universe_spec: product-development
+    document_type: system-context-diagram
+    status: listing_needed
+    proposal: null

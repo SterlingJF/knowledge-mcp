@@ -9,17 +9,16 @@ $defs:
     type: string
   path:
     title: Path
-    description: >-
-      Path from the knowledge base's root folder, with `/` between folders,
-      such as `docs/rfcs/0042-cache.md`.
+    description:
+      Path from the knowledge base's root folder, with `/` between folders, such
+      as `docs/rfcs/0042-cache.md`.
     type: string
     minLength: 1
   fingerprint:
     title: Fingerprint
-    description: >-
-      A value that changes only when the file content changes, such as SHA-256
-      or Drive's `md5Checksum`.
-      kb_prepare_document_types uses fingerprints to find files in `listing`
+    description:
+      A value that changes only when the file content changes, such as SHA-256 or
+      Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing`
       that moved.
     type: string
   digest:
@@ -38,15 +37,17 @@ $defs:
     pattern: ^[0-9a-f]{32}$
   received:
     title: Received
-    description: >-
-      Digests of the texts sent in this call. Later in the session, send a
-      digest in place of its text.
+    description:
+      Digests of the texts sent in this call. Later in the session, send a digest
+      in place of its text.
     type: array
     items:
       title: Received text
       type: object
       additionalProperties: false
-      required: [name, digest]
+      required:
+        - name
+        - digest
       properties:
         name:
           type: string
@@ -56,7 +57,11 @@ $defs:
     title: Spec in scope
     type: object
     additionalProperties: false
-    required: [id, version, source, from_parent]
+    required:
+      - id
+      - version
+      - source
+      - from_parent
     properties:
       id:
         type: string
@@ -64,22 +69,21 @@ $defs:
       version:
         type: string
       source:
-        description: >-
-          `bundled copy at <ref>` means knowledge-mcp used its own copy of the
-          universe spec, taken from git ref `<ref>` of the knowledge-bus
-          repository.
+        description:
+          "`bundled copy at <ref>` means knowledge-mcp used its own copy of the universe
+          spec, taken from git ref `<ref>` of the knowledge-bus repository."
         type: string
         pattern: ^(sent by the harness|bundled copy at \S+)$
       from_parent:
-        description: >-
-          True when the universe spec comes from a `.knowledge-bus/` folder
-          above the deepest `.knowledge-bus/` folder the harness sent.
+        description:
+          True when the universe spec comes from a `.knowledge-bus/` folder above
+          the deepest `.knowledge-bus/` folder the harness sent.
         type: boolean
   candidate:
     title: Candidate
-    description: >-
-      A document type whose alias shares a word with the file name or its
-      nearest folder.
+    description:
+      A document type whose alias shares a word with the file name or its nearest
+      folder.
     type: object
     additionalProperties: false
     required:
@@ -104,32 +108,44 @@ $defs:
       alias:
         title: Alias
         description: From kbp_kinds.
-        type: [object, "null"]
+        type:
+          - object
+          - "null"
         additionalProperties: false
         properties:
           kind:
-            enum: [descriptive, normative]
+            enum:
+              - descriptive
+              - normative
           form:
             type: string
       action:
-        type: [string, "null"]
+        type:
+          - string
+          - "null"
       actor:
-        type: [string, "null"]
+        type:
+          - string
+          - "null"
       timing:
-        type: [string, "null"]
+        type:
+          - string
+          - "null"
       matched:
-        description: >-
-          Words shared by the alias and the file name or nearest folder,
-          lowercased with common plural suffixes removed.
+        description:
+          Words shared by the alias and the file name or nearest folder, lowercased
+          with common plural suffixes removed.
         type: array
         minItems: 1
         items:
           type: string
       matched_on:
         description: "`folder` means only the nearest folder name matched."
-        enum: [name, folder]
+        enum:
+          - name
+          - folder
       role_matches:
-        description: >-
+        description:
           True when `actor` and the role share a normalized word after knowledge-mcp
           removes stopwords. Present only when the harness sent a role.
         type: boolean
@@ -137,17 +153,21 @@ $defs:
     title: Type group
     type: object
     additionalProperties: false
-    required: [universe_spec, covers, covers_matched, kinds]
+    required:
+      - universe_spec
+      - covers
+      - covers_matched
+      - kinds
     properties:
       universe_spec:
         type: string
         minLength: 1
       covers:
-        type: [string, "null"]
+        type:
+          - string
+          - "null"
       covers_matched:
-        description: >-
-          Words in the path that also appear in the universe spec label or
-          `covers`.
+        description: Words in the path that also appear in the universe spec label or `covers`.
         type: array
         items:
           type: string
@@ -157,15 +177,22 @@ $defs:
           title: Listed document type
           type: object
           additionalProperties: false
-          required: [document_type, action, actor]
+          required:
+            - document_type
+            - action
+            - actor
           properties:
             document_type:
               type: string
               minLength: 1
             action:
-              type: [string, "null"]
+              type:
+                - string
+                - "null"
             actor:
-              type: [string, "null"]
+              type:
+                - string
+                - "null"
   file_change:
     title: File change
     oneOf:
@@ -177,7 +204,9 @@ $defs:
     title: File created
     type: object
     additionalProperties: false
-    required: [change, path]
+    required:
+      - change
+      - path
     properties:
       change:
         const: created
@@ -189,7 +218,9 @@ $defs:
     title: File deleted
     type: object
     additionalProperties: false
-    required: [change, path]
+    required:
+      - change
+      - path
     properties:
       change:
         const: deleted
@@ -199,7 +230,10 @@ $defs:
     title: File moved
     type: object
     additionalProperties: false
-    required: [change, path, old_path]
+    required:
+      - change
+      - path
+      - old_path
     properties:
       change:
         const: moved
@@ -214,7 +248,10 @@ $defs:
     title: File edited
     type: object
     additionalProperties: false
-    required: [change, path, fingerprint]
+    required:
+      - change
+      - path
+      - fingerprint
     properties:
       change:
         const: edited
@@ -222,3 +259,181 @@ $defs:
         $ref: "#/$defs/path"
       fingerprint:
         $ref: "#/$defs/fingerprint"
+  listed_file:
+    title: Listed file
+    type: object
+    additionalProperties: false
+    required:
+      - path
+    properties:
+      path:
+        $ref: "#/$defs/path"
+      fingerprint:
+        $ref: "#/$defs/fingerprint"
+  folder_count:
+    title: Folder count
+    type: object
+    additionalProperties: false
+    required:
+      - folder
+      - count
+    properties:
+      folder: &id001
+        type: string
+      count:
+        type: integer
+        minimum: 1
+  filing_proposal:
+    title: Filing proposal
+    type: object
+    additionalProperties: false
+    required:
+      - folder
+      - name
+      - path
+      - folder_new
+      - name_style
+      - evidence
+      - folder_counts
+    properties:
+      folder: *id001
+      name: *id001
+      path:
+        $ref: "#/$defs/path"
+      folder_new:
+        const: false
+      name_style:
+        enum:
+          - lower-kebab
+          - lower-snake
+          - unchanged
+      evidence:
+        type: array
+        items:
+          $ref: "#/$defs/path"
+      folder_counts:
+        type: array
+        items:
+          $ref: "#/$defs/folder_count"
+  filing_assessment:
+    title: Filing assessment
+    type: object
+    additionalProperties: false
+    required:
+      - path
+      - universe_spec
+      - document_type
+      - status
+      - proposal
+    properties:
+      path:
+        $ref: "#/$defs/path"
+      universe_spec: &id002
+        type:
+          - string
+          - "null"
+      document_type: *id002
+      status:
+        enum:
+          - proposed
+          - already_matches
+          - no_peers
+          - no_document_type
+          - document_type_needed
+          - listing_needed
+          - evidence_incomplete
+          - destination_occupied
+      proposal:
+        anyOf:
+          - $ref: "#/$defs/filing_proposal"
+          - type: "null"
+    oneOf:
+      - type: object
+        required:
+          - status
+          - proposal
+          - universe_spec
+          - document_type
+        properties:
+          status:
+            const: proposed
+          proposal:
+            $ref: "#/$defs/filing_proposal"
+          universe_spec: &id003
+            type: string
+            minLength: 1
+          document_type: *id003
+      - type: object
+        required:
+          - status
+          - proposal
+          - universe_spec
+          - document_type
+        properties:
+          status:
+            enum:
+              - already_matches
+              - no_peers
+              - listing_needed
+              - evidence_incomplete
+              - destination_occupied
+          proposal:
+            type: "null"
+          universe_spec: &id004
+            type: string
+            minLength: 1
+          document_type: *id004
+      - type: object
+        required:
+          - status
+          - proposal
+          - universe_spec
+          - document_type
+        properties:
+          status:
+            enum:
+              - no_document_type
+              - document_type_needed
+          proposal:
+            type: "null"
+          universe_spec: &id005
+            type: "null"
+          document_type: *id005
+  move_path:
+    title: Move path
+    description: Path relative to the knowledge-base root, with forward slashes between folders.
+    pattern: ^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$
+    type: string
+    minLength: 1
+    not:
+      pattern: (^|/)\.{1,2}(/|$)
+  move_document:
+    title: Move document
+    type: object
+    additionalProperties: false
+    required:
+      - path
+      - text
+    properties:
+      path:
+        $ref: "#/$defs/move_path"
+      text:
+        type: string
+  move_binding:
+    title: Link binding
+    type: object
+    additionalProperties: false
+    required:
+      - source_path
+      - start
+      - end
+      - target_path
+    properties:
+      source_path:
+        $ref: "#/$defs/move_path"
+      start: &id006
+        type: integer
+        minimum: 0
+      end: *id006
+      target_path:
+        $ref: "#/$defs/move_path"

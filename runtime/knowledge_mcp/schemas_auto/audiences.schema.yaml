@@ -332,6 +332,196 @@ $defs:
           fingerprint:
             $ref: "#/$defs/fingerprint"
         additionalProperties: false
+      listed_file:
+        title: Listed file
+        type: object
+        required:
+          - path
+        properties:
+          path:
+            $ref: "#/$defs/path"
+          fingerprint:
+            $ref: "#/$defs/fingerprint"
+        additionalProperties: false
+      folder_count:
+        title: Folder count
+        type: object
+        required:
+          - folder
+          - count
+        properties:
+          folder:
+            type: string
+          count:
+            type: integer
+            minimum: 1
+        additionalProperties: false
+      filing_proposal:
+        title: Filing proposal
+        type: object
+        required:
+          - folder
+          - name
+          - path
+          - folder_new
+          - name_style
+          - evidence
+          - folder_counts
+        properties:
+          folder:
+            type: string
+          name:
+            type: string
+          path:
+            $ref: "#/$defs/path"
+          folder_new:
+            const: false
+          name_style:
+            enum:
+              - lower-kebab
+              - lower-snake
+              - unchanged
+          evidence:
+            type: array
+            items:
+              $ref: "#/$defs/path"
+          folder_counts:
+            type: array
+            items:
+              $ref: "#/$defs/folder_count"
+        additionalProperties: false
+      filing_assessment:
+        title: Filing assessment
+        type: object
+        oneOf:
+          - type: object
+            required:
+              - status
+              - proposal
+              - universe_spec
+              - document_type
+            properties:
+              status:
+                const: proposed
+              proposal:
+                $ref: "#/$defs/filing_proposal"
+              universe_spec:
+                type: string
+                minLength: 1
+              document_type:
+                type: string
+                minLength: 1
+          - type: object
+            required:
+              - status
+              - proposal
+              - universe_spec
+              - document_type
+            properties:
+              status:
+                enum:
+                  - already_matches
+                  - no_peers
+                  - listing_needed
+                  - evidence_incomplete
+                  - destination_occupied
+              proposal:
+                type: "null"
+              universe_spec:
+                type: string
+                minLength: 1
+              document_type:
+                type: string
+                minLength: 1
+          - type: object
+            required:
+              - status
+              - proposal
+              - universe_spec
+              - document_type
+            properties:
+              status:
+                enum:
+                  - no_document_type
+                  - document_type_needed
+              proposal:
+                type: "null"
+              universe_spec:
+                type: "null"
+              document_type:
+                type: "null"
+        required:
+          - path
+          - universe_spec
+          - document_type
+          - status
+          - proposal
+        properties:
+          path:
+            $ref: "#/$defs/path"
+          universe_spec:
+            type:
+              - string
+              - "null"
+          document_type:
+            type:
+              - string
+              - "null"
+          status:
+            enum:
+              - proposed
+              - already_matches
+              - no_peers
+              - no_document_type
+              - document_type_needed
+              - listing_needed
+              - evidence_incomplete
+              - destination_occupied
+          proposal:
+            anyOf:
+              - $ref: "#/$defs/filing_proposal"
+              - type: "null"
+        additionalProperties: false
+      move_path:
+        title: Move path
+        description: Path relative to the knowledge-base root, with forward slashes between folders.
+        type: string
+        not:
+          pattern: (^|/)\.{1,2}(/|$)
+        pattern: ^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$
+        minLength: 1
+      move_document:
+        title: Move document
+        type: object
+        required:
+          - path
+          - text
+        properties:
+          path:
+            $ref: "#/$defs/move_path"
+          text:
+            type: string
+        additionalProperties: false
+      move_binding:
+        title: Link binding
+        type: object
+        required:
+          - source_path
+          - start
+          - end
+          - target_path
+        properties:
+          source_path:
+            $ref: "#/$defs/move_path"
+          start:
+            type: integer
+            minimum: 0
+          end:
+            type: integer
+            minimum: 0
+          target_path:
+            $ref: "#/$defs/move_path"
+        additionalProperties: false
   problem.schema.yaml:
     $schema: https://json-schema.org/draft/2020-12/schema
     $id: problem.schema.yaml
@@ -369,6 +559,10 @@ $defs:
           - title: knowledge-mcp failed
             description: Any other failure inside knowledge-mcp.
             const: https://github.com/SterlingJF/knowledge-mcp/problems/internal-error
+          - title: Invalid document move
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/move-invalid
+          - title: Incomplete move input
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/move-input-incomplete
       title:
         type: string
       detail:
