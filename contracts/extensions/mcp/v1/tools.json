@@ -1607,6 +1607,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -1846,6 +1849,72 @@
                       "document_type_unavailable",
                       "definition_differs"
                     ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -2119,6 +2188,10 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },
@@ -3598,6 +3671,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -3840,6 +3916,72 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
               }
             }
           },
@@ -3919,6 +4061,10 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },
@@ -4847,6 +4993,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -5086,6 +5235,72 @@
                       "document_type_unavailable",
                       "definition_differs"
                     ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -5704,6 +5919,10 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },
@@ -7171,6 +7390,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -7413,6 +7635,72 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
               }
             }
           },
@@ -7492,6 +7780,10 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },
@@ -7580,7 +7872,7 @@
             ],
             "properties": {
               "schema": {
-                "const": "knowledge-mcp/edits/1"
+                "const": "knowledge-mcp/edits/2"
               },
               "location": {
                 "$ref": "common.schema.yaml#/$defs/location"
@@ -7598,6 +7890,26 @@
             "title": "Edit",
             "description": "An entry from `edits.jsonl`, with legacy permission fields converted to `allowed_by`.",
             "type": "object",
+            "if": {
+              "type": "object",
+              "required": [
+                "operation"
+              ],
+              "properties": {
+                "operation": true
+              }
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "whole_file"
+              ],
+              "properties": {
+                "whole_file": {
+                  "const": true
+                }
+              }
+            },
             "required": [
               "id",
               "time",
@@ -7637,6 +7949,9 @@
               },
               "after_digest": {
                 "$ref": "common.schema.yaml#/$defs/digest"
+              },
+              "operation": {
+                "$ref": "common.schema.yaml#/$defs/edit_operation"
               }
             },
             "additionalProperties": false
@@ -8609,6 +8924,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -8848,6 +9166,72 @@
                       "document_type_unavailable",
                       "definition_differs"
                     ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -9121,6 +9505,10 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },
@@ -10928,6 +11316,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -11167,6 +11558,72 @@
                       "document_type_unavailable",
                       "definition_differs"
                     ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -11594,6 +12051,10 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },
@@ -13245,6 +13706,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -13484,6 +13948,72 @@
                       "document_type_unavailable",
                       "definition_differs"
                     ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -13757,6 +14287,10 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },
@@ -13802,15 +14336,50 @@
       }
     },
     {
-      "name": "kb_prepare_document_types",
-      "title": "Prepare the document-types file",
-      "description": "Prepare document-types text and filing assessments from supplied configuration, file changes and entries. Include `allowed_by` to receive changed text. Append the answer to `log.jsonl` and open no knowledge-base file.\n",
+      "name": "kb_prepare_document_moves",
+      "title": "Prepare document moves",
+      "description": "Prepare moves together from supplied text and a complete listing. Return search strings, affected documents and replacement text while preserving link targets. Append the answer to log.jsonl and open no knowledge-base file.",
       "inputSchema": {
         "properties": {
           "location": {
-            "description": "The knowledge base root folder as plain text, such as a local path, a Drive folder link or a Notion page. knowledge-mcp logs this text and never opens the location.",
             "title": "Location",
             "type": "string"
+          },
+          "moves": {
+            "items": {
+              "$ref": "#/$defs/DocumentMove"
+            },
+            "title": "Moves",
+            "type": "array"
+          },
+          "listing": {
+            "items": {
+              "$ref": "#/$defs/ListedFile"
+            },
+            "title": "Listing",
+            "type": "array"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/$defs/MoveDocument"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "case_mode": {
+            "enum": [
+              "sensitive",
+              "insensitive"
+            ],
+            "title": "Case Mode",
+            "type": "string"
+          },
+          "knowledge_bus_folders": {
+            "items": {
+              "$ref": "#/$defs/KnowledgeBusFolder"
+            },
+            "title": "Knowledge Bus Folders",
+            "type": "array"
           },
           "record": {
             "anyOf": [
@@ -13837,76 +14406,6 @@
             "default": null,
             "description": "Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged."
           },
-          "knowledge_bus_folders": {
-            "default": [],
-            "description": "Every knowledge base folder that holds a `.knowledge-bus/` folder, even one with no `*.kbp.yaml` file. The bundled universe specs apply to a file when no `.knowledge-bus/` folder between the root and the file holds a `*.kbp.yaml` file or `workspace.yaml`.",
-            "items": {
-              "$ref": "#/$defs/KnowledgeBusFolder"
-            },
-            "title": "Knowledge Bus Folders",
-            "type": "array"
-          },
-          "listing": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/$defs/ListedFile"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Every file of the knowledge base outside `.knowledge-bus/` folders.",
-            "title": "Listing"
-          },
-          "changes": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/$defs/FileChange"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Files changed since the document-types file was last saved.",
-            "title": "Changes"
-          },
-          "entries": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/$defs/EntryItem"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Send your document type choices and any document types or readers specified by the person.",
-            "title": "Entries"
-          },
-          "recheck": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "True to put every file with an entry back in `to_settle`, except files with a `set_by: person` entry.",
-            "title": "Recheck"
-          },
           "allowed_by": {
             "anyOf": [
               {
@@ -13918,37 +14417,16 @@
             ],
             "default": null
           },
-          "conventions": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Current target conventions file text. Send empty text when the file is absent.",
-            "title": "Conventions"
+          "searched": {
+            "default": false,
+            "title": "Searched",
+            "type": "boolean"
           },
-          "conventions_digest": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Conventions digest received in this session. Reuse while the file remains unchanged.",
-            "title": "Conventions Digest"
-          },
-          "filing_values": {
+          "search": {
             "anyOf": [
               {
                 "items": {
-                  "$ref": "#/$defs/FilingValue"
+                  "type": "string"
                 },
                 "type": "array"
               },
@@ -13957,13 +14435,13 @@
               }
             ],
             "default": null,
-            "title": "Filing Values"
+            "title": "Search"
           },
-          "conventions_files": {
+          "bindings": {
             "anyOf": [
               {
                 "items": {
-                  "$ref": "#/$defs/ConventionFile"
+                  "$ref": "#/$defs/LinkBinding"
                 },
                 "type": "array"
               },
@@ -13972,11 +14450,16 @@
               }
             ],
             "default": null,
-            "title": "Conventions Files"
+            "title": "Bindings"
           }
         },
         "required": [
-          "location"
+          "location",
+          "moves",
+          "listing",
+          "documents",
+          "case_mode",
+          "knowledge_bus_folders"
         ],
         "type": "object",
         "$defs": {
@@ -14021,346 +14504,27 @@
             "title": "AllowedBy",
             "type": "object"
           },
-          "Audience": {
-            "additionalProperties": false,
-            "description": "The document's reader, and whether the person confirmed the value.",
-            "properties": {
-              "value": {
-                "title": "Value",
-                "type": "string"
-              },
-              "status": {
-                "enum": [
-                  "confirmed",
-                  "guessed"
-                ],
-                "title": "Status",
-                "type": "string"
-              }
-            },
-            "required": [
-              "value",
-              "status"
-            ],
-            "title": "Audience",
-            "type": "object"
-          },
-          "ConventionFile": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/ConventionFile1"
-              },
-              {
-                "$ref": "#/$defs/ConventionFile2"
-              }
-            ],
-            "title": "Convention file"
-          },
-          "ConventionFile1": {
-            "additionalProperties": false,
-            "properties": {
-              "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
-              },
-              "text": {
-                "title": "Text",
-                "type": "string"
-              },
-              "digest": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/Digest"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              }
-            },
-            "required": [
-              "folder",
-              "text"
-            ],
-            "title": "ConventionFile1",
-            "type": "object"
-          },
-          "ConventionFile2": {
-            "additionalProperties": false,
-            "properties": {
-              "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
-              },
-              "text": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Text"
-              },
-              "digest": {
-                "$ref": "#/$defs/Digest"
-              }
-            },
-            "required": [
-              "folder",
-              "digest"
-            ],
-            "title": "ConventionFile2",
-            "type": "object"
-          },
-          "ConventionsFolder": {
-            "pattern": "^(?:[^/\\\\\\u0000]+(?:/[^/\\\\\\u0000]+)*)?$",
-            "title": "Conventions folder",
-            "type": "string"
-          },
           "Digest": {
             "description": "The SHA-256 of the text's UTF-8 bytes.",
             "pattern": "^sha256:[0-9a-f]{64}$",
             "title": "Digest",
             "type": "string"
           },
-          "EntryItem": {
+          "DocumentMove": {
             "additionalProperties": false,
             "properties": {
-              "path": {
-                "description": "Path from the knowledge-base root, folders joined by `/`, such as `docs/rfcs/0042-cache.md`.",
-                "title": "Path",
-                "type": "string"
-              },
-              "set_by": {
-                "$ref": "#/$defs/SetBy",
-                "description": "`agent` when you chose the document type or reader. `person` when the person stated the document type or reader."
-              },
-              "universe_spec": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "Id of the universe spec that declares `document_type`.",
-                "title": "Universe Spec"
-              },
-              "document_type": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Document Type"
-              },
-              "no_document_type": {
-                "default": false,
-                "title": "No Document Type",
-                "type": "boolean"
-              },
-              "audience": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/Audience"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "The document's reader. `value` is one of the `choices` or the `actor` from `kb_list_audiences`. Set `status` to `confirmed` only after the person confirms the value."
-              }
-            },
-            "required": [
-              "path",
-              "set_by"
-            ],
-            "title": "EntryItem",
-            "type": "object"
-          },
-          "FileChange": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/FileCreated"
-              },
-              {
-                "$ref": "#/$defs/FileDeleted"
-              },
-              {
-                "$ref": "#/$defs/FileMoved"
-              },
-              {
-                "$ref": "#/$defs/FileEdited"
-              }
-            ],
-            "title": "File change"
-          },
-          "FileCreated": {
-            "additionalProperties": false,
-            "properties": {
-              "change": {
-                "const": "created",
-                "title": "Change",
-                "type": "string"
-              },
-              "path": {
-                "$ref": "#/$defs/Path"
-              },
-              "fingerprint": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/Fingerprint"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              }
-            },
-            "required": [
-              "change",
-              "path"
-            ],
-            "title": "FileCreated",
-            "type": "object"
-          },
-          "FileDeleted": {
-            "additionalProperties": false,
-            "properties": {
-              "change": {
-                "const": "deleted",
-                "title": "Change",
-                "type": "string"
-              },
-              "path": {
-                "$ref": "#/$defs/Path"
-              }
-            },
-            "required": [
-              "change",
-              "path"
-            ],
-            "title": "FileDeleted",
-            "type": "object"
-          },
-          "FileEdited": {
-            "additionalProperties": false,
-            "properties": {
-              "change": {
-                "const": "edited",
-                "title": "Change",
-                "type": "string"
-              },
-              "path": {
-                "$ref": "#/$defs/Path"
-              },
-              "fingerprint": {
-                "$ref": "#/$defs/Fingerprint"
-              }
-            },
-            "required": [
-              "change",
-              "path",
-              "fingerprint"
-            ],
-            "title": "FileEdited",
-            "type": "object"
-          },
-          "FileMoved": {
-            "additionalProperties": false,
-            "properties": {
-              "change": {
-                "const": "moved",
-                "title": "Change",
-                "type": "string"
-              },
-              "path": {
-                "$ref": "#/$defs/Path",
-                "description": "The path after the move."
-              },
               "old_path": {
-                "$ref": "#/$defs/Path"
+                "$ref": "#/$defs/MovePath"
               },
-              "fingerprint": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/Fingerprint"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              }
-            },
-            "required": [
-              "change",
-              "path",
-              "old_path"
-            ],
-            "title": "FileMoved",
-            "type": "object"
-          },
-          "FilingValue": {
-            "additionalProperties": false,
-            "properties": {
               "path": {
-                "$ref": "#/$defs/Path"
-              },
-              "universe_spec": {
-                "minLength": 1,
-                "title": "Universe Spec",
-                "type": "string"
-              },
-              "document_type": {
-                "minLength": 1,
-                "title": "Document Type",
-                "type": "string"
-              },
-              "properties": {
-                "anyOf": [
-                  {
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "type": "object"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": {},
-                "title": "Properties"
-              },
-              "content": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "title": "Content"
+                "$ref": "#/$defs/MovePath"
               }
             },
             "required": [
-              "path",
-              "universe_spec",
-              "document_type"
+              "old_path",
+              "path"
             ],
-            "title": "FilingValue",
+            "title": "DocumentMove",
             "type": "object"
           },
           "Fingerprint": {
@@ -14404,6 +14568,35 @@
             "title": "KnowledgeBusFolder",
             "type": "object"
           },
+          "LinkBinding": {
+            "additionalProperties": false,
+            "properties": {
+              "source_path": {
+                "$ref": "#/$defs/MovePath"
+              },
+              "start": {
+                "minimum": 0,
+                "title": "Start",
+                "type": "integer"
+              },
+              "end": {
+                "minimum": 0,
+                "title": "End",
+                "type": "integer"
+              },
+              "target_path": {
+                "$ref": "#/$defs/MovePath"
+              }
+            },
+            "required": [
+              "source_path",
+              "start",
+              "end",
+              "target_path"
+            ],
+            "title": "LinkBinding",
+            "type": "object"
+          },
           "ListedFile": {
             "additionalProperties": false,
             "properties": {
@@ -14428,19 +14621,35 @@
             "title": "ListedFile",
             "type": "object"
           },
+          "MoveDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/MovePath"
+              },
+              "text": {
+                "title": "Text",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "text"
+            ],
+            "title": "MoveDocument",
+            "type": "object"
+          },
+          "MovePath": {
+            "description": "Path relative to the knowledge-base root, with forward slashes between folders.",
+            "minLength": 1,
+            "pattern": "^[^/\\\\\\u0000]+(?:/[^/\\\\\\u0000]+)*$",
+            "title": "Move path",
+            "type": "string"
+          },
           "Path": {
             "description": "Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.",
             "minLength": 1,
             "title": "Path",
-            "type": "string"
-          },
-          "SetBy": {
-            "description": "`person` when the person stated the document type or reader. An entry the person set wins over any later entry by the agent.",
-            "enum": [
-              "agent",
-              "person"
-            ],
-            "title": "Set by",
             "type": "string"
           },
           "SpecFile": {
@@ -14497,14 +14706,14 @@
             "type": "object"
           }
         },
-        "title": "kb_prepare_document_typesArguments",
+        "title": "kb_prepare_document_movesArguments",
         "additionalProperties": false
       },
       "outputSchema": {
         "type": "object",
-        "$id": "document-types-update.schema.yaml",
-        "title": "kb_prepare_document_types result",
-        "description": "The structuredContent of a kb_prepare_document_types result, or problem details when isError is true.",
+        "$id": "document-moves.schema.yaml",
+        "title": "kb_prepare_document_moves result",
+        "description": "Replacement text and target checks for moves prepared together.",
         "oneOf": [
           {
             "$ref": "#/$defs/answer"
@@ -14515,172 +14724,304 @@
         ],
         "$defs": {
           "answer": {
-            "title": "Document types update answer",
+            "title": "Document moves answer",
             "type": "object",
+            "if": {
+              "type": "object",
+              "required": [
+                "status"
+              ],
+              "properties": {
+                "status": {
+                  "enum": [
+                    "texts_needed",
+                    "permission_needed",
+                    "blocked",
+                    "unchanged"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "writes": {
+                  "type": "array",
+                  "maxItems": 0
+                },
+                "record": {
+                  "type": "null"
+                },
+                "digest": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "type": "object",
+              "properties": {
+                "writes": {
+                  "type": "array",
+                  "minItems": 1
+                },
+                "record": {
+                  "type": "string"
+                },
+                "digest": {
+                  "$ref": "common.schema.yaml#/$defs/digest"
+                }
+              }
+            },
             "required": [
               "schema",
               "location",
+              "status",
+              "allowed_by",
+              "search",
               "based_on",
+              "writes",
               "record",
               "digest",
-              "changed",
-              "to_settle",
-              "scopes",
+              "links",
+              "issues",
               "received",
-              "filing"
+              "moves",
+              "affected_documents",
+              "record_changes"
             ],
             "properties": {
               "schema": {
-                "const": "knowledge-mcp/document-types-update/1"
+                "const": "knowledge-mcp/document-moves/1"
               },
               "location": {
-                "$ref": "common.schema.yaml#/$defs/location"
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "texts_needed",
+                  "permission_needed",
+                  "ready",
+                  "blocked",
+                  "unchanged"
+                ]
+              },
+              "allowed_by": {
+                "anyOf": [
+                  {
+                    "$ref": "document-types.schema.yaml#/$defs/allowed_by"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "search": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               },
               "based_on": {
-                "description": "Digest of the document-types text sent as `record`, or named by `record_digest`.",
-                "$ref": "common.schema.yaml#/$defs/digest"
+                "title": "Move inputs",
+                "type": "object",
+                "required": [
+                  "listing_digest",
+                  "record_digest",
+                  "documents",
+                  "configuration"
+                ],
+                "properties": {
+                  "listing_digest": {
+                    "$ref": "common.schema.yaml#/$defs/digest"
+                  },
+                  "record_digest": {
+                    "$ref": "common.schema.yaml#/$defs/digest"
+                  },
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "title": "Document digest",
+                      "type": "object",
+                      "required": [
+                        "path",
+                        "digest"
+                      ],
+                      "properties": {
+                        "path": {
+                          "$ref": "common.schema.yaml#/$defs/path"
+                        },
+                        "digest": {
+                          "$ref": "common.schema.yaml#/$defs/digest"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "configuration": {
+                    "$ref": "common.schema.yaml#/$defs/received"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "writes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/write"
+                }
               },
               "record": {
-                "description": "The merged text for the harness to save as `document-types.yaml`. Null when the call sent no `allowed_by`, or when no entry changed and the text sent was not an old `record.yaml`.",
                 "type": [
                   "string",
                   "null"
                 ]
               },
               "digest": {
-                "description": "Digest of `record`, or null when `record` is null. Send a non-null digest as `record_digest` in the next call.",
                 "type": [
                   "string",
                   "null"
                 ],
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
-              "note": {
-                "description": "Present when changes or migration lack `allowed_by`, or when `record` replaces an old `record.yaml`.",
-                "type": "string"
-              },
-              "listing_changes": {
-                "description": "File changes that knowledge-mcp found by comparing `listing` with the entries. Present only when the call sent `listing`.",
+              "links": {
                 "type": "array",
                 "items": {
-                  "$ref": "common.schema.yaml#/$defs/file_change"
+                  "$ref": "#/$defs/link"
                 }
               },
-              "changed": {
+              "issues": {
                 "type": "array",
                 "items": {
-                  "title": "Changed entry",
-                  "type": "object",
-                  "required": [
-                    "path",
-                    "change"
-                  ],
-                  "properties": {
-                    "path": {
-                      "$ref": "common.schema.yaml#/$defs/path"
-                    },
-                    "change": {
-                      "description": "knowledge-mcp retains every classification field when the universe spec and document type apply at the destination. After a conflicting move, knowledge-mcp retains the original entry and lists the destination in to_settle. Other values name classification, deletion or fingerprint updates.",
-                      "enum": [
-                        "settled",
-                        "corrected",
-                        "moved",
-                        "deleted",
-                        "kept",
-                        "fingerprint"
-                      ]
-                    },
-                    "old_path": {
-                      "$ref": "common.schema.yaml#/$defs/path"
-                    },
-                    "entry": {
-                      "$ref": "document-types.schema.yaml#/$defs/entry"
-                    },
-                    "was": {
-                      "$ref": "document-types.schema.yaml#/$defs/entry"
-                    },
-                    "note": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                }
-              },
-              "to_settle": {
-                "description": "Files that need a document type from the agent, with candidates in kb_get_document_type order.",
-                "type": "array",
-                "items": {
-                  "title": "File to settle",
-                  "type": "object",
-                  "required": [
-                    "path",
-                    "scope",
-                    "candidates"
-                  ],
-                  "properties": {
-                    "path": {
-                      "$ref": "common.schema.yaml#/$defs/path"
-                    },
-                    "scope": {
-                      "description": "The index into `scopes`.",
-                      "type": "integer",
-                      "minimum": 0
-                    },
-                    "candidates": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "common.schema.yaml#/$defs/candidate"
-                      }
-                    },
-                    "old_path": {
-                      "$ref": "common.schema.yaml#/$defs/path"
-                    },
-                    "was": {
-                      "$ref": "document-types.schema.yaml#/$defs/entry"
-                    }
-                  },
-                  "additionalProperties": false
-                }
-              },
-              "scopes": {
-                "description": "Groups of universe specs that apply, one group for each set of sent `.knowledge-bus/` folders above a file.",
-                "type": "array",
-                "items": {
-                  "title": "Scope",
-                  "type": "object",
-                  "required": [
-                    "universe_specs",
-                    "every_document_type"
-                  ],
-                  "properties": {
-                    "universe_specs": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "common.schema.yaml#/$defs/spec"
-                      }
-                    },
-                    "every_document_type": {
-                      "description": "Null unless a `to_settle` file references this group through `scope` and has no candidate matching its file name.",
-                      "type": [
-                        "array",
-                        "null"
-                      ],
-                      "items": {
-                        "$ref": "common.schema.yaml#/$defs/type_group"
-                      }
-                    }
-                  },
-                  "additionalProperties": false
+                  "$ref": "#/$defs/issue"
                 }
               },
               "received": {
                 "$ref": "common.schema.yaml#/$defs/received"
               },
-              "filing": {
+              "moves": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "common.schema.yaml#/$defs/document_move"
+                }
+              },
+              "affected_documents": {
                 "type": "array",
                 "items": {
-                  "$ref": "common.schema.yaml#/$defs/filing_assessment"
+                  "$ref": "common.schema.yaml#/$defs/document_move"
                 }
+              },
+              "record_changes": {
+                "type": "array",
+                "items": {
+                  "$ref": "common.schema.yaml#/$defs/document_move"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "write": {
+            "title": "Move write",
+            "type": "object",
+            "required": [
+              "old_path",
+              "path",
+              "before_digest",
+              "after_digest",
+              "text"
+            ],
+            "properties": {
+              "old_path": {
+                "$ref": "common.schema.yaml#/$defs/move_path"
+              },
+              "path": {
+                "$ref": "common.schema.yaml#/$defs/move_path"
+              },
+              "before_digest": {
+                "$ref": "common.schema.yaml#/$defs/digest"
+              },
+              "after_digest": {
+                "$ref": "common.schema.yaml#/$defs/digest"
+              },
+              "text": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "link": {
+            "title": "Move link",
+            "type": "object",
+            "required": [
+              "source_path",
+              "start",
+              "end",
+              "target_before",
+              "target_after",
+              "replacement"
+            ],
+            "properties": {
+              "source_path": {
+                "$ref": "common.schema.yaml#/$defs/move_path"
+              },
+              "start": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "target_before": {
+                "$ref": "common.schema.yaml#/$defs/path"
+              },
+              "target_after": {
+                "$ref": "common.schema.yaml#/$defs/path"
+              },
+              "replacement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "issue": {
+            "title": "Move issue",
+            "type": "object",
+            "required": [
+              "code",
+              "source_path",
+              "start",
+              "end",
+              "detail"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "source_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "start": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "end": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "detail": {
+                "type": "string"
               }
             },
             "additionalProperties": false
@@ -15653,6 +15994,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -15892,6 +16236,72 @@
                       "document_type_unavailable",
                       "definition_differs"
                     ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -16165,6 +16575,2573 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              },
+              "detail": {
+                "description": "For MCP errors, the last text block contains the same detail.",
+                "type": "string",
+                "minLength": 1
+              },
+              "errors": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "title": "Argument error",
+                  "type": "object",
+                  "required": [
+                    "detail",
+                    "pointer"
+                  ],
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    },
+                    "pointer": {
+                      "description": "JSON Pointer into the arguments as sent, such as \"#/entries/0/document_type\".",
+                      "type": "string",
+                      "pattern": "^#(/([^~/]|~[01])*)*$"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "kb_prepare_document_types",
+      "title": "Prepare the document-types file",
+      "description": "Prepare document-types text and filing assessments from supplied configuration, file changes and entries. Include `allowed_by` to receive changed text. Append the answer to `log.jsonl` and open no knowledge-base file.\n",
+      "inputSchema": {
+        "properties": {
+          "location": {
+            "description": "The knowledge base root folder as plain text, such as a local path, a Drive folder link or a Notion page. knowledge-mcp logs this text and never opens the location.",
+            "title": "Location",
+            "type": "string"
+          },
+          "record": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing.",
+            "title": "Record"
+          },
+          "record_digest": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Digest"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged."
+          },
+          "knowledge_bus_folders": {
+            "default": [],
+            "description": "Every knowledge base folder that holds a `.knowledge-bus/` folder, even one with no `*.kbp.yaml` file. The bundled universe specs apply to a file when no `.knowledge-bus/` folder between the root and the file holds a `*.kbp.yaml` file or `workspace.yaml`.",
+            "items": {
+              "$ref": "#/$defs/KnowledgeBusFolder"
+            },
+            "title": "Knowledge Bus Folders",
+            "type": "array"
+          },
+          "listing": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/ListedFile"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Every file of the knowledge base outside `.knowledge-bus/` folders.",
+            "title": "Listing"
+          },
+          "changes": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/FileChange"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Files changed since the document-types file was last saved.",
+            "title": "Changes"
+          },
+          "entries": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/EntryItem"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Send your document type choices and any document types or readers specified by the person.",
+            "title": "Entries"
+          },
+          "recheck": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "True to put every file with an entry back in `to_settle`, except files with a `set_by: person` entry.",
+            "title": "Recheck"
+          },
+          "allowed_by": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/AllowedBy"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "conventions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Current target conventions file text. Send empty text when the file is absent.",
+            "title": "Conventions"
+          },
+          "conventions_digest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Conventions digest received in this session. Reuse while the file remains unchanged.",
+            "title": "Conventions Digest"
+          },
+          "filing_values": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/FilingValue"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Filing Values"
+          },
+          "conventions_files": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/ConventionFile"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Conventions Files"
+          },
+          "filing_review": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FilingReview"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "type": "object",
+        "$defs": {
+          "AllowedBy": {
+            "additionalProperties": false,
+            "description": "The person's permission for the save or the edit.",
+            "properties": {
+              "basis": {
+                "description": "`request` means the person asked in this session. `instruction` means the person wrote an instruction for agents, such as in AGENTS.md. `accepted_change` means the person accepted a proposed change.",
+                "enum": [
+                  "request",
+                  "instruction",
+                  "accepted_change"
+                ],
+                "title": "Basis",
+                "type": "string"
+              },
+              "text": {
+                "description": "The request, instruction or accepted change, quoted.",
+                "minLength": 1,
+                "title": "Text",
+                "type": "string"
+              },
+              "location": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The file holding the instruction or the accepted change.",
+                "title": "Location"
+              }
+            },
+            "required": [
+              "basis",
+              "text"
+            ],
+            "title": "AllowedBy",
+            "type": "object"
+          },
+          "Audience": {
+            "additionalProperties": false,
+            "description": "The document's reader, and whether the person confirmed the value.",
+            "properties": {
+              "value": {
+                "title": "Value",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "confirmed",
+                  "guessed"
+                ],
+                "title": "Status",
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "status"
+            ],
+            "title": "Audience",
+            "type": "object"
+          },
+          "ConventionFile": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ConventionFile1"
+              },
+              {
+                "$ref": "#/$defs/ConventionFile2"
+              }
+            ],
+            "title": "Convention file"
+          },
+          "ConventionFile1": {
+            "additionalProperties": false,
+            "properties": {
+              "folder": {
+                "$ref": "#/$defs/ConventionsFolder"
+              },
+              "text": {
+                "title": "Text",
+                "type": "string"
+              },
+              "digest": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Digest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "folder",
+              "text"
+            ],
+            "title": "ConventionFile1",
+            "type": "object"
+          },
+          "ConventionFile2": {
+            "additionalProperties": false,
+            "properties": {
+              "folder": {
+                "$ref": "#/$defs/ConventionsFolder"
+              },
+              "text": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Text"
+              },
+              "digest": {
+                "$ref": "#/$defs/Digest"
+              }
+            },
+            "required": [
+              "folder",
+              "digest"
+            ],
+            "title": "ConventionFile2",
+            "type": "object"
+          },
+          "ConventionsFolder": {
+            "pattern": "^(?:[^/\\\\\\u0000]+(?:/[^/\\\\\\u0000]+)*)?$",
+            "title": "Conventions folder",
+            "type": "string"
+          },
+          "Digest": {
+            "description": "The SHA-256 of the text's UTF-8 bytes.",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "title": "Digest",
+            "type": "string"
+          },
+          "EntryItem": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "description": "Path from the knowledge-base root, folders joined by `/`, such as `docs/rfcs/0042-cache.md`.",
+                "title": "Path",
+                "type": "string"
+              },
+              "set_by": {
+                "$ref": "#/$defs/SetBy",
+                "description": "`agent` when you chose the document type or reader. `person` when the person stated the document type or reader."
+              },
+              "universe_spec": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Id of the universe spec that declares `document_type`.",
+                "title": "Universe Spec"
+              },
+              "document_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Document Type"
+              },
+              "no_document_type": {
+                "default": false,
+                "title": "No Document Type",
+                "type": "boolean"
+              },
+              "audience": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Audience"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The document's reader. `value` is one of the `choices` or the `actor` from `kb_list_audiences`. Set `status` to `confirmed` only after the person confirms the value."
+              }
+            },
+            "required": [
+              "path",
+              "set_by"
+            ],
+            "title": "EntryItem",
+            "type": "object"
+          },
+          "FileChange": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FileCreated"
+              },
+              {
+                "$ref": "#/$defs/FileDeleted"
+              },
+              {
+                "$ref": "#/$defs/FileMoved"
+              },
+              {
+                "$ref": "#/$defs/FileEdited"
+              }
+            ],
+            "title": "File change"
+          },
+          "FileCreated": {
+            "additionalProperties": false,
+            "properties": {
+              "change": {
+                "const": "created",
+                "title": "Change",
+                "type": "string"
+              },
+              "path": {
+                "$ref": "#/$defs/Path"
+              },
+              "fingerprint": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Fingerprint"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "change",
+              "path"
+            ],
+            "title": "FileCreated",
+            "type": "object"
+          },
+          "FileDeleted": {
+            "additionalProperties": false,
+            "properties": {
+              "change": {
+                "const": "deleted",
+                "title": "Change",
+                "type": "string"
+              },
+              "path": {
+                "$ref": "#/$defs/Path"
+              }
+            },
+            "required": [
+              "change",
+              "path"
+            ],
+            "title": "FileDeleted",
+            "type": "object"
+          },
+          "FileEdited": {
+            "additionalProperties": false,
+            "properties": {
+              "change": {
+                "const": "edited",
+                "title": "Change",
+                "type": "string"
+              },
+              "path": {
+                "$ref": "#/$defs/Path"
+              },
+              "fingerprint": {
+                "$ref": "#/$defs/Fingerprint"
+              }
+            },
+            "required": [
+              "change",
+              "path",
+              "fingerprint"
+            ],
+            "title": "FileEdited",
+            "type": "object"
+          },
+          "FileMoved": {
+            "additionalProperties": false,
+            "properties": {
+              "change": {
+                "const": "moved",
+                "title": "Change",
+                "type": "string"
+              },
+              "path": {
+                "$ref": "#/$defs/Path",
+                "description": "The path after the move."
+              },
+              "old_path": {
+                "$ref": "#/$defs/Path"
+              },
+              "fingerprint": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Fingerprint"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "change",
+              "path",
+              "old_path"
+            ],
+            "title": "FileMoved",
+            "type": "object"
+          },
+          "FilingReview": {
+            "additionalProperties": false,
+            "properties": {
+              "folder": {
+                "title": "Folder",
+                "type": "string"
+              },
+              "recursive": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": false,
+                "title": "Recursive"
+              }
+            },
+            "required": [
+              "folder"
+            ],
+            "title": "FilingReview",
+            "type": "object"
+          },
+          "FilingValue": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/Path"
+              },
+              "universe_spec": {
+                "minLength": 1,
+                "title": "Universe Spec",
+                "type": "string"
+              },
+              "document_type": {
+                "minLength": 1,
+                "title": "Document Type",
+                "type": "string"
+              },
+              "properties": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": {},
+                "title": "Properties"
+              },
+              "content": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Content"
+              }
+            },
+            "required": [
+              "path",
+              "universe_spec",
+              "document_type"
+            ],
+            "title": "FilingValue",
+            "type": "object"
+          },
+          "Fingerprint": {
+            "description": "A value that changes only when the file content changes, such as SHA-256 or Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing` that moved.",
+            "title": "Fingerprint",
+            "type": "string"
+          },
+          "KnowledgeBusFolder": {
+            "additionalProperties": false,
+            "properties": {
+              "folder": {
+                "description": "Path from the knowledge-base root, such as `team/notes`. Empty for the root folder.",
+                "title": "Folder",
+                "type": "string"
+              },
+              "files": {
+                "description": "Every `*.kbp.yaml` file directly inside the `.knowledge-bus/` folder.",
+                "items": {
+                  "$ref": "#/$defs/SpecFile"
+                },
+                "title": "Files",
+                "type": "array"
+              },
+              "workspace_yaml": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The text of `.knowledge-bus/workspace.yaml`.",
+                "title": "Workspace Yaml"
+              }
+            },
+            "required": [
+              "folder"
+            ],
+            "title": "KnowledgeBusFolder",
+            "type": "object"
+          },
+          "ListedFile": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/Path"
+              },
+              "fingerprint": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Fingerprint"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "title": "ListedFile",
+            "type": "object"
+          },
+          "Path": {
+            "description": "Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.",
+            "minLength": 1,
+            "title": "Path",
+            "type": "string"
+          },
+          "SetBy": {
+            "description": "`person` when the person stated the document type or reader. An entry the person set wins over any later entry by the agent.",
+            "enum": [
+              "agent",
+              "person"
+            ],
+            "title": "Set by",
+            "type": "string"
+          },
+          "SpecFile": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "description": "The file name, such as `universe.kbp.yaml`.",
+                "title": "Name",
+                "type": "string"
+              },
+              "id": {
+                "description": "The `id` value in the file's `universe:` or `guidance:` block.",
+                "title": "Id",
+                "type": "string"
+              },
+              "version": {
+                "description": "The `version` value in the file's `universe:` or `guidance:` block, as written.",
+                "title": "Version",
+                "type": "string"
+              },
+              "text": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The full file text. Send fresh text whenever the file changes. Reuse `digest` while the text stays unchanged. Leave it out when `id` and `version` match a bundled file, except in kbp_validate.",
+                "title": "Text"
+              },
+              "digest": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The file's digest, as listed in `received` by an earlier tool result this session.",
+                "title": "Digest"
+              }
+            },
+            "required": [
+              "name",
+              "id",
+              "version"
+            ],
+            "title": "SpecFile",
+            "type": "object"
+          }
+        },
+        "title": "kb_prepare_document_typesArguments",
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "$id": "document-types-update.schema.yaml",
+        "title": "kb_prepare_document_types result",
+        "description": "The structuredContent of a kb_prepare_document_types result, or problem details when isError is true.",
+        "oneOf": [
+          {
+            "$ref": "#/$defs/answer"
+          },
+          {
+            "$ref": "problem.schema.yaml"
+          }
+        ],
+        "$defs": {
+          "answer": {
+            "title": "Document types update answer",
+            "type": "object",
+            "required": [
+              "schema",
+              "location",
+              "based_on",
+              "record",
+              "digest",
+              "changed",
+              "to_settle",
+              "scopes",
+              "received",
+              "filing"
+            ],
+            "properties": {
+              "schema": {
+                "const": "knowledge-mcp/document-types-update/1"
+              },
+              "location": {
+                "$ref": "common.schema.yaml#/$defs/location"
+              },
+              "based_on": {
+                "description": "Digest of the document-types text sent as `record`, or named by `record_digest`.",
+                "$ref": "common.schema.yaml#/$defs/digest"
+              },
+              "record": {
+                "description": "The merged text for the harness to save as `document-types.yaml`. Null when the call sent no `allowed_by`, or when no entry changed and the text sent was not an old `record.yaml`.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "digest": {
+                "description": "Digest of `record`, or null when `record` is null. Send a non-null digest as `record_digest` in the next call.",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "note": {
+                "description": "Present when changes or migration lack `allowed_by`, or when `record` replaces an old `record.yaml`.",
+                "type": "string"
+              },
+              "listing_changes": {
+                "description": "File changes that knowledge-mcp found by comparing `listing` with the entries. Present only when the call sent `listing`.",
+                "type": "array",
+                "items": {
+                  "$ref": "common.schema.yaml#/$defs/file_change"
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "title": "Changed entry",
+                  "type": "object",
+                  "required": [
+                    "path",
+                    "change"
+                  ],
+                  "properties": {
+                    "path": {
+                      "$ref": "common.schema.yaml#/$defs/path"
+                    },
+                    "change": {
+                      "description": "knowledge-mcp retains every classification field when the universe spec and document type apply at the destination. After a conflicting move, knowledge-mcp retains the original entry and lists the destination in to_settle. Other values name classification, deletion or fingerprint updates.",
+                      "enum": [
+                        "settled",
+                        "corrected",
+                        "moved",
+                        "deleted",
+                        "kept",
+                        "fingerprint"
+                      ]
+                    },
+                    "old_path": {
+                      "$ref": "common.schema.yaml#/$defs/path"
+                    },
+                    "entry": {
+                      "$ref": "document-types.schema.yaml#/$defs/entry"
+                    },
+                    "was": {
+                      "$ref": "document-types.schema.yaml#/$defs/entry"
+                    },
+                    "note": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "to_settle": {
+                "description": "Files that need a document type from the agent, with candidates in kb_get_document_type order.",
+                "type": "array",
+                "items": {
+                  "title": "File to settle",
+                  "type": "object",
+                  "required": [
+                    "path",
+                    "scope",
+                    "candidates"
+                  ],
+                  "properties": {
+                    "path": {
+                      "$ref": "common.schema.yaml#/$defs/path"
+                    },
+                    "scope": {
+                      "description": "The index into `scopes`.",
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "candidates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "common.schema.yaml#/$defs/candidate"
+                      }
+                    },
+                    "old_path": {
+                      "$ref": "common.schema.yaml#/$defs/path"
+                    },
+                    "was": {
+                      "$ref": "document-types.schema.yaml#/$defs/entry"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "scopes": {
+                "description": "Groups of universe specs that apply, one group for each set of sent `.knowledge-bus/` folders above a file.",
+                "type": "array",
+                "items": {
+                  "title": "Scope",
+                  "type": "object",
+                  "required": [
+                    "universe_specs",
+                    "every_document_type"
+                  ],
+                  "properties": {
+                    "universe_specs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "common.schema.yaml#/$defs/spec"
+                      }
+                    },
+                    "every_document_type": {
+                      "description": "Null unless a `to_settle` file references this group through `scope` and has no candidate matching its file name.",
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "$ref": "common.schema.yaml#/$defs/type_group"
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "received": {
+                "$ref": "common.schema.yaml#/$defs/received"
+              },
+              "filing": {
+                "type": "array",
+                "items": {
+                  "$ref": "common.schema.yaml#/$defs/filing_assessment"
+                }
+              },
+              "filing_review": {
+                "title": "Folder filing review",
+                "type": "object",
+                "required": [
+                  "folder",
+                  "recursive",
+                  "assessments",
+                  "unresolved"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "type": "boolean"
+                  },
+                  "assessments": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "common.schema.yaml#/$defs/filing_assessment"
+                    }
+                  },
+                  "unresolved": {
+                    "type": "array",
+                    "items": {
+                      "title": "Unresolved filing",
+                      "type": "object",
+                      "required": [
+                        "path",
+                        "question"
+                      ],
+                      "properties": {
+                        "path": {
+                          "$ref": "common.schema.yaml#/$defs/path"
+                        },
+                        "question": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "conventions.schema.yaml": {
+            "$id": "conventions.schema.yaml",
+            "title": "Naming and filing conventions",
+            "description": "Saved conventions for document types in the declaring folder.",
+            "type": "object",
+            "required": [
+              "schema",
+              "from_parent",
+              "conventions"
+            ],
+            "properties": {
+              "schema": {
+                "const": "knowledge-mcp/conventions/1"
+              },
+              "from_parent": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/reference"
+                }
+              },
+              "conventions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/saved_convention"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "$defs": {
+              "part": {
+                "title": "Convention part",
+                "oneOf": [
+                  {
+                    "title": "Convention document type part",
+                    "type": "object",
+                    "required": [
+                      "part"
+                    ],
+                    "properties": {
+                      "part": {
+                        "const": "document_type"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "title": "Convention date part",
+                    "type": "object",
+                    "required": [
+                      "part",
+                      "property",
+                      "format"
+                    ],
+                    "properties": {
+                      "part": {
+                        "const": "date"
+                      },
+                      "property": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "format": {
+                        "enum": [
+                          "YYYY-MM-DD",
+                          "YYYY-MM",
+                          "YYYY"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "title": "Convention property part",
+                    "type": "object",
+                    "required": [
+                      "part",
+                      "property"
+                    ],
+                    "properties": {
+                      "part": {
+                        "const": "property"
+                      },
+                      "property": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "title": "Convention content part",
+                    "type": "object",
+                    "required": [
+                      "part"
+                    ],
+                    "properties": {
+                      "part": {
+                        "const": "content"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "title": "Convention literal part",
+                    "type": "object",
+                    "required": [
+                      "part",
+                      "value"
+                    ],
+                    "properties": {
+                      "part": {
+                        "const": "literal"
+                      },
+                      "value": {
+                        "$ref": "#/$defs/segment"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "name": {
+                "title": "Convention name",
+                "type": "object",
+                "required": [
+                  "separator",
+                  "parts"
+                ],
+                "properties": {
+                  "separator": {
+                    "enum": [
+                      " ",
+                      "-",
+                      "_"
+                    ]
+                  },
+                  "case": {
+                    "default": "as-written",
+                    "enum": [
+                      "as-written",
+                      "lower"
+                    ]
+                  },
+                  "parts": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/part"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "content": {
+                "title": "Convention content",
+                "type": "object",
+                "required": [
+                  "label",
+                  "instruction"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "instruction": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "reference": {
+                "title": "Convention reference",
+                "type": "object",
+                "required": [
+                  "universe_spec",
+                  "document_type"
+                ],
+                "properties": {
+                  "universe_spec": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "document_type": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "saved_convention": {
+                "title": "Saved convention",
+                "type": "object",
+                "if": {
+                  "type": "object",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "folder"
+                      ],
+                      "properties": {
+                        "folder": {
+                          "type": "array",
+                          "contains": {
+                            "type": "object",
+                            "required": [
+                              "part"
+                            ],
+                            "properties": {
+                              "part": {
+                                "const": "content"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "object",
+                          "required": [
+                            "parts"
+                          ],
+                          "properties": {
+                            "parts": {
+                              "type": "array",
+                              "contains": {
+                                "type": "object",
+                                "required": [
+                                  "part"
+                                ],
+                                "properties": {
+                                  "part": {
+                                    "const": "content"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "then": {
+                  "type": "object",
+                  "required": [
+                    "content"
+                  ],
+                  "properties": {
+                    "content": {
+                      "$ref": "#/$defs/content"
+                    }
+                  }
+                },
+                "else": {
+                  "type": "object",
+                  "not": {
+                    "required": [
+                      "content"
+                    ],
+                    "properties": {
+                      "content": true
+                    }
+                  }
+                },
+                "required": [
+                  "universe_spec",
+                  "document_type",
+                  "folder",
+                  "name",
+                  "set_by",
+                  "allowed_by",
+                  "time"
+                ],
+                "properties": {
+                  "universe_spec": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "document_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "folder": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/$defs/segment"
+                        },
+                        {
+                          "$ref": "#/$defs/part"
+                        }
+                      ]
+                    }
+                  },
+                  "name": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "content": {
+                    "$ref": "#/$defs/content"
+                  },
+                  "set_by": {
+                    "$ref": "document-types.schema.yaml#/$defs/set_by"
+                  },
+                  "allowed_by": {
+                    "$ref": "document-types.schema.yaml#/$defs/allowed_by"
+                  },
+                  "time": {
+                    "$ref": "common.schema.yaml#/$defs/time"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "segment": {
+                "title": "Convention segment",
+                "type": "string",
+                "not": {
+                  "enum": [
+                    ".",
+                    "..",
+                    ".knowledge-bus",
+                    ".obsidian",
+                    ".git",
+                    "node_modules",
+                    ".venv",
+                    "__pycache__",
+                    ".mypy_cache",
+                    ".pytest_cache",
+                    ".ruff_cache"
+                  ]
+                },
+                "pattern": "^[^#|^:/\\\\\\[\\]\\u0000-\\u001f\\u007f-\\u009f]+$",
+                "minLength": 1
+              }
+            }
+          },
+          "common.schema.yaml": {
+            "$id": "common.schema.yaml",
+            "title": "Shared shapes",
+            "description": "Definitions shared by the tool results and the document-types file.",
+            "$defs": {
+              "location": {
+                "title": "Location",
+                "type": "string"
+              },
+              "path": {
+                "title": "Path",
+                "description": "Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.",
+                "type": "string",
+                "minLength": 1
+              },
+              "fingerprint": {
+                "title": "Fingerprint",
+                "description": "A value that changes only when the file content changes, such as SHA-256 or Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing` that moved.",
+                "type": "string"
+              },
+              "digest": {
+                "title": "Digest",
+                "description": "The SHA-256 of the text's UTF-8 bytes.",
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "time": {
+                "title": "Time",
+                "description": "ISO 8601 date and time in UTC.",
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T.*Z$"
+              },
+              "edit_id": {
+                "title": "Edit id",
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$"
+              },
+              "received": {
+                "title": "Received",
+                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "type": "array",
+                "items": {
+                  "title": "Received text",
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "digest"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "digest": {
+                      "$ref": "#/$defs/digest"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "spec": {
+                "title": "Spec in scope",
+                "type": "object",
+                "required": [
+                  "id",
+                  "version",
+                  "source",
+                  "from_parent"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "version": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "description": "`bundled copy at <ref>` means knowledge-mcp used its own copy of the universe spec, taken from git ref `<ref>` of the knowledge-bus repository.",
+                    "type": "string",
+                    "pattern": "^(sent by the harness|bundled copy at \\S+)$"
+                  },
+                  "from_parent": {
+                    "description": "True when the universe spec comes from a `.knowledge-bus/` folder above the deepest `.knowledge-bus/` folder the harness sent.",
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "candidate": {
+                "title": "Candidate",
+                "description": "A document type whose alias shares a word with the file name or its nearest folder.",
+                "type": "object",
+                "required": [
+                  "universe_spec",
+                  "document_type",
+                  "name",
+                  "alias",
+                  "action",
+                  "actor",
+                  "timing",
+                  "matched",
+                  "matched_on"
+                ],
+                "properties": {
+                  "universe_spec": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "document_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "alias": {
+                    "title": "Alias",
+                    "description": "From kbp_kinds.",
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "descriptive",
+                          "normative"
+                        ]
+                      },
+                      "form": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "action": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "actor": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "timing": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "matched": {
+                    "description": "Words shared by the alias and the file name or nearest folder, lowercased with common plural suffixes removed.",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "matched_on": {
+                    "description": "`folder` means only the nearest folder name matched.",
+                    "enum": [
+                      "name",
+                      "folder"
+                    ]
+                  },
+                  "role_matches": {
+                    "description": "True when `actor` and the role share a normalized word after knowledge-mcp removes stopwords. Present only when the harness sent a role.",
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "type_group": {
+                "title": "Type group",
+                "type": "object",
+                "required": [
+                  "universe_spec",
+                  "covers",
+                  "covers_matched",
+                  "kinds"
+                ],
+                "properties": {
+                  "universe_spec": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "covers": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "covers_matched": {
+                    "description": "Words in the path that also appear in the universe spec label or `covers`.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "kinds": {
+                    "type": "array",
+                    "items": {
+                      "title": "Listed document type",
+                      "type": "object",
+                      "required": [
+                        "document_type",
+                        "action",
+                        "actor"
+                      ],
+                      "properties": {
+                        "document_type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "action": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "actor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "file_change": {
+                "title": "File change",
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/created"
+                  },
+                  {
+                    "$ref": "#/$defs/deleted"
+                  },
+                  {
+                    "$ref": "#/$defs/moved"
+                  },
+                  {
+                    "$ref": "#/$defs/edited"
+                  }
+                ]
+              },
+              "created": {
+                "title": "File created",
+                "type": "object",
+                "required": [
+                  "change",
+                  "path"
+                ],
+                "properties": {
+                  "change": {
+                    "const": "created"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "fingerprint": {
+                    "$ref": "#/$defs/fingerprint"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "deleted": {
+                "title": "File deleted",
+                "type": "object",
+                "required": [
+                  "change",
+                  "path"
+                ],
+                "properties": {
+                  "change": {
+                    "const": "deleted"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "moved": {
+                "title": "File moved",
+                "type": "object",
+                "required": [
+                  "change",
+                  "path",
+                  "old_path"
+                ],
+                "properties": {
+                  "change": {
+                    "const": "moved"
+                  },
+                  "path": {
+                    "description": "The path after the move.",
+                    "$ref": "#/$defs/path"
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "fingerprint": {
+                    "$ref": "#/$defs/fingerprint"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edited": {
+                "title": "File edited",
+                "type": "object",
+                "required": [
+                  "change",
+                  "path",
+                  "fingerprint"
+                ],
+                "properties": {
+                  "change": {
+                    "const": "edited"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "fingerprint": {
+                    "$ref": "#/$defs/fingerprint"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "listed_file": {
+                "title": "Listed file",
+                "type": "object",
+                "required": [
+                  "path"
+                ],
+                "properties": {
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "fingerprint": {
+                    "$ref": "#/$defs/fingerprint"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "folder_count": {
+                "title": "Folder count",
+                "type": "object",
+                "required": [
+                  "folder",
+                  "count"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_proposal": {
+                "title": "Filing proposal",
+                "type": "object",
+                "required": [
+                  "folder",
+                  "name",
+                  "path",
+                  "folder_new",
+                  "name_style",
+                  "evidence",
+                  "folder_counts"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "folder_new": {
+                    "type": "boolean"
+                  },
+                  "name_style": {
+                    "enum": [
+                      "lower-kebab",
+                      "lower-snake",
+                      "unchanged",
+                      "convention"
+                    ]
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/path"
+                    }
+                  },
+                  "folder_counts": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/folder_count"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_assessment": {
+                "title": "Filing assessment",
+                "type": "object",
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "not": {
+                      "required": [
+                        "needed"
+                      ],
+                      "properties": {
+                        "needed": true
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "proposal",
+                      "universe_spec",
+                      "document_type"
+                    ],
+                    "properties": {
+                      "status": {
+                        "const": "proposed"
+                      },
+                      "proposal": {
+                        "$ref": "#/$defs/filing_proposal"
+                      },
+                      "universe_spec": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "document_type": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "not": {
+                      "required": [
+                        "needed"
+                      ],
+                      "properties": {
+                        "needed": true
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "proposal",
+                      "universe_spec",
+                      "document_type"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "already_matches",
+                          "no_peers",
+                          "listing_needed",
+                          "evidence_incomplete",
+                          "destination_type_conflict",
+                          "destination_occupied"
+                        ]
+                      },
+                      "proposal": {
+                        "type": "null"
+                      },
+                      "universe_spec": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "document_type": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "not": {
+                      "required": [
+                        "needed"
+                      ],
+                      "properties": {
+                        "needed": true
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "proposal",
+                      "universe_spec",
+                      "document_type"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "no_document_type",
+                          "document_type_needed"
+                        ]
+                      },
+                      "proposal": {
+                        "type": "null"
+                      },
+                      "universe_spec": {
+                        "type": "null"
+                      },
+                      "document_type": {
+                        "type": "null"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "status",
+                      "proposal",
+                      "universe_spec",
+                      "document_type",
+                      "needed",
+                      "convention"
+                    ],
+                    "properties": {
+                      "status": {
+                        "const": "values_needed"
+                      },
+                      "proposal": {
+                        "type": "null"
+                      },
+                      "universe_spec": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "document_type": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "needed": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "$ref": "#/$defs/needed_value"
+                        }
+                      },
+                      "convention": {
+                        "$ref": "#/$defs/convention_source"
+                      }
+                    }
+                  }
+                ],
+                "required": [
+                  "path",
+                  "universe_spec",
+                  "document_type",
+                  "status",
+                  "proposal"
+                ],
+                "properties": {
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "universe_spec": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "document_type": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "proposed",
+                      "already_matches",
+                      "no_peers",
+                      "no_document_type",
+                      "document_type_needed",
+                      "listing_needed",
+                      "evidence_incomplete",
+                      "destination_type_conflict",
+                      "destination_occupied",
+                      "values_needed"
+                    ]
+                  },
+                  "proposal": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/filing_proposal"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "convention": {
+                    "$ref": "#/$defs/convention_source"
+                  },
+                  "needed": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/needed_value"
+                    }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "move_path": {
+                "title": "Move path",
+                "description": "Path relative to the knowledge-base root, with forward slashes between folders.",
+                "type": "string",
+                "not": {
+                  "pattern": "(^|/)\\.{1,2}(/|$)"
+                },
+                "pattern": "^[^/\\\\\\u0000]+(?:/[^/\\\\\\u0000]+)*$",
+                "minLength": 1
+              },
+              "move_document": {
+                "title": "Move document",
+                "type": "object",
+                "required": [
+                  "path",
+                  "text"
+                ],
+                "properties": {
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "move_binding": {
+                "title": "Link binding",
+                "type": "object",
+                "required": [
+                  "source_path",
+                  "start",
+                  "end",
+                  "target_path"
+                ],
+                "properties": {
+                  "source_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "start": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "end": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "target_path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_value": {
+                "title": "Filing value",
+                "type": "object",
+                "required": [
+                  "path",
+                  "universe_spec",
+                  "document_type"
+                ],
+                "properties": {
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "universe_spec": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "document_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "properties": {
+                    "default": {},
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "convention_source": {
+                "title": "Convention source",
+                "type": "object",
+                "required": [
+                  "file",
+                  "folder",
+                  "digest",
+                  "definition",
+                  "from_parent"
+                ],
+                "properties": {
+                  "file": {
+                    "const": ".knowledge-bus/plugins/knowledge-mcp/conventions.yaml"
+                  },
+                  "folder": {
+                    "$ref": "#/$defs/conventions_folder"
+                  },
+                  "from_parent": {
+                    "type": "boolean"
+                  },
+                  "digest": {
+                    "$ref": "#/$defs/digest"
+                  },
+                  "definition": {
+                    "$ref": "conventions.schema.yaml#/$defs/saved_convention"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "needed_value": {
+                "title": "Needed value",
+                "type": "object",
+                "required": [
+                  "source",
+                  "name"
+                ],
+                "properties": {
+                  "source": {
+                    "enum": [
+                      "property",
+                      "content"
+                    ]
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "conventions_folder": {
+                "title": "Conventions folder",
+                "type": "string",
+                "not": {
+                  "pattern": "(^|/)\\.{1,2}(/|$)"
+                },
+                "pattern": "^(?:[^/\\\\\\u0000]+(?:/[^/\\\\\\u0000]+)*)?$"
+              },
+              "convention_file": {
+                "title": "Convention file",
+                "type": "object",
+                "oneOf": [
+                  {
+                    "not": {
+                      "required": [
+                        "digest"
+                      ]
+                    },
+                    "required": [
+                      "text"
+                    ]
+                  },
+                  {
+                    "not": {
+                      "required": [
+                        "text"
+                      ]
+                    },
+                    "required": [
+                      "digest"
+                    ]
+                  }
+                ],
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "$ref": "#/$defs/conventions_folder"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "digest": {
+                    "$ref": "#/$defs/digest"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "folder_convention": {
+                "title": "Folder convention",
+                "type": "object",
+                "required": [
+                  "universe_spec",
+                  "document_type",
+                  "source",
+                  "base_folder"
+                ],
+                "properties": {
+                  "universe_spec": {
+                    "type": "string"
+                  },
+                  "document_type": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "$ref": "#/$defs/convention_source"
+                  },
+                  "base_folder": {
+                    "$ref": "#/$defs/conventions_folder"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "inactive_convention": {
+                "title": "Inactive convention",
+                "type": "object",
+                "required": [
+                  "universe_spec",
+                  "document_type",
+                  "source",
+                  "reason"
+                ],
+                "properties": {
+                  "universe_spec": {
+                    "type": "string"
+                  },
+                  "document_type": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "$ref": "#/$defs/convention_source"
+                  },
+                  "reason": {
+                    "enum": [
+                      "document_type_unavailable",
+                      "definition_differs"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "document-types.schema.yaml": {
+            "$id": "document-types.schema.yaml",
+            "title": "Document types",
+            "description": "The document-types file, `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` at the knowledge base's root folder. Each entry maps a file's path to a universe spec and document type, or to `no_document_type`, plus an optional reader. The harness reads and writes the file and creates missing folders.",
+            "type": "object",
+            "required": [
+              "schema",
+              "files"
+            ],
+            "properties": {
+              "schema": {
+                "const": "knowledge-mcp/document-types/1"
+              },
+              "files": {
+                "type": "object",
+                "propertyNames": {
+                  "$ref": "#/$defs/file_key"
+                },
+                "additionalProperties": {
+                  "$ref": "#/$defs/saved_entry"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "$defs": {
+              "file_key": {
+                "title": "File key",
+                "description": "Path from the root folder with `/` between folders. Empty, `.` and `..` parts and backslashes are invalid.",
+                "type": "string",
+                "pattern": "^(?:[^/\\\\.][^/\\\\]*|\\.[^/\\\\.][^/\\\\]*|\\.\\.[^/\\\\]+)(?:/(?:[^/\\\\.][^/\\\\]*|\\.[^/\\\\.][^/\\\\]*|\\.\\.[^/\\\\]+))*$"
+              },
+              "audience": {
+                "title": "Audience",
+                "description": "The document's reader, and whether the person confirmed the value.",
+                "type": "object",
+                "required": [
+                  "value",
+                  "status"
+                ],
+                "properties": {
+                  "value": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "confirmed",
+                      "guessed"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "allowed_by": {
+                "title": "Allowed by",
+                "description": "The person's permission for the save or the edit.",
+                "type": "object",
+                "required": [
+                  "basis",
+                  "text"
+                ],
+                "properties": {
+                  "basis": {
+                    "description": "`request` means the person asked in this session. `instruction` means the person wrote an instruction for agents, such as in AGENTS.md. `accepted_change` means the person accepted a proposed change.",
+                    "enum": [
+                      "request",
+                      "instruction",
+                      "accepted_change"
+                    ]
+                  },
+                  "text": {
+                    "description": "The request, instruction or accepted change, quoted.",
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "location": {
+                    "description": "The file holding the instruction or the accepted change.",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "set_by": {
+                "title": "Set by",
+                "description": "`person` when the person stated the document type or reader. An entry the person set wins over any later entry by the agent.",
+                "enum": [
+                  "agent",
+                  "person"
+                ]
+              },
+              "entry": {
+                "title": "Entry",
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/typed_entry"
+                  },
+                  {
+                    "$ref": "#/$defs/untyped_entry"
+                  }
+                ]
+              },
+              "typed_entry": {
+                "title": "Typed entry",
+                "type": "object",
+                "required": [
+                  "universe_spec",
+                  "version",
+                  "document_type",
+                  "set_by",
+                  "time"
+                ],
+                "properties": {
+                  "universe_spec": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "version": {
+                    "type": "string"
+                  },
+                  "document_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "audience": {
+                    "$ref": "#/$defs/audience"
+                  },
+                  "set_by": {
+                    "$ref": "#/$defs/set_by"
+                  },
+                  "allowed_by": {
+                    "$ref": "#/$defs/allowed_by"
+                  },
+                  "fingerprint": {
+                    "$ref": "common.schema.yaml#/$defs/fingerprint"
+                  },
+                  "time": {
+                    "$ref": "common.schema.yaml#/$defs/time"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "untyped_entry": {
+                "title": "Untyped entry",
+                "type": "object",
+                "required": [
+                  "no_document_type",
+                  "set_by",
+                  "time"
+                ],
+                "properties": {
+                  "no_document_type": {
+                    "const": true
+                  },
+                  "audience": {
+                    "$ref": "#/$defs/audience"
+                  },
+                  "set_by": {
+                    "$ref": "#/$defs/set_by"
+                  },
+                  "allowed_by": {
+                    "$ref": "#/$defs/allowed_by"
+                  },
+                  "fingerprint": {
+                    "$ref": "common.schema.yaml#/$defs/fingerprint"
+                  },
+                  "time": {
+                    "$ref": "common.schema.yaml#/$defs/time"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "saved_entry": {
+                "title": "Saved entry",
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "allowed_by"
+                    ],
+                    "properties": {
+                      "allowed_by": {
+                        "$ref": "#/$defs/allowed_by"
+                      }
+                    }
+                  },
+                  {
+                    "$ref": "#/$defs/entry"
+                  }
+                ]
+              }
+            }
+          },
+          "problem.schema.yaml": {
+            "$id": "problem.schema.yaml",
+            "title": "Problem details",
+            "description": "An error from a knowledge-mcp tool, as RFC 9457 problem details. On failure, `kb type --json` and `kb doctor --json` print a problem object as the last stderr line. Branch on `type`.",
+            "type": "object",
+            "required": [
+              "type",
+              "title",
+              "detail"
+            ],
+            "properties": {
+              "type": {
+                "oneOf": [
+                  {
+                    "title": "Invalid arguments",
+                    "description": "An argument is unknown, missing or fails the tool's input schema, or two arguments conflict.",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/argument-invalid"
+                  },
+                  {
+                    "title": "Invalid folders",
+                    "description": "The call sent invalid folders or file names, or omitted universe spec text that knowledge-mcp could not retrieve.",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/scope-invalid"
+                  },
+                  {
+                    "title": "Unknown digest",
+                    "description": "The call sent a digest that matches no text received in this session.",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/digest-unknown"
+                  },
+                  {
+                    "title": "Invalid document-types file",
+                    "description": "The document-types file text sent is not valid YAML or fails document-types.schema.yaml.",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/record-invalid"
+                  },
+                  {
+                    "title": "Unknown document type",
+                    "description": "The requested document type is absent from the selected universe spec or universe specs.",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/document-type-unknown"
+                  },
+                  {
+                    "title": "kbp failed",
+                    "description": "kbp exited with an error or is missing from the install.",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/kbp-failed"
+                  },
+                  {
+                    "title": "Unreadable kbp output",
+                    "description": "kbp printed no JSON object, or an object with an unsupported `schema` value.",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/kbp-version-skew"
+                  },
+                  {
+                    "title": "knowledge-mcp failed",
+                    "description": "Any other failure inside knowledge-mcp.",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/internal-error"
+                  },
+                  {
+                    "title": "Invalid document move",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-invalid"
+                  },
+                  {
+                    "title": "Incomplete move input",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-input-incomplete"
+                  },
+                  {
+                    "title": "Incomplete conventions context",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/conventions-context-incomplete"
+                  },
+                  {
+                    "title": "Invalid conventions",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/conventions-invalid"
+                  },
+                  {
+                    "title": "Unsupported conventions",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/conventions-unsupported"
+                  },
+                  {
+                    "title": "Invalid filing values",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },
@@ -17675,6 +20652,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -17917,6 +20897,72 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
               }
             }
           },
@@ -17996,6 +21042,10 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },
@@ -18097,6 +21147,17 @@
             "default": null,
             "description": "True when `before` is the whole file.",
             "title": "Whole File"
+          },
+          "operation": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EditOperation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           }
         },
         "required": [
@@ -18146,6 +21207,47 @@
             ],
             "title": "AllowedBy",
             "type": "object"
+          },
+          "EditOperation": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "title": "Id",
+                "type": "string"
+              },
+              "index": {
+                "minimum": 1,
+                "title": "Index",
+                "type": "integer"
+              },
+              "count": {
+                "minimum": 1,
+                "title": "Count",
+                "type": "integer"
+              },
+              "old_path": {
+                "$ref": "#/$defs/Path"
+              },
+              "path": {
+                "$ref": "#/$defs/Path"
+              }
+            },
+            "required": [
+              "id",
+              "index",
+              "count",
+              "old_path",
+              "path"
+            ],
+            "title": "EditOperation",
+            "type": "object"
+          },
+          "Path": {
+            "description": "Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.",
+            "minLength": 1,
+            "title": "Path",
+            "type": "string"
           }
         },
         "title": "kb_record_editArguments",
@@ -18169,6 +21271,26 @@
             "title": "Edit receipt",
             "description": "The recorded edit without `before` and `after`.",
             "type": "object",
+            "if": {
+              "type": "object",
+              "required": [
+                "operation"
+              ],
+              "properties": {
+                "operation": true
+              }
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "whole_file"
+              ],
+              "properties": {
+                "whole_file": {
+                  "const": true
+                }
+              }
+            },
             "required": [
               "schema",
               "id",
@@ -18180,7 +21302,7 @@
             ],
             "properties": {
               "schema": {
-                "const": "knowledge-mcp/edit/1"
+                "const": "knowledge-mcp/edit/2"
               },
               "id": {
                 "$ref": "common.schema.yaml#/$defs/edit_id"
@@ -18203,6 +21325,9 @@
               },
               "after_digest": {
                 "$ref": "common.schema.yaml#/$defs/digest"
+              },
+              "operation": {
+                "$ref": "common.schema.yaml#/$defs/edit_operation"
               }
             },
             "additionalProperties": false
@@ -19175,6 +22300,9 @@
                     "items": {
                       "$ref": "#/$defs/needed_value"
                     }
+                  },
+                  "values": {
+                    "$ref": "#/$defs/filing_value"
                   }
                 },
                 "additionalProperties": false
@@ -19414,6 +22542,72 @@
                       "document_type_unavailable",
                       "definition_differs"
                     ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "document_move": {
+                "title": "Document move",
+                "type": "object",
+                "required": [
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "old_path": {
+                    "$ref": "#/$defs/move_path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/move_path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "edit_operation": {
+                "title": "Edit operation",
+                "type": "object",
+                "required": [
+                  "id",
+                  "index",
+                  "count",
+                  "old_path",
+                  "path"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "old_path": {
+                    "$ref": "#/$defs/path"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/path"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "filing_review": {
+                "title": "Filing review",
+                "type": "object",
+                "required": [
+                  "folder"
+                ],
+                "properties": {
+                  "folder": {
+                    "type": "string"
+                  },
+                  "recursive": {
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -19687,6 +22881,10 @@
                   {
                     "title": "Invalid filing values",
                     "const": "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid"
+                  },
+                  {
+                    "title": "Document move limit exceeded",
+                    "const": "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded"
                   }
                 ]
               },

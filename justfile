@@ -152,7 +152,7 @@ check_contracts: (_contract_bundles 'check')
   pnpm --dir contracts exec jsonschema lint --exclude description_trailing_period --exclude top_level_examples --exclude const_with_type --exclude enum_with_type --exclude orphan_definitions --exclude properties_default --exclude top_level_description --exclude unnecessary_allof_wrapper --exclude unnecessary_allof_ref_wrapper_modern "${schema_dir}"
   node tools/conformance/check-conformance.ts contracts
 
-contract_bundles := 'folder-conventions convention-templates conventions conventions-update document-move document-type audiences import document-types-update edit edits document-types problem'
+contract_bundles := 'folder-conventions convention-templates conventions conventions-update document-move document-moves document-type audiences import document-types-update edit edits document-types problem'
 
 # Generate runtime/knowledge_mcp/models_auto and schemas_auto from the contract schemas.
 generate_contract_types: _contract_models (_contract_bundles 'write')

@@ -18,7 +18,11 @@ from knowledge_mcp.models import (
     KnowledgeBusFolder,
     ListedFile,
 )
-from knowledge_mcp.models_auto.common_schema import ConventionFile, FilingValue
+from knowledge_mcp.models_auto.common_schema import (
+    ConventionFile,
+    FilingReview,
+    FilingValue,
+)
 from knowledge_mcp.models_auto.document_types_update_schema import (
     DocumentTypesUpdateAnswer,
 )
@@ -104,6 +108,100 @@ class Request:
     conventions_digest: str | None = None
     conventions_files: list[ConventionFile] | None = None
     filing_values: list[FilingValue] | None = None
+    filing_review: FilingReview | None = None
+
+
+def _review_question(row: dict[str, Any]) -> str:
+    questions = {
+        "values_needed": "Supply the naming values listed in needed.",
+        "destination_occupied": "Choose an unoccupied destination or explicitly drop the blocked row.",
+        "destination_type_conflict": "Choose a folder with the saved universe spec and document type.",
+        "no_peers": "Choose a folder or supply recorded peers for this document type.",
+        "no_document_type": "Choose a document type before proposing a move.",
+        "evidence_incomplete": "Supply the missing peer-folder definitions.",
+        "listing_needed": "Supply the complete inventory.",
+    }
+    return questions.get(row["status"], "Choose the document type for this file.")
+
+
+def _review(
+    sent: Request,
+    assessments: dict[tuple[str, str, str], dict[str, Any]],
+    current: list[ListedFile] | None,
+    to_settle: list[dict[str, Any]],
+    scopes: Scopes,
+    files: records.Files,
+) -> dict[str, Any] | None:
+    review: dict[str, Any] | None = None
+    if sent.filing_review is not None:
+        recursive = sent.filing_review.recursive
+        folder = sent.filing_review.folder
+        if folder:
+            folder = records.normal_path(folder)
+
+        def selected(path: str) -> bool:
+            return (
+                (not folder or path.startswith(folder + "/"))
+                if recursive
+                else posixpath.dirname(path) == folder
+            )
+
+        waiting = {item["path"] for item in to_settle}
+        rows = [
+            filing.assess(
+                k[0],
+                (k[1] or None, k[2] or None),
+                files,
+                listing=current,
+                scopes=scopes,
+                provisional=True,
+            )
+            for k in sorted(assessments)
+            if selected(k[0]) and k[0] not in waiting
+        ]
+        values = {
+            (v.path, v.universe_spec, v.document_type): v
+            for v in sent.filing_values or []
+        }
+        for row in rows:
+            value = values.get(
+                (row["path"], row["universe_spec"], row["document_type"])
+            )
+            if value is not None:
+                row["values"] = value.model_dump(mode="json", exclude_unset=True)
+        filing.review_occupancy(rows, {i.path for i in current or []})
+        review = dict(
+            folder=folder,
+            recursive=recursive,
+            assessments=rows,
+            unresolved=[],
+        )
+        seen = set()
+        for row in rows:
+            if row["status"] not in ("proposed", "already_matches"):
+                review["unresolved"].append(
+                    dict(
+                        path=row["path"],
+                        question=_review_question(row),
+                    )
+                )
+            seen.add(row["path"])
+        for item in to_settle:
+            if selected(item["path"]) and item["path"] not in seen:
+                review["unresolved"].append(
+                    dict(
+                        path=item["path"],
+                        question="Choose the document type for this file.",
+                    )
+                )
+        review["unresolved"].sort(key=lambda r: r["path"])
+
+    return review
+
+
+def _include_review(result: dict[str, Any], review: dict[str, Any] | None) -> None:
+    if review is not None:
+        result["filing_review"] = review
 
 
 def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
@@ -145,6 +243,7 @@ def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
             merged.files,
             listing=current,
             scopes=scopes,
+            provisional=False,
         )
     for item in to_settle:
         scope = scopes.at(item["path"])
@@ -161,7 +260,10 @@ def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
                 merged.files,
                 listing=current,
                 scopes=scopes,
+                provisional=False,
             )
+
+    review = _review(sent, assessments, current, to_settle, scopes, merged.files)
 
     changed = migrated or {
         path: records.plain(entry) for path, entry in merged.files.items()
@@ -191,6 +293,7 @@ def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
         ],
         "received": list(scopes.received.values()),
     }
+    _include_review(result, review)
     if convention.context is not None:
         result["received"].extend(convention.context.received.values())
     if sent.conventions is not None:
@@ -275,6 +378,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
         conventions_digest: ConventionsDigest = None,
         filing_values: list[FilingValue] | None = None,
         conventions_files: list[ConventionFile] | None = None,
+        filing_review: FilingReview | None = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
@@ -290,7 +394,13 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             conventions_digest=conventions_digest,
             filing_values=filing_values,
             conventions_files=conventions_files,
+            filing_review=filing_review,
         )
+        if filing_review is not None and listing is None:
+            message = "Send the complete listing for a folder review."
+            raise problems.Error(
+                message, code="move-input-incomplete", pointer="#/listing"
+            )
         text = records.received_text(record, record_digest, workspace.recall)
         sent = Request(
             location=location,
@@ -304,6 +414,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             conventions_digest=conventions_digest,
             filing_values=filing_values,
             conventions_files=conventions_files,
+            filing_review=filing_review,
         )
         result = _merge(workspace, text, sent)
         if record is not None:

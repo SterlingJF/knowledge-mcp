@@ -1,0 +1,20 @@
+---
+schema: knowledge-mcp/edit/2
+id: 656af4853e6a4865b851fccdaa164054
+time: "2026-10-18T16:50:02.208Z"
+location: batch-vault
+allowed_by:
+  basis: instruction
+  text:
+    Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+    as you work.
+  location: AGENTS.md
+whole_file: true
+before_digest: sha256:cd69e037dce9a0c2b2fb36a328d84ca1bac541b1664b910ccef38371ac8ee114
+after_digest: sha256:a38e7e47f54b4da71bb351881d92a8fff327e6e8916ca1a1c92709e330396871
+operation:
+  id: batch-example
+  index: 1
+  count: 4
+  old_path: A.md
+  path: Decisions/Alpha.md

@@ -41,6 +41,7 @@ class ProblemDetails(BaseModel):
         "https://github.com/SterlingJF/knowledge-mcp/problems/conventions-invalid",
         "https://github.com/SterlingJF/knowledge-mcp/problems/conventions-unsupported",
         "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid",
+        "https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded",
     ]
     title: str
     detail: Annotated[

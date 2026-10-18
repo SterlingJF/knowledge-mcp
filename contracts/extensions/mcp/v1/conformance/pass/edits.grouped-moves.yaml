@@ -1,0 +1,149 @@
+---
+schema: knowledge-mcp/edits/2
+location: batch-vault
+edits:
+  - id: 656af4853e6a4865b851fccdaa164054
+    time: "2026-10-18T16:50:02.208Z"
+    location: batch-vault
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+        as you work.
+      location: AGENTS.md
+    whole_file: true
+    before: "[[B#Heading]]"
+    before_digest: sha256:cd69e037dce9a0c2b2fb36a328d84ca1bac541b1664b910ccef38371ac8ee114
+    after: "[[Beta#Heading]]"
+    after_digest: sha256:a38e7e47f54b4da71bb351881d92a8fff327e6e8916ca1a1c92709e330396871
+    operation:
+      id: batch-example
+      index: 1
+      count: 4
+      old_path: A.md
+      path: Decisions/Alpha.md
+  - id: 3c652da0c52e4d048b6c1ddf87192b1c
+    time: "2026-10-18T16:50:02.213Z"
+    location: batch-vault
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+        as you work.
+      location: AGENTS.md
+    whole_file: true
+    before: "[[A#^block]]"
+    before_digest: sha256:864d5630e6b679b77e6b4d17707ec93ff06da757efa0ba535726350c5c88b307
+    after: "[[Alpha#^block]]"
+    after_digest: sha256:dbd48e5c65af5de59f672d81f466fb314463f62c505b38020fca16996df9acdb
+    operation:
+      id: batch-example
+      index: 2
+      count: 4
+      old_path: B.md
+      path: Decisions/Beta.md
+  - id: 20608503ff044ebdbcbe695235f25e92
+    time: "2026-10-18T16:50:02.217Z"
+    location: batch-vault
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+        as you work.
+      location: AGENTS.md
+    whole_file: true
+    before: "[[A]] [[B]]"
+    before_digest: sha256:18bf5d6cdb9f53d6107ec9a33a92fc872402d706347708db7a27e8c255b8dd3d
+    after: "[[Alpha]] [[Beta]]"
+    after_digest: sha256:733c503ede41ec16865ab433433b2ef5655276800c1db0a884b68effbe0a9177
+    operation:
+      id: batch-example
+      index: 3
+      count: 4
+      old_path: Index.md
+      path: Index.md
+  - id: 917c14c1289a4e90915b046fe16d827c
+    time: "2026-10-18T16:50:02.222Z"
+    location: batch-vault
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+        as you work.
+      location: AGENTS.md
+    whole_file: true
+    before: |
+      # Your agent rewrites this file with text from knowledge-mcp when files change or you correct an entry.
+      # An entry with `set_by: person` overrides any later entry by the agent.
+      schema: knowledge-mcp/document-types/1
+      files:
+        A.md:
+          universe_spec: product-development
+          version: '1'
+          document_type: decision-record
+          set_by: agent
+          allowed_by:
+            basis: request
+            text: Keep these document types.
+          time: '2026-10-18T00:00:00Z'
+        B.md:
+          universe_spec: product-development
+          version: '1'
+          document_type: decision-record
+          set_by: agent
+          allowed_by:
+            basis: request
+            text: Keep these document types.
+          time: '2026-10-18T00:00:00Z'
+        Index.md:
+          universe_spec: product-development
+          version: '1'
+          document_type: decision-record
+          set_by: agent
+          allowed_by:
+            basis: request
+            text: Keep these document types.
+          time: '2026-10-18T00:00:00Z'
+    before_digest: sha256:fa8a80b3e4c48ff830ec14039b34803bf828b07d348f18464eb592ca86f8b02e
+    after: |
+      # Your agent rewrites this file with text from knowledge-mcp when files change or you correct an entry.
+      # An entry with `set_by: person` overrides any later entry by the agent.
+      schema: knowledge-mcp/document-types/1
+      files:
+        Decisions/Alpha.md:
+          universe_spec: product-development
+          version: '1'
+          document_type: decision-record
+          set_by: agent
+          allowed_by:
+            basis: request
+            text: Keep these document types.
+          fingerprint: sha256:a38e7e47f54b4da71bb351881d92a8fff327e6e8916ca1a1c92709e330396871
+          time: '2026-10-18T00:00:00Z'
+        Decisions/Beta.md:
+          universe_spec: product-development
+          version: '1'
+          document_type: decision-record
+          set_by: agent
+          allowed_by:
+            basis: request
+            text: Keep these document types.
+          fingerprint: sha256:dbd48e5c65af5de59f672d81f466fb314463f62c505b38020fca16996df9acdb
+          time: '2026-10-18T00:00:00Z'
+        Index.md:
+          universe_spec: product-development
+          version: '1'
+          document_type: decision-record
+          set_by: agent
+          allowed_by:
+            basis: request
+            text: Keep these document types.
+          fingerprint: sha256:733c503ede41ec16865ab433433b2ef5655276800c1db0a884b68effbe0a9177
+          time: '2026-10-18T00:00:00Z'
+    after_digest: sha256:d37e966bb6e49d713e16d82db9a5dc5f525515388da8e016733e4234e03ad2f3
+    operation:
+      id: batch-example
+      index: 4
+      count: 4
+      old_path: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+      path: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml

@@ -29,15 +29,30 @@ allowed_by:
     Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
     as you work.
   location: AGENTS.md
-record:
-  "schema: knowledge-mcp/conventions/1\nfrom_parent: []\nconventions:\n- universe_spec:\
-  \ codebase-recordkeeping\n  document_type: design-proposal\n  folder:\n  - Proposals\n\
-  \  name:\n    separator: ' '\n    case: as-written\n    parts:\n    - part: content\n\
-  \  content:\n    label: document title\n    instruction: Read the first document\
-  \ heading.\n  set_by: person\n  allowed_by:\n    basis: instruction\n    text: Keep\
-  \ the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date\n     \
-  \ as you work.\n    location: AGENTS.md\n  time: '2026-10-18T11:21:41.017768Z'\n"
-digest: sha256:3fa8fe31e14c6fe30d57e496917f12f60827ef2c42f996efec710b5140c8c52c
+record: |
+  schema: knowledge-mcp/conventions/1
+  from_parent: []
+  conventions:
+  - universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    folder:
+    - Proposals
+    name:
+      separator: ' '
+      case: as-written
+      parts:
+      - part: content
+    content:
+      label: document title
+      instruction: Read the first document heading.
+    set_by: person
+    allowed_by:
+      basis: instruction
+      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+        as you work.
+      location: AGENTS.md
+    time: '2026-10-18T16:49:52.394442Z'
+digest: sha256:e2bcf525766704ad059294ec1e5de0e392c092c2c9de5194f563e722d7f74ba7
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
     digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

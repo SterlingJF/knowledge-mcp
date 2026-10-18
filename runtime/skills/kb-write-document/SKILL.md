@@ -178,3 +178,59 @@ A content edit authorizes a move only when the permission also covers the move.
 4. **Update document types.** After creating, moving or deleting a file, follow `kb-track-document-types`.
 
 During this work, commit nothing, push nothing, open no issue or pull request, and post no comment.
+
+## Many files at once
+
+1. Request `kb_prepare_document_types` with `filing_review.folder` and a complete vault listing.
+   Review direct children by default; set `recursive: true` when the person includes subfolders.
+   Resolve document types and read naming values from the original documents.
+   Keep unknown types and missing values visible with specific questions.
+2. Show the complete proposal list in original-path order, with convention sources or peer evidence and new folders.
+   Identify rows by original path. Retain each original reason when the person chooses a different destination.
+   Record the person's choice separately; changing a destination changes no saved convention.
+   Recompute the complete remaining list after every change or drop.
+   An occupied name becomes available only when another accepted row vacates the name.
+   Keep blocked rows visible until the person explicitly drops or corrects each blocked row.
+   Skip all writes when every row is dropped.
+3. Prepare the complete list through `kb_prepare_document_moves`, with every moved document and current configuration.
+   Never prepare an accepted list by looping over `kb_prepare_document_move`.
+   Search every Markdown document using the exact returned strings, including files outside the reviewed folder.
+   Follow the fixed-string, case-insensitive search and binding rules in Names, folders and moves.
+   Include full matching text and every moved document; echo `search` exactly with `searched: true`.
+   A failed search stops preparation. Changed inputs require a fresh search.
+4. Show the final moves, required folders, affected documents, link repairs and document-types update before acceptance.
+   Obtain permission for the exact complete list and repeat preparation with `allowed_by`.
+   A changed destination or newly affected document requires a revised preview and renewed acceptance.
+   Reuse permission when fresh preparation has identical approved effects.
+   Explain row or byte limits before acceptance and ask for a smaller explicit review.
+   Never divide an accepted list into independently prepared groups.
+5. Recheck the listing, document digests, document-types digest, naming values and configuration digests.
+   Reprepare after changed inputs. Retain original paths and bytes, replacement bytes and write progress.
+   Allocate an unused staging directory outside link discovery and verify every temporary name is unused.
+   Stage all moving originals without overwriting files, including swaps, cycles and case-only renames.
+   Confirm final destinations are vacant, then install moving documents and stationary referring replacements.
+   Save the prepared document-types file last. Create only accepted missing folders.
+6. Record each final write immediately through `kb_record_edit`, including unchanged-text renames and the document-types file.
+   Use the root as `location`, `whole_file: true`, original `before` and final `after` or `after_digest`.
+   Supply `operation` with an opaque `id`, original `old_path`, final `path`, and positive `index` and `count`.
+   Give all records the same operation id and total count; assign each index once.
+   Stationary referring documents use equal original and final paths.
+7. Verify final paths, bytes, classifications, every original link target and every required edit record.
+   Remove staging material after successful verification. Several writes provide no transaction across files.
+   After failure, stop forward writes and restore only files whose current path and bytes match the operation's output.
+   Stage installed destinations before restoring originals, so swap recovery preserves both notes.
+   Preserve concurrent changes. Restore referring documents and configuration from retained originals when digest guards pass.
+   Remove new folders only when empty and created by this operation.
+   Retain recovery material until restoration finishes.
+   Report completed writes, restored files, temporary files, conflicting files and missing edit records.
+   After a failed recording call, list the operation records before retrying.
+   Reuse an existing matching operation index and record only missing indices.
+   Retry recording from retained text without repeating filesystem writes. Claim completion after recording succeeds.
+8. For whole-list undo, retrieve grouped records through `kb_list_edits(location=root)`.
+   Verify the complete count, unique indices, final paths and after digests, including the document-types file.
+   Block automatic undo and list conflicts after later changes or an incomplete group.
+   Present the complete inverse list and restoration effects, then obtain permission.
+   Prepare inverse moves together through `kb_prepare_document_moves`.
+   Restore recorded original text through the same staging and digest guards.
+   Restore document-types text only while its recorded after digest matches current text.
+   Verify restored targets and record the undo edits.

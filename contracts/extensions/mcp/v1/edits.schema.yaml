@@ -2,7 +2,7 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: edits.schema.yaml
 title: kb_list_edits result
-description: >-
+description:
   The structuredContent of a kb_list_edits result, or problem details when
   isError is true.
 type: object
@@ -15,10 +15,13 @@ $defs:
     description: Edits recorded for `location`, oldest first.
     type: object
     additionalProperties: false
-    required: [schema, location, edits]
+    required:
+      - schema
+      - location
+      - edits
     properties:
       schema:
-        const: knowledge-mcp/edits/1
+        const: knowledge-mcp/edits/2
       location:
         $ref: common.schema.yaml#/$defs/location
       edits:
@@ -27,7 +30,9 @@ $defs:
           $ref: "#/$defs/edit"
   edit:
     title: Edit
-    description: An entry from `edits.jsonl`, with legacy permission fields converted to `allowed_by`.
+    description:
+      An entry from `edits.jsonl`, with legacy permission fields converted
+      to `allowed_by`.
     type: object
     additionalProperties: false
     required:
@@ -56,9 +61,24 @@ $defs:
       before_digest:
         $ref: common.schema.yaml#/$defs/digest
       after:
-        description: >-
-          Absent when the kb_record_edit call for a whole-file
-          edit sent `after_digest` and no `after`.
+        description:
+          Absent when the kb_record_edit call for a whole-file edit sent
+          `after_digest` and no `after`.
         type: string
       after_digest:
         $ref: common.schema.yaml#/$defs/digest
+      operation:
+        $ref: common.schema.yaml#/$defs/edit_operation
+    if:
+      type: object
+      required:
+        - operation
+      properties:
+        operation: true
+    then:
+      type: object
+      required:
+        - whole_file
+      properties:
+        whole_file:
+          const: true

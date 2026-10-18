@@ -1,0 +1,185 @@
+---
+schema: knowledge-mcp/document-moves/1
+location: unreachable://vault
+status: permission_needed
+allowed_by: null
+search:
+  - "%"
+  - "%2E%2E%2F%41"
+  - "%2E%2E%2F%41%2E%6D%64"
+  - "%2E%2E%2F%42"
+  - "%2E%2E%2F%42%2E%6D%64"
+  - "%2E%2E/%41"
+  - "%2E%2E/%41.md"
+  - "%2E%2E/%42"
+  - "%2E%2E/%42.md"
+  - "%2E%2F%2E%2E%2F%41"
+  - "%2E%2F%2E%2E%2F%41%2E%6D%64"
+  - "%2E%2F%2E%2E%2F%42"
+  - "%2E%2F%2E%2E%2F%42%2E%6D%64"
+  - "%2E%2F%41"
+  - "%2E%2F%41%2E%6D%64"
+  - "%2E%2F%41%6C%70%68%61"
+  - "%2E%2F%41%6C%70%68%61%2E%6D%64"
+  - "%2E%2F%42"
+  - "%2E%2F%42%2E%6D%64"
+  - "%2E%2F%42%65%74%61"
+  - "%2E%2F%42%65%74%61%2E%6D%64"
+  - "%2E%2F%44%65%63%69%73%69%6F%6E%73%2F%41%6C%70%68%61"
+  - "%2E%2F%44%65%63%69%73%69%6F%6E%73%2F%41%6C%70%68%61%2E%6D%64"
+  - "%2E%2F%44%65%63%69%73%69%6F%6E%73%2F%42%65%74%61"
+  - "%2E%2F%44%65%63%69%73%69%6F%6E%73%2F%42%65%74%61%2E%6D%64"
+  - "%2E/%2E%2E/%41"
+  - "%2E/%2E%2E/%41.md"
+  - "%2E/%2E%2E/%42"
+  - "%2E/%2E%2E/%42.md"
+  - "%2E/%41"
+  - "%2E/%41%6C%70%68%61"
+  - "%2E/%41%6C%70%68%61.md"
+  - "%2E/%41.md"
+  - "%2E/%42"
+  - "%2E/%42%65%74%61"
+  - "%2E/%42%65%74%61.md"
+  - "%2E/%42.md"
+  - "%2E/%44%65%63%69%73%69%6F%6E%73/%41%6C%70%68%61"
+  - "%2E/%44%65%63%69%73%69%6F%6E%73/%41%6C%70%68%61.md"
+  - "%2E/%44%65%63%69%73%69%6F%6E%73/%42%65%74%61"
+  - "%2E/%44%65%63%69%73%69%6F%6E%73/%42%65%74%61.md"
+  - "%41"
+  - "%41%2E%6D%64"
+  - "%41%6C%70%68%61"
+  - "%41%6C%70%68%61%2E%6D%64"
+  - "%41%6C%70%68%61.md"
+  - "%41.md"
+  - "%42"
+  - "%42%2E%6D%64"
+  - "%42%65%74%61"
+  - "%42%65%74%61%2E%6D%64"
+  - "%42%65%74%61.md"
+  - "%42.md"
+  - "%44%65%63%69%73%69%6F%6E%73%2F%41%6C%70%68%61"
+  - "%44%65%63%69%73%69%6F%6E%73%2F%41%6C%70%68%61%2E%6D%64"
+  - "%44%65%63%69%73%69%6F%6E%73%2F%42%65%74%61"
+  - "%44%65%63%69%73%69%6F%6E%73%2F%42%65%74%61%2E%6D%64"
+  - "%44%65%63%69%73%69%6F%6E%73/%41%6C%70%68%61"
+  - "%44%65%63%69%73%69%6F%6E%73/%41%6C%70%68%61.md"
+  - "%44%65%63%69%73%69%6F%6E%73/%42%65%74%61"
+  - "%44%65%63%69%73%69%6F%6E%73/%42%65%74%61.md"
+  - ../%41
+  - ../%41.md
+  - ../%42
+  - ../%42.md
+  - ../A
+  - ../A.md
+  - ../B
+  - ../B.md
+  - ./%41
+  - ./%41%6C%70%68%61
+  - ./%41%6C%70%68%61.md
+  - ./%41.md
+  - ./%42
+  - ./%42%65%74%61
+  - ./%42%65%74%61.md
+  - ./%42.md
+  - ./../%41
+  - ./../%41.md
+  - ./../%42
+  - ./../%42.md
+  - ./../A
+  - ./../A.md
+  - ./../B
+  - ./../B.md
+  - ./A
+  - ./A.md
+  - ./Alpha
+  - ./Alpha.md
+  - ./B
+  - ./B.md
+  - ./Beta
+  - ./Beta.md
+  - ./Decisions/%41%6C%70%68%61
+  - ./Decisions/%41%6C%70%68%61.md
+  - ./Decisions/%42%65%74%61
+  - ./Decisions/%42%65%74%61.md
+  - ./Decisions/Alpha
+  - ./Decisions/Alpha.md
+  - ./Decisions/Beta
+  - ./Decisions/Beta.md
+  - A
+  - A.md
+  - Alpha
+  - Alpha.md
+  - B
+  - B.md
+  - Beta
+  - Beta.md
+  - Decisions/%41%6C%70%68%61
+  - Decisions/%41%6C%70%68%61.md
+  - Decisions/%42%65%74%61
+  - Decisions/%42%65%74%61.md
+  - Decisions/Alpha
+  - Decisions/Alpha.md
+  - Decisions/Beta
+  - Decisions/Beta.md
+based_on:
+  listing_digest: sha256:27f11a7835f04f76528cafb50dec4ed23b0075637bdb10447bd2e9b0c532b035
+  record_digest: sha256:fa8a80b3e4c48ff830ec14039b34803bf828b07d348f18464eb592ca86f8b02e
+  documents:
+    - path: A.md
+      digest: sha256:cd69e037dce9a0c2b2fb36a328d84ca1bac541b1664b910ccef38371ac8ee114
+    - path: B.md
+      digest: sha256:864d5630e6b679b77e6b4d17707ec93ff06da757efa0ba535726350c5c88b307
+    - path: Index.md
+      digest: sha256:18bf5d6cdb9f53d6107ec9a33a92fc872402d706347708db7a27e8c255b8dd3d
+  configuration: []
+writes: []
+record: null
+digest: null
+links:
+  - source_path: A.md
+    start: 0
+    end: 13
+    target_before: B.md
+    target_after: Decisions/Beta.md
+    replacement: "[[Beta#Heading]]"
+  - source_path: B.md
+    start: 0
+    end: 12
+    target_before: A.md
+    target_after: Decisions/Alpha.md
+    replacement: "[[Alpha#^block]]"
+  - source_path: Index.md
+    start: 0
+    end: 5
+    target_before: A.md
+    target_after: Decisions/Alpha.md
+    replacement: "[[Alpha]]"
+  - source_path: Index.md
+    start: 6
+    end: 11
+    target_before: B.md
+    target_after: Decisions/Beta.md
+    replacement: "[[Beta]]"
+issues: []
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:fa8a80b3e4c48ff830ec14039b34803bf828b07d348f18464eb592ca86f8b02e
+moves:
+  - old_path: A.md
+    path: Decisions/Alpha.md
+  - old_path: B.md
+    path: Decisions/Beta.md
+affected_documents:
+  - old_path: A.md
+    path: Decisions/Alpha.md
+  - old_path: B.md
+    path: Decisions/Beta.md
+  - old_path: Index.md
+    path: Index.md
+record_changes:
+  - old_path: A.md
+    path: Decisions/Alpha.md
+  - old_path: B.md
+    path: Decisions/Beta.md
+  - old_path: Index.md
+    path: Index.md

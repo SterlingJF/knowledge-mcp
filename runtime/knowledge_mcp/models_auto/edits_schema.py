@@ -2,7 +2,7 @@
 
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
-from ._internal import AllowedBy, Digest, EditId, Location, Time
+from ._internal import AllowedBy, Digest, EditId, EditOperation, Location, Time
 from . import problem_schema
 
 
@@ -33,6 +33,7 @@ class Edit(BaseModel):
         ),
     ] = None
     after_digest: Digest
+    operation: EditOperation | None = None
 
 
 class EditsAnswer(BaseModel):
@@ -43,7 +44,7 @@ class EditsAnswer(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    schema_: Annotated[Literal["knowledge-mcp/edits/1"], Field(alias="schema")]
+    schema_: Annotated[Literal["knowledge-mcp/edits/2"], Field(alias="schema")]
     location: Location
     edits: list[Edit]
 

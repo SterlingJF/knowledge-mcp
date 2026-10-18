@@ -11,9 +11,12 @@ import pytest
 import yaml
 from mcp.client import Client
 
+from knowledge_mcp import document_types as records
 from knowledge_mcp.main import build_server
 from knowledge_mcp.scope import Workspace
 from tests.harness import BUNDLED, CODEBASE, MODULE, PRODUCT, header
+from tests.test_document_moves_end_to_end import apply, arguments
+from tests.test_folder_filing_end_to_end import six_notes
 from tests.test_import_end_to_end import THREAD
 from tests.test_team_conventions_end_to_end import CONTRACT
 from tests.test_team_conventions_end_to_end import config as team_config
@@ -396,6 +399,7 @@ def story(client: Client) -> Any:
 
 
 async def team_stories(ask):
+    await batch_stories(ask)
     for name, folder, inputs in [
         ("company", "", team_files()),
         ("finance", "Finance", team_files()),
@@ -455,7 +459,7 @@ def masked(sample: str, answer: Any) -> Any:
                 and stem in ("document-types-update", "conventions-update")
                 and top
             )
-            changes |= stem == "document-move" and (
+            changes |= stem in ("document-move", "document-moves") and (
                 (top and key in ("record", "digest")) or key == "record_digest"
             )
             changes |= key == "digest" and (
@@ -474,12 +478,29 @@ def masked(sample: str, answer: Any) -> Any:
     return mask(answer, top=True)
 
 
+class SampleDumper(yaml.SafeDumper):
+    pass
+
+
+def sample_string(dumper, value):
+    return dumper.represent_scalar(
+        "tag:yaml.org,2002:str", value, style="|" if "\n" in value else None
+    )
+
+
+SampleDumper.add_representer(str, sample_string)
+
+
+def sample_yaml(answer):
+    return yaml.dump(answer, Dumper=SampleDumper, sort_keys=False, allow_unicode=True)
+
+
 def test_pass_samples_are_real_answers(tmp_path, write_snapshots):
     answers = in_process(tmp_path, story)
     if write_snapshots:
         PASS.mkdir(parents=True, exist_ok=True)
         for sample, answer in answers.items():
-            text = yaml.safe_dump(answer, sort_keys=False, allow_unicode=True)
+            text = sample_yaml(answer)
             (PASS / f"{sample}.yaml").write_text("---\n" + text)
 
     empty = [sample for sample, answer in answers.items() if answer is None]
@@ -512,3 +533,103 @@ def test_move_snapshot_masks_record_time_and_retains_document_digests():
     assert masked("document-move.ready", first) == masked("document-move.ready", second)
     second["based_on"]["documents"] = [{"path": "a.md", "digest": "changed content"}]
     assert masked("document-move.ready", first) != masked("document-move.ready", second)
+
+
+async def batch_stories(ask):
+    docs = {"A.md": "[[B#Heading]]", "B.md": "[[A#^block]]", "Index.md": "[[A]] [[B]]"}
+    moves = [("A.md", "Decisions/Alpha.md"), ("B.md", "Decisions/Beta.md")]
+    args = arguments(docs, moves)
+    before_record = args["record"]
+    needed = await ask("document-moves.texts-needed", "kb_prepare_document_moves", args)
+    args.update(searched=True, search=needed["search"])
+    await ask("document-moves.permission-needed", "kb_prepare_document_moves", args)
+    ready = await ask(
+        "document-moves.linked-notes",
+        "kb_prepare_document_moves",
+        {**args, "allowed_by": INSTRUCTION},
+    )
+    after = apply(docs, ready)
+    inverse = arguments(after, [(b, a) for a, b in moves], allowed_by=INSTRUCTION)
+    needed = await ask(
+        "document-moves.undo-texts-needed", "kb_prepare_document_moves", inverse
+    )
+    await ask(
+        "document-moves.undo",
+        "kb_prepare_document_moves",
+        {**inverse, "searched": True, "search": needed["search"]},
+    )
+    for name, mapping in [
+        ("swap", [("A.md", "B.md"), ("B.md", "A.md")]),
+        ("blocked", [("A.md", "B.md")]),
+    ]:
+        args = arguments(docs, mapping, allowed_by=INSTRUCTION)
+        result = await ask(
+            "document-moves." + name + "-texts-needed",
+            "kb_prepare_document_moves",
+            args,
+        )
+        await ask(
+            "document-moves." + name,
+            "kb_prepare_document_moves",
+            {**args, "searched": True, "search": result["search"]},
+        )
+    names, files, conventions, values = six_notes()
+    await ask(
+        "document-types-update.folder-review",
+        "kb_prepare_document_types",
+        dict(
+            location=NOTES,
+            record=records.dump(files),
+            listing=[dict(path=p) for p in [*files, names[-1]]],
+            filing_review=dict(folder="Inbox"),
+            conventions=conventions,
+            filing_values=values,
+        ),
+    )
+    for index, write in enumerate(ready["writes"], 1):
+        await ask(
+            "edit.grouped-move-" + str(index),
+            "kb_record_edit",
+            dict(
+                location="batch-vault",
+                allowed_by=INSTRUCTION,
+                before=docs[write["old_path"]],
+                after=write["text"],
+                whole_file=True,
+                operation=dict(
+                    id="batch-example",
+                    index=index,
+                    count=len(ready["writes"]) + 1,
+                    old_path=write["old_path"],
+                    path=write["path"],
+                ),
+            ),
+        )
+    await ask(
+        "edit.grouped-document-types",
+        "kb_record_edit",
+        dict(
+            location="batch-vault",
+            allowed_by=INSTRUCTION,
+            before=before_record,
+            after=ready["record"],
+            whole_file=True,
+            operation=dict(
+                id="batch-example",
+                index=len(ready["writes"]) + 1,
+                count=len(ready["writes"]) + 1,
+                old_path=RECORD,
+                path=RECORD,
+            ),
+        ),
+    )
+    await ask("edits.grouped-moves", "kb_list_edits", dict(location="batch-vault"))
+
+
+def test_generated_multiline_sample_keeps_yaml_line_lengths():
+    text = "    fingerprint: sha256:" + "a" * 64 + "\n"
+    sample = {"after": "# Saved document types.\n" + text}
+    rendered = sample_yaml(sample)
+    assert yaml.safe_load(rendered) == sample
+    assert max(map(len, rendered.splitlines())) <= 120
+    assert "after: |" in rendered

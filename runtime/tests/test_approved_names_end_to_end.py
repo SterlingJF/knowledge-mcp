@@ -311,6 +311,7 @@ APPROVED_TOOLS = {
     "kb_list_conventions",
     "kb_prepare_conventions",
     "kb_prepare_document_move",
+    "kb_prepare_document_moves",
     "kb_get_document_type",
     "kb_list_audiences",
     "kb_prepare_import",
@@ -331,6 +332,7 @@ NAMED_VERBS = {
     "kb_list_conventions": "List",
     "kb_prepare_conventions": "Prepare",
     "kb_prepare_document_move": "Prepare",
+    "kb_prepare_document_moves": "Prepare",
     "kb_get_document_type": "Get",
     "kb_list_audiences": "List",
     "kb_prepare_import": "Prepare",
@@ -395,6 +397,7 @@ def test_mcp_lists_the_approved_tool_names(server):
         == "Prepare naming and filing conventions"
     )
     assert tool(server, "kb_prepare_document_move").title == "Prepare a document move"
+    assert tool(server, "kb_prepare_document_moves").title == "Prepare document moves"
 
 
 def test_mcp_tool_titles_are_a_verb_and_a_noun(server):
@@ -856,9 +859,8 @@ KNOWLEDGE_BUS_TERMS = {
     '"guidance"': r"(?i)(?<![\w-])guidance(?![\w-])",
     '"definitions"': r"(?i)(?<![\w-])definitions?(?![\w-])",
 }
-README_TERMS = {
-    name: KNOWLEDGE_BUS_TERMS[name] for name in ('"Knowledge Bus"', '"universe"')
-}
+# The README Features list uses "universe spec" in full, by the owner's B7 copy.
+README_TERMS = {name: KNOWLEDGE_BUS_TERMS[name] for name in ('"Knowledge Bus"',)}
 COMMAND_OUTPUTS = [
     ["--version"],
     ["doctor"],

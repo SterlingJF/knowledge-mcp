@@ -56,7 +56,7 @@ search:
   - docs/rfcs/0042-caching.md
 based_on:
   listing_digest: sha256:6cf4518aff1cfc53a8f05e71a7e7a61fafdca564b1190d6a709af6fe817da061
-  record_digest: sha256:fe8bcb633a7c1acf69b600d75107dd68af8ea8f45053226900840a1266f0ba5f
+  record_digest: sha256:16de2d51739626311d1afe7820f3e82e827a1aaf9084b13cd4b2cd78ec5dfcea
   documents:
     - path: docs/rfcs/0042-cache.md
       digest: sha256:1e9c3db972db81f18382c36f930fe2e203e2270894d47024e63d7b47a6de8329
@@ -65,23 +65,34 @@ writes:
     path: docs/rfcs/0042-caching.md
     before_digest: sha256:1e9c3db972db81f18382c36f930fe2e203e2270894d47024e63d7b47a6de8329
     after_digest: sha256:1e9c3db972db81f18382c36f930fe2e203e2270894d47024e63d7b47a6de8329
-    text: "# Cache
-
-      "
-record:
-  "# Your agent rewrites this file with text from knowledge-mcp when files change\
-  \ or you correct an entry.\n# An entry with `set_by: person` overrides any later\
-  \ entry by the agent.\nschema: knowledge-mcp/document-types/1\nfiles:\n  docs/rfcs/0042-caching.md:\n\
-  \    universe_spec: codebase-recordkeeping\n    version: '0.1'\n    document_type:\
-  \ design-proposal\n    set_by: agent\n    allowed_by:\n      basis: instruction\n\
-  \      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up\
-  \ to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T11:21:37.881Z'\n\
-  \  ideas.txt:\n    no_document_type: true\n    set_by: agent\n    allowed_by:\n\
-  \      basis: instruction\n      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/\
-  \ up to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T11:21:37.881Z'\n"
-digest: sha256:7699766da01d55285923ca762bad62e6c3f6dd88842035892e47b4cf80857797
+    text: |
+      # Cache
+record: |
+  # Your agent rewrites this file with text from knowledge-mcp when files change or you correct an entry.
+  # An entry with `set_by: person` overrides any later entry by the agent.
+  schema: knowledge-mcp/document-types/1
+  files:
+    docs/rfcs/0042-caching.md:
+      universe_spec: codebase-recordkeeping
+      version: '0.1'
+      document_type: design-proposal
+      set_by: agent
+      allowed_by:
+        basis: instruction
+        text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date as you work.
+        location: AGENTS.md
+      time: '2026-10-18T16:49:49.058Z'
+    ideas.txt:
+      no_document_type: true
+      set_by: agent
+      allowed_by:
+        basis: instruction
+        text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date as you work.
+        location: AGENTS.md
+      time: '2026-10-18T16:49:49.058Z'
+digest: sha256:e82b01266a9dcf1eaf2848990fe90244a43b1b8d46fe6a7a03603ef7c6efa370
 links: []
 issues: []
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
-    digest: sha256:fe8bcb633a7c1acf69b600d75107dd68af8ea8f45053226900840a1266f0ba5f
+    digest: sha256:16de2d51739626311d1afe7820f3e82e827a1aaf9084b13cd4b2cd78ec5dfcea

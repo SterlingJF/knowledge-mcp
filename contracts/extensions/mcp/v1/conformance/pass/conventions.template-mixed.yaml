@@ -20,7 +20,7 @@ conventions:
         Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
         as you work.
       location: AGENTS.md
-    time: "2026-10-18T11:21:47.637059Z"
+    time: "2026-10-18T16:49:59.261080Z"
   - universe_spec: personal-notes
     document_type: decision-record
     folder:
@@ -43,7 +43,7 @@ conventions:
         Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
         as you work.
       location: AGENTS.md
-    time: "2026-10-18T11:21:47.637204Z"
+    time: "2026-10-18T16:49:59.261176Z"
   - universe_spec: personal-notes
     document_type: project-note
     folder:
@@ -65,4 +65,4 @@ conventions:
         Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
         as you work.
       location: AGENTS.md
-    time: "2026-10-18T11:21:47.637183Z"
+    time: "2026-10-18T16:49:59.261146Z"

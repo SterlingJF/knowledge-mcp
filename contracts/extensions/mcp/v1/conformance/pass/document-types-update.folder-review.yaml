@@ -1,0 +1,817 @@
+---
+schema: knowledge-mcp/document-types-update/1
+location: ~/notes
+based_on: sha256:38fbae83d69fbd948759777b71fe3f3944a17acb09bdf534f5e35412295e38fb
+record: null
+digest: null
+listing_changes:
+  - change: created
+    path: Inbox/Unsorted.md
+changed: []
+to_settle:
+  - path: Inbox/Unsorted.md
+    scope: 0
+    candidates: []
+scopes:
+  - universe_specs:
+      - id: codebase-recordkeeping
+        version: "0.1"
+        source: bundled copy at v0.10.0
+        from_parent: false
+      - id: product-development
+        version: "0.9"
+        source: bundled copy at v0.10.0
+        from_parent: false
+    every_document_type:
+      - universe_spec: codebase-recordkeeping
+        covers:
+          "The written documents of a codebase: files in its repository, commit
+          messages, change descriptions, issue reports and release notes."
+        covers_matched: []
+        kinds:
+          - document_type: readme
+            action: decide whether to try the project or one of its packages
+            actor: a first-time visitor
+          - document_type: license-file
+            action: decide whether the licence allows the planned use of the code
+            actor: anyone who plans to use, copy or change the code
+          - document_type: release-notes
+            action: decide whether to upgrade to a new release
+            actor: a user
+          - document_type: security-policy
+            action: report a vulnerability privately to the maintainers
+            actor: a person who finds a vulnerability in the software
+          - document_type: contributing-guide
+            action: prepare a change the maintainers will accept
+            actor: a contributor
+          - document_type: commit-message
+            action: decide whether to keep or undo a past change
+            actor: a maintainer or contributor
+          - document_type: code-of-conduct
+            action: report unacceptable behaviour by someone taking part in the project
+            actor: anyone who takes part in the project
+          - document_type: agent-instructions
+            action: follow the project's rules for building, testing and changing the code
+            actor: a coding agent
+          - document_type: change-description
+            action: decide whether to merge a change
+            actor: a maintainer
+          - document_type: design-proposal
+            action: accept or reject a proposed design
+            actor: the maintainers who decide on designs
+          - document_type: release-procedure
+            action: publish a release by following the project's steps
+            actor: the maintainer who publishes the release
+          - document_type: architecture-overview
+            action: learn how the main parts of the code work together
+            actor: a contributor or security reviewer
+          - document_type: notice-file
+            action:
+              include the required attribution notices in a redistributed copy of
+              the software
+            actor: anyone who redistributes the software, on its own or inside another work
+          - document_type: folder-readme
+            action: find the files to read or change in a folder
+            actor: a contributor or maintainer
+          - document_type: issue-report
+            action: decide whether to fix a reported bug or build a requested feature
+            actor: a maintainer
+          - document_type: code-owners
+            action: find who must approve a change to each file or folder
+            actor: a contributor
+          - document_type: documentation-set
+            action:
+              complete a task with the software, such as installing it or fixing an
+              error
+            actor: a user
+          - document_type: funding-file
+            action: give money to the project's maintainers
+            actor: a sponsor
+          - document_type: roadmap
+            action: choose which planned work to wait for or help build
+            actor: a user or contributor
+          - document_type: development-guide
+            action: build, run and test the code from a local copy of the repository
+            actor: a contributor
+      - universe_spec: product-development
+        covers:
+          The reasoning around deliberate work — what makes it worth doing, what
+          it should be, and whether it held up. The work may produce something made or
+          put in place, a service rendered, or something learned; for a recipient — including
+          your own later self — who simply receives it, free to take it or leave it, or
+          paying for it.
+        covers_matched: []
+        kinds:
+          - document_type: product-strategy-canvas
+            action: choose what an offering will aim for next and what it will refuse
+            actor: whoever leads the offering
+          - document_type: business-model-canvas
+            action:
+              check whether a business can deliver an offering its customers value
+              and earn more than providing it costs
+            actor: whoever starts, runs or funds the business
+          - document_type: lean-canvas
+            action: choose which assumption in a new venture's business model to test next
+            actor: whoever is starting the venture
+          - document_type: startup-canvas
+            action: decide what a new venture will aim for and how it will make money
+            actor: whoever is founding the venture, with any backers
+          - document_type: swot-analysis
+            action:
+              compare our strengths and weaknesses with the opportunities and threats
+              outside us
+            actor: whoever sets the plan
+          - document_type: pestle-analysis
+            action:
+              check which political, economic, social, technological, legal and environmental
+              conditions affect the work
+            actor: whoever sets the plan
+          - document_type: competitor-analysis
+            action:
+              find where the offering can differ from the other options people have,
+              including doing nothing
+            actor: whoever decides what to offer or how to present it
+          - document_type: persona-profile
+            action:
+              decide which kind of person, in which circumstance, to design the solution
+              for
+            actor: whoever designs the solution or studies the people it is for
+          - document_type: opportunity-assessment
+            action: decide whether to pursue a problem at all
+            actor: whoever would fund or approve the work
+          - document_type: risk-assessment
+            action: decide which risks to reduce, accept or watch, and who handles each
+            actor: the person accountable for the work
+          - document_type: design-doc
+            action: agree to or object to one proposed approach
+            actor: reviewer
+          - document_type: brand-identity-guide
+            action: apply the brand's look and wording correctly on your own
+            actor: anyone writing or designing for the brand
+          - document_type: scenario-walkthrough
+            action:
+              check, step by step, that one person can reach one goal through the
+              solution
+            actor: reviewer
+          - document_type: success-metrics
+            action: decide which numbers to improve next and which to keep where they are
+            actor: whoever runs the offering day to day
+          - document_type: architecture-overview
+            action: find which parts of the system a change will affect
+            actor: whoever will change the system
+          - document_type: system-context-diagram
+            action:
+              find what the system is responsible for and which outside people and
+              systems it works with
+            actor: anyone new to the system
+          - document_type: decision-brief
+            action: choose one of several options by a set date
+            actor: the person accountable for the choice
+          - document_type: decision-record
+            action:
+              check whether a past decision still applies, and record a replacement
+              when it no longer does
+            actor: future reader
+          - document_type: experiment-plan
+            action: commit to a test's prediction and its measures in advance
+            actor: whoever runs the test
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:38fbae83d69fbd948759777b71fe3f3944a17acb09bdf534f5e35412295e38fb
+filing:
+  - path: Inbox/Cache Plan.md
+    universe_spec: product-development
+    document_type: decision-record
+    status: proposed
+    proposal:
+      folder: Decisions
+      name: cache-plan.md
+      path: Decisions/cache-plan.md
+      folder_new: true
+      name_style: convention
+      evidence: []
+      folder_counts: []
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      from_parent: true
+      digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+      definition:
+        universe_spec: product-development
+        document_type: decision-record
+        folder:
+          - Decisions
+        name:
+          separator: "-"
+          case: lower
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first heading.
+        set_by: person
+        allowed_by:
+          basis: accepted_change
+          text: Save the convention.
+        time: "2026-10-18T00:00:00Z"
+  - path: Inbox/Kickoff.md
+    universe_spec: product-development
+    document_type: experiment-plan
+    status: proposed
+    proposal:
+      folder: Meetings
+      name: 2026-10-18 Kickoff.md
+      path: Meetings/2026-10-18 Kickoff.md
+      folder_new: true
+      name_style: convention
+      evidence: []
+      folder_counts: []
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      from_parent: true
+      digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+      definition:
+        universe_spec: product-development
+        document_type: experiment-plan
+        folder:
+          - Meetings
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: date
+              property: meeting_date
+              format: YYYY-MM-DD
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first heading.
+        set_by: person
+        allowed_by:
+          basis: accepted_change
+          text: Save the convention.
+        time: "2026-10-18T00:00:00Z"
+  - path: Inbox/Queue Plan.md
+    universe_spec: product-development
+    document_type: decision-record
+    status: proposed
+    proposal:
+      folder: Decisions
+      name: queue-plan.md
+      path: Decisions/queue-plan.md
+      folder_new: true
+      name_style: convention
+      evidence: []
+      folder_counts: []
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      from_parent: true
+      digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+      definition:
+        universe_spec: product-development
+        document_type: decision-record
+        folder:
+          - Decisions
+        name:
+          separator: "-"
+          case: lower
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first heading.
+        set_by: person
+        allowed_by:
+          basis: accepted_change
+          text: Save the convention.
+        time: "2026-10-18T00:00:00Z"
+  - path: Inbox/Retry Policy.md
+    universe_spec: product-development
+    document_type: risk-assessment
+    status: proposed
+    proposal:
+      folder: Policies
+      name: retry-policy.md
+      path: Policies/retry-policy.md
+      folder_new: false
+      name_style: lower-kebab
+      evidence:
+        - Policies/cache-limit.md
+        - Policies/retry-limit.md
+      folder_counts:
+        - folder: Policies
+          count: 2
+  - path: Inbox/Scratch.md
+    universe_spec: product-development
+    document_type: design-doc
+    status: already_matches
+    proposal: null
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      from_parent: true
+      digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+      definition:
+        universe_spec: product-development
+        document_type: design-doc
+        folder:
+          - Inbox
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first heading.
+        set_by: person
+        allowed_by:
+          basis: accepted_change
+          text: Save the convention.
+        time: "2026-10-18T00:00:00Z"
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: agent-instructions
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: architecture-overview
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: change-description
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: code-of-conduct
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: code-owners
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: commit-message
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: contributing-guide
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: development-guide
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: documentation-set
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: folder-readme
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: funding-file
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: issue-report
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: license-file
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: notice-file
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: readme
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: release-notes
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: release-procedure
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: roadmap
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: codebase-recordkeeping
+    document_type: security-policy
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: architecture-overview
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: brand-identity-guide
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: business-model-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: competitor-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: decision-brief
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: decision-record
+    status: values_needed
+    proposal: null
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      from_parent: true
+      digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+      definition:
+        universe_spec: product-development
+        document_type: decision-record
+        folder:
+          - Decisions
+        name:
+          separator: "-"
+          case: lower
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first heading.
+        set_by: person
+        allowed_by:
+          basis: accepted_change
+          text: Save the convention.
+        time: "2026-10-18T00:00:00Z"
+    needed:
+      - source: content
+        name: document title
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: design-doc
+    status: values_needed
+    proposal: null
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      from_parent: true
+      digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+      definition:
+        universe_spec: product-development
+        document_type: design-doc
+        folder:
+          - Inbox
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first heading.
+        set_by: person
+        allowed_by:
+          basis: accepted_change
+          text: Save the convention.
+        time: "2026-10-18T00:00:00Z"
+    needed:
+      - source: content
+        name: document title
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: experiment-plan
+    status: values_needed
+    proposal: null
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      from_parent: true
+      digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+      definition:
+        universe_spec: product-development
+        document_type: experiment-plan
+        folder:
+          - Meetings
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: date
+              property: meeting_date
+              format: YYYY-MM-DD
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first heading.
+        set_by: person
+        allowed_by:
+          basis: accepted_change
+          text: Save the convention.
+        time: "2026-10-18T00:00:00Z"
+    needed:
+      - source: property
+        name: meeting_date
+      - source: content
+        name: document title
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: lean-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: opportunity-assessment
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: persona-profile
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: pestle-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: product-strategy-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: risk-assessment
+    status: proposed
+    proposal:
+      folder: Policies
+      name: unsorted.md
+      path: Policies/unsorted.md
+      folder_new: false
+      name_style: lower-kebab
+      evidence:
+        - Policies/cache-limit.md
+        - Policies/retry-limit.md
+      folder_counts:
+        - folder: Inbox
+          count: 1
+        - folder: Policies
+          count: 2
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: scenario-walkthrough
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: startup-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: success-metrics
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: swot-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Unsorted.md
+    universe_spec: product-development
+    document_type: system-context-diagram
+    status: no_peers
+    proposal: null
+  - path: Policies/cache-limit.md
+    universe_spec: product-development
+    document_type: risk-assessment
+    status: already_matches
+    proposal: null
+  - path: Policies/retry-limit.md
+    universe_spec: product-development
+    document_type: risk-assessment
+    status: already_matches
+    proposal: null
+filing_review:
+  folder: Inbox
+  recursive: false
+  assessments:
+    - path: Inbox/Cache Plan.md
+      universe_spec: product-development
+      document_type: decision-record
+      status: proposed
+      proposal:
+        folder: Decisions
+        name: cache-plan.md
+        path: Decisions/cache-plan.md
+        folder_new: true
+        name_style: convention
+        evidence: []
+        folder_counts: []
+      convention:
+        file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+        folder: ""
+        from_parent: true
+        digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+        definition:
+          universe_spec: product-development
+          document_type: decision-record
+          folder:
+            - Decisions
+          name:
+            separator: "-"
+            case: lower
+            parts:
+              - part: content
+          content:
+            label: document title
+            instruction: Read the first heading.
+          set_by: person
+          allowed_by:
+            basis: accepted_change
+            text: Save the convention.
+          time: "2026-10-18T00:00:00Z"
+      values:
+        path: Inbox/Cache Plan.md
+        universe_spec: product-development
+        document_type: decision-record
+        content: Cache Plan
+    - path: Inbox/Kickoff.md
+      universe_spec: product-development
+      document_type: experiment-plan
+      status: proposed
+      proposal:
+        folder: Meetings
+        name: 2026-10-18 Kickoff.md
+        path: Meetings/2026-10-18 Kickoff.md
+        folder_new: true
+        name_style: convention
+        evidence: []
+        folder_counts: []
+      convention:
+        file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+        folder: ""
+        from_parent: true
+        digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+        definition:
+          universe_spec: product-development
+          document_type: experiment-plan
+          folder:
+            - Meetings
+          name:
+            separator: " "
+            case: as-written
+            parts:
+              - part: date
+                property: meeting_date
+                format: YYYY-MM-DD
+              - part: content
+          content:
+            label: document title
+            instruction: Read the first heading.
+          set_by: person
+          allowed_by:
+            basis: accepted_change
+            text: Save the convention.
+          time: "2026-10-18T00:00:00Z"
+      values:
+        path: Inbox/Kickoff.md
+        universe_spec: product-development
+        document_type: experiment-plan
+        properties:
+          meeting_date: "2026-10-18"
+        content: Kickoff
+    - path: Inbox/Queue Plan.md
+      universe_spec: product-development
+      document_type: decision-record
+      status: proposed
+      proposal:
+        folder: Decisions
+        name: queue-plan.md
+        path: Decisions/queue-plan.md
+        folder_new: true
+        name_style: convention
+        evidence: []
+        folder_counts: []
+      convention:
+        file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+        folder: ""
+        from_parent: true
+        digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+        definition:
+          universe_spec: product-development
+          document_type: decision-record
+          folder:
+            - Decisions
+          name:
+            separator: "-"
+            case: lower
+            parts:
+              - part: content
+          content:
+            label: document title
+            instruction: Read the first heading.
+          set_by: person
+          allowed_by:
+            basis: accepted_change
+            text: Save the convention.
+          time: "2026-10-18T00:00:00Z"
+      values:
+        path: Inbox/Queue Plan.md
+        universe_spec: product-development
+        document_type: decision-record
+        content: Queue Plan
+    - path: Inbox/Retry Policy.md
+      universe_spec: product-development
+      document_type: risk-assessment
+      status: proposed
+      proposal:
+        folder: Policies
+        name: retry-policy.md
+        path: Policies/retry-policy.md
+        folder_new: false
+        name_style: lower-kebab
+        evidence:
+          - Policies/cache-limit.md
+          - Policies/retry-limit.md
+        folder_counts:
+          - folder: Policies
+            count: 2
+    - path: Inbox/Scratch.md
+      universe_spec: product-development
+      document_type: design-doc
+      status: already_matches
+      proposal: null
+      convention:
+        file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+        folder: ""
+        from_parent: true
+        digest: sha256:2474473064c239ba82922724fe3346e791d44c776b4b164bdae1158fe5848cf2
+        definition:
+          universe_spec: product-development
+          document_type: design-doc
+          folder:
+            - Inbox
+          name:
+            separator: " "
+            case: as-written
+            parts:
+              - part: content
+          content:
+            label: document title
+            instruction: Read the first heading.
+          set_by: person
+          allowed_by:
+            basis: accepted_change
+            text: Save the convention.
+          time: "2026-10-18T00:00:00Z"
+      values:
+        path: Inbox/Scratch.md
+        universe_spec: product-development
+        document_type: design-doc
+        content: Scratch
+  unresolved:
+    - path: Inbox/Unsorted.md
+      question: Choose the document type for this file.

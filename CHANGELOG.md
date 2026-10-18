@@ -4,6 +4,9 @@
 
 ### Added
 
+- `kb_prepare_document_moves` prepares a whole list of accepted moves at once and repairs the links between notes that move together.
+- An accepted list can be undone from the edit records; an undo that conflicts with a later change stops and lists the affected files.
+- Two moves to the same path, or a move into a path another file needs, block the list and name each affected move.
 - A team folder keeps its own conventions and takes from the parent folder only the conventions it lists in `from_parent`.
 - The agent can list the conventions in effect for a folder, with the folder each convention comes from.
 - Filing proposals and moves block when the destination's universe specs lack the document type or define it differently.

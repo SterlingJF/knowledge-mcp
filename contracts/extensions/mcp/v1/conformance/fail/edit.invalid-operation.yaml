@@ -1,0 +1,17 @@
+---
+schema: knowledge-mcp/edit/2
+id: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+time: "2026-10-18T00:00:00Z"
+location: vault
+allowed_by:
+  basis: request
+  text: Move the note.
+whole_file: true
+before_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+after_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+operation:
+  id: group
+  index: 0
+  count: 1
+  old_path: A.md
+  path: B.md

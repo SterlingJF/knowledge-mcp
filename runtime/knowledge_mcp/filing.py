@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import posixpath
 import re
+import unicodedata
 from collections import Counter
 from typing import Any
 
@@ -120,13 +121,14 @@ def _peers(
     return peers, False
 
 
-def assess(
+def assess(  # noqa: PLR0913 - provisional rendering preserves single-file occupancy behavior.
     path: str,
     type_id: tuple[str | None, str | None],
     files: records.Files,
     *,
     listing: list[ListedFile] | None,
     scopes: Scopes,
+    provisional: bool = False,
 ) -> dict[str, Any]:
     universe, kind = type_id
     result: dict[str, Any] = dict(
@@ -140,7 +142,7 @@ def assess(
     if universe is None or kind is None:
         return _untyped(result, path, files)
     if scopes.conventions is not None:
-        assessed = scopes.conventions.assess(result, listing)
+        assessed = scopes.conventions.assess(result, listing, provisional=provisional)
         if assessed is not None:
             return assessed
     if listing is None:
@@ -153,11 +155,16 @@ def assess(
         return result
     if not peers:
         return result
-    return _proposal(result, peers, paths, scopes)
+    return _proposal(result, peers, paths, scopes, provisional=provisional)
 
 
 def _proposal(
-    result: dict[str, Any], peers: list[str], paths: set[str], scopes: Scopes
+    result: dict[str, Any],
+    peers: list[str],
+    paths: set[str],
+    scopes: Scopes,
+    *,
+    provisional: bool = False,
 ) -> dict[str, Any]:
     path = result["path"]
     universe, kind = result["universe_spec"], result["document_type"]
@@ -184,7 +191,7 @@ def _proposal(
         result["status"] = "destination_type_conflict"
     elif destination == path:
         result["status"] = "already_matches"
-    elif destination in paths:
+    elif destination in paths and not provisional:
         result["status"] = "destination_occupied"
     else:
         result["status"] = "proposed"
@@ -198,3 +205,50 @@ def _proposal(
             folder_counts=[dict(folder=f, count=counts[f]) for f in sorted(counts)],
         )
     return result
+
+
+def _connect_conflicts(
+    conflicts: dict[str, set[str]], left: set[str], right: set[str]
+) -> None:
+    for source in left:
+        conflicts.setdefault(source, set()).update(right - {source})
+
+
+def path_conflicts(paths: set[str], mapping: dict[str, str]) -> dict[str, set[str]]:
+    def identity(path: str) -> str:
+        return unicodedata.normalize("NFC", path).casefold()
+
+    original: dict[str, set[str]] = {}
+    final: dict[str, set[str]] = {}
+    for path in paths:
+        original.setdefault(identity(path), set()).add(path)
+        final.setdefault(identity(mapping.get(path, path)), set()).add(path)
+    conflicts: dict[str, set[str]] = {}
+
+    # Ambiguous original identities remain unsafe even when destinations differ.
+    for group in original.values():
+        if len(group) > 1:
+            _connect_conflicts(conflicts, group, group)
+    for path, group in final.items():
+        if len(group) > 1:
+            _connect_conflicts(conflicts, group, group)
+        parent = posixpath.dirname(path)
+        while parent:
+            if parent in final:
+                _connect_conflicts(conflicts, group, final[parent])
+                _connect_conflicts(conflicts, final[parent], group)
+            parent = posixpath.dirname(parent)
+    return conflicts
+
+
+def review_occupancy(rows: list[dict[str, Any]], paths: set[str]) -> None:
+    while True:
+        mapping = {
+            r["path"]: r["proposal"]["path"] for r in rows if r["status"] == "proposed"
+        }
+        conflicts = path_conflicts(paths, mapping)
+        blocked = [r for r in rows if r["path"] in mapping and r["path"] in conflicts]
+        if not blocked:
+            return
+        for row in blocked:
+            row.update(status="destination_occupied", proposal=None)

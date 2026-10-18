@@ -5,15 +5,20 @@ import posixpath
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from functools import cached_property
 from typing import Any
 from urllib.parse import quote, unquote
 
 import yaml
 
 from knowledge_mcp import document_types as records
-from knowledge_mcp import problems
+from knowledge_mcp import filing, problems
 from knowledge_mcp.models import AllowedBy, KnowledgeBusFolder, ListedFile
-from knowledge_mcp.models_auto.common_schema import LinkBinding, MoveDocument
+from knowledge_mcp.models_auto.common_schema import (
+    DocumentMove,
+    LinkBinding,
+    MoveDocument,
+)
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.type_scope import Scopes
 
@@ -50,10 +55,13 @@ def search_strings(old: str, new: str, listing: list[str], text: str) -> list[st
     found = {"%", *_aliases(text)}
     for path in (old, new):
         forms = {path, posixpath.basename(path)}
-        for source in listing:
-            if source.lower().endswith(".md"):
-                relative = posixpath.relpath(path, posixpath.dirname(source) or ".")
-                forms.update((relative, "./" + relative))
+        for folder in {
+            posixpath.dirname(source)
+            for source in listing
+            if source.lower().endswith(".md")
+        }:
+            relative = posixpath.relpath(path, folder or ".")
+            forms.update((relative, "./" + relative))
         for form in list(forms):
             if form.lower().endswith(".md"):
                 forms.add(form[:-3])
@@ -247,7 +255,62 @@ def _resolve(
     return (candidates[0], None) if candidates else (None, "link-broken")
 
 
-def _reference(token: Token, target: str, source: str, paths: list[str]) -> str:
+@dataclass
+class InventoryIndex:
+    paths: set[str]
+    suffixes: dict[str, set[str]] = field(default_factory=dict)
+    folded: dict[str, set[str]] = field(default_factory=dict)
+    exact_folded: dict[str, set[str]] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        for path in self.paths:
+            self.exact_folded.setdefault(path.casefold(), set()).add(path)
+            parts = path.split("/")
+            for offset in range(len(parts)):
+                suffix = "/".join(parts[offset:])
+                self.suffixes.setdefault(suffix, set()).add(path)
+                self.folded.setdefault(suffix.casefold(), set()).add(path)
+
+    def resolve(self, token: Token, source: str) -> tuple[str | None, str | None]:
+        path = (
+            token.path[1:] if token.wiki and token.path.startswith("/") else token.path
+        )
+        if not path:
+            return source, None
+        names = {path}
+        if token.wiki and not path.lower().endswith(".md"):
+            names.add(path + ".md")
+        if not token.wiki or path.startswith(("./", "../")):
+            names = {
+                posixpath.normpath(posixpath.join(posixpath.dirname(source), n))
+                if not n.startswith("/")
+                else n.lstrip("/")
+                for n in names
+            }
+            exact = names & self.paths
+            folded = set().union(
+                *(self.exact_folded.get(n.casefold(), set()) for n in names)
+            )
+        else:
+            exact = names & self.paths if "/" in path else set()
+            if not exact:
+                exact = set().union(*(self.suffixes.get(n, set()) for n in names))
+            folded = set().union(*(self.folded.get(n.casefold(), set()) for n in names))
+        if len(exact) != len(folded) or len(exact or folded) > 1:
+            return None, "link-ambiguous"
+        found = exact or folded
+        return (next(iter(found)), None) if found else (None, "link-broken")
+
+
+def _reference(
+    token: Token,
+    target: str,
+    source: str,
+    paths: list[str],
+    resolver: Callable[
+        [Token, str, list[str]], tuple[str | None, str | None]
+    ] = _resolve,
+) -> str:
     explicit_extension = token.path.lower().endswith(
         ".md"
     ) or not target.lower().endswith(".md")
@@ -278,7 +341,7 @@ def _reference(token: Token, target: str, source: str, paths: list[str]) -> str:
     for length in range(1, len(parts) + 1):
         candidate = "/".join(parts[-length:])
         check = Token(0, 0, 0, 0, candidate, True)
-        resolved, issue = _resolve(check, source, paths)
+        resolved, issue = resolver(check, source, paths)
         if resolved == target and issue is None:
             return candidate
     return stem
@@ -311,8 +374,10 @@ class Request:
     knowledge_bus_folders: list[KnowledgeBusFolder]
 
 
-def _invalid(detail: str, *, code: str = "move-invalid") -> None:
-    raise MoveError(detail, code=code)
+def _invalid(
+    detail: str, *, code: str = "move-invalid", pointer: str | None = None
+) -> None:
+    raise MoveError(detail, code=code, pointer=pointer)
 
 
 def _inputs(sent: Request) -> tuple[list[str], dict[str, str]]:
@@ -378,7 +443,7 @@ def _answer(
 
 @dataclass
 class Plan:
-    sent: Request
+    sent: Request | BatchRequest
     paths: list[str]
     docs: dict[str, str]
     result: dict[str, Any]
@@ -387,9 +452,14 @@ class Plan:
     used: set[tuple[str, int, int]] = field(default_factory=set)
     revised: dict[str, str] = field(default_factory=dict)
     aliases: set[str] = field(init=False)
+    original_index: InventoryIndex | None = field(init=False, default=None)
+    final_index: InventoryIndex | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         self.after_paths = sorted(self.after(p) for p in self.paths)
+        if isinstance(self.sent, BatchRequest):
+            self.original_index = InventoryIndex(set(self.paths))
+            self.final_index = InventoryIndex(set(self.after_paths))
         self.bindings = {
             (b.source_path, b.start, b.end): b.target_path for b in self.sent.bindings
         }
@@ -399,7 +469,19 @@ class Plan:
         if len(self.bindings) != len(self.sent.bindings):
             _invalid("Send each link binding once.")
 
+    def resolve(
+        self, token: Token, source: str, paths: list[str]
+    ) -> tuple[str | None, str | None]:
+        index = self.original_index if paths is self.paths else self.final_index
+        return (
+            index.resolve(token, source)
+            if index is not None
+            else _resolve(token, source, paths)
+        )
+
     def after(self, path: str) -> str:
+        if isinstance(self.sent, BatchRequest):
+            return self.sent.mapping.get(path, path)
         return self.sent.path if path == self.sent.old_path else path
 
     def issue(
@@ -408,7 +490,7 @@ class Plan:
         self.result["issues"].append(_issue(code, source, token, detail))
 
     def target(self, token: Token, source: str) -> str | None:
-        target, problem = _resolve(token, source, self.paths)
+        target, problem = self.resolve(token, source, self.paths)
         if (
             token.wiki
             and token.path.casefold() in {alias.casefold() for alias in self.aliases}
@@ -438,7 +520,7 @@ class Plan:
 
     def replacement(self, token: Token, source: str, target: str) -> str | None:
         after_source, after_target = self.after(source), self.after(target)
-        resolved, problem = _resolve(token, after_source, self.after_paths)
+        resolved, problem = self.resolve(token, after_source, self.after_paths)
         if resolved == after_target and problem is None:
             return None
         if (
@@ -451,7 +533,9 @@ class Plan:
                 if not token.path.endswith(".md")
                 else after_target
             )
-        return _reference(token, after_target, after_source, self.after_paths)
+        return _reference(
+            token, after_target, after_source, self.after_paths, self.resolve
+        )
 
     def document(self, source: str, text: str) -> None:
         parsed, unsupported = tokens(text)
@@ -507,7 +591,9 @@ class Plan:
             )
             return
         for token, target in zip(parsed, expected, strict=True):
-            resolved, problem = _resolve(token, self.after(source), self.after_paths)
+            resolved, problem = self.resolve(
+                token, self.after(source), self.after_paths
+            )
             if (
                 resolved != target
                 or (target is not None and problem)
@@ -521,6 +607,7 @@ class Plan:
                 )
 
     def validate_destination(self, files: records.Files, scopes: Scopes) -> None:
+        assert isinstance(self.sent, Request)
         equal: Callable[[str], str] = (
             str.casefold if self.sent.case_mode == "insensitive" else str
         )
@@ -552,7 +639,9 @@ class Plan:
             )
 
     def writes(self, files: records.Files) -> None:
-        for source in sorted(self.docs, key=lambda p: (p != self.sent.old_path, p)):
+        assert isinstance(self.sent, Request)
+        old_path = self.sent.old_path
+        for source in sorted(self.docs, key=lambda p: (p != old_path, p)):
             text = self.revised.get(source, self.docs[source])
             if source != self.sent.old_path and text == self.docs[source]:
                 continue
@@ -600,3 +689,247 @@ def prepare(workspace: Workspace, sent: Request, record: str) -> dict[str, Any]:
     result["record"] = records.dump(files)
     result["digest"] = workspace.remember(result["record"])
     return result
+
+
+MAX_MOVES = 1000
+MAX_BYTES = 32 * 1024 * 1024
+
+
+@dataclass(frozen=True)
+class BatchRequest:
+    location: str
+    moves: list[DocumentMove]
+    listing: list[ListedFile]
+    documents: list[MoveDocument]
+    case_mode: str
+    bindings: list[LinkBinding]
+    searched: bool
+    search: list[str]
+    allowed_by: AllowedBy | None
+    knowledge_bus_folders: list[KnowledgeBusFolder]
+
+    @cached_property
+    def mapping(self) -> dict[str, str]:
+        return {m.old_path: m.path for m in self.moves if m.old_path != m.path}
+
+
+def _limit(measured: int, limit: int, quantity: str, pointer: str) -> None:
+    if measured > limit:
+        _invalid(
+            f"knowledge-mcp measured {measured} {quantity}. The limit permits {limit} {quantity}.",
+            code="move-limit-exceeded",
+            pointer=pointer,
+        )
+
+
+def _batch_path(path: str, pointer: str) -> str:
+    normalized = records.normal_path(path, code="move-invalid", pointer=pointer)
+    if normalized != path:
+        _invalid("Send normalized root-relative paths.", pointer=pointer)
+    return normalized
+
+
+def _batch_inputs(sent: BatchRequest) -> tuple[list[str], dict[str, str]]:
+    _limit(len(sent.moves), MAX_MOVES, "move rows", "#/moves")
+    _limit(
+        sum(len(d.text.encode("utf-8")) for d in sent.documents),
+        MAX_BYTES,
+        "UTF-8 text bytes",
+        "#/documents",
+    )
+    paths = sorted(
+        _batch_path(i.path, f"#/listing/{index}/path")
+        for index, i in enumerate(sent.listing)
+    )
+    if len(paths) != len(set(paths)):
+        _invalid("Send each inventory path once.", pointer="#/listing")
+    sources = set()
+    for index, move in enumerate(sent.moves):
+        old = _batch_path(move.old_path, f"#/moves/{index}/old_path")
+        new = _batch_path(move.path, f"#/moves/{index}/path")
+        if (
+            old in sources
+            or old not in paths
+            or records.is_configuration(old)
+            or records.is_configuration(new)
+        ):
+            _invalid(
+                "Send unique listed sources outside configuration folders.",
+                pointer=f"#/moves/{index}",
+            )
+        sources.add(old)
+    docs = {
+        _batch_path(d.path, f"#/documents/{index}/path"): d.text
+        for index, d in enumerate(sent.documents)
+    }
+    if len(docs) != len(sent.documents) or any(p not in paths for p in docs):
+        _invalid("Send each document once using a listed path.", pointer="#/documents")
+    if not sources <= docs.keys():
+        _invalid(
+            "Send the text of every moved document.",
+            code="move-input-incomplete",
+            pointer="#/documents",
+        )
+    return paths, docs
+
+
+def _batch_destinations(
+    plan: Plan, sent: BatchRequest, files: records.Files, scopes: Scopes
+) -> None:
+    conflicts = filing.path_conflicts(set(plan.paths), sent.mapping)
+    for old in sorted(conflicts):
+        if old not in sent.mapping and any(
+            occupant in sent.mapping for occupant in conflicts[old]
+        ):
+            continue
+        for occupant in sorted(conflicts[old]):
+            plan.issue(
+                "destination-occupied",
+                old,
+                None,
+                f"Destination {plan.after(old)} for {old} conflicts with "
+                f"{plan.after(occupant)} from {occupant}. Choose another destination or revise the conflicting row.",
+            )
+    for old, new in sorted(sent.mapping.items()):
+        entry = files.get(old)
+        universe, _, _ = (
+            records.named(entry) if entry is not None else (None, None, False)
+        )
+        if entry is not None and (
+            not records.valid_at(entry, scopes.kinds_at(new))
+            or (universe is not None and not scopes.same_definition(old, new, universe))
+        ):
+            plan.issue(
+                "destination-type-conflict",
+                old,
+                None,
+                "Choose a folder with the saved universe spec and document type.",
+            )
+
+
+def _batch_writes(
+    plan: Plan, sent: BatchRequest, files: records.Files
+) -> records.Files:
+    final = {p: e for p, e in files.items() if p not in sent.mapping}
+    for old, entry in files.items():
+        text = plan.revised.get(old, plan.docs.get(old))
+        updated = entry
+        if old in plan.docs and text is not None and text != plan.docs[old]:
+            updated = entry.model_copy(update={"fingerprint": records.digest(text)})
+        final[plan.after(old)] = updated
+    for old, before in sorted(plan.docs.items()):
+        text = plan.revised.get(old, before)
+        if old not in sent.mapping and text == before:
+            continue
+        plan.result["writes"].append(
+            dict(
+                old_path=old,
+                path=plan.after(old),
+                before_digest=records.digest(before),
+                after_digest=records.digest(text),
+                text=text,
+            )
+        )
+    return final
+
+
+def prepare_batch(
+    workspace: Workspace, sent: BatchRequest, record: str
+) -> dict[str, Any]:
+    paths, docs = _batch_inputs(sent)
+    mapping = sent.mapping
+    final_paths = [mapping.get(p, p) for p in paths]
+    result: dict[str, Any] = dict(
+        schema="knowledge-mcp/document-moves/1",
+        location=sent.location,
+        status="texts_needed" if mapping else "unchanged",
+        moves=[dict(old_path=p, path=mapping[p]) for p in sorted(mapping)],
+        allowed_by=sent.allowed_by.model_dump(mode="json", exclude_unset=True)
+        if sent.allowed_by
+        else None,
+        search=sorted(
+            {
+                s
+                for old, new in mapping.items()
+                for s in search_strings(
+                    old, new, sorted(set(paths + final_paths)), docs[old]
+                )
+            }
+        ),
+        based_on=dict(
+            listing_digest=records.digest(
+                json.dumps(
+                    [
+                        i.model_dump(mode="json")
+                        for i in sorted(sent.listing, key=lambda i: i.path)
+                    ],
+                    sort_keys=True,
+                )
+            ),
+            record_digest=workspace.remember(record),
+            documents=[
+                dict(path=p, digest=workspace.remember(t))
+                for p, t in sorted(docs.items())
+            ],
+            configuration=[],
+        ),
+        affected_documents=[],
+        record_changes=[],
+        writes=[],
+        record=None,
+        digest=None,
+        links=[],
+        issues=[],
+        received=[],
+    )
+    if not mapping or not sent.searched or sent.search != result["search"]:
+        return result
+    files = records.parse(record)
+    scopes = Scopes(workspace, sent.knowledge_bus_folders)
+    plan = Plan(sent, paths, docs, result)
+    _batch_destinations(plan, sent, files, scopes)
+    for source, text in sorted(docs.items()):
+        if source.lower().endswith(".md"):
+            plan.document(source, text)
+    if plan.used != plan.bindings.keys():
+        _invalid(
+            "Each binding must identify a complete supplied internal link token.",
+            pointer="#/bindings",
+        )
+    result["received"] = list(scopes.received.values())
+    result["based_on"]["configuration"] = list(scopes.received.values())
+    if any(i["code"] != "link-broken" for i in result["issues"]):
+        result["status"] = "blocked"
+        return result
+    final = _batch_writes(plan, sent, files)
+    result["affected_documents"] = [
+        dict(old_path=w["old_path"], path=w["path"]) for w in result["writes"]
+    ]
+    result["record_changes"] = [
+        dict(old_path=p, path=plan.after(p))
+        for p in sorted(files)
+        if p in mapping
+        or records.plain(files[p]) != records.plain(final[plan.after(p)])
+    ]
+    result["status"] = "ready" if sent.allowed_by else "permission_needed"
+    result["record"] = records.dump(final)
+    result["digest"] = records.digest(result["record"])
+    check_batch_size(result)
+    if sent.allowed_by:
+        workspace.remember(result["record"])
+    else:
+        result.update(writes=[], record=None, digest=None)
+    return result
+
+
+def check_batch_size(result: dict[str, Any]) -> None:
+    _limit(
+        len(
+            json.dumps(result, ensure_ascii=False, separators=(",", ":")).encode(
+                "utf-8"
+            )
+        ),
+        MAX_BYTES,
+        "answer bytes",
+        "#/documents",
+    )

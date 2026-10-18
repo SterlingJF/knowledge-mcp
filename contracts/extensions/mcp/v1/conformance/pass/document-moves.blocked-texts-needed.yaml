@@ -1,0 +1,62 @@
+---
+schema: knowledge-mcp/document-moves/1
+location: unreachable://vault
+status: texts_needed
+allowed_by:
+  basis: instruction
+  text:
+    Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+    as you work.
+  location: AGENTS.md
+search:
+  - "%"
+  - "%2E%2F%41"
+  - "%2E%2F%41%2E%6D%64"
+  - "%2E%2F%42"
+  - "%2E%2F%42%2E%6D%64"
+  - "%2E/%41"
+  - "%2E/%41.md"
+  - "%2E/%42"
+  - "%2E/%42.md"
+  - "%41"
+  - "%41%2E%6D%64"
+  - "%41.md"
+  - "%42"
+  - "%42%2E%6D%64"
+  - "%42.md"
+  - ./%41
+  - ./%41.md
+  - ./%42
+  - ./%42.md
+  - ./A
+  - ./A.md
+  - ./B
+  - ./B.md
+  - A
+  - A.md
+  - B
+  - B.md
+based_on:
+  listing_digest: sha256:27f11a7835f04f76528cafb50dec4ed23b0075637bdb10447bd2e9b0c532b035
+  record_digest: sha256:fa8a80b3e4c48ff830ec14039b34803bf828b07d348f18464eb592ca86f8b02e
+  documents:
+    - path: A.md
+      digest: sha256:cd69e037dce9a0c2b2fb36a328d84ca1bac541b1664b910ccef38371ac8ee114
+    - path: B.md
+      digest: sha256:864d5630e6b679b77e6b4d17707ec93ff06da757efa0ba535726350c5c88b307
+    - path: Index.md
+      digest: sha256:18bf5d6cdb9f53d6107ec9a33a92fc872402d706347708db7a27e8c255b8dd3d
+  configuration: []
+writes: []
+record: null
+digest: null
+links: []
+issues: []
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:fa8a80b3e4c48ff830ec14039b34803bf828b07d348f18464eb592ca86f8b02e
+moves:
+  - old_path: A.md
+    path: B.md
+affected_documents: []
+record_changes: []

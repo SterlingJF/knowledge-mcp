@@ -21,6 +21,7 @@ The server serves MCP over stdio and opens no network port. Harnesses with a kno
 | `kb_list_edits`                | List the edits recorded for `location`, oldest first, to check or undo an edit.                                                                               | [edits.schema.yaml](../contracts/extensions/mcp/v1/edits.schema.yaml)                                 |
 | `kb_prepare_conventions`       | Prepare conventions text from supplied configuration and proposed changes.                                                                                    | [conventions-update.schema.yaml](../contracts/extensions/mcp/v1/conventions-update.schema.yaml)       |
 | `kb_prepare_document_move`     | Prepare a document move from supplied text, a complete listing and permission.                                                                                | [document-move.schema.yaml](../contracts/extensions/mcp/v1/document-move.schema.yaml)                 |
+| `kb_prepare_document_moves`    | Prepare moves together from supplied text and a complete listing.                                                                                             | [document-moves.schema.yaml](../contracts/extensions/mcp/v1/document-moves.schema.yaml)               |
 | `kb_prepare_document_types`    | Prepare document-types text and filing assessments from supplied configuration, file changes and entries.                                                     | [document-types-update.schema.yaml](../contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
 | `kb_prepare_import`            | Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`.                                    | [import.schema.yaml](../contracts/extensions/mcp/v1/import.schema.yaml)                               |
 | `kb_record_edit`               | Record an edit right after you make it, so the person can check or undo the change.                                                                           | [edit.schema.yaml](../contracts/extensions/mcp/v1/edit.schema.yaml)                                   |
@@ -131,6 +132,23 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 | `search`                | list of string or null                            | no       |                                                                                                                                                                                                                                                                                                                     |
 | `bindings`              | list of [LinkBinding](#linkbinding) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
 
+### `kb_prepare_document_moves`
+
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `moves`                 | list of [DocumentMove](#documentmove)             | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `listing`               | list of [ListedFile](#listedfile)                 | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `documents`             | list of [MoveDocument](#movedocument)             | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `case_mode`             | `sensitive` or `insensitive`                      | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `record`                | string or null                                    | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
+| `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
+| `allowed_by`            | [AllowedBy](#allowedby) or null                   | no       |                                                                                                                                                                                                                                                                                                                     |
+| `searched`              | boolean                                           | no       |                                                                                                                                                                                                                                                                                                                     |
+| `search`                | list of string or null                            | no       |                                                                                                                                                                                                                                                                                                                     |
+| `bindings`              | list of [LinkBinding](#linkbinding) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
+
 ### `kb_prepare_document_types`
 
 | Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                             |
@@ -148,6 +166,7 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 | `conventions_digest`    | string or null                                    | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                                                                                                                                                                                                                                |
 | `filing_values`         | list of [FilingValue](#filingvalue) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
 | `conventions_files`     | list of [ConventionFile](#conventionfile) or null | no       |                                                                                                                                                                                                                                                                                                                     |
+| `filing_review`         | [FilingReview](#filingreview) or null             | no       |                                                                                                                                                                                                                                                                                                                     |
 
 ### `kb_prepare_import`
 
@@ -160,14 +179,15 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 
 ### `kb_record_edit`
 
-| Argument       | Type                    | Required | Meaning                                                                                                                           |
-| -------------- | ----------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `location`     | string                  | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                   |
-| `allowed_by`   | [AllowedBy](#allowedby) | yes      |                                                                                                                                   |
-| `before`       | string                  | yes      | The replaced text. Send an empty string for a new file.                                                                           |
-| `after`        | string or null          | no       | The text that replaced `before`. Omit it only for a whole-file edit sent with `after_digest`.                                     |
-| `after_digest` | string or null          | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
-| `whole_file`   | boolean or null         | no       | True when `before` is the whole file.                                                                                             |
+| Argument       | Type                                    | Required | Meaning                                                                                                                           |
+| -------------- | --------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `location`     | string                                  | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                   |
+| `allowed_by`   | [AllowedBy](#allowedby)                 | yes      |                                                                                                                                   |
+| `before`       | string                                  | yes      | The replaced text. Send an empty string for a new file.                                                                           |
+| `after`        | string or null                          | no       | The text that replaced `before`. Omit it only for a whole-file edit sent with `after_digest`.                                     |
+| `after_digest` | string or null                          | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
+| `whole_file`   | boolean or null                         | no       | True when `before` is the whole file.                                                                                             |
+| `operation`    | [EditOperation](#editoperation) or null | no       |                                                                                                                                   |
 
 ### `kbp_card`
 
@@ -346,6 +366,23 @@ Type: string, pattern `^(?:[^/\\\u0000]+(?:/[^/\\\u0000]+)*)?$`.
 
 Type: string, pattern `^sha256:[0-9a-f]{64}$`.
 
+### DocumentMove
+
+| Field      | Type                  | Required | Meaning |
+| ---------- | --------------------- | -------- | ------- |
+| `old_path` | [MovePath](#movepath) | yes      |         |
+| `path`     | [MovePath](#movepath) | yes      |         |
+
+### EditOperation
+
+| Field      | Type          | Required | Meaning |
+| ---------- | ------------- | -------- | ------- |
+| `id`       | string        | yes      |         |
+| `index`    | integer       | yes      |         |
+| `count`    | integer       | yes      |         |
+| `old_path` | [Path](#path) | yes      |         |
+| `path`     | [Path](#path) | yes      |         |
+
 ### EntryItem
 
 | Field              | Type                          | Required | Meaning                                                                                                                                                               |
@@ -392,6 +429,13 @@ Type: [FileCreated](#filecreated) or [FileDeleted](#filedeleted) or [FileMoved](
 | `path`        | [Path](#path)                       | yes      | The path after the move. |
 | `old_path`    | [Path](#path)                       | yes      |                          |
 | `fingerprint` | [Fingerprint](#fingerprint) or null | no       |                          |
+
+### FilingReview
+
+| Field       | Type            | Required | Meaning |
+| ----------- | --------------- | -------- | ------- |
+| `folder`    | string          | yes      |         |
+| `recursive` | boolean or null | no       |         |
 
 ### FilingValue
 

@@ -1,0 +1,27 @@
+---
+schema: knowledge-mcp/document-moves/1
+location: vault
+status: blocked
+moves:
+  - old_path: A.md
+    path: B.md
+allowed_by: null
+search: []
+based_on:
+  listing_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  record_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  documents: []
+  configuration: []
+affected_documents: []
+record_changes: []
+writes:
+  - old_path: A.md
+    path: B.md
+    before_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+    after_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+    text: ""
+record: null
+digest: null
+links: []
+issues: []
+received: []

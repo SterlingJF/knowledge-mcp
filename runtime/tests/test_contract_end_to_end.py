@@ -33,6 +33,7 @@ CODES = {
     "record-invalid",
     "move-invalid",
     "move-input-incomplete",
+    "move-limit-exceeded",
     "document-type-unknown",
     "kbp-failed",
     "kbp-version-skew",
@@ -48,9 +49,10 @@ TAGS = {
     "kb_list_audiences": "knowledge-mcp/audiences/1",
     "kb_prepare_import": "knowledge-mcp/import/1",
     "kb_prepare_document_types": "knowledge-mcp/document-types-update/1",
-    "kb_record_edit": "knowledge-mcp/edit/1",
-    "kb_list_edits": "knowledge-mcp/edits/1",
+    "kb_record_edit": "knowledge-mcp/edit/2",
+    "kb_list_edits": "knowledge-mcp/edits/2",
     "kb_prepare_document_move": "knowledge-mcp/document-move/1",
+    "kb_prepare_document_moves": "knowledge-mcp/document-moves/1",
 }
 ISSUES = "https://github.com/SterlingJF/knowledge-mcp/issues"
 
@@ -290,6 +292,18 @@ def test_each_kb_tool_answers_with_structured_content_equal_to_its_text(tmp_path
                 "knowledge_bus_folders": [root_folder()],
                 "allowed_by": ALLOWED,
             },
+        ),
+        (
+            "kb_prepare_document_moves",
+            dict(
+                location=NOTES,
+                record="",
+                moves=[],
+                listing=[],
+                documents=[],
+                case_mode="sensitive",
+                knowledge_bus_folders=[],
+            ),
         ),
     )
 

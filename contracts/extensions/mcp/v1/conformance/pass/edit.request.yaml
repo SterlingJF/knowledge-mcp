@@ -1,7 +1,7 @@
 ---
-schema: knowledge-mcp/edit/1
-id: d8275a2fb85b4c12b7985e0cfbd2ad89
-time: "2026-10-18T11:21:46.430Z"
+schema: knowledge-mcp/edit/2
+id: 0ba98b4f65e841648f9bc9721991d1c8
+time: "2026-10-18T16:49:58.034Z"
 location: ~/notes/DESIGN.md
 allowed_by:
   basis: request

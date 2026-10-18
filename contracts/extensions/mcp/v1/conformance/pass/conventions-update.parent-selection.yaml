@@ -17,9 +17,12 @@ allowed_by:
     Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
     as you work.
   location: AGENTS.md
-record:
-  "schema: knowledge-mcp/conventions/1\nfrom_parent:\n- universe_spec: company-records\n\
-  \  document_type: contract\nconventions: []\n"
+record: |
+  schema: knowledge-mcp/conventions/1
+  from_parent:
+  - universe_spec: company-records
+    document_type: contract
+  conventions: []
 digest: sha256:6ebb1c20aa9ec2cba499b7bddcc1d9943de0835c8b1966bbe36c6ca0d900e58c
 received:
   - name: team.kbp.yaml

@@ -68,3 +68,16 @@ Source metadata names the declaring folder, file suffix, digest, complete conven
 Filing folders remain relative to the declaring folder.
 The answer reports inactive declarations for unavailable document types and different universe spec definitions.
 Legacy conventions arguments describe root configuration. Explicit file inputs reject simultaneous legacy arguments.
+
+## Preparing moves together
+
+`kb_prepare_document_moves` resolves links against the original inventory and prepares the complete final mapping.
+Echo the returned search strings after searching every Markdown document.
+A preview returns affected documents; `allowed_by` permits replacement text.
+Non-ready answers contain empty writes and a null record.
+
+Edit answers use `knowledge-mcp/edit/2` and `knowledge-mcp/edits/2`.
+The existing v1 contract directory contains both updated answer schemas.
+Optional operation metadata groups whole-file edits for guarded whole-list undo.
+Listing continues reading ungrouped entries and converts legacy permission fields.
+Document-types and conventions stored formats remain at `/1`.

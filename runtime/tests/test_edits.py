@@ -63,13 +63,13 @@ def test_edit_listing_returns_text_for_manual_undo(tmp_path):
     )
 
     receipt = answer(recorded)
-    assert receipt["schema"] == "knowledge-mcp/edit/1"
+    assert receipt["schema"] == "knowledge-mcp/edit/2"
     assert receipt["before_digest"] == digest(BEFORE)
     assert receipt["after_digest"] == digest(AFTER)
     assert "before" not in receipt and "after" not in receipt
 
     edits = answer(listed)
-    assert edits["schema"] == "knowledge-mcp/edits/1"
+    assert edits["schema"] == "knowledge-mcp/edits/2"
     [edit] = edits["edits"]
     assert edit["id"] == receipt["id"]
     assert edit["allowed_by"] == {"basis": "request", "text": request}
@@ -251,3 +251,54 @@ def test_an_unknown_basis_is_refused(tmp_path):
     assert entry["returned"] == texts(result)
     canonical = json.dumps(arguments, sort_keys=True, separators=(",", ":"))
     assert entry["sent"] == digest(canonical)
+
+
+def test_grouped_unchanged_rename_and_legacy_records(tmp_path):
+    base = dict(
+        location="unreachable://vault",
+        allowed_by=dict(basis="request", text="Move the notes."),
+        before="# A",
+        after="# A",
+        whole_file=True,
+    )
+    operation = dict(id="move-list", index=1, count=2, old_path="A.md", path="B.md")
+    recorded, legacy, listed = ask(
+        tmp_path / "state",
+        ("kb_record_edit", {**base, "operation": operation}),
+        ("kb_record_edit", base),
+        ("kb_list_edits", dict(location=base["location"])),
+    )
+    assert answer(recorded)["operation"] == operation
+    assert answer(recorded)["before_digest"] == answer(recorded)["after_digest"]
+    first, second = answer(listed)["edits"]
+    assert first["operation"] == operation and "operation" not in second
+    assert answer(legacy)["schema"] == "knowledge-mcp/edit/2"
+
+
+def test_invalid_group_metadata_creates_no_record(tmp_path):
+    base = dict(
+        location="vault",
+        allowed_by=dict(basis="request", text="Move the notes."),
+        before="A",
+        after="A",
+        whole_file=True,
+    )
+    valid = dict(id="group", index=1, count=1, old_path="A.md", path="B.md")
+    changes = [
+        dict(index=0),
+        dict(index=2),
+        dict(count=0),
+        dict(old_path="../A.md"),
+        dict(extra=True),
+    ]
+    results = ask(
+        tmp_path / "state",
+        *[
+            ("kb_record_edit", {**base, "operation": {**valid, **change}})
+            for change in changes
+        ],
+        ("kb_record_edit", {**base, "whole_file": False, "operation": valid}),
+        ("kb_list_edits", dict(location="vault")),
+    )
+    assert all(r.is_error for r in results[:-1])
+    assert answer(results[-1])["edits"] == []

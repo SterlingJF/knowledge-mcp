@@ -359,6 +359,8 @@ $defs:
         minItems: 1
         items:
           $ref: "#/$defs/needed_value"
+      values:
+        $ref: "#/$defs/filing_value"
     oneOf:
       - type: object
         required:
@@ -558,7 +560,8 @@ $defs:
     title: Convention file
     type: object
     additionalProperties: false
-    required: [folder]
+    required:
+      - folder
     properties:
       folder:
         $ref: "#/$defs/conventions_folder"
@@ -567,17 +570,25 @@ $defs:
       digest:
         $ref: "#/$defs/digest"
     oneOf:
-      - required: [text]
+      - required:
+          - text
         not:
-          required: [digest]
-      - required: [digest]
+          required:
+            - digest
+      - required:
+          - digest
         not:
-          required: [text]
+          required:
+            - text
   folder_convention:
     title: Folder convention
     type: object
     additionalProperties: false
-    required: [universe_spec, document_type, source, base_folder]
+    required:
+      - universe_spec
+      - document_type
+      - source
+      - base_folder
     properties:
       universe_spec:
         type: string
@@ -591,7 +602,11 @@ $defs:
     title: Inactive convention
     type: object
     additionalProperties: false
-    required: [universe_spec, document_type, source, reason]
+    required:
+      - universe_spec
+      - document_type
+      - source
+      - reason
     properties:
       universe_spec:
         type: string
@@ -600,4 +615,54 @@ $defs:
       source:
         $ref: "#/$defs/convention_source"
       reason:
-        enum: [document_type_unavailable, definition_differs]
+        enum:
+          - document_type_unavailable
+          - definition_differs
+  document_move:
+    title: Document move
+    type: object
+    additionalProperties: false
+    required:
+      - old_path
+      - path
+    properties:
+      old_path:
+        $ref: "#/$defs/move_path"
+      path:
+        $ref: "#/$defs/move_path"
+  edit_operation:
+    title: Edit operation
+    type: object
+    additionalProperties: false
+    required:
+      - id
+      - index
+      - count
+      - old_path
+      - path
+    properties:
+      id:
+        type: string
+        minLength: 1
+      index:
+        type: integer
+        minimum: 1
+      count:
+        type: integer
+        minimum: 1
+      old_path:
+        $ref: "#/$defs/path"
+      path:
+        $ref: "#/$defs/path"
+  filing_review:
+    title: Filing review
+    type: object
+    additionalProperties: false
+    required:
+      - folder
+    properties:
+      folder:
+        type: string
+      recursive:
+        type: boolean
+        default: false

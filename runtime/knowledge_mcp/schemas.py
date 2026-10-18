@@ -16,6 +16,7 @@ RESULTS = {
     "kb_list_conventions": "folder-conventions",
     "kb_prepare_conventions": "conventions-update",
     "kb_prepare_document_move": "document-move",
+    "kb_prepare_document_moves": "document-moves",
     "kb_get_document_type": "document-type",
     "kb_list_audiences": "audiences",
     "kb_prepare_import": "import",

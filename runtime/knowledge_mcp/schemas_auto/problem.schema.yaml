@@ -53,6 +53,8 @@ properties:
         const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-unsupported
       - title: Invalid filing values
         const: https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid
+      - title: Document move limit exceeded
+        const: https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded
   title:
     type: string
   detail:

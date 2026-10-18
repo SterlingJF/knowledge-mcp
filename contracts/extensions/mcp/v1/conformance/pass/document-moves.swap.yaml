@@ -1,0 +1,149 @@
+---
+schema: knowledge-mcp/document-moves/1
+location: unreachable://vault
+status: ready
+allowed_by:
+  basis: instruction
+  text:
+    Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+    as you work.
+  location: AGENTS.md
+search:
+  - "%"
+  - "%2E%2F%41"
+  - "%2E%2F%41%2E%6D%64"
+  - "%2E%2F%42"
+  - "%2E%2F%42%2E%6D%64"
+  - "%2E/%41"
+  - "%2E/%41.md"
+  - "%2E/%42"
+  - "%2E/%42.md"
+  - "%41"
+  - "%41%2E%6D%64"
+  - "%41.md"
+  - "%42"
+  - "%42%2E%6D%64"
+  - "%42.md"
+  - ./%41
+  - ./%41.md
+  - ./%42
+  - ./%42.md
+  - ./A
+  - ./A.md
+  - ./B
+  - ./B.md
+  - A
+  - A.md
+  - B
+  - B.md
+based_on:
+  listing_digest: sha256:27f11a7835f04f76528cafb50dec4ed23b0075637bdb10447bd2e9b0c532b035
+  record_digest: sha256:fa8a80b3e4c48ff830ec14039b34803bf828b07d348f18464eb592ca86f8b02e
+  documents:
+    - path: A.md
+      digest: sha256:cd69e037dce9a0c2b2fb36a328d84ca1bac541b1664b910ccef38371ac8ee114
+    - path: B.md
+      digest: sha256:864d5630e6b679b77e6b4d17707ec93ff06da757efa0ba535726350c5c88b307
+    - path: Index.md
+      digest: sha256:18bf5d6cdb9f53d6107ec9a33a92fc872402d706347708db7a27e8c255b8dd3d
+  configuration: []
+writes:
+  - old_path: A.md
+    path: B.md
+    before_digest: sha256:cd69e037dce9a0c2b2fb36a328d84ca1bac541b1664b910ccef38371ac8ee114
+    after_digest: sha256:e357608a3ab91cc096b813038783ca124da0526c78875b08769e5ac25f1bdf6e
+    text: "[[A#Heading]]"
+  - old_path: B.md
+    path: A.md
+    before_digest: sha256:864d5630e6b679b77e6b4d17707ec93ff06da757efa0ba535726350c5c88b307
+    after_digest: sha256:5aa66b3a015556788cf62bb62874f778b5a83feb6113b3e1be694ba9a57a96d6
+    text: "[[B#^block]]"
+  - old_path: Index.md
+    path: Index.md
+    before_digest: sha256:18bf5d6cdb9f53d6107ec9a33a92fc872402d706347708db7a27e8c255b8dd3d
+    after_digest: sha256:f0ddf2d6b98b4f690bcc0c97e33271a101c8f2d7e42abdb0a6efc469b6043f1d
+    text: "[[B]] [[A]]"
+record: |
+  # Your agent rewrites this file with text from knowledge-mcp when files change or you correct an entry.
+  # An entry with `set_by: person` overrides any later entry by the agent.
+  schema: knowledge-mcp/document-types/1
+  files:
+    A.md:
+      universe_spec: product-development
+      version: '1'
+      document_type: decision-record
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:5aa66b3a015556788cf62bb62874f778b5a83feb6113b3e1be694ba9a57a96d6
+      time: '2026-10-18T00:00:00Z'
+    B.md:
+      universe_spec: product-development
+      version: '1'
+      document_type: decision-record
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:e357608a3ab91cc096b813038783ca124da0526c78875b08769e5ac25f1bdf6e
+      time: '2026-10-18T00:00:00Z'
+    Index.md:
+      universe_spec: product-development
+      version: '1'
+      document_type: decision-record
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:f0ddf2d6b98b4f690bcc0c97e33271a101c8f2d7e42abdb0a6efc469b6043f1d
+      time: '2026-10-18T00:00:00Z'
+digest: sha256:083f509e550c1f19d09cfc1f0e3f649804367e6dd59b561ec14955838f18586e
+links:
+  - source_path: A.md
+    start: 0
+    end: 13
+    target_before: B.md
+    target_after: A.md
+    replacement: "[[A#Heading]]"
+  - source_path: B.md
+    start: 0
+    end: 12
+    target_before: A.md
+    target_after: B.md
+    replacement: "[[B#^block]]"
+  - source_path: Index.md
+    start: 0
+    end: 5
+    target_before: A.md
+    target_after: B.md
+    replacement: "[[B]]"
+  - source_path: Index.md
+    start: 6
+    end: 11
+    target_before: B.md
+    target_after: A.md
+    replacement: "[[A]]"
+issues: []
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:fa8a80b3e4c48ff830ec14039b34803bf828b07d348f18464eb592ca86f8b02e
+moves:
+  - old_path: A.md
+    path: B.md
+  - old_path: B.md
+    path: A.md
+affected_documents:
+  - old_path: A.md
+    path: B.md
+  - old_path: B.md
+    path: A.md
+  - old_path: Index.md
+    path: Index.md
+record_changes:
+  - old_path: A.md
+    path: B.md
+  - old_path: B.md
+    path: A.md
+  - old_path: Index.md
+    path: Index.md

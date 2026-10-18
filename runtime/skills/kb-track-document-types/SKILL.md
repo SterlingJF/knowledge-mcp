@@ -54,9 +54,16 @@ description: Use at session start and after creating, moving or deleting a knowl
    After an accepted convention change, refresh filing assessments on request.
    Keep existing document paths until a proposal is accepted.
    Keep convention changes separate from classification changes and document moves.
-10. **Keep entries in the document-types file.** Change entries through `kb_prepare_document_types` or the prepared document-types text from `kb_prepare_document_move`.
+10. **Keep entries in the document-types file.** Change entries through `kb_prepare_document_types` or the prepared document-types text from `kb_prepare_document_move` or `kb_prepare_document_moves`.
     Keep document text out of the document-types file.
 
 For requested starter conventions, follow Templates in `kb-write-document`.
 At session start, read saved conventions without reapplying templates or replacing accepted patterns.
 Keep classification permission, configuration permission and move permission separate.
+
+For many proposals, request a folder review through `filing_review` with a complete listing.
+Follow Many files at once in `kb-write-document` for changes, drops, acceptance and application.
+Keep unresolved classifications and missing naming values visible.
+Save the complete prepared document-types update with the accepted moves.
+Avoid intermediate tracking updates while files occupy temporary paths.
+Refresh the inventory after completion without replaying moves already represented by the prepared record.

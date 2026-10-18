@@ -2,8 +2,7 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: edits.schema.yaml
 title: kb_list_edits result
-description: >-
-  The structuredContent of a kb_list_edits result, or problem details when
+description: The structuredContent of a kb_list_edits result, or problem details when
   isError is true.
 type: object
 oneOf:
@@ -14,10 +13,13 @@ $defs:
     title: Edits answer
     description: Edits recorded for `location`, oldest first.
     type: object
-    required: [schema, location, edits]
+    required:
+      - schema
+      - location
+      - edits
     properties:
       schema:
-        const: knowledge-mcp/edits/1
+        const: knowledge-mcp/edits/2
       location:
         $ref: common.schema.yaml#/$defs/location
       edits:
@@ -27,8 +29,22 @@ $defs:
     additionalProperties: false
   edit:
     title: Edit
-    description: An entry from `edits.jsonl`, with legacy permission fields converted to `allowed_by`.
+    description: An entry from `edits.jsonl`, with legacy permission fields converted
+      to `allowed_by`.
     type: object
+    if:
+      type: object
+      required:
+        - operation
+      properties:
+        operation: true
+    then:
+      type: object
+      required:
+        - whole_file
+      properties:
+        whole_file:
+          const: true
     required:
       - id
       - time
@@ -55,12 +71,13 @@ $defs:
       before_digest:
         $ref: common.schema.yaml#/$defs/digest
       after:
-        description: >-
-          Absent when the kb_record_edit call for a whole-file
-          edit sent `after_digest` and no `after`.
+        description: Absent when the kb_record_edit call for a whole-file edit sent
+          `after_digest` and no `after`.
         type: string
       after_digest:
         $ref: common.schema.yaml#/$defs/digest
+      operation:
+        $ref: common.schema.yaml#/$defs/edit_operation
     additionalProperties: false
   conventions.schema.yaml:
     $schema: https://json-schema.org/draft/2020-12/schema
@@ -742,6 +759,8 @@ $defs:
             minItems: 1
             items:
               $ref: "#/$defs/needed_value"
+          values:
+            $ref: "#/$defs/filing_value"
         additionalProperties: false
       move_path:
         title: Move path
@@ -910,6 +929,54 @@ $defs:
             enum:
               - document_type_unavailable
               - definition_differs
+        additionalProperties: false
+      document_move:
+        title: Document move
+        type: object
+        required:
+          - old_path
+          - path
+        properties:
+          old_path:
+            $ref: "#/$defs/move_path"
+          path:
+            $ref: "#/$defs/move_path"
+        additionalProperties: false
+      edit_operation:
+        title: Edit operation
+        type: object
+        required:
+          - id
+          - index
+          - count
+          - old_path
+          - path
+        properties:
+          id:
+            type: string
+            minLength: 1
+          index:
+            type: integer
+            minimum: 1
+          count:
+            type: integer
+            minimum: 1
+          old_path:
+            $ref: "#/$defs/path"
+          path:
+            $ref: "#/$defs/path"
+        additionalProperties: false
+      filing_review:
+        title: Filing review
+        type: object
+        required:
+          - folder
+        properties:
+          folder:
+            type: string
+          recursive:
+            default: false
+            type: boolean
         additionalProperties: false
   document-types.schema.yaml:
     $schema: https://json-schema.org/draft/2020-12/schema
@@ -1093,6 +1160,8 @@ $defs:
             const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-unsupported
           - title: Invalid filing values
             const: https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid
+          - title: Document move limit exceeded
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded
       title:
         type: string
       detail:

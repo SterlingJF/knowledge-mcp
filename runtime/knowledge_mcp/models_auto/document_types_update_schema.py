@@ -30,6 +30,14 @@ class Scope(BaseModel):
     ]
 
 
+class UnresolvedFiling(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: Path
+    question: str
+
+
 class ChangedEntry(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -56,6 +64,16 @@ class FileToSettle(BaseModel):
     candidates: list[Candidate]
     old_path: Path | None = None
     was: Entry | None = None
+
+
+class FolderFilingReview(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    folder: str
+    recursive: bool
+    assessments: list[FilingAssessment]
+    unresolved: list[UnresolvedFiling]
 
 
 class DocumentTypesUpdateAnswer(BaseModel):
@@ -112,6 +130,9 @@ class DocumentTypesUpdateAnswer(BaseModel):
     ]
     received: Received
     filing: list[FilingAssessment]
+    filing_review: Annotated[
+        FolderFilingReview | None, Field(title="Folder filing review")
+    ] = None
 
 
 type KbPrepareDocumentTypesResult = Annotated[

@@ -2,9 +2,9 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: edit.schema.yaml
 title: kb_record_edit result
-description: >-
-  The structuredContent of a kb_record_edit result, or problem details when
-  isError is true.
+description:
+  The structuredContent of a kb_record_edit result, or problem details
+  when isError is true.
 type: object
 oneOf:
   - $ref: "#/$defs/answer"
@@ -25,7 +25,7 @@ $defs:
       - after_digest
     properties:
       schema:
-        const: knowledge-mcp/edit/1
+        const: knowledge-mcp/edit/2
       id:
         $ref: common.schema.yaml#/$defs/edit_id
       time:
@@ -41,3 +41,18 @@ $defs:
         $ref: common.schema.yaml#/$defs/digest
       after_digest:
         $ref: common.schema.yaml#/$defs/digest
+      operation:
+        $ref: common.schema.yaml#/$defs/edit_operation
+    if:
+      type: object
+      required:
+        - operation
+      properties:
+        operation: true
+    then:
+      type: object
+      required:
+        - whole_file
+      properties:
+        whole_file:
+          const: true

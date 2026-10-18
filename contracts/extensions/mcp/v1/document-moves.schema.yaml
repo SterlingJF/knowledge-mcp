@@ -1,0 +1,207 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: document-moves.schema.yaml
+title: kb_prepare_document_moves result
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Document moves answer
+    type: object
+    additionalProperties: false
+    required:
+      - schema
+      - location
+      - status
+      - allowed_by
+      - search
+      - based_on
+      - writes
+      - record
+      - digest
+      - links
+      - issues
+      - received
+      - moves
+      - affected_documents
+      - record_changes
+    properties:
+      schema:
+        const: knowledge-mcp/document-moves/1
+      location: &id001
+        type: string
+      status:
+        enum:
+          - texts_needed
+          - permission_needed
+          - ready
+          - blocked
+          - unchanged
+      allowed_by:
+        anyOf:
+          - $ref: document-types.schema.yaml#/$defs/allowed_by
+          - type: "null"
+      search:
+        type: array
+        items: *id001
+      based_on:
+        title: Move inputs
+        type: object
+        additionalProperties: false
+        required:
+          - listing_digest
+          - record_digest
+          - documents
+          - configuration
+        properties:
+          listing_digest: &id002
+            $ref: common.schema.yaml#/$defs/digest
+          record_digest: *id002
+          documents:
+            type: array
+            items:
+              title: Document digest
+              type: object
+              additionalProperties: false
+              required:
+                - path
+                - digest
+              properties:
+                path: &id004
+                  $ref: common.schema.yaml#/$defs/path
+                digest: *id002
+          configuration:
+            $ref: common.schema.yaml#/$defs/received
+      writes:
+        type: array
+        items:
+          $ref: "#/$defs/write"
+      record: &id005
+        type:
+          - string
+          - "null"
+      digest:
+        type:
+          - string
+          - "null"
+        pattern: ^sha256:[0-9a-f]{64}$
+      links:
+        type: array
+        items:
+          $ref: "#/$defs/link"
+      issues:
+        type: array
+        items:
+          $ref: "#/$defs/issue"
+      received:
+        $ref: common.schema.yaml#/$defs/received
+      moves:
+        type: array
+        items:
+          $ref: common.schema.yaml#/$defs/document_move
+        uniqueItems: true
+      affected_documents:
+        type: array
+        items:
+          $ref: common.schema.yaml#/$defs/document_move
+      record_changes:
+        type: array
+        items:
+          $ref: common.schema.yaml#/$defs/document_move
+    if:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          enum:
+            - texts_needed
+            - permission_needed
+            - blocked
+            - unchanged
+    then:
+      type: object
+      properties:
+        writes:
+          type: array
+          maxItems: 0
+        record:
+          type: "null"
+        digest:
+          type: "null"
+    else:
+      type: object
+      properties:
+        writes:
+          type: array
+          minItems: 1
+        record:
+          type: string
+        digest:
+          $ref: common.schema.yaml#/$defs/digest
+  write:
+    title: Move write
+    type: object
+    additionalProperties: false
+    required:
+      - old_path
+      - path
+      - before_digest
+      - after_digest
+      - text
+    properties:
+      old_path:
+        $ref: common.schema.yaml#/$defs/move_path
+      path:
+        $ref: common.schema.yaml#/$defs/move_path
+      before_digest: *id002
+      after_digest: *id002
+      text: *id001
+  link:
+    title: Move link
+    type: object
+    additionalProperties: false
+    required:
+      - source_path
+      - start
+      - end
+      - target_before
+      - target_after
+      - replacement
+    properties:
+      source_path:
+        $ref: common.schema.yaml#/$defs/move_path
+      start: &id003
+        type: integer
+        minimum: 0
+      end: *id003
+      target_before: *id004
+      target_after: *id004
+      replacement: *id005
+  issue:
+    title: Move issue
+    type: object
+    additionalProperties: false
+    required:
+      - code
+      - source_path
+      - start
+      - end
+      - detail
+    properties:
+      code: *id001
+      source_path: *id005
+      start:
+        type:
+          - integer
+          - "null"
+        minimum: 0
+      end:
+        type:
+          - integer
+          - "null"
+        minimum: 0
+      detail: *id001
+description: Replacement text and target checks for moves prepared together.

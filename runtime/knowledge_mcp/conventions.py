@@ -570,7 +570,11 @@ class Filing:
         )
 
     def assess(
-        self, result: dict[str, Any], listing: list[ListedFile] | None
+        self,
+        result: dict[str, Any],
+        listing: list[ListedFile] | None,
+        *,
+        provisional: bool = False,
     ) -> dict[str, Any] | None:
         definitions, sources = self.at(result["path"])
         key = result["universe_spec"], result["document_type"]
@@ -621,7 +625,7 @@ class Filing:
         folder_identity = unicodedata.normalize("NFC", folder).casefold()
         if destination == result["path"]:
             result["status"] = "already_matches"
-        elif identity in identities:
+        elif identity in identities and not provisional:
             result["status"] = "destination_occupied"
         else:
             result["status"] = "proposed"

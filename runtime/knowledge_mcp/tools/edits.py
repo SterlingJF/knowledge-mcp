@@ -8,6 +8,7 @@ from pydantic import Field
 
 from knowledge_mcp import edits
 from knowledge_mcp.models import AllowedBy
+from knowledge_mcp.models_auto.common_schema import EditOperation
 from knowledge_mcp.models_auto.edit_schema import EditReceipt
 from knowledge_mcp.models_auto.edits_schema import EditsAnswer
 from knowledge_mcp.scope import Workspace
@@ -69,6 +70,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             bool | None,
             Field(description="True when `before` is the whole file."),
         ] = None,
+        operation: EditOperation | None = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
@@ -77,6 +79,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             after=after,
             after_digest=after_digest,
             whole_file=whole_file,
+            operation=operation,
         )
         texts = edits.Texts(
             before=before,
@@ -84,7 +87,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             after_digest=after_digest,
             whole_file=bool(whole_file),
         )
-        entry = edits.record(location, allowed_by, texts)
+        entry = edits.record(location, allowed_by, texts, operation)
         return respond.answer(
             "kb_record_edit", location, arguments, EditReceipt, edits.receipt(entry)
         )

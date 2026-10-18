@@ -332,6 +332,33 @@ type ConventionFile = Annotated[
 ]
 
 
+class DocumentMove(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    old_path: MovePath
+    path: MovePath
+
+
+class EditOperation(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    id: Annotated[str, Field(min_length=1)]
+    index: Annotated[int, Field(ge=1)]
+    count: Annotated[int, Field(ge=1)]
+    old_path: Path
+    path: Path
+
+
+class FilingReview(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    folder: str
+    recursive: bool | None = False
+
+
 type FileChange = Annotated[
     FileCreated | FileDeleted | FileMoved | FileEdited, Field(title="File change")
 ]
@@ -379,6 +406,7 @@ class FilingAssessment1(BaseModel):
     proposal: Annotated[FilingProposal1 | None, Field(title="Filing proposal")]
     convention: ConventionSource | None = None
     needed: Annotated[list[NeededValue] | None, Field(min_length=1)] = None
+    values: FilingValue | None = None
 
 
 class FilingAssessment2(BaseModel):
@@ -409,6 +437,7 @@ class FilingAssessment2(BaseModel):
     proposal: FilingProposal | None
     convention: ConventionSource | None = None
     needed: Annotated[list[NeededValue] | None, Field(min_length=1)] = None
+    values: FilingValue | None = None
 
 
 class FilingAssessment3(BaseModel):
@@ -435,6 +464,7 @@ class FilingAssessment3(BaseModel):
     proposal: FilingProposal | None
     convention: ConventionSource | None = None
     needed: Annotated[list[NeededValue] | None, Field(min_length=1)] = None
+    values: FilingValue | None = None
 
 
 class FilingAssessment4(BaseModel):
@@ -448,6 +478,7 @@ class FilingAssessment4(BaseModel):
     proposal: FilingProposal | None
     convention: ConventionSource
     needed: Annotated[list[NeededValue], Field(min_length=1)]
+    values: FilingValue | None = None
 
 
 type FilingAssessment = Annotated[

@@ -22,6 +22,7 @@ from knowledge_mcp.tools import (
     convention_templates,
     conventions,
     document_move,
+    document_moves,
     document_type,
     document_types,
     edits,
@@ -134,6 +135,7 @@ def build_server(workspace: Workspace | None = None) -> MCPServer:
     convention_templates.register(mcp)
     conventions.register(mcp, workspace)
     document_move.register(mcp, workspace)
+    document_moves.register(mcp, workspace)
     document_type.register(mcp, workspace)
     audience.register(mcp, workspace)
     edits.register(mcp, workspace)

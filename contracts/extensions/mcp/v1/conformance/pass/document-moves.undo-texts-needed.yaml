@@ -1,0 +1,154 @@
+---
+schema: knowledge-mcp/document-moves/1
+location: unreachable://vault
+status: texts_needed
+allowed_by:
+  basis: instruction
+  text:
+    Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+    as you work.
+  location: AGENTS.md
+search:
+  - "%"
+  - "%2E%2E%2F%41"
+  - "%2E%2E%2F%41%2E%6D%64"
+  - "%2E%2E%2F%42"
+  - "%2E%2E%2F%42%2E%6D%64"
+  - "%2E%2E/%41"
+  - "%2E%2E/%41.md"
+  - "%2E%2E/%42"
+  - "%2E%2E/%42.md"
+  - "%2E%2F%2E%2E%2F%41"
+  - "%2E%2F%2E%2E%2F%41%2E%6D%64"
+  - "%2E%2F%2E%2E%2F%42"
+  - "%2E%2F%2E%2E%2F%42%2E%6D%64"
+  - "%2E%2F%41"
+  - "%2E%2F%41%2E%6D%64"
+  - "%2E%2F%41%6C%70%68%61"
+  - "%2E%2F%41%6C%70%68%61%2E%6D%64"
+  - "%2E%2F%42"
+  - "%2E%2F%42%2E%6D%64"
+  - "%2E%2F%42%65%74%61"
+  - "%2E%2F%42%65%74%61%2E%6D%64"
+  - "%2E%2F%44%65%63%69%73%69%6F%6E%73%2F%41%6C%70%68%61"
+  - "%2E%2F%44%65%63%69%73%69%6F%6E%73%2F%41%6C%70%68%61%2E%6D%64"
+  - "%2E%2F%44%65%63%69%73%69%6F%6E%73%2F%42%65%74%61"
+  - "%2E%2F%44%65%63%69%73%69%6F%6E%73%2F%42%65%74%61%2E%6D%64"
+  - "%2E/%2E%2E/%41"
+  - "%2E/%2E%2E/%41.md"
+  - "%2E/%2E%2E/%42"
+  - "%2E/%2E%2E/%42.md"
+  - "%2E/%41"
+  - "%2E/%41%6C%70%68%61"
+  - "%2E/%41%6C%70%68%61.md"
+  - "%2E/%41.md"
+  - "%2E/%42"
+  - "%2E/%42%65%74%61"
+  - "%2E/%42%65%74%61.md"
+  - "%2E/%42.md"
+  - "%2E/%44%65%63%69%73%69%6F%6E%73/%41%6C%70%68%61"
+  - "%2E/%44%65%63%69%73%69%6F%6E%73/%41%6C%70%68%61.md"
+  - "%2E/%44%65%63%69%73%69%6F%6E%73/%42%65%74%61"
+  - "%2E/%44%65%63%69%73%69%6F%6E%73/%42%65%74%61.md"
+  - "%41"
+  - "%41%2E%6D%64"
+  - "%41%6C%70%68%61"
+  - "%41%6C%70%68%61%2E%6D%64"
+  - "%41%6C%70%68%61.md"
+  - "%41.md"
+  - "%42"
+  - "%42%2E%6D%64"
+  - "%42%65%74%61"
+  - "%42%65%74%61%2E%6D%64"
+  - "%42%65%74%61.md"
+  - "%42.md"
+  - "%44%65%63%69%73%69%6F%6E%73%2F%41%6C%70%68%61"
+  - "%44%65%63%69%73%69%6F%6E%73%2F%41%6C%70%68%61%2E%6D%64"
+  - "%44%65%63%69%73%69%6F%6E%73%2F%42%65%74%61"
+  - "%44%65%63%69%73%69%6F%6E%73%2F%42%65%74%61%2E%6D%64"
+  - "%44%65%63%69%73%69%6F%6E%73/%41%6C%70%68%61"
+  - "%44%65%63%69%73%69%6F%6E%73/%41%6C%70%68%61.md"
+  - "%44%65%63%69%73%69%6F%6E%73/%42%65%74%61"
+  - "%44%65%63%69%73%69%6F%6E%73/%42%65%74%61.md"
+  - ../%41
+  - ../%41.md
+  - ../%42
+  - ../%42.md
+  - ../A
+  - ../A.md
+  - ../B
+  - ../B.md
+  - ./%41
+  - ./%41%6C%70%68%61
+  - ./%41%6C%70%68%61.md
+  - ./%41.md
+  - ./%42
+  - ./%42%65%74%61
+  - ./%42%65%74%61.md
+  - ./%42.md
+  - ./../%41
+  - ./../%41.md
+  - ./../%42
+  - ./../%42.md
+  - ./../A
+  - ./../A.md
+  - ./../B
+  - ./../B.md
+  - ./A
+  - ./A.md
+  - ./Alpha
+  - ./Alpha.md
+  - ./B
+  - ./B.md
+  - ./Beta
+  - ./Beta.md
+  - ./Decisions/%41%6C%70%68%61
+  - ./Decisions/%41%6C%70%68%61.md
+  - ./Decisions/%42%65%74%61
+  - ./Decisions/%42%65%74%61.md
+  - ./Decisions/Alpha
+  - ./Decisions/Alpha.md
+  - ./Decisions/Beta
+  - ./Decisions/Beta.md
+  - A
+  - A.md
+  - Alpha
+  - Alpha.md
+  - B
+  - B.md
+  - Beta
+  - Beta.md
+  - Decisions/%41%6C%70%68%61
+  - Decisions/%41%6C%70%68%61.md
+  - Decisions/%42%65%74%61
+  - Decisions/%42%65%74%61.md
+  - Decisions/Alpha
+  - Decisions/Alpha.md
+  - Decisions/Beta
+  - Decisions/Beta.md
+based_on:
+  listing_digest: sha256:5136e1405aaa49fac05410e24bcd9f427cdf6a0d1a2dd9ae8d5717b8bb3e28ed
+  record_digest: sha256:fbc5c379e4278f45dbf15ca3d2043ded1da2f2c2e2c12fcedf86088336a7e92d
+  documents:
+    - path: Decisions/Alpha.md
+      digest: sha256:a38e7e47f54b4da71bb351881d92a8fff327e6e8916ca1a1c92709e330396871
+    - path: Decisions/Beta.md
+      digest: sha256:dbd48e5c65af5de59f672d81f466fb314463f62c505b38020fca16996df9acdb
+    - path: Index.md
+      digest: sha256:733c503ede41ec16865ab433433b2ef5655276800c1db0a884b68effbe0a9177
+  configuration: []
+writes: []
+record: null
+digest: null
+links: []
+issues: []
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:fbc5c379e4278f45dbf15ca3d2043ded1da2f2c2e2c12fcedf86088336a7e92d
+moves:
+  - old_path: Decisions/Alpha.md
+    path: A.md
+  - old_path: Decisions/Beta.md
+    path: B.md
+affected_documents: []
+record_changes: []

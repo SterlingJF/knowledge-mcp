@@ -7,12 +7,13 @@ from dataclasses import dataclass
 from typing import Any
 
 from knowledge_mcp import log, problems
-from knowledge_mcp.document_types import OLD_BASIS
+from knowledge_mcp.document_types import OLD_BASIS, normal_path
+from knowledge_mcp.models_auto.common_schema import EditOperation
 from knowledge_mcp.models_auto.document_types_schema import AllowedBy
 from knowledge_mcp.models_auto.edits_schema import Edit
 
-SCHEMA = "knowledge-mcp/edit/1"
-LISTING = "knowledge-mcp/edits/1"
+SCHEMA = "knowledge-mcp/edit/2"
+LISTING = "knowledge-mcp/edits/2"
 NAME = "edits.jsonl"
 
 DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
@@ -69,15 +70,28 @@ def _after_digest(texts: Texts) -> str:
     return computed
 
 
-def record(location: str, allowed_by: AllowedBy, texts: Texts) -> dict[str, Any]:
+def record(
+    location: str,
+    allowed_by: AllowedBy,
+    texts: Texts,
+    operation: EditOperation | None = None,
+) -> dict[str, Any]:
     """Append the edit to `edits.jsonl` and return the new entry."""
     after_digest = _after_digest(texts)
+    if operation is not None:
+        if not texts.whole_file or operation.index > operation.count:
+            message = "Grouped edits require whole-file text and an index within the group count."
+            raise EditError(message, pointer="#/operation")
+        normal_path(operation.old_path, pointer="#/operation/old_path")
+        normal_path(operation.path, pointer="#/operation/path")
     entry: dict[str, Any] = {
         "id": uuid.uuid4().hex,
         "time": log.now(),
         "location": location,
         "allowed_by": allowed_by.model_dump(mode="json", exclude_none=True),
     }
+    if operation is not None:
+        entry["operation"] = operation.model_dump(mode="json")
     if texts.whole_file:
         entry["whole_file"] = True
     entry["before"] = texts.before

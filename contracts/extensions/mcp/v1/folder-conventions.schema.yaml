@@ -2,7 +2,9 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: folder-conventions.schema.yaml
 title: kb_list_conventions result
-description: The conventions in effect for a folder, each with the folder that declares it and a mark on conventions taken from a parent folder.
+description: >-
+  The conventions in effect for a folder, each with the folder that declares it
+  and a mark on conventions taken from a parent folder.
 type: object
 oneOf:
   - $ref: "#/$defs/answer"

@@ -2,7 +2,7 @@
 
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
-from ._internal import AllowedBy, Digest, EditId, Location, Time
+from ._internal import AllowedBy, Digest, EditId, EditOperation, Location, Time
 from . import problem_schema
 
 
@@ -14,7 +14,7 @@ class EditReceipt(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    schema_: Annotated[Literal["knowledge-mcp/edit/1"], Field(alias="schema")]
+    schema_: Annotated[Literal["knowledge-mcp/edit/2"], Field(alias="schema")]
     id: EditId
     time: Time
     location: Location
@@ -25,6 +25,7 @@ class EditReceipt(BaseModel):
     ] = None
     before_digest: Digest
     after_digest: Digest
+    operation: EditOperation | None = None
 
 
 type KbRecordEditResult = Annotated[
