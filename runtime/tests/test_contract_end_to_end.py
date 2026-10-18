@@ -23,6 +23,7 @@ MODES = ["legacy", "auto"]
 
 BASE = "https://github.com/SterlingJF/knowledge-mcp/problems/"
 CODES = {
+    "conventions-context-incomplete",
     "conventions-invalid",
     "conventions-unsupported",
     "filing-values-invalid",
@@ -40,6 +41,7 @@ CODES = {
 PROBLEM_FIELDS = {"type", "title", "detail", "errors"}
 
 TAGS = {
+    "kb_list_conventions": "knowledge-mcp/folder-conventions/1",
     "kb_list_convention_templates": "knowledge-mcp/convention-templates/1",
     "kb_prepare_conventions": "knowledge-mcp/conventions-update/1",
     "kb_get_document_type": "knowledge-mcp/document-type/1",
@@ -258,6 +260,15 @@ def test_each_kb_tool_answers_with_structured_content_equal_to_its_text(tmp_path
     """The text block supports clients that display text without structured content."""
     results = calls(
         tmp_path,
+        (
+            "kb_list_conventions",
+            {
+                "location": NOTES,
+                "folder": "",
+                "knowledge_bus_folders": [root_folder()],
+                "conventions_files": [{"folder": "", "text": ""}],
+            },
+        ),
         ("kb_list_convention_templates", {"location": NOTES}),
         ("kb_prepare_conventions", {"location": NOTES, "conventions": ""}),
         ("kb_get_document_type", type_call()),

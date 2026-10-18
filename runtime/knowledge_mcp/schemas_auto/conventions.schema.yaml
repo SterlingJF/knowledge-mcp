@@ -2,7 +2,7 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: conventions.schema.yaml
 title: Naming and filing conventions
-description: Saved conventions for document types at the knowledge-base root.
+description: Saved conventions for document types in the declaring folder.
 type: object
 required:
   - schema
@@ -703,6 +703,7 @@ $defs:
                   - no_peers
                   - listing_needed
                   - evidence_incomplete
+                  - destination_type_conflict
                   - destination_occupied
               proposal:
                 type: "null"
@@ -786,6 +787,7 @@ $defs:
               - document_type_needed
               - listing_needed
               - evidence_incomplete
+              - destination_type_conflict
               - destination_occupied
               - values_needed
           proposal:
@@ -872,11 +874,14 @@ $defs:
           - folder
           - digest
           - definition
+          - from_parent
         properties:
           file:
             const: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
           folder:
-            const: ""
+            $ref: "#/$defs/conventions_folder"
+          from_parent:
+            type: boolean
           digest:
             $ref: "#/$defs/digest"
           definition:
@@ -896,4 +901,72 @@ $defs:
           name:
             type: string
             minLength: 1
+        additionalProperties: false
+      conventions_folder:
+        title: Conventions folder
+        type: string
+        not:
+          pattern: (^|/)\.{1,2}(/|$)
+        pattern: ^(?:[^/\\\u0000]+(?:/[^/\\\u0000]+)*)?$
+      convention_file:
+        title: Convention file
+        type: object
+        oneOf:
+          - not:
+              required:
+                - digest
+            required:
+              - text
+          - not:
+              required:
+                - text
+            required:
+              - digest
+        required:
+          - folder
+        properties:
+          folder:
+            $ref: "#/$defs/conventions_folder"
+          text:
+            type: string
+          digest:
+            $ref: "#/$defs/digest"
+        additionalProperties: false
+      folder_convention:
+        title: Folder convention
+        type: object
+        required:
+          - universe_spec
+          - document_type
+          - source
+          - base_folder
+        properties:
+          universe_spec:
+            type: string
+          document_type:
+            type: string
+          source:
+            $ref: "#/$defs/convention_source"
+          base_folder:
+            $ref: "#/$defs/conventions_folder"
+        additionalProperties: false
+      inactive_convention:
+        title: Inactive convention
+        type: object
+        required:
+          - universe_spec
+          - document_type
+          - source
+          - reason
+        properties:
+          universe_spec:
+            type: string
+          document_type:
+            type: string
+          source:
+            $ref: "#/$defs/convention_source"
+          reason:
+            enum:
+              - document_type_unavailable
+              - definition_differs
         additionalProperties: false

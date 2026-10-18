@@ -18,7 +18,7 @@ from knowledge_mcp.models import (
     KnowledgeBusFolder,
     ListedFile,
 )
-from knowledge_mcp.models_auto.common_schema import FilingValue
+from knowledge_mcp.models_auto.common_schema import ConventionFile, FilingValue
 from knowledge_mcp.models_auto.document_types_update_schema import (
     DocumentTypesUpdateAnswer,
 )
@@ -102,17 +102,25 @@ class Request:
     allowed_by: AllowedBy | None
     conventions: str | None = None
     conventions_digest: str | None = None
+    conventions_files: list[ConventionFile] | None = None
     filing_values: list[FilingValue] | None = None
 
 
 def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
+    scopes = Scopes(workspace, sent.folders)
     convention = naming.Filing.read(
-        workspace, sent.conventions, sent.conventions_digest, sent.filing_values
+        workspace,
+        sent.conventions,
+        sent.conventions_digest,
+        sent.filing_values,
+        naming.Context(workspace, scopes, sent.conventions_files)
+        if sent.conventions_files is not None
+        else None,
     )
     files = records.parse(text)
     migrated = records.is_old(text)
     based_on = workspace.remember(text)
-    scopes = Scopes(workspace, sent.folders, conventions=convention)
+    scopes.conventions = convention
     from_listing = _listing_events(files, sent.listing)
     merged = records.merge(
         files,
@@ -183,6 +191,8 @@ def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
         ],
         "received": list(scopes.received.values()),
     }
+    if convention.context is not None:
+        result["received"].extend(convention.context.received.values())
     if sent.conventions is not None:
         result["received"].append({"name": naming.PLACE, "digest": convention.digest})
     if from_listing is not None:
@@ -264,6 +274,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
         conventions: ConventionsText = None,
         conventions_digest: ConventionsDigest = None,
         filing_values: list[FilingValue] | None = None,
+        conventions_files: list[ConventionFile] | None = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
@@ -278,6 +289,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             conventions=conventions,
             conventions_digest=conventions_digest,
             filing_values=filing_values,
+            conventions_files=conventions_files,
         )
         text = records.received_text(record, record_digest, workspace.recall)
         sent = Request(
@@ -291,6 +303,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             conventions=conventions,
             conventions_digest=conventions_digest,
             filing_values=filing_values,
+            conventions_files=conventions_files,
         )
         result = _merge(workspace, text, sent)
         if record is not None:

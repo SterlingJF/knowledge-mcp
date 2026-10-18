@@ -51,6 +51,8 @@ properties:
         title: Invalid document move
       - const: https://github.com/SterlingJF/knowledge-mcp/problems/move-input-incomplete
         title: Incomplete move input
+      - const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-context-incomplete
+        title: Incomplete conventions context
       - const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-invalid
         title: Invalid conventions
       - const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-unsupported

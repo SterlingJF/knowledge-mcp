@@ -108,7 +108,14 @@ def _peers(
             continue
         if any(not f or peer.startswith(f + "/") for f in missing):
             return [], True
-        if frozenset(scopes.kinds_at(peer)) == subject_specs:
+        if frozenset(scopes.kinds_at(peer)) == subject_specs and (
+            scopes.conventions is None
+            or scopes.conventions.context is None
+            or all(
+                scopes.same_definition(path, peer, identity)
+                for identity in subject_specs
+            )
+        ):
             peers.append(peer)
     return peers, False
 
@@ -129,6 +136,7 @@ def assess(
         status="no_peers",
         proposal=None,
     )
+    scopes.validate_conventions(path)
     if universe is None or kind is None:
         return _untyped(result, path, files)
     if scopes.conventions is not None:
@@ -145,6 +153,14 @@ def assess(
         return result
     if not peers:
         return result
+    return _proposal(result, peers, paths, scopes)
+
+
+def _proposal(
+    result: dict[str, Any], peers: list[str], paths: set[str], scopes: Scopes
+) -> dict[str, Any]:
+    path = result["path"]
+    universe, kind = result["universe_spec"], result["document_type"]
     current = posixpath.dirname(path)
     counts = Counter(posixpath.dirname(p) for p in peers)
     maximum = max(counts.values())
@@ -160,7 +176,13 @@ def assess(
     evidence = [p for p in peers if posixpath.dirname(p) == folder]
     name, style = _name(path, evidence)
     destination = posixpath.join(folder, name)
-    if destination == path:
+    if (
+        scopes.conventions is not None
+        and scopes.conventions.context is not None
+        and not scopes.allows_transfer(path, destination, (universe, kind))
+    ):
+        result["status"] = "destination_type_conflict"
+    elif destination == path:
         result["status"] = "already_matches"
     elif destination in paths:
         result["status"] = "destination_occupied"

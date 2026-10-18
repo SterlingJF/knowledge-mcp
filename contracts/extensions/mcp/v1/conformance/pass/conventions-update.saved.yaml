@@ -1,6 +1,9 @@
 ---
 schema: knowledge-mcp/conventions-update/1
 location: ~/notes
+folder: ""
+current_from_parent: []
+proposed_from_parent: []
 file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
 status: ready
 based_on: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -33,8 +36,8 @@ record:
   \  content:\n    label: document title\n    instruction: Read the first document\
   \ heading.\n  set_by: person\n  allowed_by:\n    basis: instruction\n    text: Keep\
   \ the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date\n     \
-  \ as you work.\n    location: AGENTS.md\n  time: '2026-10-18T10:23:46.318839Z'\n"
-digest: sha256:86fdc69909e449ad65864fd3672e79845987d95ea0c388614781dfd4e1ed5f4f
+  \ as you work.\n    location: AGENTS.md\n  time: '2026-10-18T11:21:41.017768Z'\n"
+digest: sha256:3fa8fe31e14c6fe30d57e496917f12f60827ef2c42f996efec710b5140c8c52c
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
     digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

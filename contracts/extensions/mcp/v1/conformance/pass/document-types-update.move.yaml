@@ -1,7 +1,7 @@
 ---
 schema: knowledge-mcp/document-types-update/1
 location: ~/notes
-based_on: sha256:0de8c9dd982c2c7488b1819c70e591cab86b8c1c545238e0f335dd2448c74d65
+based_on: sha256:fe8bcb633a7c1acf69b600d75107dd68af8ea8f45053226900840a1266f0ba5f
 record:
   "# Your agent rewrites this file with text from knowledge-mcp when files change\
   \ or you correct an entry.\n# An entry with `set_by: person` overrides any later\
@@ -9,11 +9,11 @@ record:
   \    universe_spec: codebase-recordkeeping\n    version: '0.1'\n    document_type:\
   \ design-proposal\n    set_by: agent\n    allowed_by:\n      basis: instruction\n\
   \      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up\
-  \ to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T10:23:43.605Z'\n\
+  \ to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T11:21:37.881Z'\n\
   \  ideas.txt:\n    no_document_type: true\n    set_by: agent\n    allowed_by:\n\
   \      basis: instruction\n      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/\
-  \ up to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T10:23:43.605Z'\n"
-digest: sha256:fb0df5e2ad69477ca584926025059097733e1bf55ac4c1b98e9833a6250f19e4
+  \ up to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T11:21:37.881Z'\n"
+digest: sha256:7699766da01d55285923ca762bad62e6c3f6dd88842035892e47b4cf80857797
 changed:
   - path: docs/rfcs/0042-caching.md
     change: moved
@@ -29,7 +29,7 @@ changed:
           Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
           date as you work.
         location: AGENTS.md
-      time: "2026-10-18T10:23:43.605Z"
+      time: "2026-10-18T11:21:37.881Z"
 to_settle: []
 scopes:
   - universe_specs:
@@ -44,7 +44,7 @@ scopes:
     every_document_type: null
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
-    digest: sha256:0de8c9dd982c2c7488b1819c70e591cab86b8c1c545238e0f335dd2448c74d65
+    digest: sha256:fe8bcb633a7c1acf69b600d75107dd68af8ea8f45053226900840a1266f0ba5f
 filing:
   - path: docs/rfcs/0042-caching.md
     universe_spec: codebase-recordkeeping

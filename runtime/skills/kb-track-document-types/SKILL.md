@@ -8,9 +8,9 @@ description: Use at session start and after creating, moving or deleting a knowl
 1. **Read the document-types file.** Read `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` at the root folder with your own tools.
    If missing, read `.knowledge-bus/plugins/knowledge-mcp/record.yaml` for migration.
    Use an empty string when both files are missing.
-   Read the root conventions file alongside the document-types file.
-   Send its text as `conventions` on each preparation call, or empty text when absent.
-   Reuse `conventions_digest` only while the file remains unchanged.
+   Read conventions along every affected ancestor path at session start.
+   Send `conventions_files` as `kb-write-document` describes, including explicit absence markers.
+   Reuse each file digest while its text remains unchanged.
 2. **Start the session.** Call `kb_prepare_document_types` with:
    - `location`: the root folder, as text.
    - `record`: the text read in the previous step.
@@ -22,7 +22,9 @@ description: Use at session start and after creating, moving or deleting a knowl
 3. **Update after each file change.** Keep the complete listing current after creates, moves, renames, edits and deletions. After each change, call `kb_prepare_document_types` with the same `location` and `knowledge_bus_folders`. Include `changes` and the current `record` or `record_digest`.
    After saving `record`, send the returned `digest` as `record_digest` instead of `record` on the next call.
    Follow any `note` in `changed`.
-4. **Review names and folders.** Show missing naming values beside each affected typed file.
+4. **Review names and folders.** Resolve conventions separately for each document.
+   Keep peer evidence within the applicable universe specs. Report broken parent selections before proposing moves.
+   Show missing naming values beside each affected typed file.
    Follow `kb-write-document` to collect values for a file under review. Show `filing` proposals beside typed files. Keep proposals conditional while choosing a document type.
    Prepare accepted moves through the Names, folders and moves sequence in `kb-write-document` before changing files.
    Save the prepared document-types text with the move and link repairs. Valid moves retain every classification field.

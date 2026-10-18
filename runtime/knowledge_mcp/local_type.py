@@ -68,7 +68,10 @@ def _spec_files(
             "id": identity[0],
             "version": identity[1],
         }
-        if identity not in index:
+        if (
+            identity not in index
+            or index[identity].path.read_text(encoding="utf-8") != text
+        ):
             entry["text"] = text
         files.append(entry)
     return files
@@ -165,12 +168,28 @@ def arguments(
         if saved.is_file():
             sent["record"] = _record_text(saved, command)
             break
-    config = root / conventions.PLACE
-    sent["conventions"] = config.read_text(encoding="utf-8") if config.is_file() else ""
+    sent["conventions_files"] = _convention_files(root, specs)
     sent.update({"filing_values": filing_values} if filing_values is not None else {})
     if role:
         sent["role"] = role
     return sent
+
+
+def _convention_files(root: Path, specs: list[dict[str, Any]]) -> list[dict[str, str]]:
+    result = []
+    for scope in specs:
+        config = root / scope["folder"] / conventions.PLACE
+        text = config.read_text(encoding="utf-8") if config.is_file() else ""
+        if config.is_file() and not text.strip():
+            raise ToolFault(
+                problems.Error(
+                    f"Save valid conventions YAML in {config}.",
+                    code="conventions-invalid",
+                ).details(),
+                "Save a complete conventions file, then repeat kb type.",
+            )
+        result.append(dict(folder=scope["folder"], text=text))
+    return result
 
 
 def _record_text(saved: Path, command: str) -> str:

@@ -6,7 +6,9 @@ from ._internal import (
     AllowedBy,
     ConventionContent,
     ConventionName,
+    ConventionReference,
     ConventionSegment,
+    ConventionsFolder,
     Digest,
     Location,
     Part,
@@ -52,6 +54,9 @@ class ConventionsUpdateAnswer(BaseModel):
         Literal["knowledge-mcp/conventions-update/1"], Field(alias="schema")
     ]
     location: Location
+    folder: ConventionsFolder | None = None
+    current_from_parent: list[ConventionReference] | None = None
+    proposed_from_parent: list[ConventionReference] | None = None
     file: Literal[".knowledge-bus/plugins/knowledge-mcp/conventions.yaml"]
     status: Literal["ready", "permission_needed", "unchanged"]
     based_on: Digest

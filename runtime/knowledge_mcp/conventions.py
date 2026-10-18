@@ -8,12 +8,12 @@ from datetime import UTC, date, datetime
 from typing import Any, NoReturn
 
 import yaml
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from knowledge_mcp import document_types as records
 from knowledge_mcp import problems, schemas
 from knowledge_mcp.models import AllowedBy, KnowledgeBusFolder, ListedFile
-from knowledge_mcp.models_auto.common_schema import FilingValue
+from knowledge_mcp.models_auto.common_schema import ConventionFile, FilingValue
 from knowledge_mcp.models_auto.conventions_schema import NamingAndFilingConventions
 from knowledge_mcp.models_auto.conventions_update_schema import Change
 from knowledge_mcp.scope import Workspace
@@ -82,7 +82,7 @@ def validate_pattern(entry: dict[str, Any], pointer: str) -> None:
 
 
 def parse(text: str) -> list[dict[str, Any]]:
-    if not text.strip():
+    if text == "":
         return []
     try:
         data = yaml.safe_load(text)
@@ -95,12 +95,6 @@ def parse(text: str) -> list[dict[str, Any]]:
         saved = NamingAndFilingConventions.model_validate(data)
     except ValidationError as error:
         invalid(f"Correct {PLACE}: {error}")
-    if saved.from_parent:
-        invalid(
-            "Parent conventions are reserved for a later version. Send an empty from_parent list.",
-            "#/conventions/from_parent",
-            "conventions-unsupported",
-        )
     found = []
     seen = set()
     for i, entry in enumerate(saved.conventions):
@@ -140,19 +134,192 @@ def received_text(workspace: Workspace, text: str | None, digest: str | None) ->
     return text or ""
 
 
+def selections(text: str) -> list[dict[str, str]]:
+    parse(text)
+    return sorted(yaml.safe_load(text)["from_parent"], key=pair) if text else []
+
+
+def normal_folder(folder: str) -> str:
+    if folder == "":
+        return folder
+    if (
+        folder.startswith("/")
+        or any(p in ("", ".", "..") for p in folder.split("/"))
+        or "\\" in folder
+    ):
+        invalid(
+            "Use a normalized folder relative to the knowledge-base root.",
+            "#/folder",
+            "argument-invalid",
+        )
+    return records.normal_path(folder, pointer="#/folder")
+
+
+def within(parent: str, folder: str) -> bool:
+    return not parent or folder == parent or folder.startswith(parent + "/")
+
+
+@dataclass
+class Context:
+    workspace: Workspace
+    scopes: Scopes
+    files: list[ConventionFile]
+    texts: dict[str, str] = field(default_factory=dict)
+    received: dict[str, dict[str, str]] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        seen = set()
+        for item in self.files:
+            if {"text", "digest"} <= item.model_fields_set:
+                invalid(
+                    "Send exactly one of text or digest for each conventions file.",
+                    "#/conventions_files",
+                    "argument-invalid",
+                )
+            folder = normal_folder(item.folder)
+            if folder in seen:
+                invalid(
+                    "Send each conventions folder once.",
+                    "#/conventions_files",
+                    "argument-invalid",
+                )
+            seen.add(folder)
+
+    def load(self, folder: str) -> str:
+        if folder in self.texts:
+            return self.texts[folder]
+        item = next((f for f in self.files if f.folder == folder), None)
+        if item is None:
+            invalid(
+                f"Send conventions text or an absence marker for {posixpath.join(folder, PLACE)}.",
+                "#/conventions_files",
+                "conventions-context-incomplete",
+            )
+        text = received_text(self.workspace, item.text, item.digest)
+        if text and not text.strip():
+            invalid(f"Save valid conventions YAML in {posixpath.join(folder, PLACE)}.")
+        parse(text)
+        self.texts[folder] = text
+        self.received[folder] = dict(
+            name=posixpath.join(folder, PLACE), digest=self.workspace.remember(text)
+        )
+        return text
+
+    def chain(self, folder: str) -> list[str]:
+        required = {f.folder for f in self.scopes.folders if within(f.folder, folder)}
+        required.update(f.folder for f in self.files if within(f.folder, folder))
+        return sorted(required, key=lambda f: (f.count("/") + bool(f), f))
+
+    def source(
+        self, folder: str, requested: str, entry: dict[str, Any]
+    ) -> dict[str, Any]:
+        return dict(
+            file=PLACE,
+            folder=folder,
+            digest=self.workspace.remember(self.load(folder)),
+            definition=entry,
+            from_parent=folder != requested,
+        )
+
+    def declarations(self, folder: str) -> list[tuple[str, dict[str, Any]]]:
+        boundaries = [f for f in self.chain(folder) if self.load(f)]
+        effective: list[tuple[str, dict[str, Any]]] = []
+        for index, base in enumerate(boundaries):
+            text = self.load(base)
+            local = parse(text)
+            selected = selections(text)
+            seen = {pair(e) for e in local}
+            parent = boundaries[index - 1] if index else None
+            available = (
+                {pair(e): e for e in parse(self.load(parent))}
+                if parent is not None
+                else {}
+            )
+            effective = [(base, e) for e in local]
+            for i, reference in enumerate(selected):
+                key = pair(reference)
+                pointer = f"#/conventions_files/{next(j for j, f in enumerate(self.files) if f.folder == base)}/from_parent/{i}"
+                if key in seen:
+                    invalid(
+                        "Select each pair once and keep selected pairs separate from local declarations.",
+                        pointer,
+                    )
+                seen.add(key)
+                if parent is None or key not in available:
+                    invalid(
+                        f"Select a convention declared directly in the nearest parent conventions file for {base or '<root>'}.",
+                        pointer,
+                    )
+                target = self.scopes.kinds_at(posixpath.join(base, "document.md"))
+                if key[0] not in target or key[1] not in target[key[0]][1]:
+                    invalid(
+                        "Select a document type available in the selecting folder.",
+                        pointer,
+                    )
+                if not self.scopes.same_definition(
+                    posixpath.join(parent, "document.md"),
+                    posixpath.join(base, "document.md"),
+                    key[0],
+                ):
+                    invalid(
+                        "Select a convention using the same universe spec definition in both folders.",
+                        pointer,
+                    )
+                effective.append((parent, available[key]))
+        return effective
+
+    def inspect(self, folder: str) -> dict[str, Any]:
+        folder = normal_folder(folder)
+        entries = self.declarations(folder)
+        target = self.scopes.kinds_at(posixpath.join(folder, "document.md"))
+        active, inactive = [], []
+        for base, entry in sorted(entries, key=lambda e: (*pair(e[1]), e[0])):
+            u, k = pair(entry)
+            source = self.source(base, folder, entry)
+            item = dict(universe_spec=u, document_type=k, source=source)
+            reason = None
+            if u not in target or k not in target[u][1]:
+                reason = "document_type_unavailable"
+            elif not self.scopes.same_definition(
+                posixpath.join(base, "document.md"),
+                posixpath.join(folder, "document.md"),
+                u,
+            ):
+                reason = "definition_differs"
+            if reason:
+                inactive.append(dict(**item, reason=reason))
+            else:
+                active.append(dict(**item, base_folder=base))
+        return dict(conventions=active, inactive=inactive)
+
+
+@dataclass
+class Target:
+    folders: list[KnowledgeBusFolder]
+    folder: str = ""
+    files: list[ConventionFile] | None = None
+    from_parent: list[dict[str, str]] | None = None
+
+
 def prepare(
     workspace: Workspace,
     text: str,
     *,
     changes: list[Change],
     allowed_by: AllowedBy | None,
-    folders: list[KnowledgeBusFolder],
+    target: Target,
 ) -> dict[str, Any]:
+    folder = normal_folder(target.folder)
+    from_parent = target.from_parent
     current = parse(text)
+    current_selection = selections(text)
+    proposed_selection = (
+        sorted(from_parent, key=pair) if from_parent is not None else current_selection
+    )
     entries = {pair(e): e for e in current}
     effective = []
     seen = set()
-    scopes = Scopes(workspace, folders)
+    scopes = Scopes(workspace, target.folders)
     for i, operation in enumerate(changes):
         change = plain(operation)
         key = pair(change)
@@ -166,10 +333,10 @@ def prepare(
             del entries[key]
         else:
             validate_pattern(change, pointer)
-            kinds = scopes.kinds_at("document.md")
+            kinds = scopes.kinds_at(posixpath.join(folder, "document.md"))
             if key[0] not in kinds or key[1] not in kinds[key[0]][1]:
                 invalid(
-                    "Choose a document type declared in the supplied root definitions or bundled universe specs.",
+                    "Choose a document type available in the target folder.",
                     pointer + "/document_type",
                     "document-type-unknown",
                 )
@@ -183,27 +350,48 @@ def prepare(
                 continue
             entries[key] = {
                 **pattern,
-                "allowed_by": plain(allowed_by) if allowed_by else None,
+                "allowed_by": plain(allowed_by)
+                if allowed_by
+                else {
+                    "basis": "accepted_change",
+                    "text": "Review the proposed convention.",
+                },
                 "time": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
             }
         effective.append(change)
-    record = None
-    if effective and allowed_by is not None:
-        record = yaml.safe_dump(
-            {
-                "schema": SCHEMA,
-                "from_parent": [],
-                "conventions": [entries[k] for k in sorted(entries)],
-            },
-            sort_keys=False,
-            allow_unicode=True,
+    proposed = yaml.safe_dump(
+        dict(
+            schema=SCHEMA,
+            from_parent=proposed_selection,
+            conventions=[entries[k] for k in sorted(entries)],
+        ),
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    context_files = list(target.files or [])
+    if any(f.folder == folder for f in context_files):
+        invalid(
+            "Send ancestor context separately from the target conventions text.",
+            "#/conventions_files",
+            "argument-invalid",
         )
+    context_files.append(
+        TypeAdapter(ConventionFile).validate_python(dict(folder=folder, text=proposed))
+    )
+    context = Context(workspace, scopes, context_files)
+    context.inspect(folder)
+    changed = bool(effective) or proposed_selection != current_selection
+    record = proposed if changed and allowed_by is not None else None
+    if record is not None:
         workspace.remember(record)
     return dict(
         schema="knowledge-mcp/conventions-update/1",
         file=PLACE,
+        folder=folder,
+        current_from_parent=current_selection,
+        proposed_from_parent=proposed_selection,
         status="unchanged"
-        if not effective
+        if not changed
         else "permission_needed"
         if allowed_by is None
         else "ready",
@@ -215,7 +403,8 @@ def prepare(
         digest=records.digest(record) if record is not None else None,
         received=[
             *scopes.received.values(),
-            {"name": PLACE, "digest": records.digest(text)},
+            *[v for k, v in context.received.items() if k != folder],
+            dict(name=posixpath.join(folder, PLACE), digest=workspace.remember(text)),
         ],
     )
 
@@ -303,6 +492,7 @@ def render(
 class Filing:
     definitions: dict[tuple[str, str], dict[str, Any]]
     digest: str
+    context: Context | None = None
     values: dict[tuple[str, str, str], tuple[FilingValue, str]] = field(
         default_factory=dict
     )
@@ -314,9 +504,22 @@ class Filing:
         text: str | None,
         digest: str | None,
         values: list[FilingValue] | None,
+        context: Context | None = None,
     ) -> Filing:
+        if context is not None and (text is not None or digest is not None):
+            invalid(
+                "Send conventions_files separately from legacy conventions arguments.",
+                "#/conventions_files",
+                "argument-invalid",
+            )
         supplied = received_text(workspace, text, digest)
+        if context is None and selections(supplied):
+            invalid(
+                "Supply explicit ancestor conventions files to resolve parent selections.",
+                "#/conventions/from_parent",
+            )
         self = cls({pair(e): e for e in parse(supplied)}, workspace.remember(supplied))
+        self.context = context
         for i, value in enumerate(values or []):
             pointer = problems.pointer("filing_values", i)
             if value.properties is None:
@@ -341,7 +544,8 @@ class Filing:
                     pointer,
                     "filing-values-invalid",
                 )
-            definition = self.definitions.get(key[1:])
+            definitions, _ = self.at(path)
+            definition = definitions.get(key[1:])
             if definition is None:
                 invalid(
                     "Supply filing values for an applicable convention.",
@@ -352,14 +556,36 @@ class Filing:
             self.values[key] = value, pointer
         return self
 
+    def at(
+        self, path: str
+    ) -> tuple[
+        dict[tuple[str, str], dict[str, Any]], dict[tuple[str, str], dict[str, Any]]
+    ]:
+        if self.context is None:
+            return self.definitions, {}
+        answer = self.context.inspect(posixpath.dirname(path))
+        return (
+            {pair(e): e["source"]["definition"] for e in answer["conventions"]},
+            {pair(e): e["source"] for e in answer["conventions"]},
+        )
+
     def assess(
         self, result: dict[str, Any], listing: list[ListedFile] | None
     ) -> dict[str, Any] | None:
-        entry = self.definitions.get((result["universe_spec"], result["document_type"]))
+        definitions, sources = self.at(result["path"])
+        key = result["universe_spec"], result["document_type"]
+        entry = definitions.get(key)
         if entry is None:
             return None
-        result["convention"] = dict(
-            file=PLACE, folder="", digest=self.digest, definition=entry
+        result["convention"] = sources.get(
+            key,
+            dict(
+                file=PLACE,
+                folder="",
+                digest=self.digest,
+                definition=entry,
+                from_parent=bool(posixpath.dirname(result["path"])),
+            ),
         )
         value, pointer = self.values.get(
             (result["path"], *pair(entry)), (None, "#/filing_values")
@@ -371,13 +597,23 @@ class Filing:
         if listing is None:
             result["status"] = "listing_needed"
             return result
-        folder = "/".join(segments)
+        folder = posixpath.join(result["convention"]["folder"], *segments)
         name = (
             entry["name"]["separator"].join(parts)
             + posixpath.splitext(result["path"])[1]
         )
         _segment(name, pointer, "filing-values-invalid")
         destination = posixpath.join(folder, name)
+        if self.context is not None:
+            scopes = self.context.scopes
+            kinds = scopes.kinds_at(destination)
+            if (
+                key[0] not in kinds
+                or key[1] not in kinds[key[0]][1]
+                or not scopes.same_definition(result["path"], destination, key[0])
+            ):
+                result["status"] = "destination_type_conflict"
+                return result
         paths = {records.normal_path(p.path) for p in listing}
         # Case behavior is unknown for supplied inventories, so block equivalent paths.
         identities = {unicodedata.normalize("NFC", p).casefold() for p in paths}

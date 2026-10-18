@@ -1,6 +1,9 @@
 ---
 schema: knowledge-mcp/conventions-update/1
 location: ~/notes
+folder: ""
+current_from_parent: []
+proposed_from_parent: []
 file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
 status: permission_needed
 based_on: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

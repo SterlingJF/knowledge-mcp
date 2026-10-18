@@ -1,0 +1,32 @@
+---
+schema: knowledge-mcp/conventions-update/1
+location: ~/notes
+folder: Finance
+current_from_parent: []
+proposed_from_parent:
+  - universe_spec: company-records
+    document_type: contract
+file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+status: ready
+based_on: sha256:3d65b8202b7f6cdd25df71ed68256df5a50ec23a100bac398e9b7498942f4169
+current: []
+changes: []
+allowed_by:
+  basis: instruction
+  text:
+    Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+    as you work.
+  location: AGENTS.md
+record:
+  "schema: knowledge-mcp/conventions/1\nfrom_parent:\n- universe_spec: company-records\n\
+  \  document_type: contract\nconventions: []\n"
+digest: sha256:6ebb1c20aa9ec2cba499b7bddcc1d9943de0835c8b1966bbe36c6ca0d900e58c
+received:
+  - name: team.kbp.yaml
+    digest: sha256:9e702fbdc5ff38bd6234bcab28aba0834b1fe91da4791e91d76096e4bd50c2c1
+  - name: team.kbp.yaml
+    digest: sha256:7047bcaf37c75feb69ecabf8573db01f5e5e818d887f93df08f5c0dbe6111f0e
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:1ddeb76484f8e9230f839647ba3eb82fc85a3e774c29c9eb6f245156d84d25ef
+  - name: Finance/.knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:3d65b8202b7f6cdd25df71ed68256df5a50ec23a100bac398e9b7498942f4169

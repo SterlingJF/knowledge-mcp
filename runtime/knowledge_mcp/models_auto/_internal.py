@@ -300,6 +300,38 @@ class NeededValue(BaseModel):
     name: Annotated[str, Field(min_length=1)]
 
 
+type ConventionsFolder = Annotated[
+    str,
+    Field(
+        pattern="^(?:[^/\\\\\\u0000]+(?:/[^/\\\\\\u0000]+)*)?$",
+        title="Conventions folder",
+    ),
+]
+
+
+class ConventionFile1(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    folder: ConventionsFolder
+    text: str
+    digest: Digest | None = None
+
+
+class ConventionFile2(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    folder: ConventionsFolder
+    text: str | None = None
+    digest: Digest
+
+
+type ConventionFile = Annotated[
+    ConventionFile1 | ConventionFile2, Field(title="Convention file")
+]
+
+
 type FileChange = Annotated[
     FileCreated | FileDeleted | FileMoved | FileEdited, Field(title="File change")
 ]
@@ -310,9 +342,30 @@ class ConventionSource(BaseModel):
         extra="forbid",
     )
     file: Literal[".knowledge-bus/plugins/knowledge-mcp/conventions.yaml"]
-    folder: Literal[""]
+    folder: ConventionsFolder
+    from_parent: bool
     digest: Digest
     definition: SavedConvention
+
+
+class FolderConvention(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    universe_spec: str
+    document_type: str
+    source: ConventionSource
+    base_folder: ConventionsFolder
+
+
+class InactiveConvention(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    universe_spec: str
+    document_type: str
+    source: ConventionSource
+    reason: Literal["document_type_unavailable", "definition_differs"]
 
 
 class FilingAssessment1(BaseModel):
@@ -343,12 +396,14 @@ class FilingAssessment2(BaseModel):
         "document_type_needed",
         "listing_needed",
         "evidence_incomplete",
+        "destination_type_conflict",
         "destination_occupied",
         "values_needed",
         "already_matches",
         "no_peers",
         "listing_needed",
         "evidence_incomplete",
+        "destination_type_conflict",
         "destination_occupied",
     ]
     proposal: FilingProposal | None
@@ -371,6 +426,7 @@ class FilingAssessment3(BaseModel):
         "document_type_needed",
         "listing_needed",
         "evidence_incomplete",
+        "destination_type_conflict",
         "destination_occupied",
         "values_needed",
         "no_document_type",
@@ -503,7 +559,7 @@ type Folder = list[ConventionSegment | Part]
 
 class NamingAndFilingConventions(BaseModel):
     """
-    Saved conventions for document types at the knowledge-base root.
+    Saved conventions for document types in the declaring folder.
     """
 
     model_config = ConfigDict(

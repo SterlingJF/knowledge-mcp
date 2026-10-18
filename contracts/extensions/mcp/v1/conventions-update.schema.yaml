@@ -29,6 +29,16 @@ $defs:
         const: knowledge-mcp/conventions-update/1
       location:
         $ref: common.schema.yaml#/$defs/location
+      folder:
+        $ref: common.schema.yaml#/$defs/conventions_folder
+      current_from_parent:
+        type: array
+        items:
+          $ref: conventions.schema.yaml#/$defs/reference
+      proposed_from_parent:
+        type: array
+        items:
+          $ref: conventions.schema.yaml#/$defs/reference
       file:
         const: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
       status:

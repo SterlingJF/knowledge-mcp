@@ -14,7 +14,7 @@ from knowledge_mcp.models import (
     KnowledgeBusFolder,
     ListedFile,
 )
-from knowledge_mcp.models_auto.common_schema import Digest, FilingValue
+from knowledge_mcp.models_auto.common_schema import ConventionFile, Digest, FilingValue
 from knowledge_mcp.models_auto.document_type_schema import DocumentTypeAnswer
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
@@ -105,6 +105,7 @@ def get_document_type(
     conventions: str | None = None,
     conventions_digest: str | None = None,
     filing_values: list[FilingValue] | None = None,
+    conventions_files: list[ConventionFile] | None = None,
 ) -> dict[str, Any]:
     received: list[dict[str, Any]] = []
     files = _saved_files(workspace, record, record_digest, changes, received)
@@ -158,9 +159,17 @@ def get_document_type(
             ),
         )
     convention = naming.Filing.read(
-        workspace, conventions, conventions_digest, filing_values
+        workspace,
+        conventions,
+        conventions_digest,
+        filing_values,
+        naming.Context(workspace, scopes, conventions_files)
+        if conventions_files is not None
+        else None,
     )
     scopes.conventions = convention
+    if convention.context is not None:
+        convention.context.inspect("/".join(folders))
     if conventions is not None:
         received.append({"name": naming.PLACE, "digest": convention.digest})
     current = filing.inventory(workspace, location, inventory_listing, changes)
@@ -175,6 +184,8 @@ def get_document_type(
         for u, k in filing.choices(result)
     ]
     result["received"] = list(scopes.received.values()) + received
+    if convention.context is not None:
+        result["received"].extend(convention.context.received.values())
     return result
 
 
@@ -198,6 +209,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
         conventions: ConventionsText = None,
         conventions_digest: ConventionsDigest = None,
         filing_values: list[FilingValue] | None = None,
+        conventions_files: list[ConventionFile] | None = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
@@ -212,6 +224,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             conventions=conventions,
             conventions_digest=conventions_digest,
             filing_values=filing_values,
+            conventions_files=conventions_files,
         )
         result = get_document_type(
             workspace,
@@ -227,6 +240,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             conventions=conventions,
             conventions_digest=conventions_digest,
             filing_values=filing_values,
+            conventions_files=conventions_files,
         )
         return respond.answer(
             "kb_get_document_type", location, arguments, DocumentTypeAnswer, result

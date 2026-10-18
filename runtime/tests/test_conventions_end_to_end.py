@@ -170,13 +170,17 @@ def test_a14_concurrent_retry_preserves_unrelated_change():
 
 
 def test_a15_parent_selection():
-    data = yaml.safe_load(stored())
-    data["from_parent"] = [
-        {"universe_spec": PRODUCT, "document_type": "decision-record"}
-    ]
-    assert invoke(conventions=yaml.safe_dump(data))["type"].endswith(
-        "/conventions-unsupported"
+    a = invoke(
+        folder="Finance",
+        conventions="",
+        conventions_files=[dict(folder="", text=stored())],
+        from_parent=[dict(universe_spec=PRODUCT, document_type="decision-record")],
+        allowed_by=PERMISSION,
     )
+    assert a["status"] == "ready"
+    assert yaml.safe_load(a["record"])["from_parent"] == [
+        dict(universe_spec=PRODUCT, document_type="decision-record")
+    ]
 
 
 def test_stdio_preparation(tmp_path):

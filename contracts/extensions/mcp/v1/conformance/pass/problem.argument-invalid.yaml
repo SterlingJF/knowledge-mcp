@@ -4,7 +4,7 @@ title: Invalid arguments
 detail:
   kb_get_document_type takes no argument named digest. Its arguments are location,
   name, folders, knowledge_bus_folders, role, record, record_digest, changes, listing,
-  conventions, conventions_digest and filing_values.
+  conventions, conventions_digest, filing_values and conventions_files.
 errors:
   - detail: kb_get_document_type takes no argument named digest.
     pointer: "#/digest"

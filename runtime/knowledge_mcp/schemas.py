@@ -13,6 +13,7 @@ from jsonschema.exceptions import best_match
 # kbp_* tools return kbp's output with no output schema.
 RESULTS = {
     "kb_list_convention_templates": "convention-templates",
+    "kb_list_conventions": "folder-conventions",
     "kb_prepare_conventions": "conventions-update",
     "kb_prepare_document_move": "document-move",
     "kb_get_document_type": "document-type",

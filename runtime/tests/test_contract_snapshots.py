@@ -15,6 +15,10 @@ from knowledge_mcp.main import build_server
 from knowledge_mcp.scope import Workspace
 from tests.harness import BUNDLED, CODEBASE, MODULE, PRODUCT, header
 from tests.test_import_end_to_end import THREAD
+from tests.test_team_conventions_end_to_end import CONTRACT
+from tests.test_team_conventions_end_to_end import config as team_config
+from tests.test_team_conventions_end_to_end import files as team_files
+from tests.test_team_conventions_end_to_end import folders as team_folders
 from tests.test_template_workflow_end_to_end import folders, proposal
 
 CONTRACTS = MODULE.parent / "contracts" / "extensions" / "mcp" / "v1"
@@ -385,9 +389,51 @@ def story(client: Client) -> Any:
             answers["conventions.template-" + name] = yaml.safe_load(
                 result.structured_content["record"]
             )
+        await team_stories(ask)
         return answers
 
     return steps()
+
+
+async def team_stories(ask):
+    for name, folder, inputs in [
+        ("company", "", team_files()),
+        ("finance", "Finance", team_files()),
+        ("engineering", "Engineering", team_files()),
+        ("descendant", "Finance/Planning", team_files()),
+        ("empty", "Finance", team_files(team_config())),
+        (
+            "inactive",
+            "Engineering",
+            [
+                dict(folder="", text=team_files()[0]["text"]),
+                dict(folder="Engineering", text=""),
+            ],
+        ),
+    ]:
+        await ask(
+            "folder-conventions." + name,
+            "kb_list_conventions",
+            dict(
+                location=NOTES,
+                folder=folder,
+                knowledge_bus_folders=team_folders(),
+                conventions_files=inputs,
+            ),
+        )
+    await ask(
+        "conventions-update.parent-selection",
+        "kb_prepare_conventions",
+        dict(
+            location=NOTES,
+            folder="Finance",
+            conventions=team_config(),
+            conventions_files=[team_files()[0]],
+            knowledge_bus_folders=team_folders(),
+            from_parent=[dict(universe_spec=CONTRACT[0], document_type=CONTRACT[1])],
+            allowed_by=INSTRUCTION,
+        ),
+    )
 
 
 def masked(sample: str, answer: Any) -> Any:

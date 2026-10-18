@@ -58,3 +58,13 @@ Give a problem type a new URI when its meaning changes.
 | Item           | Location                                                                                |
 | -------------- | --------------------------------------------------------------------------------------- |
 | Contract tests | `runtime/tests/test_contract_snapshots.py`, `runtime/tests/test_contract_end_to_end.py` |
+
+## Team conventions
+
+`folder-conventions.schema.yaml` describes `kb_list_conventions` answers.
+Supply conventions files beside relevant `.knowledge-bus/` folders, including explicit absence markers.
+A team file creates a boundary. Each team selects declarations directly from the nearest parent conventions file.
+Source metadata names the declaring folder, file suffix, digest, complete convention and parent mark.
+Filing folders remain relative to the declaring folder.
+The answer reports inactive declarations for unavailable document types and different universe spec definitions.
+Legacy conventions arguments describe root configuration. Explicit file inputs reject simultaneous legacy arguments.

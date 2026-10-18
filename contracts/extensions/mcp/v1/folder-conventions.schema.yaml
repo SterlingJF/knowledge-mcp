@@ -1,0 +1,32 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: folder-conventions.schema.yaml
+title: kb_list_conventions result
+description: The conventions in effect for a folder, each with the folder that declares it and a mark on conventions taken from a parent folder.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Folder conventions answer
+    type: object
+    additionalProperties: false
+    required: [schema, location, folder, conventions, inactive, received]
+    properties:
+      schema:
+        const: knowledge-mcp/folder-conventions/1
+      location:
+        $ref: common.schema.yaml#/$defs/location
+      folder:
+        $ref: common.schema.yaml#/$defs/conventions_folder
+      conventions:
+        type: array
+        items:
+          $ref: common.schema.yaml#/$defs/folder_convention
+      inactive:
+        type: array
+        items:
+          $ref: common.schema.yaml#/$defs/inactive_convention
+      received:
+        $ref: common.schema.yaml#/$defs/received

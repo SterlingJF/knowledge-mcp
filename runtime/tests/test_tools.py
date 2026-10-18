@@ -8,6 +8,7 @@ import yaml
 from tests.harness import server_parameters, session
 
 TOOLS = {
+    "kb_list_conventions",
     "kb_list_convention_templates",
     "kb_prepare_import",
     "kb_get_document_type",

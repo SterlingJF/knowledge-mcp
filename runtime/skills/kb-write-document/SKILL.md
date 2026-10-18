@@ -6,19 +6,22 @@ description: Use before writing or editing a knowledge-base document, locally or
 # Write a Document
 
 1. Read knowledge-base files with your own tools.
-   Read `.knowledge-bus/plugins/knowledge-mcp/conventions.yaml` at the root. Use empty text when the file is absent.
+   Establish the root and the requested folder. Discover `.knowledge-bus/` folders along every relevant ancestor path.
+   Read `.knowledge-bus/plugins/knowledge-mcp/conventions.yaml` under each supplied configuration folder.
+   Record explicit absence for missing files. An existing empty file is invalid.
 
 2. **Get the document type.** Call `kb_get_document_type` with:
    - `location`: the file's path or URL, as text.
    - `name`: the filename, including its extension.
    - `folders`: the folder names on the path from the root folder to the file.
-   - `knowledge_bus_folders`: every folder containing `.knowledge-bus/`, including folders holding peer documents. Set `folder` to its root-relative path. In `files`, list each `*.kbp.yaml` file directly inside the `.knowledge-bus/` directory by `name`. Include the `id` and `version` from the `universe:` or `guidance:` block. Include `text` when those values match no file bundled with knowledge-mcp. When `.knowledge-bus/workspace.yaml` exists, send its text as `workspace_yaml` on every call.
+   - `knowledge_bus_folders`: every folder containing `.knowledge-bus/`, including folders holding peer documents. Set `folder` to its root-relative path. In `files`, list each `*.kbp.yaml` file directly inside the `.knowledge-bus/` directory by `name`. Include the `id` and `version` from the `universe:` or `guidance:` block. Send complete local `*.kbp.yaml` text on first use, including files with bundled ids and versions. When `.knowledge-bus/workspace.yaml` exists, send its text as `workspace_yaml` on every call.
    - `role`: the reader's role, such as maintainer or product lead, when you can tell.
    - `listing`: every current document and attachment path relative to the root.
    - `record`: the current document-types file text. Follow `kb-track-document-types` for reading and migration.
-   - `conventions`: the current root conventions text, or empty text when absent. Reuse `conventions_digest` only while the file remains unchanged.
+   - `conventions_files`: each relevant configuration folder and its complete conventions `text`; send empty text for an absent file.
+     Use `folder: ""` for the root. Reuse `digest` from `received` while the file remains unchanged.
 
-   Send custom `*.kbp.yaml` text and the document-types file text once per session. On later calls, reuse the digest from `received` while the text is unchanged. Send a `*.kbp.yaml` digest as `digest` and the document-types digest as `record_digest`.
+   Send the document-types file text once per session. On later calls, reuse the digest from `received` while the text is unchanged. Send a `*.kbp.yaml` digest as `digest` and the document-types digest as `record_digest`.
 
 3. **Use the saved entry.** Read `recorded.entry` when the answer includes `recorded`. Use any saved `document_type`, `no_document_type` and `audience` values. Tell the person the entry comes from the document-types file.
 4. **Choose a candidate.** Otherwise choose from `candidates`:
@@ -42,9 +45,19 @@ description: Use before writing or editing a knowledge-base document, locally or
 For card and reader calls, include only configuration folders from the root down to the subject folder.
 Keep the complete peer-folder inventory for document-type lookup, tracking and move preparation.
 
+## Folder conventions
+
+Call `kb_list_conventions` when the person asks which conventions apply in a folder.
+Send the root, requested `folder`, current `knowledge_bus_folders` and explicit `conventions_files`.
+Show each convention, its declaring folder, parent mark and inactive reason.
+Resolve broken parent selections before proposing moves.
+A selected convention keeps its declaring folder as the filing base.
+For example, a company convention using `Contracts` still files under the company folder when Finance selects the convention.
+Save a reviewed local convention to file under `Finance/Contracts`.
+
 ## Templates
 
-1. Read the root conventions file and current universe specs.
+1. Read conventions and current universe specs for the selected folder.
    List every document type through `kbp_kinds`.
    Identify note document types and explicitly list excluded codebase records.
    Keep universe spec changes with the knowledge-bus skills.
@@ -86,7 +99,7 @@ Keep the complete peer-folder inventory for document-type lookup, tracking and m
    Combine accepted patterns from different templates in the same conventions file.
    Use `set_by: agent` for template suggestions and `set_by: person` for conventions the person states.
    Keep attribution separate from permission.
-9. Save accepted changes through Conventions below, with complete root definitions.
+9. Save accepted changes through Conventions below, with complete definitions for the selected folder.
    Skip the configuration write when every proposal is dropped.
    Saving conventions leaves note paths, note bytes and classifications unchanged.
    Apply each accepted move through Names, folders and moves, including both preparation calls and every link repair.
@@ -98,11 +111,18 @@ Keep the complete peer-folder inventory for document-type lookup, tracking and m
    When converting a peer proposal, show any difference from the original proposal.
 2. Get permission for each addition, replacement or removal.
    Call `kb_prepare_conventions` with `location` set to the root, current `conventions` text, proposed `changes` and `allowed_by`.
-   Include current root definitions in `knowledge_bus_folders`, with custom universe spec text or an unchanged session digest.
-3. Reread the file and compare its digest with `based_on` before writing.
+   Set `folder` to the selected folder and supply ancestor `conventions_files`, excluding the target file.
+   Include current applicable definitions in `knowledge_bus_folders`, with complete local universe spec text or an unchanged session digest.
+   Send `from_parent` to replace the complete parent selection; omission preserves the current selection.
+   Preview every resulting convention before creating a team boundary or changing parent selections.
+   Keep template proposals local to the selected folder. Choose parent selections explicitly.
+3. Reread target text, parent conventions and universe spec configuration before writing.
+   Compare the target digest with `based_on`.
    After a concurrent change, prepare again from fresh text and preserve unrelated conventions.
 4. Save the returned `record` and record the edit through `kb_record_edit`.
-   Keep an empty conventions file after removing the last convention.
+   Keep valid conventions YAML with `conventions: []` after removing the last local convention.
+   Preserve accepted `from_parent` selections and the saved boundary.
+   Reread saved text and repeat preparation after saving.
    Existing files keep their names and folders until the person accepts a proposal.
 
 ## Names, folders and moves
@@ -130,6 +150,7 @@ A content edit authorizes a move only when the permission also covers the move.
    Case-dependent links and hand-written alias links also require established targets. Keep existing broken links unresolved.
 5. Show any newly discovered referring documents and extend permission to cover those documents before applying writes.
 6. Recheck the conventions digest before applying the proposal.
+   Recheck target conventions, parent conventions and applicable universe spec configuration.
    After a changed convention, obtain a fresh proposal and renewed acceptance when the destination changes.
    Recheck the document-types and supplied document digests in `based_on`.
    Compare a fresh inventory with the supplied listing, including fingerprints.

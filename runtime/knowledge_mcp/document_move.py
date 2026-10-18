@@ -531,8 +531,18 @@ class Plan:
             self.issue(
                 "destination-occupied", None, None, "Choose an unoccupied destination."
             )
-        if self.sent.old_path in files and not records.valid_at(
-            files[self.sent.old_path], scopes.kinds_at(self.sent.path)
+        entry = files.get(self.sent.old_path)
+        universe, _, _ = (
+            records.named(entry) if entry is not None else (None, None, False)
+        )
+        if entry is not None and (
+            not records.valid_at(entry, scopes.kinds_at(self.sent.path))
+            or (
+                universe is not None
+                and not scopes.same_definition(
+                    self.sent.old_path, self.sent.path, universe
+                )
+            )
         ):
             self.issue(
                 "destination-type-conflict",

@@ -4,6 +4,9 @@
 
 ### Added
 
+- A team folder keeps its own conventions and takes from the parent folder only the conventions it lists in `from_parent`.
+- The agent can list the conventions in effect for a folder, with the folder each convention comes from.
+- Filing proposals and moves block when the destination's universe specs lack the document type or define it differently.
 - `kb_list_convention_templates` lists the ACE, PARA and Johnny.Decimal templates with their published sources, offline.
 - The skills take the person through each convention a template proposes before the agent saves it.
 - `kb_prepare_conventions` prepares the conventions file: a folder and a name pattern per document type.

@@ -17,6 +17,7 @@ The server serves MCP over stdio and opens no network port. Harnesses with a kno
 | `kb_get_document_type`         | Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing.                                             | [document-type.schema.yaml](../contracts/extensions/mcp/v1/document-type.schema.yaml)                 |
 | `kb_list_audiences`            | List the readers you can choose for a document type.                                                                                                          | [audiences.schema.yaml](../contracts/extensions/mcp/v1/audiences.schema.yaml)                         |
 | `kb_list_convention_templates` | List bundled ACE, PARA and Johnny.Decimal definitions for notes, with folder purposes, naming suggestions and sources.                                        | [convention-templates.schema.yaml](../contracts/extensions/mcp/v1/convention-templates.schema.yaml)   |
+| `kb_list_conventions`          | List naming and filing conventions that apply in a folder, with their source folders and parent marks.                                                        | [folder-conventions.schema.yaml](../contracts/extensions/mcp/v1/folder-conventions.schema.yaml)       |
 | `kb_list_edits`                | List the edits recorded for `location`, oldest first, to check or undo an edit.                                                                               | [edits.schema.yaml](../contracts/extensions/mcp/v1/edits.schema.yaml)                                 |
 | `kb_prepare_conventions`       | Prepare conventions text from supplied configuration and proposed changes.                                                                                    | [conventions-update.schema.yaml](../contracts/extensions/mcp/v1/conventions-update.schema.yaml)       |
 | `kb_prepare_document_move`     | Prepare a document move from supplied text, a complete listing and permission.                                                                                | [document-move.schema.yaml](../contracts/extensions/mcp/v1/document-move.schema.yaml)                 |
@@ -62,9 +63,10 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 | `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
 | `changes`               | list of [FileChange](#filechange) or null         | no       | Files changed since the document-types file was last saved. Send them with `record` or `record_digest`. knowledge-mcp applies the changes to the entries for this answer only.                                                                                                                                      |
 | `listing`               | list of [ListedFile](#listedfile) or null         | no       |                                                                                                                                                                                                                                                                                                                     |
-| `conventions`           | string or null                                    | no       | Current root conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                        |
+| `conventions`           | string or null                                    | no       | Current target conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                      |
 | `conventions_digest`    | string or null                                    | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                                                                                                                                                                                                                                |
 | `filing_values`         | list of [FilingValue](#filingvalue) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
+| `conventions_files`     | list of [ConventionFile](#conventionfile) or null | no       |                                                                                                                                                                                                                                                                                                                     |
 
 ### `kb_list_audiences`
 
@@ -82,6 +84,15 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 | ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------- |
 | `location` | string | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
 
+### `kb_list_conventions`
+
+| Argument                | Type                                              | Required | Meaning                                                                                                         |
+| ----------------------- | ------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
+| `folder`                | string                                            | yes      |                                                                                                                 |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      |                                                                                                                 |
+| `conventions_files`     | list of [ConventionFile](#conventionfile)         | yes      |                                                                                                                 |
+
 ### `kb_list_edits`
 
 | Argument   | Type   | Required | Meaning                                                                                                         |
@@ -90,14 +101,17 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 
 ### `kb_prepare_conventions`
 
-| Argument                | Type                                              | Required | Meaning                                                                                                         |
-| ----------------------- | ------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
-| `conventions`           | string or null                                    | no       | Current root conventions file text. Send empty text when the file is absent.                                    |
-| `conventions_digest`    | string or null                                    | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                            |
-| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | no       |                                                                                                                 |
-| `changes`               | list of [Change](#change)                         | no       |                                                                                                                 |
-| `allowed_by`            | [AllowedBy](#allowedby) or null                   | no       |                                                                                                                 |
+| Argument                | Type                                                        | Required | Meaning                                                                                                         |
+| ----------------------- | ----------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                                      | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
+| `conventions`           | string or null                                              | no       | Current target conventions file text. Send empty text when the file is absent.                                  |
+| `conventions_digest`    | string or null                                              | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                            |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder)           | no       |                                                                                                                 |
+| `changes`               | list of [Change](#change)                                   | no       |                                                                                                                 |
+| `allowed_by`            | [AllowedBy](#allowedby) or null                             | no       |                                                                                                                 |
+| `folder`                | string                                                      | no       |                                                                                                                 |
+| `conventions_files`     | list of [ConventionFile](#conventionfile) or null           | no       |                                                                                                                 |
+| `from_parent`           | list of [ConventionReference](#conventionreference) or null | no       |                                                                                                                 |
 
 ### `kb_prepare_document_move`
 
@@ -130,9 +144,10 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 | `entries`               | list of [EntryItem](#entryitem) or null           | no       | Send your document type choices and any document types or readers specified by the person.                                                                                                                                                                                                                          |
 | `recheck`               | boolean or null                                   | no       | True to put every file with an entry back in `to_settle`, except files with a `set_by: person` entry.                                                                                                                                                                                                               |
 | `allowed_by`            | [AllowedBy](#allowedby) or null                   | no       |                                                                                                                                                                                                                                                                                                                     |
-| `conventions`           | string or null                                    | no       | Current root conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                        |
+| `conventions`           | string or null                                    | no       | Current target conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                      |
 | `conventions_digest`    | string or null                                    | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                                                                                                                                                                                                                                |
 | `filing_values`         | list of [FilingValue](#filingvalue) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
+| `conventions_files`     | list of [ConventionFile](#conventionfile) or null | no       |                                                                                                                                                                                                                                                                                                                     |
 
 ### `kb_prepare_import`
 
@@ -270,6 +285,26 @@ Type: [UpsertConvention](#upsertconvention) or [RemoveConvention](#removeconvent
 | ------ | --------------- | -------- | ------- |
 | `part` | `document_type` | yes      |         |
 
+### ConventionFile
+
+Type: [ConventionFile1](#conventionfile1) or [ConventionFile2](#conventionfile2).
+
+### ConventionFile1
+
+| Field    | Type                                    | Required | Meaning |
+| -------- | --------------------------------------- | -------- | ------- |
+| `folder` | [ConventionsFolder](#conventionsfolder) | yes      |         |
+| `text`   | string                                  | yes      |         |
+| `digest` | [Digest](#digest) or null               | no       |         |
+
+### ConventionFile2
+
+| Field    | Type                                    | Required | Meaning |
+| -------- | --------------------------------------- | -------- | ------- |
+| `folder` | [ConventionsFolder](#conventionsfolder) | yes      |         |
+| `text`   | string or null                          | no       |         |
+| `digest` | [Digest](#digest)                       | yes      |         |
+
 ### ConventionLiteralPart
 
 | Field   | Type                                    | Required | Meaning |
@@ -292,9 +327,20 @@ Type: [UpsertConvention](#upsertconvention) or [RemoveConvention](#removeconvent
 | `part`     | `property` | yes      |         |
 | `property` | string     | yes      |         |
 
+### ConventionReference
+
+| Field           | Type   | Required | Meaning |
+| --------------- | ------ | -------- | ------- |
+| `universe_spec` | string | yes      |         |
+| `document_type` | string | yes      |         |
+
 ### ConventionSegment
 
 Type: string, pattern `^[^#|^:/\\\[\]\u0000-\u001f\u007f-\u009f]+$`.
+
+### ConventionsFolder
+
+Type: string, pattern `^(?:[^/\\\u0000]+(?:/[^/\\\u0000]+)*)?$`.
 
 ### Digest
 

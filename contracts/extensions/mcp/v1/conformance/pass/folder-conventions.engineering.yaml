@@ -1,0 +1,41 @@
+---
+schema: knowledge-mcp/folder-conventions/1
+location: ~/notes
+folder: Engineering
+conventions:
+  - universe_spec: engineering
+    document_type: meeting-note
+    source:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: Engineering
+      from_parent: false
+      digest: sha256:18d2987c512a74b210a4bee515b4ede4c80faf84ff7da2ad674d3cce14610d63
+      definition:
+        universe_spec: engineering
+        document_type: meeting-note
+        folder:
+          - Reviews
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first heading.
+        set_by: person
+        allowed_by:
+          basis: accepted_change
+          text: Save the convention.
+        time: "2026-10-18T00:00:00Z"
+    base_folder: Engineering
+inactive: []
+received:
+  - name: team.kbp.yaml
+    digest: sha256:9e702fbdc5ff38bd6234bcab28aba0834b1fe91da4791e91d76096e4bd50c2c1
+  - name: team.kbp.yaml
+    digest: sha256:13b110ae68bb0f311e52d6591e33a1001484d856a770fa8d1aa85ab0f5d967fb
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:1ddeb76484f8e9230f839647ba3eb82fc85a3e774c29c9eb6f245156d84d25ef
+  - name: Engineering/.knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:18d2987c512a74b210a4bee515b4ede4c80faf84ff7da2ad674d3cce14610d63

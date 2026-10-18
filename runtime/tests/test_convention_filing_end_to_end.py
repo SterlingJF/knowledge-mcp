@@ -456,5 +456,5 @@ def test_convention_save_skill_supplies_custom_root_definitions():
     )[0]
     assert "`location`" in section
     assert "`knowledge_bus_folders`" in section
-    assert "custom" in section
+    assert "complete local universe spec text" in section
     assert "digest" in section

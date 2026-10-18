@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from knowledge_mcp import bundled, kbp, problems
 from knowledge_mcp import document_types as records
-from knowledge_mcp import kbp, problems
 from knowledge_mcp.models import KnowledgeBusFolder, ScopeRequest
 from knowledge_mcp.scope import SENT, Rebuilt, ScopeError, Workspace
 
@@ -113,6 +113,54 @@ class Scopes:
         )
         self.found[key] = scope
         return scope
+
+    def definition(self, path: str, identity: str) -> tuple[str, ...]:
+        self.at(path)
+        chain = sorted(
+            (
+                f
+                for f in self.folders
+                if not f.folder or path.startswith(f.folder + "/")
+            ),
+            key=lambda f: len(f.folder),
+        )
+        for folder in reversed(chain):
+            specs = [s for s in folder.files if s.id == identity]
+            if specs:
+                texts = []
+                for spec in specs:
+                    text = (
+                        spec.text
+                        if spec.text is not None
+                        else self.workspace.recall(spec.digest)
+                        if spec.digest
+                        else None
+                    )
+                    if text is None:
+                        copy = bundled.index().get((spec.id, spec.version))
+                        text = copy.path.read_text(encoding="utf-8") if copy else ""
+                    texts.append(records.digest(text))
+                return tuple(sorted(texts))
+        copies = [c for c in bundled.copies() if c.id == identity]
+        return tuple(
+            sorted(records.digest(c.path.read_text(encoding="utf-8")) for c in copies)
+        )
+
+    def same_definition(self, first: str, second: str, identity: str) -> bool:
+        return self.definition(first, identity) == self.definition(second, identity)
+
+    def validate_conventions(self, path: str) -> None:
+        if self.conventions is not None and self.conventions.context is not None:
+            self.conventions.at(path)
+
+    def allows_transfer(self, first: str, second: str, key: tuple[str, str]) -> bool:
+        kinds = self.kinds_at(second)
+        universe, kind = key
+        return (
+            universe in kinds
+            and kind in kinds[universe][1]
+            and self.same_definition(first, second, universe)
+        )
 
     def kinds_at(self, path: str) -> records.Kinds:
         return self.at(path).kinds
