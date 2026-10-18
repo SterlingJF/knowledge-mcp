@@ -498,6 +498,9 @@ class SavedConvention(BaseModel):
     time: Time
 
 
+type Folder = list[ConventionSegment | Part]
+
+
 class NamingAndFilingConventions(BaseModel):
     """
     Saved conventions for document types at the knowledge-base root.

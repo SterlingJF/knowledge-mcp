@@ -42,6 +42,55 @@ description: Use before writing or editing a knowledge-base document, locally or
 For card and reader calls, include only configuration folders from the root down to the subject folder.
 Keep the complete peer-folder inventory for document-type lookup, tracking and move preparation.
 
+## Templates
+
+1. Read the root conventions file and current universe specs.
+   List every document type through `kbp_kinds`.
+   Identify note document types and explicitly list excluded codebase records.
+   Keep universe spec changes with the knowledge-bus skills.
+2. Call `kb_list_convention_templates` for the bundled definitions and sources.
+   Ask which pattern to use when the person has not chosen a pattern.
+   Map every note document type by its declared purpose and relevant note content.
+   Read `kbp_card` when a purpose remains unclear. Filename keywords alone cannot decide the assignment.
+   Keep unfamiliar types and unresolved mappings visible with a specific question.
+3. Start ACE with Atlas, Calendar and Efforts.
+   Credit ACE for folder purposes, and knowledge-mcp for title and meeting-note naming suggestions.
+   Daily notes use a recorded date alone; other Calendar notes use a recorded date and title.
+   Replace the suggested `date` property with the actual recorded property before acceptance.
+   Never derive dates from the current date or filesystem timestamps.
+4. For customized ACE, preserve the person's actual folder names and confirm each assignment.
+   Ask for the actual daily-note and meeting-note folders rather than inventing a Calendar equivalent.
+   Never infer authorship from folder spelling.
+   For a document type spanning several folders, recommend a single chosen folder.
+   Offer a dynamic folder from a named recorded property when the notes already distinguish the folders.
+   Discuss distinct document types through the knowledge-bus skills separately.
+5. For PARA, propose Projects, Areas, Resources and Archives by purpose.
+   Credit knowledge-mcp for title naming and suggested property names.
+   Add project, area or topic subfolders from recorded properties after review.
+   Preserve accepted numbered prefixes. Review active and archived placement explicitly.
+6. For Johnny.Decimal, ask for existing or person-supplied area, category and ID folders and unknown numbers.
+   Check that the category number belongs within the area range and the ID begins with the category number.
+   Request correction or clarification for invalid or unusual relationships before saving a Johnny.Decimal proposal.
+   Preserve supplied numbers, titles and prefixes. Put notes directly inside the accepted ID folder.
+   Use the recorded date and title; include a recorded filename ID only after explicit acceptance.
+   Never allocate numbers, generate a JDex or invent an ID folder.
+7. Show a proposal or a blocking question for every note document type.
+   Include the existing convention, proposed folder, naming parts, property and content sources, and a rendered example.
+   Construct `knowledge-mcp/conventions/1` text in memory and call `kb_get_document_type` with supplied naming values for previews.
+   Mark new folders from the inventory and check existing empty folders with your own tools.
+   Proposed note folders wait for accepted moves.
+8. Collect an accept, change or drop answer for each proposal.
+   Preserve existing conventions when proposals are dropped. Explain replacements before requesting acceptance.
+   Keep unresolved proposals pending or explicitly dropped.
+   Resolve two proposals for the same universe spec and document type through a choice or a reviewed combined pattern.
+   Combine accepted patterns from different templates in the same conventions file.
+   Use `set_by: agent` for template suggestions and `set_by: person` for conventions the person states.
+   Keep attribution separate from permission.
+9. Save accepted changes through Conventions below, with complete root definitions.
+   Skip the configuration write when every proposal is dropped.
+   Saving conventions leaves note paths, note bytes and classifications unchanged.
+   Apply each accepted move through Names, folders and moves, including both preparation calls and every link repair.
+
 ## Conventions
 
 1. Translate the requested folder and filename into structured parts.

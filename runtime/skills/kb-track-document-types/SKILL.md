@@ -54,3 +54,7 @@ description: Use at session start and after creating, moving or deleting a knowl
    Keep convention changes separate from classification changes and document moves.
 10. **Keep entries in the document-types file.** Change entries through `kb_prepare_document_types` or the prepared document-types text from `kb_prepare_document_move`.
     Keep document text out of the document-types file.
+
+For requested starter conventions, follow Templates in `kb-write-document`.
+At session start, read saved conventions without reapplying templates or replacing accepted patterns.
+Keep classification permission, configuration permission and move permission separate.

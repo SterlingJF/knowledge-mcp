@@ -3,7 +3,7 @@ schema: knowledge-mcp/conventions-update/1
 location: ~/notes
 file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
 status: ready
-based_on: sha256:26e1a2e3eb624c01072a1e666fbe8e50c40fff8a398cf06a55123d795cbd0dcb
+based_on: sha256:86fdc69909e449ad65864fd3672e79845987d95ea0c388614781dfd4e1ed5f4f
 current:
   - universe_spec: codebase-recordkeeping
     document_type: design-proposal
@@ -24,7 +24,7 @@ current:
         Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
         as you work.
       location: AGENTS.md
-    time: "2026-10-18T09:13:54.666110Z"
+    time: "2026-10-18T10:23:46.318839Z"
 changes:
   - change: remove
     universe_spec: codebase-recordkeeping
@@ -45,4 +45,4 @@ record: "schema: knowledge-mcp/conventions/1
 digest: sha256:46dae9fa51d8c171301b1602f8f8bd8b4fe8cc29af7d6539d43b95f9937f18d9
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
-    digest: sha256:26e1a2e3eb624c01072a1e666fbe8e50c40fff8a398cf06a55123d795cbd0dcb
+    digest: sha256:86fdc69909e449ad65864fd3672e79845987d95ea0c388614781dfd4e1ed5f4f

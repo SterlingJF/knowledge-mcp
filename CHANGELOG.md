@@ -4,6 +4,8 @@
 
 ### Added
 
+- `kb_list_convention_templates` lists the ACE, PARA and Johnny.Decimal templates with their published sources, offline.
+- The skills take the person through each convention a template proposes before the agent saves it.
 - `kb_prepare_conventions` prepares the conventions file: a folder and a name pattern per document type.
 - Filing proposals follow a saved convention and list any value the agent still has to supply.
 - `kb type --filing-values` takes the values a convention needs.

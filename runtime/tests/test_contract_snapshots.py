@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +15,7 @@ from knowledge_mcp.main import build_server
 from knowledge_mcp.scope import Workspace
 from tests.harness import BUNDLED, CODEBASE, MODULE, PRODUCT, header
 from tests.test_import_end_to_end import THREAD
+from tests.test_template_workflow_end_to_end import folders, proposal
 
 CONTRACTS = MODULE.parent / "contracts" / "extensions" / "mcp" / "v1"
 TOOLS_JSON = CONTRACTS / "tools.json"
@@ -334,6 +336,55 @@ def story(client: Client) -> Any:
                 "record_digest": "sha256:" + "2" * 64,
             },
         )
+        template_catalog = await ask(
+            "convention-templates.catalog",
+            "kb_list_convention_templates",
+            {"location": NOTES},
+        )
+        template_proposal = partial(proposal, catalog_data=template_catalog)
+        daily = template_proposal()
+        custom = template_proposal(
+            name="atlas-title", kind="knowledge-note", folder=["Atlas (general notes)"]
+        )
+        project = template_proposal(
+            "para",
+            "projects-title",
+            "project-note",
+            ["Projects", {"part": "property", "property": "project"}],
+        )
+        numbered = template_proposal(
+            "johnny-decimal",
+            "id-date-title",
+            "meeting-note",
+            ["10-19 Work", "12 Meetings", "12.03 Product reviews"],
+        )
+        decision = template_proposal(
+            name="atlas-title", kind="decision-record", folder=["Atlas", "Decisions"]
+        )
+        decision["name"]["parts"].insert(
+            0, {"part": "property", "property": "decision_number"}
+        )
+        for name, changes in [
+            ("ace", [daily]),
+            ("customized-ace", [custom]),
+            ("para", [project]),
+            ("johnny-decimal", [numbered]),
+            ("mixed", [daily, project, decision]),
+        ]:
+            result = await client.call_tool(
+                "kb_prepare_conventions",
+                {
+                    "location": NOTES,
+                    "conventions": "",
+                    "knowledge_bus_folders": folders(),
+                    "changes": changes,
+                    "allowed_by": INSTRUCTION,
+                },
+            )
+            assert not result.is_error, result.structured_content
+            answers["conventions.template-" + name] = yaml.safe_load(
+                result.structured_content["record"]
+            )
         return answers
 
     return steps()

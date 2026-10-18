@@ -1,7 +1,7 @@
 ---
 schema: knowledge-mcp/document-types-update/1
 location: ~/notes
-based_on: sha256:254c9d9b1e0c23210d457077093af2ff130050d088d122464bdfd3151a1b77b3
+based_on: sha256:0de8c9dd982c2c7488b1819c70e591cab86b8c1c545238e0f335dd2448c74d65
 record: null
 digest: null
 listing_changes: []
@@ -10,9 +10,9 @@ to_settle: []
 scopes: []
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
-    digest: sha256:26e1a2e3eb624c01072a1e666fbe8e50c40fff8a398cf06a55123d795cbd0dcb
+    digest: sha256:86fdc69909e449ad65864fd3672e79845987d95ea0c388614781dfd4e1ed5f4f
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
-    digest: sha256:254c9d9b1e0c23210d457077093af2ff130050d088d122464bdfd3151a1b77b3
+    digest: sha256:0de8c9dd982c2c7488b1819c70e591cab86b8c1c545238e0f335dd2448c74d65
 filing:
   - path: docs/rfcs/0042-cache.md
     universe_spec: codebase-recordkeeping
@@ -29,7 +29,7 @@ filing:
     convention:
       file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
       folder: ""
-      digest: sha256:26e1a2e3eb624c01072a1e666fbe8e50c40fff8a398cf06a55123d795cbd0dcb
+      digest: sha256:86fdc69909e449ad65864fd3672e79845987d95ea0c388614781dfd4e1ed5f4f
       definition:
         universe_spec: codebase-recordkeeping
         document_type: design-proposal
@@ -50,7 +50,7 @@ filing:
             Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up
             to date as you work.
           location: AGENTS.md
-        time: "2026-10-18T09:13:54.666110Z"
+        time: "2026-10-18T10:23:46.318839Z"
   - path: ideas.txt
     universe_spec: null
     document_type: null

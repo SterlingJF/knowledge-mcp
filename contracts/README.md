@@ -42,6 +42,9 @@ Write fail samples by hand as `conformance/fail/<name>.<case>.yaml`.
 
 Each successful `kb_*` result has a `schema` field with a schema ID, such as `knowledge-mcp/document-type/1`.
 The document-types file has `schema: knowledge-mcp/document-types/1`.
+The template catalog uses `knowledge-mcp/convention-templates/1`.
+The folder, name and content definitions come from `conventions.schema.yaml`.
+Templates describe proposals; saved conventions contain accepted patterns without a template dependency.
 The root conventions file has `schema: knowledge-mcp/conventions/1`.
 Filing assessments add convention sources and missing values while retaining their `/1` schema IDs.
 Raise the schema version when the stored file changes, or when an answer field is removed or renamed, changes meaning or becomes narrower.

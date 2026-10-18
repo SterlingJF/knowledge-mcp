@@ -307,6 +307,7 @@ def test_setup_remove_restores_home_with_the_flag_on_either_side(tmp_path, remov
 
 
 APPROVED_TOOLS = {
+    "kb_list_convention_templates",
     "kb_prepare_conventions",
     "kb_prepare_document_move",
     "kb_get_document_type",
@@ -325,6 +326,7 @@ APPROVED_TOOLS = {
     "kbp_card",
 }
 NAMED_VERBS = {
+    "kb_list_convention_templates": "List",
     "kb_prepare_conventions": "Prepare",
     "kb_prepare_document_move": "Prepare",
     "kb_get_document_type": "Get",
@@ -381,6 +383,10 @@ def tool(server: dict[str, Any], name: str) -> Any:
 
 def test_mcp_lists_the_approved_tool_names(server):
     assert set(server["tools"]) == APPROVED_TOOLS
+    assert (
+        tool(server, "kb_list_convention_templates").title
+        == "List convention templates"
+    )
     assert (
         tool(server, "kb_prepare_conventions").title
         == "Prepare naming and filing conventions"

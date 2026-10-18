@@ -1,0 +1,160 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: convention-templates.schema.yaml
+title: kb_list_convention_templates result
+description: The naming and filing templates knowledge-mcp ships, with the published source for each choice.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Convention templates answer
+    type: object
+    additionalProperties: false
+    required:
+      - schema
+      - location
+      - templates
+    properties:
+      schema:
+        const: knowledge-mcp/convention-templates/1
+      location:
+        $ref: common.schema.yaml#/$defs/location
+      templates:
+        type: array
+        minItems: 3
+        maxItems: 3
+        uniqueItems: true
+        items:
+          $ref: "#/$defs/template"
+  template:
+    title: Convention template
+    type: object
+    additionalProperties: false
+    required:
+      - id
+      - title
+      - sources
+      - variants
+    properties:
+      id:
+        enum:
+          - ace
+          - para
+          - johnny-decimal
+      title:
+        type: string
+        minLength: 1
+      sources:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          $ref: "#/$defs/source"
+      variants:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          $ref: "#/$defs/variant"
+  variant:
+    title: Convention template variant
+    type: object
+    additionalProperties: false
+    required:
+      - id
+      - folder_role
+      - purpose
+      - folder
+      - name
+      - folder_sources
+      - name_sources
+      - adaptation
+    properties:
+      id:
+        type: string
+        minLength: 1
+      folder_role:
+        type: string
+        minLength: 1
+      purpose:
+        type: string
+        minLength: 1
+      folder:
+        anyOf:
+          - $ref: conventions.schema.yaml#/$defs/saved_convention/properties/folder
+          - type: "null"
+      name:
+        $ref: conventions.schema.yaml#/$defs/name
+      content:
+        $ref: conventions.schema.yaml#/$defs/content
+      folder_sources:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      name_sources:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      adaptation:
+        type: string
+        minLength: 1
+    if:
+      type: object
+      anyOf:
+        - type: object
+          required:
+            - folder
+          properties:
+            folder:
+              type: array
+              contains: &id001
+                type: object
+                required:
+                  - part
+                properties:
+                  part:
+                    const: content
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: object
+              required:
+                - parts
+              properties:
+                parts:
+                  type: array
+                  contains: *id001
+    then:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          $ref: conventions.schema.yaml#/$defs/content
+    else:
+      type: object
+      not:
+        required:
+          - content
+        properties:
+          content: true
+  source:
+    title: Convention template source
+    type: object
+    additionalProperties: false
+    required:
+      - title
+      - url
+    properties:
+      title:
+        type: string
+        minLength: 1
+      url:
+        type: string
+        pattern: ^https://

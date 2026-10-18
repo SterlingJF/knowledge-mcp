@@ -1,0 +1,23 @@
+---
+schema: knowledge-mcp/conventions/1
+from_parent: []
+conventions:
+  - universe_spec: personal-notes
+    document_type: daily-note
+    folder:
+      - Calendar
+    name:
+      separator: " "
+      case: as-written
+      parts:
+        - part: date
+          property: date
+          format: YYYY-MM-DD
+    set_by: agent
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+        as you work.
+      location: AGENTS.md
+    time: "2026-10-18T10:23:52.091008Z"

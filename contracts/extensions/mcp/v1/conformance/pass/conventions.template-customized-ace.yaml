@@ -1,0 +1,24 @@
+---
+schema: knowledge-mcp/conventions/1
+from_parent: []
+conventions:
+  - universe_spec: personal-notes
+    document_type: knowledge-note
+    folder:
+      - Atlas (general notes)
+    name:
+      separator: " "
+      case: as-written
+      parts:
+        - part: content
+    content:
+      label: document title
+      instruction: Read the document title.
+    set_by: agent
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+        as you work.
+      location: AGENTS.md
+    time: "2026-10-18T10:23:52.202467Z"

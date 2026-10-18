@@ -1,0 +1,214 @@
+---
+schema: knowledge-mcp/convention-templates/1
+location: vault
+templates:
+  - id: ace
+    title: ACE
+    sources:
+      - title: ACE folder framework
+        url: https://blog.linkingyourthinking.com/notes/ace-folder-framework
+      - title: ACE expands and contracts
+        url: https://blog.linkingyourthinking.com/notes/the-ace-folder-framework-flexes-for-you
+      - title: Detailed ACE structure
+        url: https://blog.linkingyourthinking.com/notes/a-deeper-dive-into-how-ace-works
+      - title: Daily notes
+        url: https://obsidian.md/help/plugins/daily-notes
+    variants:
+      - id: atlas-title
+        folder_role: Atlas
+        purpose: Knowledge, ideas, reference, maps, people and sources.
+        folder:
+          - Atlas
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: unrecorded
+        content:
+          label: document title
+          instruction: Read the document title.
+        folder_sources:
+          - https://blog.linkingyourthinking.com/notes/ace-folder-framework
+        name_sources: []
+        adaptation:
+          knowledge-mcp suggests title naming. Keep supplied folder names and
+          confirm each customized assignment.
+      - id: calendar-daily
+        folder_role: Calendar
+        purpose: Notes for a recorded calendar date.
+        folder:
+          - Calendar
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: date
+              property: date
+              format: YYYY-MM-DD
+        folder_sources:
+          - https://blog.linkingyourthinking.com/notes/ace-folder-framework
+        name_sources:
+          - https://obsidian.md/help/plugins/daily-notes
+        adaptation:
+          Use the date property accepted for this document type. Ask for the
+          actual Calendar folder when customizing ACE.
+      - id: calendar-note
+        folder_role: Calendar
+        purpose: Meetings and other dated notes.
+        folder:
+          - Calendar
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: date
+              property: date
+              format: YYYY-MM-DD
+            - part: content
+        content:
+          label: document title
+          instruction: Read the document title.
+        folder_sources:
+          - https://blog.linkingyourthinking.com/notes/ace-folder-framework
+        name_sources: []
+        adaptation:
+          knowledge-mcp suggests date and title naming. Confirm the recorded
+          date property and the actual Calendar folder.
+      - id: efforts-title
+        folder_role: Efforts
+        purpose: Project and action notes.
+        folder:
+          - Efforts
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the document title.
+        folder_sources:
+          - https://blog.linkingyourthinking.com/notes/ace-folder-framework
+        name_sources: []
+        adaptation:
+          knowledge-mcp suggests title naming. Keep supplied folder names and
+          confirm each customized assignment.
+  - id: para
+    title: PARA
+    sources:
+      - title: The PARA Method
+        url: https://fortelabs.com/blog/para/
+    variants:
+      - id: projects-title
+        folder_role: Projects
+        purpose: Notes supporting a current goal.
+        folder:
+          - Projects
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the document title.
+        folder_sources:
+          - https://fortelabs.com/blog/para/
+        name_sources: []
+        adaptation:
+          knowledge-mcp suggests title naming. Add a subfolder from a recorded
+          project property after review.
+      - id: areas-title
+        folder_role: Areas
+        purpose: Notes supporting an ongoing responsibility.
+        folder:
+          - Areas
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the document title.
+        folder_sources:
+          - https://fortelabs.com/blog/para/
+        name_sources: []
+        adaptation:
+          knowledge-mcp suggests title naming. Add a subfolder from a recorded
+          area property after review.
+      - id: resources-title
+        folder_role: Resources
+        purpose: Reference notes and subjects of interest.
+        folder:
+          - Resources
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the document title.
+        folder_sources:
+          - https://fortelabs.com/blog/para/
+        name_sources: []
+        adaptation:
+          knowledge-mcp suggests title naming. Add a subfolder from a recorded
+          topic property after review.
+      - id: archives-title
+        folder_role: Archives
+        purpose: Inactive notes retained for reference.
+        folder:
+          - Archives
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the document title.
+        folder_sources:
+          - https://fortelabs.com/blog/para/
+        name_sources: []
+        adaptation:
+          knowledge-mcp suggests title naming. Add a subfolder from a recorded
+          archive group property after review.
+  - id: johnny-decimal
+    title: Johnny.Decimal
+    sources:
+      - title: Numbers
+        url: https://johnnydecimal.com/documentation/the-numbers
+      - title: IDs
+        url: https://johnnydecimal.com/documentation/ids
+      - title: Saving files
+        url: https://johnnydecimal.com/documentation/saving-files
+      - title: Naming files
+        url: https://johnnydecimal.com/documentation/naming-files
+    variants:
+      - id: id-date-title
+        folder_role: ID folder
+        purpose: Notes directly inside a supplied numbered ID folder.
+        folder: null
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: date
+              property: date
+              format: YYYY-MM-DD
+            - part: content
+        content:
+          label: document title
+          instruction: Read the document title.
+        folder_sources:
+          - https://johnnydecimal.com/documentation/the-numbers
+          - https://johnnydecimal.com/documentation/ids
+          - https://johnnydecimal.com/documentation/saving-files
+        name_sources:
+          - https://johnnydecimal.com/documentation/naming-files
+        adaptation:
+          Ask for existing or person-supplied area, category and ID folders.
+          Validate category membership within the area and ID membership within the category.
+          Preserve supplied numbers and titles. Confirm the recorded date property.

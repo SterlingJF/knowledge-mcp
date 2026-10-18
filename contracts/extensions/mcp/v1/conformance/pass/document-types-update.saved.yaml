@@ -9,11 +9,11 @@ record:
   \    universe_spec: codebase-recordkeeping\n    version: '0.1'\n    document_type:\
   \ design-proposal\n    set_by: agent\n    allowed_by:\n      basis: instruction\n\
   \      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up\
-  \ to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T09:13:51.812Z'\n\
+  \ to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T10:23:43.605Z'\n\
   \  ideas.txt:\n    no_document_type: true\n    set_by: agent\n    allowed_by:\n\
   \      basis: instruction\n      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/\
-  \ up to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T09:13:51.812Z'\n"
-digest: sha256:254c9d9b1e0c23210d457077093af2ff130050d088d122464bdfd3151a1b77b3
+  \ up to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T10:23:43.605Z'\n"
+digest: sha256:0de8c9dd982c2c7488b1819c70e591cab86b8c1c545238e0f335dd2448c74d65
 changed:
   - path: docs/rfcs/0042-cache.md
     change: settled
@@ -28,7 +28,7 @@ changed:
           Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
           date as you work.
         location: AGENTS.md
-      time: "2026-10-18T09:13:51.812Z"
+      time: "2026-10-18T10:23:43.605Z"
   - path: ideas.txt
     change: settled
     entry:
@@ -40,7 +40,7 @@ changed:
           Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
           date as you work.
         location: AGENTS.md
-      time: "2026-10-18T09:13:51.812Z"
+      time: "2026-10-18T10:23:43.605Z"
 to_settle: []
 scopes:
   - universe_specs:
