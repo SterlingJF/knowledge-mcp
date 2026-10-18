@@ -16626,7 +16626,7 @@
     {
       "name": "kb_prepare_document_types",
       "title": "Prepare the document-types file",
-      "description": "Prepare document-types text and filing assessments from supplied configuration, file changes and entries. Include `allowed_by` to receive changed text. Append the answer to `log.jsonl` and open no knowledge-base file.\n",
+      "description": "Prepare document-types text and filing assessments by comparing a complete listing with saved entries. Retain observed events through follow-up classification calls. Include `allowed_by` to receive changed text. Append the answer to `log.jsonl` and open no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -16681,7 +16681,7 @@
               }
             ],
             "default": null,
-            "description": "Every file of the knowledge base outside `.knowledge-bus/` folders.",
+            "description": "Every knowledge-base file, including attachments and files in nested folders. Exclude files beneath every `.knowledge-bus/` folder. Send the listing after complete enumeration; an incomplete listing can produce false deletion claims.",
             "title": "Listing"
           },
           "changes": {
@@ -17419,13 +17419,14 @@
                 "type": "string"
               },
               "listing_changes": {
-                "description": "File changes that knowledge-mcp found by comparing `listing` with the entries. Present only when the call sent `listing`.",
+                "description": "Observed events from comparing the complete listing with saved entries. Present when the call sent `listing`. Retain these events through follow-up classification and naming-value calls. Edited events include first-fingerprint baseline updates.",
                 "type": "array",
                 "items": {
                   "$ref": "common.schema.yaml#/$defs/file_change"
                 }
               },
               "changed": {
+                "description": "Prepared entry changes, including classifications, moves, deletions and fingerprint updates. Use listing_changes to count observed arrivals.",
                 "type": "array",
                 "items": {
                   "title": "Changed entry",
@@ -17536,6 +17537,7 @@
                 "$ref": "common.schema.yaml#/$defs/received"
               },
               "filing": {
+                "description": "Assessments for saved entries and candidate types. Join by current path, universe spec and chosen document type. Candidate assessments remain conditional until the document type is chosen. Keep the complete array when capping a conversational preview.",
                 "type": "array",
                 "items": {
                   "$ref": "common.schema.yaml#/$defs/filing_assessment"

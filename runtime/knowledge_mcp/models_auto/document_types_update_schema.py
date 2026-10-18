@@ -112,10 +112,15 @@ class DocumentTypesUpdateAnswer(BaseModel):
     listing_changes: Annotated[
         list[FileChange] | None,
         Field(
-            description="File changes that knowledge-mcp found by comparing `listing` with the entries. Present only when the call sent `listing`."
+            description="Observed events from comparing the complete listing with saved entries. Present when the call sent `listing`. Retain these events through follow-up classification and naming-value calls. Edited events include first-fingerprint baseline updates."
         ),
     ] = None
-    changed: list[ChangedEntry]
+    changed: Annotated[
+        list[ChangedEntry],
+        Field(
+            description="Prepared entry changes, including classifications, moves, deletions and fingerprint updates. Use listing_changes to count observed arrivals."
+        ),
+    ]
     to_settle: Annotated[
         list[FileToSettle],
         Field(
@@ -129,7 +134,12 @@ class DocumentTypesUpdateAnswer(BaseModel):
         ),
     ]
     received: Received
-    filing: list[FilingAssessment]
+    filing: Annotated[
+        list[FilingAssessment],
+        Field(
+            description="Assessments for saved entries and candidate types. Join by current path, universe spec and chosen document type. Candidate assessments remain conditional until the document type is chosen. Keep the complete array when capping a conversational preview."
+        ),
+    ]
     filing_review: Annotated[
         FolderFilingReview | None, Field(title="Folder filing review")
     ] = None

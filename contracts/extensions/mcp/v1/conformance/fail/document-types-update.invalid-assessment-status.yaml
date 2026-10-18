@@ -1,0 +1,30 @@
+---
+schema: knowledge-mcp/document-types-update/1
+location: unreachable://session-notes
+based_on: sha256:be577b08b42dd3339fc1fd6e4c38662355ad56f302e633bfd6925496494e66fb
+record: null
+digest: null
+listing_changes: []
+changed: []
+to_settle: []
+scopes: []
+received: []
+filing:
+  - path: Calendar/first-meeting.md
+    universe_spec: session-notes
+    document_type: meeting-note
+    status: chosen
+    proposal:
+      folder: Inbox
+      name: first-meeting.md
+      path: Inbox/first-meeting.md
+      folder_new: false
+      name_style: unchanged
+      evidence:
+        - Inbox/Kickoff.md
+        - Inbox/Review.md
+      folder_counts:
+        - folder: Calendar
+          count: 1
+        - folder: Inbox
+          count: 2

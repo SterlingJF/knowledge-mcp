@@ -2,8 +2,8 @@
 schema: knowledge-mcp/edits/2
 location: batch-vault
 edits:
-  - id: 656af4853e6a4865b851fccdaa164054
-    time: "2026-10-18T16:50:02.208Z"
+  - id: 1332254c1fc24a2daae3192a91503436
+    time: "2026-10-18T17:42:18.053Z"
     location: batch-vault
     allowed_by:
       basis: instruction
@@ -22,8 +22,8 @@ edits:
       count: 4
       old_path: A.md
       path: Decisions/Alpha.md
-  - id: 3c652da0c52e4d048b6c1ddf87192b1c
-    time: "2026-10-18T16:50:02.213Z"
+  - id: 587a7ea55ed4459d918ca0fc2bd09bab
+    time: "2026-10-18T17:42:18.058Z"
     location: batch-vault
     allowed_by:
       basis: instruction
@@ -42,8 +42,8 @@ edits:
       count: 4
       old_path: B.md
       path: Decisions/Beta.md
-  - id: 20608503ff044ebdbcbe695235f25e92
-    time: "2026-10-18T16:50:02.217Z"
+  - id: e830471b6cd44183afb79b2d4eb314b8
+    time: "2026-10-18T17:42:18.067Z"
     location: batch-vault
     allowed_by:
       basis: instruction
@@ -62,8 +62,8 @@ edits:
       count: 4
       old_path: Index.md
       path: Index.md
-  - id: 917c14c1289a4e90915b046fe16d827c
-    time: "2026-10-18T16:50:02.222Z"
+  - id: 3fdadc18d8594fc89c37fe4199fa1453
+    time: "2026-10-18T17:42:18.073Z"
     location: batch-vault
     allowed_by:
       basis: instruction

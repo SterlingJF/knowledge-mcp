@@ -26,12 +26,12 @@ recorded:
         Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
         date as you work.
       location: AGENTS.md
-    time: "2026-10-18T16:49:49.058Z"
+    time: "2026-10-18T17:42:05.277Z"
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
-    digest: sha256:16de2d51739626311d1afe7820f3e82e827a1aaf9084b13cd4b2cd78ec5dfcea
+    digest: sha256:687bb092d814a8ac220f14df5701ffdd1c4562bdbea0e91a792c5e14745f6c12
   - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
-    digest: sha256:e2bcf525766704ad059294ec1e5de0e392c092c2c9de5194f563e722d7f74ba7
+    digest: sha256:56453ac08b1f7449e94e876e36a677a39ab0ff0a66de5882579c94d887f7ef93
 filing:
   - path: docs/rfcs/0042-cache.md
     universe_spec: codebase-recordkeeping
@@ -42,7 +42,7 @@ filing:
       file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
       folder: ""
       from_parent: true
-      digest: sha256:e2bcf525766704ad059294ec1e5de0e392c092c2c9de5194f563e722d7f74ba7
+      digest: sha256:56453ac08b1f7449e94e876e36a677a39ab0ff0a66de5882579c94d887f7ef93
       definition:
         universe_spec: codebase-recordkeeping
         document_type: design-proposal
@@ -63,7 +63,7 @@ filing:
             Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up
             to date as you work.
           location: AGENTS.md
-        time: "2026-10-18T16:49:52.394442Z"
+        time: "2026-10-18T17:42:08.472251Z"
     needed:
       - source: content
         name: document title

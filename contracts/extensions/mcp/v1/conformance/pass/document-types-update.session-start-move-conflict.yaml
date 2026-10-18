@@ -1,0 +1,551 @@
+---
+schema: knowledge-mcp/document-types-update/1
+location: unreachable://session-notes
+based_on: sha256:be577b08b42dd3339fc1fd6e4c38662355ad56f302e633bfd6925496494e66fb
+record: |
+  # Your agent rewrites this file with text from knowledge-mcp when files change or you correct an entry.
+  # An entry with `set_by: person` overrides any later entry by the agent.
+  schema: knowledge-mcp/document-types/1
+  files:
+    Calendar/first-meeting.md:
+      universe_spec: session-notes
+      version: '1'
+      document_type: meeting-note
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:12589a527fa1cfd4eb38f33e8b90fd31b23c90f65fa470d664ccb81dc7f994cc
+      time: '2026-10-18T00:00:00Z'
+    Calendar/second-meeting.md:
+      universe_spec: session-notes
+      version: '1'
+      document_type: meeting-note
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:8a6e06b8a908003e5cd90ff3f95c550647b1be192076e88bba16a6e06053324a
+      time: '2026-10-18T00:00:00Z'
+    Meetings/Review.md:
+      universe_spec: session-notes
+      version: '1'
+      document_type: meeting-note
+      audience:
+        value: the team lead
+        status: confirmed
+      set_by: person
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:c97ace4c8fef2cee8fa0f3c9f52aab18dbd4f42438afe362ffb8f75ce4c04b84
+      time: '2026-10-18T00:00:00Z'
+digest: sha256:019b057811f7ba66ec939715467c381bc402b303dc26dccc512b349871ac7ce3
+listing_changes:
+  - change: moved
+    path: Inbox/Review.md
+    old_path: Meetings/Review.md
+    fingerprint: sha256:c97ace4c8fef2cee8fa0f3c9f52aab18dbd4f42438afe362ffb8f75ce4c04b84
+  - change: deleted
+    path: Notes/Old checklist.md
+  - change: created
+    path: Inbox/Cache Plan.md
+    fingerprint: sha256:980fda00f26ad81583d554c6bfe241a7c4570799b94b692d35249aff8cf0390b
+  - change: created
+    path: Inbox/Kickoff.md
+    fingerprint: sha256:81224e18fbfa831d4650f256837680d67e6a46280eeb84b269b45a3ddcb76981
+  - change: created
+    path: Inbox/Loose thoughts.md
+    fingerprint: sha256:8c8cb92f4e09f0800dcd9ed732a7b2a294fbe54de5d1b9840a76c5a99e684d2c
+changed:
+  - path: Inbox/Review.md
+    change: moved
+    old_path: Meetings/Review.md
+    was:
+      universe_spec: session-notes
+      version: "1"
+      document_type: meeting-note
+      audience:
+        value: the team lead
+        status: confirmed
+      set_by: person
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:c97ace4c8fef2cee8fa0f3c9f52aab18dbd4f42438afe362ffb8f75ce4c04b84
+      time: "2026-10-18T00:00:00Z"
+    note:
+      The destination lacks the saved document type. Choose another folder or change
+      the universe specs separately.
+  - path: Notes/Old checklist.md
+    change: deleted
+    was:
+      universe_spec: session-notes
+      version: "1"
+      document_type: meeting-note
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:401aef3fcb05f13831147eb1aa9bc8b05a93c6a7ce9c1ff250502fd992928a05
+      time: "2026-10-18T00:00:00Z"
+to_settle:
+  - path: Inbox/Review.md
+    scope: 0
+    candidates: []
+    old_path: Meetings/Review.md
+    was:
+      universe_spec: session-notes
+      version: "1"
+      document_type: meeting-note
+      audience:
+        value: the team lead
+        status: confirmed
+      set_by: person
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:c97ace4c8fef2cee8fa0f3c9f52aab18dbd4f42438afe362ffb8f75ce4c04b84
+      time: "2026-10-18T00:00:00Z"
+  - path: Inbox/Cache Plan.md
+    scope: 0
+    candidates:
+      - universe_spec: other-notes
+        document_type: meeting-note
+        name: Meeting note
+        alias:
+          kind: descriptive
+          form: experiment plan / pre-registration / study protocol
+        action: commit to a test's prediction and its measures in advance
+        actor: whoever runs the test
+        timing: before collecting any data for the test
+        matched:
+          - plan
+        matched_on: name
+  - path: Inbox/Kickoff.md
+    scope: 0
+    candidates: []
+  - path: Inbox/Loose thoughts.md
+    scope: 0
+    candidates: []
+scopes:
+  - universe_specs:
+      - id: other-notes
+        version: "0.9"
+        source: sent by the harness
+        from_parent: false
+    every_document_type:
+      - universe_spec: other-notes
+        covers:
+          The reasoning around deliberate work — what makes it worth doing, what
+          it should be, and whether it held up. The work may produce something made or
+          put in place, a service rendered, or something learned; for a recipient — including
+          your own later self — who simply receives it, free to take it or leave it, or
+          paying for it.
+        covers_matched: []
+        kinds:
+          - document_type: product-strategy-canvas
+            action: choose what an offering will aim for next and what it will refuse
+            actor: whoever leads the offering
+          - document_type: business-model-canvas
+            action:
+              check whether a business can deliver an offering its customers value
+              and earn more than providing it costs
+            actor: whoever starts, runs or funds the business
+          - document_type: lean-canvas
+            action: choose which assumption in a new venture's business model to test next
+            actor: whoever is starting the venture
+          - document_type: startup-canvas
+            action: decide what a new venture will aim for and how it will make money
+            actor: whoever is founding the venture, with any backers
+          - document_type: swot-analysis
+            action:
+              compare our strengths and weaknesses with the opportunities and threats
+              outside us
+            actor: whoever sets the plan
+          - document_type: pestle-analysis
+            action:
+              check which political, economic, social, technological, legal and environmental
+              conditions affect the work
+            actor: whoever sets the plan
+          - document_type: competitor-analysis
+            action:
+              find where the offering can differ from the other options people have,
+              including doing nothing
+            actor: whoever decides what to offer or how to present it
+          - document_type: persona-profile
+            action:
+              decide which kind of person, in which circumstance, to design the solution
+              for
+            actor: whoever designs the solution or studies the people it is for
+          - document_type: opportunity-assessment
+            action: decide whether to pursue a problem at all
+            actor: whoever would fund or approve the work
+          - document_type: risk-assessment
+            action: decide which risks to reduce, accept or watch, and who handles each
+            actor: the person accountable for the work
+          - document_type: design-doc
+            action: agree to or object to one proposed approach
+            actor: reviewer
+          - document_type: brand-identity-guide
+            action: apply the brand's look and wording correctly on your own
+            actor: anyone writing or designing for the brand
+          - document_type: scenario-walkthrough
+            action:
+              check, step by step, that one person can reach one goal through the
+              solution
+            actor: reviewer
+          - document_type: success-metrics
+            action: decide which numbers to improve next and which to keep where they are
+            actor: whoever runs the offering day to day
+          - document_type: architecture-overview
+            action: find which parts of the system a change will affect
+            actor: whoever will change the system
+          - document_type: system-context-diagram
+            action:
+              find what the system is responsible for and which outside people and
+              systems it works with
+            actor: anyone new to the system
+          - document_type: decision-brief
+            action: choose one of several options by a set date
+            actor: the person accountable for the choice
+          - document_type: decision-record
+            action:
+              check whether a past decision still applies, and record a replacement
+              when it no longer does
+            actor: future reader
+          - document_type: meeting-note
+            action: commit to a test's prediction and its measures in advance
+            actor: whoever runs the test
+  - universe_specs:
+      - id: session-notes
+        version: "0.9"
+        source: sent by the harness
+        from_parent: false
+    every_document_type: null
+received:
+  - name: notes.kbp.yaml
+    digest: sha256:5b35d1e201c6fd49cd9574186f8cdd6341c33a415dc6b0d8df6b2a0a576556e2
+  - name: notes.kbp.yaml
+    digest: sha256:d56132dd947b0f1b396361093134ba37d234dde60e4739c0c2ddcb4bd35273f3
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:3edeb7be8d157a7017e483223a12319e860be4a0414b1b3ac0da2a4e1bd1e440
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:be577b08b42dd3339fc1fd6e4c38662355ad56f302e633bfd6925496494e66fb
+filing:
+  - path: Calendar/first-meeting.md
+    universe_spec: session-notes
+    document_type: meeting-note
+    status: already_matches
+    proposal: null
+  - path: Calendar/second-meeting.md
+    universe_spec: session-notes
+    document_type: meeting-note
+    status: already_matches
+    proposal: null
+  - path: Inbox/Cache Plan.md
+    universe_spec: other-notes
+    document_type: meeting-note
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: architecture-overview
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: brand-identity-guide
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: business-model-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: competitor-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: decision-brief
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: decision-record
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: design-doc
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: lean-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: meeting-note
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: opportunity-assessment
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: persona-profile
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: pestle-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: product-strategy-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: risk-assessment
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: scenario-walkthrough
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: startup-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: success-metrics
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: swot-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Kickoff.md
+    universe_spec: other-notes
+    document_type: system-context-diagram
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: architecture-overview
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: brand-identity-guide
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: business-model-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: competitor-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: decision-brief
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: decision-record
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: design-doc
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: lean-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: meeting-note
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: opportunity-assessment
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: persona-profile
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: pestle-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: product-strategy-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: risk-assessment
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: scenario-walkthrough
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: startup-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: success-metrics
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: swot-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Loose thoughts.md
+    universe_spec: other-notes
+    document_type: system-context-diagram
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: architecture-overview
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: brand-identity-guide
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: business-model-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: competitor-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: decision-brief
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: decision-record
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: design-doc
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: lean-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: meeting-note
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: opportunity-assessment
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: persona-profile
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: pestle-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: product-strategy-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: risk-assessment
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: scenario-walkthrough
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: startup-canvas
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: success-metrics
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: swot-analysis
+    status: no_peers
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: other-notes
+    document_type: system-context-diagram
+    status: no_peers
+    proposal: null
+  - path: Meetings/Review.md
+    universe_spec: session-notes
+    document_type: meeting-note
+    status: proposed
+    proposal:
+      folder: Calendar
+      name: review.md
+      path: Calendar/review.md
+      folder_new: false
+      name_style: lower-kebab
+      evidence:
+        - Calendar/first-meeting.md
+        - Calendar/second-meeting.md
+      folder_counts:
+        - folder: Calendar
+          count: 2

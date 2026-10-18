@@ -18,6 +18,11 @@ from tests.harness import BUNDLED, CODEBASE, MODULE, PRODUCT, header
 from tests.test_document_moves_end_to_end import apply, arguments
 from tests.test_folder_filing_end_to_end import six_notes
 from tests.test_import_end_to_end import THREAD
+from tests.test_session_start_filing_end_to_end import (
+    configuration,
+    five_events,
+)
+from tests.test_session_start_filing_end_to_end import inputs as session_inputs
 from tests.test_team_conventions_end_to_end import CONTRACT
 from tests.test_team_conventions_end_to_end import config as team_config
 from tests.test_team_conventions_end_to_end import files as team_files
@@ -398,8 +403,34 @@ def story(client: Client) -> Any:
     return steps()
 
 
+async def session_start_stories(ask):
+    args = session_inputs()
+    args.update(five_events())
+    await ask("document-types-update.session-start", "kb_prepare_document_types", args)
+    args.pop("filing_values")
+    await ask(
+        "document-types-update.session-start-values-needed",
+        "kb_prepare_document_types",
+        args,
+    )
+    nested = configuration()[0]
+    nested["folder"] = "Inbox"
+    nested["files"][0]["text"] = nested["files"][0]["text"].replace(
+        "session-notes", "other-notes"
+    )
+    nested["files"][0]["id"] = "other-notes"
+    args["knowledge_bus_folders"].append(nested)
+    args.pop("entries")
+    await ask(
+        "document-types-update.session-start-move-conflict",
+        "kb_prepare_document_types",
+        args,
+    )
+
+
 async def team_stories(ask):
     await batch_stories(ask)
+    await session_start_stories(ask)
     for name, folder, inputs in [
         ("company", "", team_files()),
         ("finance", "Finance", team_files()),

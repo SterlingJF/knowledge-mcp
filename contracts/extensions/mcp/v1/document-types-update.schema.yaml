@@ -58,12 +58,17 @@ $defs:
         type: string
       listing_changes:
         description:
-          File changes that knowledge-mcp found by comparing `listing`
-          with the entries. Present only when the call sent `listing`.
+          Observed events from comparing the complete listing with saved entries.
+          Present when the call sent `listing`. Retain these events through follow-up
+          classification and naming-value calls. Edited events include first-fingerprint
+          baseline updates.
         type: array
         items:
           $ref: common.schema.yaml#/$defs/file_change
       changed:
+        description:
+          Prepared entry changes, including classifications, moves, deletions and
+          fingerprint updates. Use listing_changes to count observed arrivals.
         type: array
         items:
           title: Changed entry
@@ -154,6 +159,11 @@ $defs:
       received:
         $ref: common.schema.yaml#/$defs/received
       filing:
+        description:
+          Assessments for saved entries and candidate types. Join by current path,
+          universe spec and chosen document type. Candidate assessments remain
+          conditional until the document type is chosen. Keep the complete array
+          when capping a conversational preview.
         type: array
         items:
           $ref: common.schema.yaml#/$defs/filing_assessment

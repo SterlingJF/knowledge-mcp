@@ -36,7 +36,7 @@ from knowledge_mcp.tools.document_type import (
 from knowledge_mcp.type_scope import Scopes
 
 DESCRIPTION = """\
-Prepare document-types text and filing assessments from supplied configuration, file changes and entries. Include `allowed_by` to receive changed text. Append the answer to `log.jsonl` and open no knowledge-base file.
+Prepare document-types text and filing assessments by comparing a complete listing with saved entries. Retain observed events through follow-up classification calls. Include `allowed_by` to receive changed text. Append the answer to `log.jsonl` and open no knowledge-base file.
 """
 
 MIGRATED = (
@@ -345,7 +345,8 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             list[ListedFile] | None,
             Field(
                 description=(
-                    "Every file of the knowledge base outside `.knowledge-bus/` folders."
+                    "Every knowledge-base file, including attachments and files in nested folders. Exclude files beneath every `.knowledge-bus/` folder. "
+                    "Send the listing after complete enumeration; an incomplete listing can produce false deletion claims."
                 )
             ),
         ] = None,

@@ -1,0 +1,278 @@
+---
+schema: knowledge-mcp/document-types-update/1
+location: unreachable://session-notes
+based_on: sha256:be577b08b42dd3339fc1fd6e4c38662355ad56f302e633bfd6925496494e66fb
+record: |
+  # Your agent rewrites this file with text from knowledge-mcp when files change or you correct an entry.
+  # An entry with `set_by: person` overrides any later entry by the agent.
+  schema: knowledge-mcp/document-types/1
+  files:
+    Calendar/first-meeting.md:
+      universe_spec: session-notes
+      version: '1'
+      document_type: meeting-note
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:12589a527fa1cfd4eb38f33e8b90fd31b23c90f65fa470d664ccb81dc7f994cc
+      time: '2026-10-18T00:00:00Z'
+    Calendar/second-meeting.md:
+      universe_spec: session-notes
+      version: '1'
+      document_type: meeting-note
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:8a6e06b8a908003e5cd90ff3f95c550647b1be192076e88bba16a6e06053324a
+      time: '2026-10-18T00:00:00Z'
+    Inbox/Cache Plan.md:
+      universe_spec: session-notes
+      version: '0.9'
+      document_type: decision-record
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:980fda00f26ad81583d554c6bfe241a7c4570799b94b692d35249aff8cf0390b
+      time: '2026-10-18T17:42:18.233Z'
+    Inbox/Kickoff.md:
+      universe_spec: session-notes
+      version: '0.9'
+      document_type: meeting-note
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:81224e18fbfa831d4650f256837680d67e6a46280eeb84b269b45a3ddcb76981
+      time: '2026-10-18T17:42:18.233Z'
+    Inbox/Loose thoughts.md:
+      no_document_type: true
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:8c8cb92f4e09f0800dcd9ed732a7b2a294fbe54de5d1b9840a76c5a99e684d2c
+      time: '2026-10-18T17:42:18.233Z'
+    Inbox/Review.md:
+      universe_spec: session-notes
+      version: '1'
+      document_type: meeting-note
+      audience:
+        value: the team lead
+        status: confirmed
+      set_by: person
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:c97ace4c8fef2cee8fa0f3c9f52aab18dbd4f42438afe362ffb8f75ce4c04b84
+      time: '2026-10-18T00:00:00Z'
+digest: sha256:9a0d923a62e50043d756cafb2a3af0933fd580e11a147529c803b5b5f8223f8e
+listing_changes:
+  - change: moved
+    path: Inbox/Review.md
+    old_path: Meetings/Review.md
+    fingerprint: sha256:c97ace4c8fef2cee8fa0f3c9f52aab18dbd4f42438afe362ffb8f75ce4c04b84
+  - change: deleted
+    path: Notes/Old checklist.md
+  - change: created
+    path: Inbox/Cache Plan.md
+    fingerprint: sha256:980fda00f26ad81583d554c6bfe241a7c4570799b94b692d35249aff8cf0390b
+  - change: created
+    path: Inbox/Kickoff.md
+    fingerprint: sha256:81224e18fbfa831d4650f256837680d67e6a46280eeb84b269b45a3ddcb76981
+  - change: created
+    path: Inbox/Loose thoughts.md
+    fingerprint: sha256:8c8cb92f4e09f0800dcd9ed732a7b2a294fbe54de5d1b9840a76c5a99e684d2c
+changed:
+  - path: Inbox/Review.md
+    change: moved
+    old_path: Meetings/Review.md
+    entry:
+      universe_spec: session-notes
+      version: "1"
+      document_type: meeting-note
+      audience:
+        value: the team lead
+        status: confirmed
+      set_by: person
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:c97ace4c8fef2cee8fa0f3c9f52aab18dbd4f42438afe362ffb8f75ce4c04b84
+      time: "2026-10-18T00:00:00Z"
+  - path: Notes/Old checklist.md
+    change: deleted
+    was:
+      universe_spec: session-notes
+      version: "1"
+      document_type: meeting-note
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:401aef3fcb05f13831147eb1aa9bc8b05a93c6a7ce9c1ff250502fd992928a05
+      time: "2026-10-18T00:00:00Z"
+  - path: Inbox/Cache Plan.md
+    change: settled
+    entry:
+      universe_spec: session-notes
+      version: "0.9"
+      document_type: decision-record
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:980fda00f26ad81583d554c6bfe241a7c4570799b94b692d35249aff8cf0390b
+      time: "2026-10-18T17:42:18.233Z"
+  - path: Inbox/Kickoff.md
+    change: settled
+    entry:
+      universe_spec: session-notes
+      version: "0.9"
+      document_type: meeting-note
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:81224e18fbfa831d4650f256837680d67e6a46280eeb84b269b45a3ddcb76981
+      time: "2026-10-18T17:42:18.233Z"
+  - path: Inbox/Loose thoughts.md
+    change: settled
+    entry:
+      no_document_type: true
+      set_by: agent
+      allowed_by:
+        basis: request
+        text: Keep these document types.
+      fingerprint: sha256:8c8cb92f4e09f0800dcd9ed732a7b2a294fbe54de5d1b9840a76c5a99e684d2c
+      time: "2026-10-18T17:42:18.233Z"
+to_settle: []
+scopes:
+  - universe_specs:
+      - id: session-notes
+        version: "0.9"
+        source: sent by the harness
+        from_parent: false
+    every_document_type: null
+received:
+  - name: notes.kbp.yaml
+    digest: sha256:5b35d1e201c6fd49cd9574186f8cdd6341c33a415dc6b0d8df6b2a0a576556e2
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:3edeb7be8d157a7017e483223a12319e860be4a0414b1b3ac0da2a4e1bd1e440
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:be577b08b42dd3339fc1fd6e4c38662355ad56f302e633bfd6925496494e66fb
+filing:
+  - path: Calendar/first-meeting.md
+    universe_spec: session-notes
+    document_type: meeting-note
+    status: proposed
+    proposal:
+      folder: Inbox
+      name: first-meeting.md
+      path: Inbox/first-meeting.md
+      folder_new: false
+      name_style: unchanged
+      evidence:
+        - Inbox/Kickoff.md
+        - Inbox/Review.md
+      folder_counts:
+        - folder: Calendar
+          count: 1
+        - folder: Inbox
+          count: 2
+  - path: Calendar/second-meeting.md
+    universe_spec: session-notes
+    document_type: meeting-note
+    status: proposed
+    proposal:
+      folder: Inbox
+      name: second-meeting.md
+      path: Inbox/second-meeting.md
+      folder_new: false
+      name_style: unchanged
+      evidence:
+        - Inbox/Kickoff.md
+        - Inbox/Review.md
+      folder_counts:
+        - folder: Calendar
+          count: 1
+        - folder: Inbox
+          count: 2
+  - path: Inbox/Cache Plan.md
+    universe_spec: session-notes
+    document_type: decision-record
+    status: proposed
+    proposal:
+      folder: Decisions
+      name: cache-plan.md
+      path: Decisions/cache-plan.md
+      folder_new: true
+      name_style: convention
+      evidence: []
+      folder_counts: []
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      from_parent: true
+      digest: sha256:3edeb7be8d157a7017e483223a12319e860be4a0414b1b3ac0da2a4e1bd1e440
+      definition:
+        universe_spec: session-notes
+        document_type: decision-record
+        folder:
+          - Decisions
+        name:
+          separator: "-"
+          case: lower
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first heading.
+        set_by: person
+        allowed_by:
+          basis: accepted_change
+          text: Save the convention.
+        time: "2026-10-18T00:00:00Z"
+  - path: Inbox/Kickoff.md
+    universe_spec: session-notes
+    document_type: meeting-note
+    status: proposed
+    proposal:
+      folder: Calendar
+      name: kickoff.md
+      path: Calendar/kickoff.md
+      folder_new: false
+      name_style: lower-kebab
+      evidence:
+        - Calendar/first-meeting.md
+        - Calendar/second-meeting.md
+      folder_counts:
+        - folder: Calendar
+          count: 2
+        - folder: Inbox
+          count: 1
+  - path: Inbox/Loose thoughts.md
+    universe_spec: null
+    document_type: null
+    status: no_document_type
+    proposal: null
+  - path: Inbox/Review.md
+    universe_spec: session-notes
+    document_type: meeting-note
+    status: proposed
+    proposal:
+      folder: Calendar
+      name: review.md
+      path: Calendar/review.md
+      folder_new: false
+      name_style: lower-kebab
+      evidence:
+        - Calendar/first-meeting.md
+        - Calendar/second-meeting.md
+      folder_counts:
+        - folder: Calendar
+          count: 2
+        - folder: Inbox
+          count: 1

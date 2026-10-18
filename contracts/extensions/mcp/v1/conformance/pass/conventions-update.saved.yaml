@@ -51,8 +51,8 @@ record: |
       text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
         as you work.
       location: AGENTS.md
-    time: '2026-10-18T16:49:52.394442Z'
-digest: sha256:e2bcf525766704ad059294ec1e5de0e392c092c2c9de5194f563e722d7f74ba7
+    time: '2026-10-18T17:42:08.472251Z'
+digest: sha256:56453ac08b1f7449e94e876e36a677a39ab0ff0a66de5882579c94d887f7ef93
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
     digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
