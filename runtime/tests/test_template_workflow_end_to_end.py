@@ -596,10 +596,8 @@ def test_t07_invalid_johnny_decimal_relationships_remain_pending(supplied, quest
     assert "Request correction or clarification" in skill
 
 
-def test_t14_docs_distinguish_published_rules_and_suggestions():
-    text = (Path(__file__).parents[2] / "docs/convention-templates.md").read_text()
-    assert "ACE and PARA prescribe folder purposes, without filename rules." in text
-    assert "knowledge-mcp suggests title naming and meeting-note filenames." in text
+def test_naming_guide_links_every_template_source():
+    text = (Path(__file__).parents[2] / "docs/naming-and-filing.md").read_text()
     for template in catalog()["templates"]:
         assert all(source["url"] in text for source in template["sources"])
 

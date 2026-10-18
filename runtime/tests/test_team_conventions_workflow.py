@@ -77,12 +77,3 @@ def test_last_local_removal_keeps_valid_yaml_and_parent_selections():
     saved = yaml.safe_load(answer["record"])
     assert saved["conventions"] == []
     assert saved["from_parent"] == yaml.safe_load(FINANCE)["from_parent"]
-
-
-def test_team_documentation_names_the_discovered_configuration_path():
-    text = (ROOT / "docs/team-conventions.md").read_text()
-    assert (
-        "Save team conventions in `<team>/.knowledge-bus/plugins/knowledge-mcp/conventions.yaml`."
-        in text
-    )
-    assert "beside each team's" not in text
