@@ -1,11 +1,4 @@
-"""The passages an outside document's text splits into, by line, for the agent to mark.
-
-A passage is a heading (`#` lines, or a line underlined with `=` or `-`), a list item with its
-continuation lines, a fenced code block kept whole, or a paragraph: a run of other lines between
-blank lines. A line of three or more `-`, `*` or `_` alone separates passages and is none.
-Nothing here judges what a passage says: an instruction inside the text is a passage like any
-other.
-"""
+"""Split Markdown into headings, list items, fenced code blocks and paragraphs."""
 
 from __future__ import annotations
 
@@ -13,7 +6,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-# The longest opening shown for a passage, in characters, before the cut mark.
+# Maximum length of `opening` in characters, excluding the trailing `…`.
 OPENING = 80
 
 _ATX = re.compile(r"^ {0,3}(#{1,6})(?:[ \t]|$)")
@@ -31,61 +24,79 @@ class _Open:
     fence: str = ""
 
 
-def split(text: str) -> list[dict[str, Any]]:
-    """Each passage: id, kind, first and last line, opening words, and the heading above."""
-    found: list[tuple[str, int, int, str, int]] = []
+Passage = tuple[str, int, int, str, int]
+
+
+@dataclass
+class _Scanner:
+    found: list[Passage] = field(default_factory=list)
     current: _Open | None = None
 
-    def close(last: int, kind: str | None = None, level: int = 0) -> None:
-        nonlocal current
-        if current is not None:
-            found.append(
-                (kind or current.kind, current.first, last, current.lines[0], level)
+    def close(self, last: int, kind: str | None = None, level: int = 0) -> None:
+        if self.current is not None:
+            self.found.append(
+                (
+                    kind or self.current.kind,
+                    self.current.first,
+                    last,
+                    self.current.lines[0],
+                    level,
+                )
             )
-        current = None
+        self.current = None
 
-    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
-    for number, line in enumerate(lines, start=1):
-        if current is not None and current.kind == "code":
-            current.lines.append(line)
+    def consume(self, number: int, line: str) -> None:
+        if self.current is not None and self.current.kind == "code":
+            self.current.lines.append(line)
             if re.fullmatch(
-                rf"{re.escape(current.fence[0])}{{{len(current.fence)},}}", line.strip()
+                rf"{re.escape(self.current.fence[0])}{{{len(self.current.fence)},}}",
+                line.strip(),
             ):
-                close(number)
-            continue
+                self.close(number)
+            return
         if not line.strip():
-            close(number - 1)
-            continue
+            self.close(number - 1)
+            return
         fence = _FENCE.match(line)
         if fence:
-            close(number - 1)
-            current = _Open("code", number, [line], fence.group(1))
-            continue
+            self.close(number - 1)
+            self.current = _Open("code", number, [line], fence.group(1))
+            return
         underline = _UNDERLINE.match(line)
-        if underline and current is not None and current.kind == "paragraph":
-            close(number, "heading", 1 if underline.group(1)[0] == "=" else 2)
-            continue
+        if underline and self.current is not None and self.current.kind == "paragraph":
+            self.close(number, "heading", 1 if underline.group(1)[0] == "=" else 2)
+            return
         if _RULE.match(line):
-            close(number - 1)
-            continue
+            self.close(number - 1)
+            return
         heading = _ATX.match(line)
         if heading:
-            close(number - 1)
-            found.append(("heading", number, number, line, len(heading.group(1))))
-            continue
+            self.close(number - 1)
+            self.found.append(("heading", number, number, line, len(heading.group(1))))
+            return
         if _ITEM.match(line):
-            close(number - 1)
-            current = _Open("list-item", number, [line])
-            continue
-        if current is None:
-            current = _Open("paragraph", number, [line])
+            self.close(number - 1)
+            self.current = _Open("list-item", number, [line])
+        elif self.current is None:
+            self.current = _Open("paragraph", number, [line])
         else:
-            current.lines.append(line)
-    if current is not None:
-        # An unclosed code block runs to the last line; text has no line after its final newline.
-        last = len(lines) - 1 if lines[-1] == "" else len(lines)
-        close(max(last, current.first))
+            self.current.lines.append(line)
 
+
+def split(text: str) -> list[dict[str, Any]]:
+    scanner = _Scanner()
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    for number, line in enumerate(lines, start=1):
+        scanner.consume(number, line)
+    if scanner.current is not None:
+        # A trailing newline adds no line.
+        last = len(lines) - 1 if lines[-1] == "" else len(lines)
+        scanner.close(max(last, scanner.current.first))
+
+    return _passages(scanner.found)
+
+
+def _passages(found: list[Passage]) -> list[dict[str, Any]]:
     passages: list[dict[str, Any]] = []
     headings: list[tuple[int, str]] = []
     for index, (kind, first, last, line, level) in enumerate(found, start=1):
@@ -107,7 +118,6 @@ def split(text: str) -> list[dict[str, Any]]:
 
 
 def opening(line: str) -> str:
-    """The line's first words, spaces collapsed, cut at a word with `…` past `OPENING`."""
     flat = " ".join(line.split())
     if len(flat) <= OPENING:
         return flat

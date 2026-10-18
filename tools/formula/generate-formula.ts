@@ -15,7 +15,7 @@ import { parse } from "smol-toml";
 
 const repository = "SterlingJF/knowledge-mcp";
 const description =
-  "Help agent apps read, write and bring in knowledge with universe specs";
+  "Help harnesses read, write and import knowledge with universe specs";
 const usage =
   "Usage: generate-formula --sdist <knowledge_mcp-<version>.tar.gz> --out <Formula/knowledge-mcp.rb> " +
   "[--url <release asset url>] [--lock uv.lock] [--requirements runtime/requirements.lock] " +
@@ -316,7 +316,7 @@ ${depends.join("\n")}
 ${resources.join("\n")}
   def install
     virtualenv_install_with_resources
-    # Host settings and skill links name opt paths, which \`brew upgrade\` moves to the new version.
+    # Harness settings and skill links name opt paths, which \`brew upgrade\` moves to the new version.
     site_packages = Language::Python.site_packages("python3.14")
     (bin/"kb").unlink
     (bin/"kb").write_env_script libexec/"bin/kb",
@@ -326,13 +326,13 @@ ${resources.join("\n")}
 
   def caveats
     <<~EOS
-      Register knowledge-mcp with each agent app you use on this Mac:
+      Register knowledge-mcp with each harness you use on this Mac:
         kb setup claude-code
         kb setup codex
         kb setup claude-desktop
         kb setup pi
         kb setup opencode
-      Before \`brew uninstall knowledge-mcp\`, run \`kb setup --remove <host>\` for each app.
+      Before \`brew uninstall knowledge-mcp\`, run \`kb setup --remove <harness>\` for each harness.
       Your answer log and edit record stay after the uninstall, in $KNOWLEDGE_MCP_STATE_DIR when set,
       else $XDG_STATE_HOME/knowledge-mcp, else ~/.local/state/knowledge-mcp. \`kb doctor\` shows the folder in use.
     EOS

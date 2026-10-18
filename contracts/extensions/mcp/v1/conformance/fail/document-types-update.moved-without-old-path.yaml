@@ -1,0 +1,14 @@
+---
+# A move in listing_changes names the path before the move.
+schema: knowledge-mcp/document-types-update/1
+location: ~/notes
+based_on: sha256:1111111111111111111111111111111111111111111111111111111111111111
+record: null
+digest: null
+listing_changes:
+  - change: moved
+    path: docs/rfcs/0042-caching.md
+changed: []
+to_settle: []
+scopes: []
+received: []

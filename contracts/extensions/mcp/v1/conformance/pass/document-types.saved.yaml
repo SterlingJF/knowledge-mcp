@@ -1,0 +1,25 @@
+---
+schema: knowledge-mcp/document-types/1
+files:
+  docs/rfcs/0042-cache.md:
+    universe_spec: codebase-recordkeeping
+    version: "0.1"
+    document_type: design-proposal
+    set_by: agent
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
+        date as you work.
+      location: AGENTS.md
+    time: "2026-10-18T07:04:56.885Z"
+  ideas.txt:
+    no_document_type: true
+    set_by: agent
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
+        date as you work.
+      location: AGENTS.md
+    time: "2026-10-18T07:04:56.885Z"

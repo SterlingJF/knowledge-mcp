@@ -1,0 +1,18 @@
+---
+# Document types sit in one flat list beside universe_specs, each naming its universe spec.
+schema: knowledge-mcp/import/1
+location: pasted in chat
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy at v0.10.0
+    from_parent: false
+    document_types: []
+document_types: []
+passages:
+  - id: p1
+    kind: paragraph
+    lines: [1, 1]
+    opening: Ana said so.
+    under: null
+received: []

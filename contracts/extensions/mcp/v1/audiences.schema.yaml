@@ -1,0 +1,90 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: audiences.schema.yaml
+title: kb_list_audiences result
+description: >-
+  The structuredContent of a kb_list_audiences result, or problem details
+  when isError is true.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Audiences answer
+    type: object
+    additionalProperties: false
+    required:
+      - schema
+      - location
+      - universe_spec
+      - universe_specs
+      - document_type
+      - actor
+      - frame
+      - choices
+      - received
+    properties:
+      schema:
+        const: knowledge-mcp/audiences/1
+      location:
+        $ref: common.schema.yaml#/$defs/location
+      universe_spec:
+        description: The id of the universe spec that holds the document type.
+        type: string
+        minLength: 1
+      universe_specs:
+        description: The universe spec named by `universe_spec`.
+        type: array
+        minItems: 1
+        maxItems: 1
+        items:
+          $ref: common.schema.yaml#/$defs/spec
+      document_type:
+        type: string
+        minLength: 1
+      actor:
+        description: The role that uses the document type, from kbp_kinds.
+        type: [string, "null"]
+      frame:
+        title: Audience frame
+        description: >-
+          The audience question from the universe spec, or null when the
+          universe spec has none.
+        type: [object, "null"]
+        additionalProperties: false
+        required: [id, question]
+        properties:
+          id:
+            const: audience
+          question:
+            type: string
+      choices:
+        description: In universe spec order.
+        type: array
+        items:
+          title: Audience choice
+          type: object
+          additionalProperties: false
+          required: [id, label]
+          properties:
+            id:
+              type: string
+              minLength: 1
+            label:
+              type: string
+            question:
+              description: The question for this choice, from the universe spec.
+              type: string
+      received:
+        $ref: common.schema.yaml#/$defs/received
+    if:
+      type: object
+      properties:
+        frame:
+          type: "null"
+    then:
+      type: object
+      properties:
+        choices:
+          const: []

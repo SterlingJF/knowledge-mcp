@@ -1,7 +1,7 @@
 {
   "name": "knowledge-mcp",
-  "version": "0.2.1",
-  "description": "Say what each file in a knowledge base is for, from the universe specs that apply to the file, check the card before writing, bring in documents written elsewhere passage by passage, and keep a record of each edit and of each file's fit, with every knowledge-bus skill and kbp mode.",
+  "version": "0.3.0",
+  "description": "Plain, structured thinking while you work. It's free, open, and local-first.",
   "author": { "name": "Sterling Freeman" },
   "homepage": "https://github.com/SterlingJF/knowledge-mcp",
   "repository": "https://github.com/SterlingJF/knowledge-mcp",
@@ -10,11 +10,11 @@
   "mcpServers": "./codex-mcp.json",
   "interface": {
     "displayName": "knowledge-mcp",
-    "shortDescription": "Say what each file in a knowledge base is for.",
-    "longDescription": "Find every universe spec and document type that fits a file, read its card, check the card's conditions before writing, bring in documents written elsewhere passage by passage, keep a record of each edit and of each file's fit, and use every knowledge-bus skill and kbp mode.",
+    "shortDescription": "Plain, structured thinking while you work. It's free, open, and local-first.",
+    "longDescription": "Plain, structured thinking while you work. It's free, open, and local-first.",
     "developerName": "Sterling Freeman",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": "What is this file for?"
+    "defaultPrompt": "Which document type is README.md?"
   }
 }

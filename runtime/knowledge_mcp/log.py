@@ -1,12 +1,4 @@
-"""One JSON Lines entry per tool answer, in knowledge-mcp's own state folder.
-
-The edit record (`knowledge_mcp.edits`) keeps its own JSON Lines file in the same folder.
-
-The folder is the one `KNOWLEDGE_MCP_STATE_DIR` names, else `$XDG_STATE_HOME/knowledge-mcp`, else
-`~/.local/state/knowledge-mcp`. `directory` alone resolves the folder; the log, the edit record,
-Explorer and `kb setup` all call `directory`. Codex starts the server with HOME, a few other names
-and the names its entry lists, so the default needs only HOME.
-"""
+"""The tool log, `log.jsonl`, and the location of the state folder."""
 
 from __future__ import annotations
 
@@ -19,14 +11,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-# Names the state folder; a host that clears the environment must pass the name through.
 VARIABLE = "KNOWLEDGE_MCP_STATE_DIR"
 
 _lock = threading.Lock()
 
 
 def _absolute(value: str) -> Path | None:
-    """The folder an absolute value names, `~` expanded; None for an empty or relative value."""
+    """The value as a Path after `~` expansion, or None when the value is empty or relative."""
     expanded = os.path.expanduser(value)
     return Path(expanded) if os.path.isabs(expanded) else None
 
@@ -34,7 +25,11 @@ def _absolute(value: str) -> Path | None:
 def directory(
     environ: Mapping[str, str] | None = None, home: Path | None = None
 ) -> Path:
-    """The state folder: `$KNOWLEDGE_MCP_STATE_DIR`, else the XDG one, else the one under HOME."""
+    """`$KNOWLEDGE_MCP_STATE_DIR`, else `$XDG_STATE_HOME/knowledge-mcp`, else
+    `~/.local/state/knowledge-mcp`.
+
+    Skips empty and relative values.
+    """
     environ = os.environ if environ is None else environ
     named = _absolute(environ.get(VARIABLE, ""))
     if named is not None:
@@ -50,7 +45,7 @@ def path() -> Path:
 
 
 def digest(arguments: dict[str, Any]) -> str:
-    """SHA-256 of the arguments as sent, keys sorted, no spaces."""
+    """Hash JSON with sorted keys and no whitespace between tokens."""
     canonical = json.dumps(arguments, sort_keys=True, separators=(",", ":"))
     return text_digest(canonical)
 
@@ -66,7 +61,10 @@ def now() -> str:
 
 
 def append(name: str, entry: dict[str, Any]) -> None:
-    """Append one JSON line to `name` in the state folder, readable by the user alone."""
+    """Append one JSON line to `name` in the state folder.
+
+    Create a missing folder with mode 0700 and a missing file with mode 0600.
+    """
     line = json.dumps(entry, ensure_ascii=False) + "\n"
     with _lock:
         directory().mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -82,7 +80,7 @@ def append(name: str, entry: dict[str, Any]) -> None:
 def record(
     tool: str, location: str, arguments: dict[str, Any], returned: list[str]
 ) -> None:
-    """Append the time, the tool, the location text, a digest of the arguments and every text returned."""
+    """Store a digest of the arguments, never the arguments themselves."""
     append(
         path().name,
         {

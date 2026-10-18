@@ -1,0 +1,17 @@
+---
+# A candidate names its document type as document_type.
+schema: knowledge-mcp/document-type/1
+location: docs/rfcs/0042-cache.md
+universe_specs: []
+candidates:
+  - universe_spec: codebase-recordkeeping
+    kind: design-proposal
+    name: Design proposal
+    alias: null
+    action: null
+    actor: null
+    timing: null
+    matched: [rfc]
+    matched_on: folder
+every_document_type: null
+received: []

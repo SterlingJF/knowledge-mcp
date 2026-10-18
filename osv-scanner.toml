@@ -1,6 +1,6 @@
-# Scan exceptions belong here with a vulnerability ID, reason, and expiry.
+# Give every ignored vulnerability a reason and an ignoreUntil date.
 
 [[IgnoredVulns]]
 id = "GHSA-vfj7-8cjw-p6xm"
 ignoreUntil = 2027-01-08
-reason = "braces 3.0.3: no patched release. Reached only through markdownlint-cli2, which expands only glob patterns from this repo or the tool itself."
+reason = "braces 3.0.3 has no patched release. Only markdownlint-cli2 uses braces. braces expands only glob patterns from this repo and markdownlint-cli2."

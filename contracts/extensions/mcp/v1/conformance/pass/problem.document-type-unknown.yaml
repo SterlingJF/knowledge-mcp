@@ -1,0 +1,11 @@
+---
+type: https://github.com/SterlingJF/knowledge-mcp/problems/document-type-unknown
+title: Unknown document type
+detail:
+  No document type 'no-such-type' in the universe specs that apply. Pick a document
+  type from the `kbp_kinds` list.
+errors:
+  - detail:
+      No document type 'no-such-type' in the universe specs that apply. Pick a
+      document type from the `kbp_kinds` list.
+    pointer: "#/document_type"

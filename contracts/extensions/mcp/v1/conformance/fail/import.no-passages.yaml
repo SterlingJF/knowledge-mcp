@@ -1,0 +1,16 @@
+---
+# Rejected by the schema: kb_prepare_import returns an error for a text with
+# no passage.
+schema: knowledge-mcp/import/1
+location: https://drive.google.com/document/d/1Example/edit
+universe_specs:
+  - id: team-notes
+    version: "1"
+    source: sent by the harness
+    from_parent: true
+document_types: []
+passages: []
+received:
+  - name: team-notes.kbp.yaml
+    digest: >-
+      sha256:0000000000000000000000000000000000000000000000000000000000000000

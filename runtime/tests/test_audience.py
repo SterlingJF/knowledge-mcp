@@ -1,5 +1,3 @@
-"""Test audience choices from each document type's universe spec through the stdio server."""
-
 from __future__ import annotations
 
 import json
@@ -8,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from knowledge_mcp import bundled
-from tests.hosts import (
+from tests.harness import (
     CODEBASE,
     PRODUCT,
     checked,
@@ -44,23 +42,28 @@ def audience_arguments(root: Path, document: str, kind: str, **extra) -> dict:
     return {
         **scope_arguments(root, document, send_text=extra.pop("send_text", False)),
         "location": str(root / document),
-        "kind": kind,
+        "document_type": kind,
         **extra,
     }
 
 
 def test_design_doc_returns_audience_frame_values(codebase, tmp_path):
     [result] = ask(
-        tmp_path, ("kb_audience", audience_arguments(codebase, PRICING, "design-doc"))
+        tmp_path,
+        ("kb_list_audiences", audience_arguments(codebase, PRICING, "design-doc")),
     )
-    answer = checked(result, "audience")
+    answer = checked(result, "audiences")
 
-    assert answer["universe_spec"] == {
-        "id": PRODUCT,
-        "version": "0.9",
-        "source": f"bundled copy at {bundled.ref()}",
-    }
-    assert answer["kind"] == "design-doc"
+    assert answer["universe_spec"] == PRODUCT
+    assert answer["universe_specs"] == [
+        {
+            "id": PRODUCT,
+            "version": "0.9",
+            "source": f"bundled copy at {bundled.ref()}",
+            "from_parent": False,
+        }
+    ]
+    assert answer["document_type"] == "design-doc"
     assert answer["actor"] == "reviewer"
     assert answer["frame"] == {
         "id": "audience",
@@ -73,17 +76,17 @@ def test_design_doc_returns_audience_frame_values(codebase, tmp_path):
 def test_design_proposal_returns_actor_without_choices(codebase, tmp_path):
     [result] = ask(
         tmp_path,
-        ("kb_audience", audience_arguments(codebase, RFC, "design-proposal")),
+        ("kb_list_audiences", audience_arguments(codebase, RFC, "design-proposal")),
     )
-    answer = checked(result, "audience")
+    answer = checked(result, "audiences")
 
-    assert answer["universe_spec"]["id"] == CODEBASE
+    assert answer["universe_spec"] == CODEBASE
     assert answer["actor"] == "the maintainers who decide on designs"
     assert answer["frame"] is None
     assert answer["choices"] == []
 
 
-def test_host_defined_audience_choices_are_reused_by_digest(codebase, tmp_path):
+def test_harness_defined_audience_choices_are_reused_by_digest(codebase, tmp_path):
     universe = codebase / ".knowledge-bus" / f"{PRODUCT}.kbp.yaml"
     text = universe.read_text()
     assert "values: [self, internal, counterparty, regulator, public]" in text
@@ -96,18 +99,20 @@ def test_host_defined_audience_choices_are_reused_by_digest(codebase, tmp_path):
     first = audience_arguments(codebase, PRICING, "design-doc", send_text=True)
 
     async def steps(client):
-        sent = checked(await client.call_tool("kb_audience", first), "audience")
+        sent = checked(await client.call_tool("kb_list_audiences", first), "audiences")
         digests = {item["name"]: item["digest"] for item in sent["received"]}
         later = audience_arguments(codebase, PRICING, "design-doc")
-        for scope in later["universe_specs"]:
+        for scope in later["knowledge_bus_folders"]:
             for spec in scope["files"]:
                 spec["digest"] = digests[spec["name"]]
-        return sent, checked(await client.call_tool("kb_audience", later), "audience")
+        return sent, checked(
+            await client.call_tool("kb_list_audiences", later), "audiences"
+        )
 
     sent, later = session(server_parameters(tmp_path), steps)
 
     assert [choice["id"] for choice in sent["choices"]] == ["self", "partner"]
-    assert sent["universe_spec"]["source"] == "sent by the host"
+    assert sent["universe_specs"][0]["source"] == "sent by the harness"
     assert later["choices"] == sent["choices"]
     assert later["received"] == []
 
@@ -117,29 +122,30 @@ def test_single_universe_spec_returns_audience_choices(tmp_path):
     write(root, PRICING)
 
     [result] = ask(
-        tmp_path, ("kb_audience", audience_arguments(root, PRICING, "design-doc"))
+        tmp_path, ("kb_list_audiences", audience_arguments(root, PRICING, "design-doc"))
     )
 
-    assert [c["id"] for c in checked(result, "audience")["choices"]] == AUDIENCE
+    assert [c["id"] for c in checked(result, "audiences")["choices"]] == AUDIENCE
 
 
 def test_ambiguous_type_requires_universe_argument(codebase, tmp_path):
     arguments = audience_arguments(codebase, PRICING, "architecture-overview")
     unsettled, settled = ask(
         tmp_path,
-        ("kb_audience", arguments),
-        ("kb_audience", {**arguments, "universe": CODEBASE}),
+        ("kb_list_audiences", arguments),
+        ("kb_list_audiences", {**arguments, "universe_spec": CODEBASE}),
     )
 
     assert unsettled.is_error
     [message] = texts(unsettled)
-    assert CODEBASE in message and PRODUCT in message and "`universe`" in message
-    assert checked(settled, "audience")["universe_spec"]["id"] == CODEBASE
+    assert CODEBASE in message and PRODUCT in message and "`universe_spec`" in message
+    assert checked(settled, "audiences")["universe_spec"] == CODEBASE
 
 
 def test_an_unknown_document_type_is_refused(codebase, tmp_path):
     [result] = ask(
-        tmp_path, ("kb_audience", audience_arguments(codebase, PRICING, "not-a-type"))
+        tmp_path,
+        ("kb_list_audiences", audience_arguments(codebase, PRICING, "not-a-type")),
     )
 
     assert result.is_error
@@ -148,12 +154,15 @@ def test_an_unknown_document_type_is_refused(codebase, tmp_path):
 
 def test_each_answer_is_logged_once(codebase, tmp_path):
     calls = [
-        ("kb_audience", audience_arguments(codebase, PRICING, "design-doc")),
-        ("kb_audience", audience_arguments(codebase, RFC, "design-proposal")),
+        ("kb_list_audiences", audience_arguments(codebase, PRICING, "design-doc")),
+        ("kb_list_audiences", audience_arguments(codebase, RFC, "design-proposal")),
     ]
     results = ask(tmp_path, *calls)
 
     log = tmp_path / "knowledge-mcp" / "log.jsonl"
     logged = [json.loads(line) for line in log.read_text().splitlines()]
-    assert [entry["tool"] for entry in logged] == ["kb_audience", "kb_audience"]
+    assert [entry["tool"] for entry in logged] == [
+        "kb_list_audiences",
+        "kb_list_audiences",
+    ]
     assert [entry["returned"] for entry in logged] == [texts(r) for r in results]

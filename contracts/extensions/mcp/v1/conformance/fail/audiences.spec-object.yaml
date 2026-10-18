@@ -1,0 +1,18 @@
+---
+# universe_spec is the id string; the spec object sits in universe_specs.
+schema: knowledge-mcp/audiences/1
+location: ~/notes/docs/rfcs/0042-cache.md
+universe_spec:
+  id: codebase-recordkeeping
+  version: "0.1"
+  source: bundled copy at v0.10.0
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy at v0.10.0
+    from_parent: false
+document_type: design-proposal
+actor: the maintainers who decide on designs
+frame: null
+choices: []
+received: []

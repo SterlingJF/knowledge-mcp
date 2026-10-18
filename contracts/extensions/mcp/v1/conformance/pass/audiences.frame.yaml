@@ -1,0 +1,26 @@
+---
+schema: knowledge-mcp/audiences/1
+location: ~/notes/docs/rfcs/0042-cache.md
+universe_spec: product-development
+universe_specs:
+  - id: product-development
+    version: "0.9"
+    source: bundled copy at v0.10.0
+    from_parent: false
+document_type: design-doc
+actor: reviewer
+frame:
+  id: audience
+  question: Who is this artifact going to?
+choices:
+  - id: self
+    label: Self
+  - id: internal
+    label: Internal
+  - id: counterparty
+    label: Counterparty
+  - id: regulator
+    label: Regulator
+  - id: public
+    label: Public
+received: []

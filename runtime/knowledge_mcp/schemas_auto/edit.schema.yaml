@@ -1,0 +1,481 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: edit.schema.yaml
+title: kb_record_edit result
+description: >-
+  The structuredContent of a kb_record_edit result, or problem details when
+  isError is true.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Edit receipt
+    description: The recorded edit without `before` and `after`.
+    type: object
+    required:
+      - schema
+      - id
+      - time
+      - location
+      - allowed_by
+      - before_digest
+      - after_digest
+    properties:
+      schema:
+        const: knowledge-mcp/edit/1
+      id:
+        $ref: common.schema.yaml#/$defs/edit_id
+      time:
+        $ref: common.schema.yaml#/$defs/time
+      location:
+        $ref: common.schema.yaml#/$defs/location
+      allowed_by:
+        $ref: document-types.schema.yaml#/$defs/allowed_by
+      whole_file:
+        description: Present when the edit replaced the whole file.
+        const: true
+      before_digest:
+        $ref: common.schema.yaml#/$defs/digest
+      after_digest:
+        $ref: common.schema.yaml#/$defs/digest
+    additionalProperties: false
+  common.schema.yaml:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    $id: common.schema.yaml
+    title: Shared shapes
+    description: Definitions shared by the tool results and the document-types file.
+    $defs:
+      location:
+        title: Location
+        type: string
+      path:
+        title: Path
+        description: Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.
+        type: string
+        minLength: 1
+      fingerprint:
+        title: Fingerprint
+        description: A value that changes only when the file content changes, such as SHA-256 or Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing` that moved.
+        type: string
+      digest:
+        title: Digest
+        description: The SHA-256 of the text's UTF-8 bytes.
+        type: string
+        pattern: ^sha256:[0-9a-f]{64}$
+      time:
+        title: Time
+        description: ISO 8601 date and time in UTC.
+        type: string
+        pattern: ^\d{4}-\d{2}-\d{2}T.*Z$
+      edit_id:
+        title: Edit id
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      received:
+        title: Received
+        description: Digests of the texts sent in this call. Later in the session, send a digest in place of its text.
+        type: array
+        items:
+          title: Received text
+          type: object
+          required:
+            - name
+            - digest
+          properties:
+            name:
+              type: string
+            digest:
+              $ref: "#/$defs/digest"
+          additionalProperties: false
+      spec:
+        title: Spec in scope
+        type: object
+        required:
+          - id
+          - version
+          - source
+          - from_parent
+        properties:
+          id:
+            type: string
+            minLength: 1
+          version:
+            type: string
+          source:
+            description: "`bundled copy at <ref>` means knowledge-mcp used its own copy of the universe spec, taken from git ref `<ref>` of the knowledge-bus repository."
+            type: string
+            pattern: ^(sent by the harness|bundled copy at \S+)$
+          from_parent:
+            description: True when the universe spec comes from a `.knowledge-bus/` folder above the deepest `.knowledge-bus/` folder the harness sent.
+            type: boolean
+        additionalProperties: false
+      candidate:
+        title: Candidate
+        description: A document type whose alias shares a word with the file name or its nearest folder.
+        type: object
+        required:
+          - universe_spec
+          - document_type
+          - name
+          - alias
+          - action
+          - actor
+          - timing
+          - matched
+          - matched_on
+        properties:
+          universe_spec:
+            type: string
+            minLength: 1
+          document_type:
+            type: string
+            minLength: 1
+          name:
+            type: string
+          alias:
+            title: Alias
+            description: From kbp_kinds.
+            type:
+              - object
+              - "null"
+            properties:
+              kind:
+                enum:
+                  - descriptive
+                  - normative
+              form:
+                type: string
+            additionalProperties: false
+          action:
+            type:
+              - string
+              - "null"
+          actor:
+            type:
+              - string
+              - "null"
+          timing:
+            type:
+              - string
+              - "null"
+          matched:
+            description: Words shared by the alias and the file name or nearest folder, lowercased with common plural suffixes removed.
+            type: array
+            minItems: 1
+            items:
+              type: string
+          matched_on:
+            description: "`folder` means only the nearest folder name matched."
+            enum:
+              - name
+              - folder
+          role_matches:
+            description: True when `actor` and the role share a normalized word after knowledge-mcp removes stopwords. Present only when the harness sent a role.
+            type: boolean
+        additionalProperties: false
+      type_group:
+        title: Type group
+        type: object
+        required:
+          - universe_spec
+          - covers
+          - covers_matched
+          - kinds
+        properties:
+          universe_spec:
+            type: string
+            minLength: 1
+          covers:
+            type:
+              - string
+              - "null"
+          covers_matched:
+            description: Words in the path that also appear in the universe spec label or `covers`.
+            type: array
+            items:
+              type: string
+          kinds:
+            type: array
+            items:
+              title: Listed document type
+              type: object
+              required:
+                - document_type
+                - action
+                - actor
+              properties:
+                document_type:
+                  type: string
+                  minLength: 1
+                action:
+                  type:
+                    - string
+                    - "null"
+                actor:
+                  type:
+                    - string
+                    - "null"
+              additionalProperties: false
+        additionalProperties: false
+      file_change:
+        title: File change
+        oneOf:
+          - $ref: "#/$defs/created"
+          - $ref: "#/$defs/deleted"
+          - $ref: "#/$defs/moved"
+          - $ref: "#/$defs/edited"
+      created:
+        title: File created
+        type: object
+        required:
+          - change
+          - path
+        properties:
+          change:
+            const: created
+          path:
+            $ref: "#/$defs/path"
+          fingerprint:
+            $ref: "#/$defs/fingerprint"
+        additionalProperties: false
+      deleted:
+        title: File deleted
+        type: object
+        required:
+          - change
+          - path
+        properties:
+          change:
+            const: deleted
+          path:
+            $ref: "#/$defs/path"
+        additionalProperties: false
+      moved:
+        title: File moved
+        type: object
+        required:
+          - change
+          - path
+          - old_path
+        properties:
+          change:
+            const: moved
+          path:
+            description: The path after the move.
+            $ref: "#/$defs/path"
+          old_path:
+            $ref: "#/$defs/path"
+          fingerprint:
+            $ref: "#/$defs/fingerprint"
+        additionalProperties: false
+      edited:
+        title: File edited
+        type: object
+        required:
+          - change
+          - path
+          - fingerprint
+        properties:
+          change:
+            const: edited
+          path:
+            $ref: "#/$defs/path"
+          fingerprint:
+            $ref: "#/$defs/fingerprint"
+        additionalProperties: false
+  document-types.schema.yaml:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    $id: document-types.schema.yaml
+    title: Document types
+    description: The document-types file, `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` at the knowledge base's root folder. Each entry maps a file's path to a universe spec and document type, or to `no_document_type`, plus an optional reader. The harness reads and writes the file and creates missing folders.
+    type: object
+    required:
+      - schema
+      - files
+    properties:
+      schema:
+        const: knowledge-mcp/document-types/1
+      files:
+        type: object
+        propertyNames:
+          $ref: "#/$defs/file_key"
+        additionalProperties:
+          $ref: "#/$defs/saved_entry"
+    additionalProperties: false
+    $defs:
+      file_key:
+        title: File key
+        description: Path from the root folder with `/` between folders. Empty, `.` and `..` parts and backslashes are invalid.
+        type: string
+        pattern: ^(?:[^/\\.][^/\\]*|\.[^/\\.][^/\\]*|\.\.[^/\\]+)(?:/(?:[^/\\.][^/\\]*|\.[^/\\.][^/\\]*|\.\.[^/\\]+))*$
+      audience:
+        title: Audience
+        description: The document's reader, and whether the person confirmed the value.
+        type: object
+        required:
+          - value
+          - status
+        properties:
+          value:
+            type: string
+          status:
+            enum:
+              - confirmed
+              - guessed
+        additionalProperties: false
+      allowed_by:
+        title: Allowed by
+        description: The person's permission for the save or the edit.
+        type: object
+        required:
+          - basis
+          - text
+        properties:
+          basis:
+            description: "`request` means the person asked in this session. `instruction` means the person wrote an instruction for agents, such as in AGENTS.md. `accepted_change` means the person accepted a proposed change."
+            enum:
+              - request
+              - instruction
+              - accepted_change
+          text:
+            description: The request, instruction or accepted change, quoted.
+            type: string
+            minLength: 1
+          location:
+            description: The file holding the instruction or the accepted change.
+            type: string
+        additionalProperties: false
+      set_by:
+        title: Set by
+        description: "`person` when the person stated the document type or reader. An entry the person set wins over any later entry by the agent."
+        enum:
+          - agent
+          - person
+      entry:
+        title: Entry
+        oneOf:
+          - $ref: "#/$defs/typed_entry"
+          - $ref: "#/$defs/untyped_entry"
+      typed_entry:
+        title: Typed entry
+        type: object
+        required:
+          - universe_spec
+          - version
+          - document_type
+          - set_by
+          - time
+        properties:
+          universe_spec:
+            type: string
+            minLength: 1
+          version:
+            type: string
+          document_type:
+            type: string
+            minLength: 1
+          audience:
+            $ref: "#/$defs/audience"
+          set_by:
+            $ref: "#/$defs/set_by"
+          allowed_by:
+            $ref: "#/$defs/allowed_by"
+          fingerprint:
+            $ref: common.schema.yaml#/$defs/fingerprint
+          time:
+            $ref: common.schema.yaml#/$defs/time
+        additionalProperties: false
+      untyped_entry:
+        title: Untyped entry
+        type: object
+        required:
+          - no_document_type
+          - set_by
+          - time
+        properties:
+          no_document_type:
+            const: true
+          audience:
+            $ref: "#/$defs/audience"
+          set_by:
+            $ref: "#/$defs/set_by"
+          allowed_by:
+            $ref: "#/$defs/allowed_by"
+          fingerprint:
+            $ref: common.schema.yaml#/$defs/fingerprint
+          time:
+            $ref: common.schema.yaml#/$defs/time
+        additionalProperties: false
+      saved_entry:
+        title: Saved entry
+        allOf:
+          - type: object
+            required:
+              - allowed_by
+            properties:
+              allowed_by:
+                $ref: "#/$defs/allowed_by"
+          - $ref: "#/$defs/entry"
+  problem.schema.yaml:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    $id: problem.schema.yaml
+    title: Problem details
+    description: An error from a knowledge-mcp tool, as RFC 9457 problem details. On failure, `kb type --json` and `kb doctor --json` print a problem object as the last stderr line. Branch on `type`.
+    type: object
+    required:
+      - type
+      - title
+      - detail
+    properties:
+      type:
+        oneOf:
+          - title: Invalid arguments
+            description: An argument is unknown, missing or fails the tool's input schema, or two arguments conflict.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/argument-invalid
+          - title: Invalid folders
+            description: The call sent invalid folders or file names, or omitted universe spec text that knowledge-mcp could not retrieve.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/scope-invalid
+          - title: Unknown digest
+            description: The call sent a digest that matches no text received in this session.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/digest-unknown
+          - title: Invalid document-types file
+            description: The document-types file text sent is not valid YAML or fails document-types.schema.yaml.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/record-invalid
+          - title: Unknown document type
+            description: The requested document type is absent from the selected universe spec or universe specs.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/document-type-unknown
+          - title: kbp failed
+            description: kbp exited with an error or is missing from the install.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/kbp-failed
+          - title: Unreadable kbp output
+            description: kbp printed no JSON object, or an object with an unsupported `schema` value.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/kbp-version-skew
+          - title: knowledge-mcp failed
+            description: Any other failure inside knowledge-mcp.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/internal-error
+      title:
+        type: string
+      detail:
+        description: For MCP errors, the last text block contains the same detail.
+        type: string
+        minLength: 1
+      errors:
+        type: array
+        minItems: 1
+        items:
+          title: Argument error
+          type: object
+          required:
+            - detail
+            - pointer
+          properties:
+            detail:
+              type: string
+            pointer:
+              description: JSON Pointer into the arguments as sent, such as "#/entries/0/document_type".
+              type: string
+              pattern: ^#(/([^~/]|~[01])*)*$
+          additionalProperties: false
+    additionalProperties: false

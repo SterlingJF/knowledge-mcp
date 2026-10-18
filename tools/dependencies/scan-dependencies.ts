@@ -14,61 +14,81 @@ import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
 import { parseAllDocuments, stringify } from "yaml";
+import type { Document } from "yaml";
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+type Yaml = string | number | boolean | null | ReadonlyArray<Yaml> | Mapping;
+interface Mapping {
+  readonly [key: string]: Yaml;
+}
+
+function isMapping<Value>(value: Value): value is Value & Mapping {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function readLockDocuments(path: string): Array<Record<string, unknown>> {
+function isLockfileVersion(version: Yaml | undefined): boolean {
+  return (
+    (typeof version === "string" && /^\d+(?:\.\d+)?$/.test(version)) ||
+    (typeof version === "number" && Number.isFinite(version) && version > 0)
+  );
+}
+
+/** Throws on a YAML error or a non-mapping document. The message names the document. */
+function parseDocument(document: Document.Parsed, location: string): Mapping {
+  if (document.errors.length > 0) {
+    throw new Error(
+      `${location}: ${document.errors.map((error) => error.message).join("; ")}`,
+    );
+  }
+  let value: unknown;
+  try {
+    value = document.toJS();
+  } catch (error) {
+    throw new Error(
+      `${location}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+  if (!isMapping(value))
+    throw new Error(`${location}: expected a lockfile mapping`);
+  return value;
+}
+
+function isMappingOfMappings(value: Yaml | undefined): value is Mapping {
+  return isMapping(value) && Object.values(value).every(isMapping);
+}
+
+function checkLock(value: Mapping, location: string): void {
+  if (!isLockfileVersion(value.lockfileVersion)) {
+    throw new Error(`${location}: missing or invalid lockfileVersion`);
+  }
+  const importers = value.importers;
+  if (!isMappingOfMappings(importers) || Object.keys(importers).length === 0) {
+    throw new Error(
+      `${location}: expected importers to be a nonempty mapping of mappings`,
+    );
+  }
+  for (const key of ["packages", "snapshots"]) {
+    if (key in value && !isMappingOfMappings(value[key])) {
+      throw new Error(
+        `${location}: expected every ${key} entry to be a mapping`,
+      );
+    }
+  }
+  if ("settings" in value && !isMapping(value.settings)) {
+    throw new Error(`${location}: expected a settings mapping`);
+  }
+}
+
+function readLockDocuments(path: string): Array<Mapping> {
   const documents = parseAllDocuments(readFileSync(path, "utf8"));
   if (documents.length === 0) throw new Error(`${path}: no lockfile documents`);
   return documents.map((document, index) => {
     const location = `${path}, document ${index + 1}`;
-    if (document.errors.length > 0) {
-      throw new Error(
-        `${location}: ${document.errors.map((error) => error.message).join("; ")}`,
-      );
-    }
-    let value: unknown;
-    try {
-      value = document.toJS();
-    } catch (error) {
-      throw new Error(
-        `${location}: ${error instanceof Error ? error.message : error}`,
-      );
-    }
-    if (!isRecord(value))
-      throw new Error(`${location}: expected a lockfile mapping`);
-    const version = value.lockfileVersion;
-    if (!(
-      (typeof version === "string" && /^\d+(?:\.\d+)?$/.test(version)) ||
-      (typeof version === "number" && Number.isFinite(version) && version > 0)
-    )) {
-      throw new Error(`${location}: missing or invalid lockfileVersion`);
-    }
-    if (
-      !isRecord(value.importers) ||
-      Object.keys(value.importers).length === 0 ||
-      !Object.values(value.importers).every(isRecord)
-    ) {
-      throw new Error(`${location}: expected nonempty importer mappings`);
-    }
-    for (const key of ["packages", "snapshots"]) {
-      if (
-        key in value &&
-        (!isRecord(value[key]) || !Object.values(value[key]).every(isRecord))
-      ) {
-        throw new Error(`${location}: expected ${key} mappings`);
-      }
-    }
-    if ("settings" in value && !isRecord(value.settings)) {
-      throw new Error(`${location}: expected a settings mapping`);
-    }
+    const value = parseDocument(document, location);
+    checkLock(value, location);
     return value;
   });
 }
 
-/** Every Cargo.lock outside hidden, node_modules and target folders. */
 function findCargoLockfiles(directory: string): Array<string> {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
@@ -83,7 +103,11 @@ function findCargoLockfiles(directory: string): Array<string> {
   });
 }
 
-/** Split every pnpm document for scanners that only understand one YAML document. */
+/**
+ * Returns the scanner's exit code, 127 for a missing scanner, or 1 for another spawn error.
+ * Returns 128 plus the signal number when a signal stops the scanner.
+ * Writes each pnpm-lock.yaml document to a temporary file because the scanner reads one YAML document per file.
+ */
 export function scanDependencies(
   options: { rootDir?: string; scanner?: string } = {},
 ): number {
@@ -116,9 +140,7 @@ export function scanDependencies(
     );
     if (result.error) {
       console.error(result.error.message);
-      return (result.error as NodeJS.ErrnoException).code === "ENOENT"
-        ? 127
-        : 1;
+      return "code" in result.error && result.error.code === "ENOENT" ? 127 : 1;
     }
     if (result.signal) {
       const signals: Partial<typeof constants.signals> = constants.signals;
@@ -135,7 +157,9 @@ if (
   import.meta.url === pathToFileURL(resolve(process.argv[1])).href
 ) {
   if (process.argv.length > 2) {
-    console.error("Usage: scan-dependencies (scans the current repository)");
+    console.error(
+      "Usage: node tools/dependencies/scan-dependencies.ts (run from the repo root, no arguments)",
+    );
     process.exitCode = 1;
   } else {
     try {

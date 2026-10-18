@@ -53,7 +53,7 @@ function run(dir: string, ...args: Array<string>) {
   };
 }
 
-test("fills a region from the file and heading its marker names", () => {
+test("fills a region from the file and heading named in its BEGIN marker", () => {
   const dir = workspace({
     "alpha/README.md": moduleReadme,
     "README.md": `# Root\n\n${region("alpha/README.md#layout", "old\n")}\nAfter.\n`,
@@ -99,7 +99,7 @@ test("check passes when every region is current", () => {
   assert.equal(run(dir, "--check").status, 0);
 });
 
-test("check fails on drift and leaves the file untouched", () => {
+test("check fails on a stale region and leaves the file untouched", () => {
   const stale = region("alpha/README.md#layout", "old\n");
   const dir = workspace({
     "alpha/README.md": moduleReadme,
@@ -107,7 +107,10 @@ test("check fails on drift and leaves the file untouched", () => {
   });
   const { status, output, readme } = run(dir, "--check");
   assert.equal(status, 1);
-  assert.match(output, /stale: README\.md alpha\/README\.md#layout/);
+  assert.match(
+    output,
+    /README\.md: region alpha\/README\.md#layout is stale\. Run `just generate_readme_maps`\./,
+  );
   assert.equal(readme, stale);
 });
 
@@ -149,7 +152,7 @@ test("fails when a region has no end marker", () => {
   assert.match(output, /unmatched/);
 });
 
-test("an END marker before BEGIN is rejected without changing the README", () => {
+test("fails on an END marker before BEGIN and leaves the README unchanged", () => {
   const original =
     "<!-- END AUTO-GENERATED alpha/README.md#layout -->\n<!-- BEGIN AUTO-GENERATED alpha/README.md#layout -->\n";
   const dir = workspace({

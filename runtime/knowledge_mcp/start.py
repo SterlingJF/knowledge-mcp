@@ -1,11 +1,6 @@
-"""Start the server from `requirements.lock`, every hashed file checked: `python -m knowledge_mcp.start`.
+"""Plugin entry point: install `requirements.lock` into a cached environment, then run the server."""
 
-Both host manifests run this with uv. It needs only the standard library, so it runs before any
-dependency is installed. It builds one virtual environment per lock and Python in
-knowledge-mcp's cache folder with `uv pip sync`, which refuses a file whose hash differs from the
-lock, then runs `python -m knowledge_mcp` from that environment. Later starts reuse the environment.
-"""
-
+# Standard library only: this module runs before any dependency is installed.
 from __future__ import annotations
 
 import hashlib
@@ -21,7 +16,8 @@ LOCK = PLUGIN / "requirements.lock"
 
 
 def cache() -> Path:
-    """`$XDG_CACHE_HOME/knowledge-mcp/environments`, else `~/.cache/knowledge-mcp/environments`."""
+    """Use `$XDG_CACHE_HOME/knowledge-mcp/environments` when XDG_CACHE_HOME is absolute.
+    Otherwise use `~/.cache/knowledge-mcp/environments`."""
     base = os.environ.get("XDG_CACHE_HOME", "")
     root = Path(base) if os.path.isabs(base) else Path.home() / ".cache"
     return root / "knowledge-mcp" / "environments"
@@ -34,15 +30,17 @@ def interpreter(environment: Path) -> Path:
 def _uv(*args: str) -> None:
     uv = shutil.which("uv")
     if uv is None:
-        sys.exit("knowledge-mcp needs uv: https://docs.astral.sh/uv/")
-    # stdout carries MCP messages, so uv reports on stderr.
+        sys.exit(
+            "Error: uv is not on PATH.\nInstall uv from https://docs.astral.sh/uv/."
+        )
+    # MCP messages use stdout, so uv's output goes to stderr.
     done = subprocess.run([uv, *args], stdout=sys.stderr, check=False)
     if done.returncode != 0:
         sys.exit(done.returncode)
 
 
 def environment() -> Path:
-    """The environment for this lock and this Python, built once."""
+    """Build the cached environment when its Python executable is missing."""
     key = hashlib.sha256(LOCK.read_bytes() + sys.version.encode()).hexdigest()[:16]
     target = cache() / key
     if interpreter(target).is_file():
@@ -59,11 +57,12 @@ def environment() -> Path:
             sys.executable,
             str(stage),
         )
+        # `uv pip sync` rejects any download whose hash is not in requirements.lock.
         _uv("pip", "sync", "--quiet", "--python", str(interpreter(stage)), str(LOCK))
         try:
             stage.rename(target)
         except OSError:
-            # Another session built the same environment first.
+            # Another session may have built the same environment first.
             if not interpreter(target).is_file():
                 raise
     finally:

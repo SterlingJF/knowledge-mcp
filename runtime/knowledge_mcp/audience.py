@@ -1,28 +1,27 @@
-"""Who a document is for, from the card's own universe spec, as `kbp` reports the spec.
-
-The choices are the values of the universe spec's `audience` frame, read from the
-`knowledge-bus/explorer-model/1` model that `kbp --inspect` prints. A universe spec that declares
-no `audience` frame offers no choices; the document type's `actor` from `kbp --kinds` stands
-instead.
-"""
+"""Read the audience choices of a universe spec from kbp output."""
 
 from __future__ import annotations
 
 from typing import Any
 
-SCHEMA = "knowledge-mcp/audience/1"
-MODEL = "knowledge-bus/explorer-model/1"
-FRAME = "audience"
+from knowledge_mcp import problems
+
+SCHEMA = "knowledge-mcp/audiences/1"
+AUDIENCE_ID = "audience"
 
 
-class AudienceError(ValueError):
-    """The answer can't be given; the message says what to send instead."""
+class AudienceError(problems.Error):
+    code = "document-type-unknown"
 
 
 def holder(
     listing: dict[str, Any], kind: str, universe: str | None
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """The universe spec in a `--kinds` listing that holds `kind`, and the document type."""
+    """Find the universe spec and the entry for document type `kind` in a `kb kbp kinds` listing.
+
+    `universe` limits the search to one universe spec. Raise AudienceError when no universe
+    spec, or more than one, holds `kind`.
+    """
     groups = listing.get("universe_specs", [listing])
     found = [
         (group["universe_spec"], item)
@@ -33,33 +32,33 @@ def holder(
     ]
     if not found:
         where = (
-            f"universe spec {universe}" if universe else "the universe specs in scope"
+            f"universe spec {universe}" if universe else "the universe specs that apply"
         )
-        msg = f"No document type {kind!r} in {where}: pick one that `kbp_kinds` lists."
-        raise AudienceError(msg)
+        msg = f"No document type {kind!r} in {where}. Pick a document type from the `kbp_kinds` list."
+        raise AudienceError(msg, pointer=problems.pointer("document_type"))
     if len(found) > 1:
         ids = ", ".join(spec["id"] for spec, _ in found)
         msg = (
-            f"Document type {kind!r} is in {ids}: send the one you mean as `universe`."
+            f"Document type {kind!r} is in universe specs {ids}. "
+            "Send the id of the universe spec you mean as `universe_spec`."
         )
-        raise AudienceError(msg)
+        raise AudienceError(
+            msg, code="argument-invalid", pointer=problems.pointer("universe_spec")
+        )
     return found[0]
 
 
 def frame(model: dict[str, Any]) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
-    """The `audience` frame and its values in a `kbp --inspect` model, or none."""
-    if model.get("schema") != MODEL:
-        msg = (
-            f"kbp --inspect printed schema {model.get('schema')!r}; knowledge-mcp reads {MODEL}. "
-            "The knowledge-bus pin and knowledge-mcp are out of step."
-        )
-        raise AudienceError(msg)
+    """Return the audience question and its choices from a `kb kbp inspect` model.
+
+    With no audience question, return `(None, [])`.
+    """
     entities = model.get("entities", [])
     declared = next(
         (
             e
             for e in entities
-            if e.get("kind") == "frame" and e.get("sourceId") == FRAME
+            if e.get("kind") == "frame" and e.get("sourceId") == AUDIENCE_ID
         ),
         None,
     )
@@ -73,4 +72,4 @@ def frame(model: dict[str, Any]) -> tuple[dict[str, Any] | None, list[dict[str, 
         if entity.get("description"):
             choice["question"] = entity["description"]
         choices.append(choice)
-    return {"id": FRAME, "question": declared.get("description", "")}, choices
+    return {"id": AUDIENCE_ID, "question": declared.get("description", "")}, choices

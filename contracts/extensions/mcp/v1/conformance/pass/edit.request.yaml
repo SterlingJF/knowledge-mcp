@@ -1,0 +1,10 @@
+---
+schema: knowledge-mcp/edit/1
+id: 6d90294609b64f94a0ec8d2e68de6ed7
+time: "2026-10-18T07:05:02.424Z"
+location: ~/notes/DESIGN.md
+allowed_by:
+  basis: request
+  text: Add an Overview section to DESIGN.md.
+before_digest: sha256:3713f20ffca57278ca48c668c8d3b9a0ac0f754b180ecf840ee526e15991c651
+after_digest: sha256:c20e71fb57a21d8d5987facb7aee1f77174be26dd46ab58cc0066bae0d3c5df7

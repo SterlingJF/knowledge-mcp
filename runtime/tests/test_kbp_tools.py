@@ -1,5 +1,3 @@
-"""Compare MCP tool responses with direct kbp output in equivalent scopes."""
-
 from __future__ import annotations
 
 import json
@@ -11,11 +9,10 @@ import anyio
 import pytest
 from mcp.client import Client
 
-from knowledge_mcp import kbp
-from knowledge_mcp.contract import ScopeRequest
 from knowledge_mcp.main import build_server
+from knowledge_mcp.models import ScopeRequest
 from knowledge_mcp.scope import Workspace
-from tests.hosts import (
+from tests.harness import (
     CODEBASE,
     PRODUCT,
     knowledge_base,
@@ -25,6 +22,7 @@ from tests.hosts import (
     texts,
     write,
 )
+from tests.kb_cli import KBP, kbp_env
 
 RFC = "docs/rfcs/0042-cache.md"
 RECORD = ".knowledge-bus/plugins/knowledge-mcp/record.yaml"
@@ -32,7 +30,6 @@ RECORD = ".knowledge-bus/plugins/knowledge-mcp/record.yaml"
 
 @pytest.fixture(autouse=True)
 def state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Keep the in-process server's log inside the test folder."""
     monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path / "state"))
     return tmp_path / "state"
 
@@ -57,16 +54,15 @@ def in_process(workspace: Workspace, calls: list[tuple[str, dict[str, Any]]]) ->
 def printed(
     workspace: Workspace, arguments: dict[str, Any], argv: list[str], **env: str
 ):
-    """Run kbp in the rebuilt folder and return stdout, stderr and exit code."""
     request = ScopeRequest.model_validate(arguments)
     with workspace.rebuilt(request) as rebuilt:
         done = subprocess.run(
-            [str(kbp.executable()), *argv],
+            [str(KBP), *argv],
             cwd=rebuilt.cwd,
             capture_output=True,
             text=True,
             check=False,
-            env=kbp.environment(**env),
+            env=kbp_env(**env),
         )
     return done.stdout, done.stderr, done.returncode
 
@@ -82,7 +78,7 @@ def streams(result) -> tuple[str, str, int]:
 
 
 CASES = [
-    ("kbp_check", {}, [], True),
+    ("kbp_validate", {}, [], True),
     ("kbp_inspect", {"universe": PRODUCT}, ["--inspect", "--universe", PRODUCT], False),
     ("kbp_kinds", {}, ["--kinds"], False),
     ("kbp_kinds", {"format": "markdown"}, ["--kinds", "--format", "markdown"], False),
@@ -101,10 +97,9 @@ CASES = [
 ]
 
 
-@pytest.mark.parametrize(("tool", "extra", "argv", "send_text"), CASES)
-def test_kbp_tool_matches_cli_streams_and_exit_status(
-    codebase, tmp_path, tool, extra, argv, send_text
-):
+@pytest.mark.parametrize("case", CASES)
+def test_kbp_tool_matches_cli_streams_and_exit_status(codebase, tmp_path, case):
+    tool, extra, argv, send_text = case
     workspace = Workspace(tmp_path / "work")
     arguments = {
         **scope_arguments(codebase, RFC, send_text=send_text),
@@ -114,7 +109,7 @@ def test_kbp_tool_matches_cli_streams_and_exit_status(
 
     [result] = in_process(workspace, [(tool, arguments)])
 
-    scope = {key: arguments[key] for key in ("folders", "universe_specs")}
+    scope = {key: arguments[key] for key in ("folders", "knowledge_bus_folders")}
     assert streams(result) == printed(workspace, scope, argv)
     assert result.is_error is (result.meta["exit_code"] != 0)
 
@@ -130,10 +125,10 @@ def test_mint_matches_cli_code_shape_and_count(codebase, tmp_path):
 
     [result] = in_process(workspace, [("kbp_mint", arguments)])
 
-    scope = {key: arguments[key] for key in ("folders", "universe_specs")}
+    scope = {key: arguments[key] for key in ("folders", "knowledge_bus_folders")}
     out, err, code = streams(result)
     kbp_out, kbp_err, kbp_code = printed(workspace, scope, ["--mint", "element", "3"])
-    # Codes are random; compare code prefixes and lengths with the CLI output.
+    # Random codes prevent comparisons of exact output.
     shape = [(line[0], len(line)) for line in out.splitlines()]
     assert shape == [(line[0], len(line)) for line in kbp_out.splitlines()]
     assert len(shape) == 3
@@ -148,7 +143,7 @@ def test_version_and_self_check_match_cli_output(tmp_path):
 
     for result, argv in ((version, ["--version"]), (self_check, ["--self-check"])):
         done = subprocess.run(
-            [str(kbp.executable()), *argv], capture_output=True, text=True, check=False
+            [str(KBP), *argv], capture_output=True, text=True, check=False
         )
         assert streams(result) == (done.stdout, done.stderr, done.returncode)
 
@@ -175,14 +170,14 @@ def test_explore_writes_index_and_returns_explorer_path(codebase, state):
     assert str(written) in texts(result)[-1]
 
 
-def test_check_refuses_bundled_copies(codebase, tmp_path):
+def test_validate_rejects_bundled_copies(codebase, tmp_path):
     workspace = Workspace(tmp_path / "work")
     arguments = {**scope_arguments(codebase, RFC), "location": str(codebase / RFC)}
 
-    [result] = in_process(workspace, [("kbp_check", arguments)])
+    [result] = in_process(workspace, [("kbp_validate", arguments)])
 
     assert result.is_error
-    assert "send the text" in texts(result)[0]
+    assert "Send the text" in texts(result)[0]
 
 
 def test_check_runs_on_text_sent_earlier_by_digest(codebase, tmp_path):
@@ -191,16 +186,16 @@ def test_check_runs_on_text_sent_earlier_by_digest(codebase, tmp_path):
         **scope_arguments(codebase, RFC, send_text=True),
         "location": str(codebase / RFC),
     }
-    [checked] = in_process(workspace, [("kbp_check", first)])
+    [checked] = in_process(workspace, [("kbp_validate", first)])
     digests = json.loads(texts(checked)[-1])["received"]
     by_name = {item["name"]: item["digest"] for item in digests}
     second = json.loads(json.dumps(first))
-    for scope in second["universe_specs"]:
+    for scope in second["knowledge_bus_folders"]:
         for entry in scope["files"]:
             del entry["text"]
             entry["digest"] = by_name[entry["name"]]
 
-    [again] = in_process(workspace, [("kbp_check", second)])
+    [again] = in_process(workspace, [("kbp_validate", second)])
 
     assert streams(again) == streams(checked)
     assert again.meta["exit_code"] == 0
@@ -209,7 +204,10 @@ def test_check_runs_on_text_sent_earlier_by_digest(codebase, tmp_path):
 def test_unknown_spec_digest_returns_text_request(codebase, tmp_path):
     workspace = Workspace(tmp_path / "work")
     arguments = {**scope_arguments(codebase, RFC), "location": str(codebase / RFC)}
-    arguments["universe_specs"][0]["files"][0] |= {"id": "mine", "digest": "sha256:00"}
+    arguments["knowledge_bus_folders"][0]["files"][0] |= {
+        "id": "mine",
+        "digest": "sha256:00",
+    }
 
     [result] = in_process(workspace, [("kbp_kinds", arguments)])
 
@@ -217,8 +215,7 @@ def test_unknown_spec_digest_returns_text_request(codebase, tmp_path):
     assert "Send the text of" in texts(result)[0]
 
 
-def test_check_ignores_fit_record_plugin_directory(codebase, tmp_path):
-    """kbp reads only the definitions directly inside `.knowledge-bus/`."""
+def test_validate_ignores_document_types_plugin_directory(codebase, tmp_path):
     workspace = Workspace(tmp_path / "work")
 
     def check_both() -> tuple[tuple[str, str, int], tuple[str, str, int]]:
@@ -226,75 +223,80 @@ def test_check_ignores_fit_record_plugin_directory(codebase, tmp_path):
             **scope_arguments(codebase, RFC, send_text=True),
             "location": str(codebase / RFC),
         }
-        [result] = in_process(workspace, [("kbp_check", arguments)])
+        [result] = in_process(workspace, [("kbp_validate", arguments)])
         done = subprocess.run(
-            [str(kbp.executable())],
+            [str(KBP)],
             cwd=codebase / "docs" / "rfcs",
             capture_output=True,
             text=True,
             check=False,
-            env=kbp.environment(),
+            env=kbp_env(),
         )
         return streams(result), (done.stdout, done.stderr, done.returncode)
 
     without = check_both()
-    write(codebase, RECORD, "schema: knowledge-mcp/fit-record/1\nfiles: {}\n")
+    write(codebase, RECORD, "schema: knowledge-mcp/document-types/1\nfiles: {}\n")
     with_record = check_both()
 
     assert with_record == without
     assert without[0][2] == 0 and without[1][2] == 0
 
 
-def test_check_fit_record_only_scope_preserves_refusal(tmp_path):
+def test_validate_document_types_only_scope_preserves_error(tmp_path):
     root = tmp_path / "plain"
     write(root, RFC, "# Cache\n")
     workspace = Workspace(tmp_path / "work")
 
     def check() -> tuple[bool, list[str]]:
         arguments = {**scope_arguments(root, RFC), "location": str(root / RFC)}
-        [result] = in_process(workspace, [("kbp_check", arguments)])
+        [result] = in_process(workspace, [("kbp_validate", arguments)])
         return result.is_error, texts(result)
 
     without = check()
-    write(root, RECORD, "schema: knowledge-mcp/fit-record/1\nfiles: {}\n")
-    assert scope_arguments(root, RFC)["universe_specs"] == [{"depth": 0, "files": []}]
+    write(root, RECORD, "schema: knowledge-mcp/document-types/1\nfiles: {}\n")
+    assert scope_arguments(root, RFC)["knowledge_bus_folders"] == [
+        {"folder": "", "files": []}
+    ]
     with_record = check()
 
     assert with_record[0] and with_record == without
 
 
-def test_missing_parent_definitions_preserve_kbp_refusal(
+def test_missing_parent_definitions_preserve_kbp_error(
     tmp_path,
 ):
-    """A record-only parent supplies no universe definitions for `from_parent`."""
     root = tmp_path / "plain"
-    write(root, RECORD, "schema: knowledge-mcp/fit-record/1\nfiles: {}\n")
+    write(root, RECORD, "schema: knowledge-mcp/document-types/1\nfiles: {}\n")
     write(root, "team/.knowledge-bus/workspace.yaml", f"from_parent:\n  - {PRODUCT}\n")
     document = "team/notes/pricing.md"
     write(root, document, "# Pricing\n")
     workspace = Workspace(tmp_path / "work")
     scope = scope_arguments(root, document)
-    assert scope["universe_specs"] == [
-        {"depth": 0, "files": []},
-        {"depth": 1, "files": [], "workspace_yaml": f"from_parent:\n  - {PRODUCT}\n"},
+    assert scope["knowledge_bus_folders"] == [
+        {"folder": "", "files": []},
+        {
+            "folder": "team",
+            "files": [],
+            "workspace_yaml": f"from_parent:\n  - {PRODUCT}\n",
+        },
     ]
     located = {**scope, "location": str(root / document)}
 
     fitted, listed = in_process(
         workspace,
         [
-            ("kb_fit", {**located, "name": "pricing.md"}),
+            ("kb_get_document_type", {**located, "name": "pricing.md"}),
             ("kbp_kinds", located),
         ],
     )
 
     done = subprocess.run(
-        [str(kbp.executable()), "--kinds"],
+        [str(KBP), "--kinds"],
         cwd=root / "team" / "notes",
         capture_output=True,
         text=True,
         check=False,
-        env=kbp.environment(),
+        env=kbp_env(),
     )
     direct = (done.stdout, done.stderr, done.returncode)
     assert done.returncode == 1

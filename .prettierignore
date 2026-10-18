@@ -1,10 +1,20 @@
 pnpm-lock.yaml
+uv.lock
 .claude/
 dist/
 
-# Vendored read-only from another project.
+# Vendored from knowledge-bus.
 runtime/knowledge-bus/universes/
-runtime/skills/kb-*/
+runtime/skills/kb-check/
+runtime/skills/kb-evolve/
+runtime/skills/kb-explore/
+runtime/skills/kb-ingest/
+runtime/skills/kb-uncover-decision/
+runtime/skills/kb-uncover-question/
 
 # Tests depend on the exact bytes of these fixtures.
 runtime/tests/fixtures/
+
+# The staleness checks compare these generated files with fresh unformatted output, so Prettier must leave them alone.
+runtime/knowledge_mcp/schemas_auto/
+contracts/extensions/mcp/v1/tools.json

@@ -1,0 +1,124 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: document-types.schema.yaml
+title: Document types
+description: >-
+  The document-types file,
+  `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` at the knowledge
+  base's root folder. Each entry maps a file's path to a universe spec and
+  document type, or to `no_document_type`, plus an optional reader. The harness reads and writes the
+  file and creates missing folders.
+type: object
+additionalProperties: false
+required: [schema, files]
+properties:
+  schema:
+    const: knowledge-mcp/document-types/1
+  files:
+    type: object
+    propertyNames:
+      $ref: "#/$defs/file_key"
+    additionalProperties:
+      $ref: "#/$defs/saved_entry"
+$defs:
+  file_key:
+    title: File key
+    description: >-
+      Path from the root folder with `/` between folders. Empty, `.` and `..`
+      parts and backslashes are invalid.
+    type: string
+    pattern: ^(?:[^/\\.][^/\\]*|\.[^/\\.][^/\\]*|\.\.[^/\\]+)(?:/(?:[^/\\.][^/\\]*|\.[^/\\.][^/\\]*|\.\.[^/\\]+))*$
+  audience:
+    title: Audience
+    description: The document's reader, and whether the person confirmed the value.
+    type: object
+    additionalProperties: false
+    required: [value, status]
+    properties:
+      value:
+        type: string
+      status:
+        enum: [confirmed, guessed]
+  allowed_by:
+    title: Allowed by
+    description: The person's permission for the save or the edit.
+    type: object
+    additionalProperties: false
+    required: [basis, text]
+    properties:
+      basis:
+        description: >-
+          `request` means the person asked in this session. `instruction`
+          means the person wrote an instruction for agents, such as in
+          AGENTS.md. `accepted_change` means the person accepted a proposed
+          change.
+        enum: [request, instruction, accepted_change]
+      text:
+        description: The request, instruction or accepted change, quoted.
+        type: string
+        minLength: 1
+      location:
+        description: The file holding the instruction or the accepted change.
+        type: string
+  set_by:
+    title: Set by
+    description: >-
+      `person` when the person stated the document type or reader. An entry
+      the person set wins over any later entry by the agent.
+    enum: [agent, person]
+  entry:
+    title: Entry
+    oneOf:
+      - $ref: "#/$defs/typed_entry"
+      - $ref: "#/$defs/untyped_entry"
+  typed_entry:
+    title: Typed entry
+    type: object
+    additionalProperties: false
+    required: [universe_spec, version, document_type, set_by, time]
+    properties:
+      universe_spec:
+        type: string
+        minLength: 1
+      version:
+        type: string
+      document_type:
+        type: string
+        minLength: 1
+      audience:
+        $ref: "#/$defs/audience"
+      set_by:
+        $ref: "#/$defs/set_by"
+      allowed_by:
+        $ref: "#/$defs/allowed_by"
+      fingerprint:
+        $ref: common.schema.yaml#/$defs/fingerprint
+      time:
+        $ref: common.schema.yaml#/$defs/time
+  untyped_entry:
+    title: Untyped entry
+    type: object
+    additionalProperties: false
+    required: [no_document_type, set_by, time]
+    properties:
+      no_document_type:
+        const: true
+      audience:
+        $ref: "#/$defs/audience"
+      set_by:
+        $ref: "#/$defs/set_by"
+      allowed_by:
+        $ref: "#/$defs/allowed_by"
+      fingerprint:
+        $ref: common.schema.yaml#/$defs/fingerprint
+      time:
+        $ref: common.schema.yaml#/$defs/time
+  saved_entry:
+    title: Saved entry
+    allOf:
+      - type: object
+        required: [allowed_by]
+        properties:
+          allowed_by:
+            $ref: "#/$defs/allowed_by"
+      - $ref: "#/$defs/entry"

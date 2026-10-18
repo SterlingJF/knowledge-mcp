@@ -1,0 +1,17 @@
+---
+# Choices with no audience frame: an invented list.
+schema: knowledge-mcp/audiences/1
+location: ~/notes/docs/rfcs/0042-cache.md
+universe_spec: codebase-recordkeeping
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy at v0.10.0
+    from_parent: false
+document_type: design-proposal
+actor: the maintainers who decide on designs
+frame: null
+choices:
+  - id: maintainers
+    label: Maintainers
+received: []

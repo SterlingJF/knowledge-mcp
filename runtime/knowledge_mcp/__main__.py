@@ -1,4 +1,4 @@
-"""`python -m knowledge_mcp`: the stdio server, as `kb mcp` starts it; the plugins start `knowledge_mcp.start`."""
+"""Run the MCP server on stdin and stdout, for knowledge_mcp.start and `python -m knowledge_mcp` registrations."""
 
 from knowledge_mcp.main import main
 

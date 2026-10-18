@@ -1,48 +1,28 @@
-# File: runtime/scripts/generate_tools_doc.py
-
-"""Regenerate or check the intro and the tool tables in the tools doc the caller names."""
+"""Write or check the generated regions of an MCP tools doc from contracts/extensions/mcp/v1/tools.json."""
 
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 import unicodedata
 from pathlib import Path
+from typing import Any
 
-MODULE = Path(__file__).resolve().parent.parent
-
-sys.path.insert(0, str(MODULE))
-
-INTRO = re.compile(
-    r"(<!-- BEGIN AUTO-GENERATED intro -->\n\n).*?(\n\n<!-- END AUTO-GENERATED intro -->)",
-    re.DOTALL,
-)
-
-
-class Collector:
-    """Collect @mcp.tool registrations."""
-
-    def __init__(self) -> None:
-        self.tools: list[dict] = []
-
-    def tool(self, **kwargs):
-        def decorate(function):
-            self.tools.append(kwargs)
-            return function
-
-        return decorate
+ROOT = Path(__file__).resolve().parents[2]
+CONTRACTS = ROOT / "contracts" / "extensions" / "mcp" / "v1"
+RECIPE = "just generate_mcp_tools_doc"
 
 
 def first_sentence(text: str) -> str:
-    """First sentence of the flattened text."""
     flat = " ".join(text.split())
     match = re.match(r"(.+?\.)(?:\s|$)", flat)
     return match.group(1) if match else flat
 
 
 def display_width(text: str) -> int:
-    """Columns the text fills: wide characters take two, combining marks none."""
+    """Count two columns per wide character, zero per combining mark and one column per remaining character."""
     return sum(
         0
         if unicodedata.combining(char)
@@ -53,12 +33,11 @@ def display_width(text: str) -> int:
     )
 
 
-def table(tools: list[dict]) -> str:
-    """Markdown table for the collected tools, columns padded as Prettier pads them."""
-    rows = [("Tool", "What it does")] + [
-        (f"`{t['name']}`", first_sentence(t["description"])) for t in tools
+def table(rows: list[tuple[str, ...]]) -> str:
+    """A Markdown table with Prettier's padding."""
+    widths = [
+        max(3, *(display_width(row[i]) for row in rows)) for i in range(len(rows[0]))
     ]
-    widths = [max(3, *(display_width(row[i]) for row in rows)) for i in range(2)]
 
     def line(cells: tuple[str, ...]) -> str:
         padded = (
@@ -71,70 +50,130 @@ def table(tools: list[dict]) -> str:
     return "\n".join(line(row) for row in (rows[0], divider, *rows[1:]))
 
 
-def intro(count: int) -> str:
-    """The tool count and the transport."""
+def cell(text: str) -> str:
+    """Text for one table cell: one line, pipes escaped."""
+    return " ".join(text.split()).replace("|", "\\|")
+
+
+def listing(values: list[Any]) -> str:
+    quoted = [f"`{value}`" for value in values]
     return (
-        f"The server has {count} tools. It speaks MCP over stdio: each agent app starts the server "
-        "with `kb mcp` or from its plugin, and the server opens no network port."
+        quoted[0] if len(quoted) == 1 else ", ".join(quoted[:-1]) + " or " + quoted[-1]
     )
 
 
-def parse_args() -> argparse.Namespace:
-    """The doc path, and whether to check instead of write."""
+def kind(schema: dict[str, Any]) -> str:
+    """Render a `$ref` as a link to its Shapes table."""
+    if "$ref" in schema:
+        name = schema["$ref"].rsplit("/", 1)[-1]
+        return f"[{name}](#{name.lower()})"
+    if "anyOf" in schema:
+        return " or ".join(kind(option) for option in schema["anyOf"])
+    if "enum" in schema or "const" in schema:
+        return listing(schema["enum"] if "enum" in schema else [schema["const"]])
+    if schema.get("type") == "array":
+        return f"list of {kind(schema.get('items', {}))}"
+    if "pattern" in schema:
+        return f"string, pattern `{schema['pattern']}`"
+    types = schema.get("type", "any")
+    return " or ".join(types) if isinstance(types, list) else str(types)
+
+
+def fields(schema: dict[str, Any], label: str) -> str:
+    required = set(schema.get("required", []))
+    rows = [(label, "Type", "Required", "Meaning")] + [
+        (
+            f"`{name}`",
+            cell(kind(prop)),
+            "yes" if name in required else "no",
+            cell(prop.get("description", "")),
+        )
+        for name, prop in schema.get("properties", {}).items()
+    ]
+    if len(rows) > 1:
+        return table(rows)
+    return (
+        "No arguments." if schema.get("type") == "object" else f"Type: {kind(schema)}."
+    )
+
+
+def regions(tools: list[dict[str, Any]]) -> dict[str, str]:
+    summary = [("Tool", "Purpose", "Result")]
+    arguments: list[str] = []
+    shapes: dict[str, dict[str, Any]] = {}
+    for tool in tools:
+        output = tool.get("outputSchema")
+        if output and "$id" not in output:
+            message = f"tools.json: {tool['name']} has an outputSchema with no $id. Run just generate_contract_snapshots."
+            raise SystemExit(message)
+        result = (
+            f"[{output['$id']}](../contracts/extensions/mcp/v1/{output['$id']})"
+            if output
+            else "kbp's output, as is"
+        )
+        summary.append(
+            (f"`{tool['name']}`", cell(first_sentence(tool["description"])), result)
+        )
+        arguments.append(
+            f"### `{tool['name']}`\n\n{fields(tool['inputSchema'], 'Argument')}"
+        )
+        for name, shape in tool["inputSchema"].get("$defs", {}).items():
+            if shapes.setdefault(name, shape) != shape:
+                message = f"tools.json: two tools define different shapes named {name}. Give the conflicting definitions distinct names in their source. Run just generate_contract_types, then just generate_contract_snapshots."
+                raise SystemExit(message)
+    return {
+        "intro": (
+            "The server serves MCP over stdio and opens no network port. Harnesses with a "
+            "knowledge-mcp plugin start the server through the plugin. Other harnesses run "
+            "`kb mcp`."
+        ),
+        "tools": table(summary),
+        "arguments": "\n\n".join(arguments),
+        "shapes": "\n\n".join(
+            f"### {n}\n\n{fields(s, 'Field')}" for n, s in sorted(shapes.items())
+        ),
+    }
+
+
+def main() -> int:
+    """With --check, write nothing and exit 1 when the doc is stale.
+
+    Exit 2 when a region is missing.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "doc", type=Path, help="the tools doc, such as docs/mcp-tools.md"
     )
-    parser.add_argument("--check", action="store_true", help="fail if the doc is stale")
-    return parser.parse_args()
-
-
-def main() -> int:
-    """Regenerate or check the doc."""
-    args = parse_args()
-    doc: Path = args.doc
-
-    from knowledge_mcp.tools import audience, edits, fit, fit_record, kbp, mark
-
-    count = 0
-    sections = {}
-    for heading, modules in (
-        ("## Fit a file", (fit,)),
-        ("## Before writing", (audience, edits)),
-        ("## Keep the fit record", (fit_record,)),
-        ("## Bring in a document", (mark,)),
-        ("## knowledge-bus", (kbp,)),
-    ):
-        collector = Collector()
-        for module in modules:
-            module.register(collector, None)
-        count += len(collector.tools)
-        sections[heading] = table(collector.tools)
-
-    text = doc.read_text()
-    if not INTRO.search(text):
-        print("no AUTO-GENERATED intro region found", file=sys.stderr)
-        return 2
-    text = INTRO.sub(lambda m: m.group(1) + intro(count) + m.group(2), text)
-    for heading, new_table in sections.items():
-        # Replace the first markdown table after the heading, padded or not.
+    parser.add_argument(
+        "--check", action="store_true", help="fail when the doc is stale"
+    )
+    args = parser.parse_args()
+    listed = json.loads((CONTRACTS / "tools.json").read_text())
+    tools = listed["tools"] if isinstance(listed, dict) else listed
+    text = args.doc.read_text()
+    updated = text
+    for name, body in regions(tools).items():
         pattern = re.compile(
-            rf"({re.escape(heading)}\n\n)\| Tool +\| What it does +\|\n\|[ -]+\|[ -]+\|\n(?:\|.*\n)+",
+            rf"(<!-- BEGIN AUTO-GENERATED {name} -->\n\n).*?(\n\n<!-- END AUTO-GENERATED {name} -->)",
+            re.DOTALL,
         )
-        if not pattern.search(text):
-            print(f"no table found under {heading!r}", file=sys.stderr)
+        if not pattern.search(updated):
+            print(
+                f"{args.doc}: no {name} region. Add the BEGIN and END AUTO-GENERATED {name} lines.",
+                file=sys.stderr,
+            )
             return 2
-        text = pattern.sub(lambda m, rows=new_table: m.group(1) + rows + "\n", text)
-
+        updated = pattern.sub(
+            lambda match, body=body: match.group(1) + body + match.group(2), updated
+        )
     if args.check:
-        if text != doc.read_text():
-            print(f"{doc} is stale; regenerate it.", file=sys.stderr)
+        if updated != text:
+            print(f"{args.doc} is stale. Run {RECIPE}.", file=sys.stderr)
             return 1
-        print(f"{doc} is current.")
+        print(f"{args.doc} is current.")
         return 0
-
-    doc.write_text(text)
-    print(f"{doc} regenerated.")
+    args.doc.write_text(updated)
+    print(f"Wrote {args.doc}.")
     return 0
 
 

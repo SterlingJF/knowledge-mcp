@@ -1,7 +1,21 @@
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=5120"]
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: c28bdcf8375e77edd030528df92456f2dcfbbbb7 # frozen: 44.149.0
+    hooks:
+      - id: renovate-config-validator
+        args: ["--strict"]
+  - repo: local
+    hooks:
+      # The plugin start script and the Homebrew formula install from runtime/requirements.lock.
+      - id: requirements-lock
+        name: Export uv.lock to runtime/requirements.lock
+        entry: just generate_knowledge_mcp_lock
+        language: system
+        files: ^uv\.lock$
+        pass_filenames: false

@@ -1,9 +1,4 @@
-"""The folders a host describes, rebuilt in a private temporary folder for `kbp` to run in.
-
-`kbp` runs from the document's rebuilt folder with no target, so it picks the nearest
-`.knowledge-bus/` and applies `workspace.yaml` itself. When no folder on the chain holds a
-definition, the bundled universe specs apply. Nothing here reads the knowledge base.
-"""
+"""Rebuild `.knowledge-bus/` folders in temporary storage for kbp."""
 
 from __future__ import annotations
 
@@ -18,20 +13,20 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from knowledge_mcp import bundled, log
-from knowledge_mcp.contract import ScopeRequest, SpecFile
+from knowledge_mcp import bundled, log, problems
+from knowledge_mcp.models import KnowledgeBusFolder, ScopeRequest, SpecFile
 
-SENT = "sent by the host"
+SENT = "sent by the harness"
 SUFFIX = ".kbp.yaml"
 
 
-class ScopeError(ValueError):
-    """The request can't be rebuilt; the message says what to send instead."""
+class ScopeError(problems.Error):
+    code = "scope-invalid"
 
 
 @dataclass
 class Rebuilt:
-    """A rebuilt folder chain, alive inside `Workspace.rebuilt`."""
+    """`Workspace.rebuilt` deletes `cwd` on exit."""
 
     cwd: Path
     bundled: list[str] = field(default_factory=list)
@@ -42,24 +37,24 @@ class Rebuilt:
 
 
 class Workspace:
-    """One server process: its private temporary folder and the texts sent this session."""
+    """Hold the private temporary folder, spec texts keyed by digest, and file fingerprints for
+    one process.
+    """
 
     def __init__(self, base: Path | None = None) -> None:
         self._base = base
         self._texts: dict[str, str] = {}
         self._lock = threading.Lock()
-        # Per knowledge base location: the fingerprint last seen for each path this session.
         self.fingerprints: dict[str, dict[str, str]] = {}
 
     def remember(self, text: str) -> str:
-        """Keep a text sent this session; return its digest."""
+        """Store `text` for this session and return its digest."""
         digest = _digest(text)
         with self._lock:
             self._texts[digest] = text
         return digest
 
     def recall(self, digest: str) -> str | None:
-        """A text this session holds for the digest."""
         with self._lock:
             return self._texts.get(digest)
 
@@ -75,7 +70,11 @@ class Workspace:
     def rebuilt(
         self, request: ScopeRequest, *, sent_only: bool = False
     ) -> Iterator[Rebuilt]:
-        """Rebuild the chain; `sent_only` refuses bundled copies, for checking."""
+        """Write the `.knowledge-bus/` folders to a temporary folder.
+
+        Hold the workspace lock until exit, then delete the temporary folder. With `sent_only`,
+        use supplied text or cached digests and skip bundled files.
+        """
         with self._lock:
             plan, rebuilt = self._plan(request, sent_only=sent_only)
             rebuilt.key = hashlib.sha256(
@@ -104,68 +103,57 @@ class Workspace:
     def _plan(
         self, request: ScopeRequest, *, sent_only: bool
     ) -> tuple[list[tuple[int, str, str]], Rebuilt]:
-        """(depth, path inside the depth's folder, text) for every file to write."""
-        for name in request.folders:
-            _safe_folder(name)
-        depths = [scope.depth for scope in request.universe_specs]
-        if len(set(depths)) != len(depths):
-            msg = "Send each folder of the chain once in `universe_specs`."
-            raise ScopeError(msg)
-        for scope in request.universe_specs:
-            if scope.depth > len(request.folders):
-                msg = (
-                    f"`depth` {scope.depth} lies below the document's folder: it counts entries "
-                    f"of `folders`, which has {len(request.folders)} entries."
-                )
-                raise ScopeError(msg)
+        """Return the files to write as (depth, path relative to the folder at that depth, text),
+        plus the Rebuilt record.
+
+        A path ending in `/` is a folder to create. Raise ScopeError for unsafe names, duplicate folders,
+        folders outside the document path, or unavailable universe spec text.
+        """
+        for index, name in enumerate(request.folders):
+            _safe_folder(name, problems.pointer("folders", index))
+        chain = _chain(request)
         rebuilt = Rebuilt(cwd=Path())
         plan: list[tuple[int, str, str]] = []
-        # A `.knowledge-bus/` holding no definition, such as one holding only the fit record's
-        # plugin folder, adds nothing; with no definition on the chain, the bundled set applies.
+        # A `.knowledge-bus/` with no spec file or workspace.yaml, such as one holding only the
+        # plugins folder, counts as empty. When every `.knowledge-bus/` sent is empty, kb uses
+        # the bundled universe specs.
         if not any(
-            scope.files or scope.workspace_yaml is not None
-            for scope in request.universe_specs
+            item.files or item.workspace_yaml is not None for _, _, item in chain
         ):
             if sent_only:
                 msg = (
-                    "kbp_check checks only universe spec text you send, never a bundled copy: "
-                    "send the text of each `*.kbp.yaml` file in scope."
+                    "kbp_validate never validates a bundled copy, so send the text of each "
+                    "`*.kbp.yaml` file from the root folder down to the document's folder."
                 )
-                raise ScopeError(msg)
+                raise ScopeError(msg, pointer=problems.pointer("knowledge_bus_folders"))
             for copy in bundled.copies():
                 plan.append((0, f".knowledge-bus/{copy.name}", _read(copy.path)))
                 rebuilt.bundled.append(copy.name)
                 rebuilt.sources[copy.id] = bundled.label()
             return plan, rebuilt
 
-        missing = []
-        for scope in sorted(request.universe_specs, key=lambda scope: scope.depth):
-            plan.append((scope.depth, ".knowledge-bus/", ""))
-            for spec in scope.files:
-                _safe_file(spec.name)
+        missing: list[tuple[str, str, bool]] = []
+        for depth, position, item in chain:
+            plan.append((depth, ".knowledge-bus/", ""))
+            for number, spec in enumerate(item.files):
+                place = ("knowledge_bus_folders", position, "files", number)
+                _safe_file(spec.name, problems.pointer(*place, "name"))
                 text = self._text(spec, rebuilt, sent_only=sent_only)
                 if text is None:
-                    missing.append(spec.name)
+                    sent_digest = spec.digest is not None and spec.text is None
+                    field = ("digest",) if sent_digest else ()
+                    missing.append(
+                        (spec.name, problems.pointer(*place, *field), sent_digest)
+                    )
                     continue
-                plan.append((scope.depth, f".knowledge-bus/{spec.name}", text))
-            if scope.workspace_yaml is not None:
+                plan.append((depth, f".knowledge-bus/{spec.name}", text))
+            if item.workspace_yaml is not None:
                 plan.append(
-                    (scope.depth, ".knowledge-bus/workspace.yaml", scope.workspace_yaml)
+                    (depth, ".knowledge-bus/workspace.yaml", item.workspace_yaml)
                 )
         if missing:
-            names = ", ".join(missing)
-            if sent_only:
-                msg = (
-                    "kbp_check checks only universe spec text you send, never a bundled copy: "
-                    f"send the text of {names}."
-                )
-            else:
-                msg = (
-                    f"Send the text of {names}: no bundled universe spec has that id and version, "
-                    "and this session holds no copy for the digest sent."
-                )
-            raise ScopeError(msg)
-        nearest = max(request.universe_specs, key=lambda scope: scope.depth)
+            raise _missing(missing, sent_only=sent_only)
+        nearest = chain[-1][2]
         rebuilt.nearest = {spec.id for spec in nearest.files}
         return plan, rebuilt
 
@@ -197,13 +185,76 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def _safe_folder(name: str) -> None:
+def _parts(folder: str, pointer: str) -> tuple[str, ...]:
+    """Split a root-relative folder path into folder names. `""` and `.` mean the root and give `()`."""
+    if folder in ("", "."):
+        return ()
+    parts = tuple(folder.removeprefix("./").split("/"))
+    for name in parts:
+        _safe_folder(name, pointer)
+    return parts
+
+
+def _chain(request: ScopeRequest) -> list[tuple[int, int, KnowledgeBusFolder]]:
+    """List (depth, index as sent, folder) for each `.knowledge-bus/` folder, root first.
+
+    Raise ScopeError for a folder sent twice or a folder outside the path to the document.
+    """
+    positions = request.positions or list(range(len(request.knowledge_bus_folders)))
+    chain = []
+    seen = set()
+    for position, item in zip(positions, request.knowledge_bus_folders, strict=True):
+        pointer = problems.pointer("knowledge_bus_folders", position, "folder")
+        parts = _parts(item.folder, pointer)
+        if parts in seen:
+            msg = (
+                f"{item.folder!r} appears twice in `knowledge_bus_folders`. "
+                "Send each folder once."
+            )
+            raise ScopeError(msg, pointer=pointer)
+        if list(parts) != request.folders[: len(parts)]:
+            msg = (
+                f"{item.folder!r} is not on the path to the document. Send only the folders "
+                "from the root folder down to the document's folder."
+            )
+            raise ScopeError(msg, pointer=pointer)
+        seen.add(parts)
+        chain.append((len(parts), position, item))
+    chain.sort(key=lambda found: found[0])
+    return chain
+
+
+def _missing(missing: list[tuple[str, str, bool]], *, sent_only: bool) -> ScopeError:
+    """Without `sent_only`, when any file was sent by digest, the code is `digest-unknown` and the
+    errors name only the files sent by digest.
+    """
+    names = ", ".join(name for name, _, _ in missing)
+    errors = [(f"No text for {name}.", pointer) for name, pointer, _ in missing]
+    if sent_only:
+        msg = (
+            f"Send the text of {names}, or a digest from an earlier response in this session. "
+            "kbp_validate never validates a bundled copy."
+        )
+        return ScopeError(msg, errors=errors)
+    msg = (
+        f"Send the text of {names}. Either no bundled universe spec has the id and version "
+        "you sent, or this session has no text for the digest you sent."
+    )
+    if any(sent_digest for _, _, sent_digest in missing):
+        digests = [
+            error for error, (_, _, sent) in zip(errors, missing, strict=True) if sent
+        ]
+        return ScopeError(msg, code="digest-unknown", errors=digests)
+    return ScopeError(msg, errors=errors)
+
+
+def _safe_folder(name: str, pointer: str) -> None:
     if name in ("", ".", "..") or any(char in name for char in "/\\\0"):
-        msg = f"Unsupported folder name {name!r}. Use each folder's own name."
-        raise ScopeError(msg)
+        msg = f"Unsupported folder name {name!r}. Send each folder as a plain name without slashes, not `.` or `..`."
+        raise ScopeError(msg, pointer=pointer)
 
 
-def _safe_file(name: str) -> None:
+def _safe_file(name: str, pointer: str) -> None:
     stem = name.removesuffix(SUFFIX)
     if (
         not name.endswith(SUFFIX)
@@ -212,7 +263,7 @@ def _safe_file(name: str) -> None:
         or any(char in name for char in "/\\\0")
     ):
         msg = (
-            f"Unsupported definition filename {name!r}. Use a `.kbp.yaml` filename "
+            f"Unsupported universe spec file name {name!r}. Use a `.kbp.yaml` name "
             "without a leading dot or path separators."
         )
-        raise ScopeError(msg)
+        raise ScopeError(msg, pointer=pointer)

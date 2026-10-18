@@ -11,28 +11,23 @@
   },
   "packageRules": [
     {
-      "description": "Minor and patch updates merge once CI passes; majors wait for review.",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
     },
     {
-      "description": "Peer dependency ranges stay ranges and widen for a new major.",
+      "description": "Widen peer dependency ranges instead of pinning them.",
       "matchDepTypes": ["peerDependencies"],
       "rangeStrategy": "widen"
     },
     {
-      "description": "mcp updates wait for review. Any mcp release can change the MCP revisions knowledge-mcp speaks.",
+      "description": "Review mcp updates by hand. A new mcp release can change the MCP spec revisions the server supports.",
       "matchPackageNames": ["mcp"],
       "automerge": false
     },
     {
-      "description": "knowledge-bus moves with `just refresh_knowledge_model <tag>`, which copies the universe specs and skills at the tag of the release archive the package is pinned to.",
+      "description": "Update knowledge-bus by hand. Change the pin in runtime/pyproject.toml, run uv lock, then run `just refresh_knowledge_model <tag>`.",
       "matchPackageNames": ["knowledge-bus"],
       "enabled": false
-    },
-    {
-      "groupName": "oxc",
-      "matchPackageNames": ["oxc-parser"]
     },
     {
       "groupName": "pydantic",
@@ -43,9 +38,8 @@
       "matchPackageNames": ["pytest"]
     },
     {
-      "description": "Actions in the release workflow stay pinned by commit SHA, with the version in a comment.",
+      "description": "Pin GitHub Actions to commit SHAs, with the version in a comment.",
       "matchManagers": ["github-actions"],
-      "matchFileNames": [".github/workflows/release.yml"],
       "pinDigests": true
     }
   ],

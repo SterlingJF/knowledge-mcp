@@ -1,0 +1,43 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: edit.schema.yaml
+title: kb_record_edit result
+description: >-
+  The structuredContent of a kb_record_edit result, or problem details when
+  isError is true.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Edit receipt
+    description: The recorded edit without `before` and `after`.
+    type: object
+    additionalProperties: false
+    required:
+      - schema
+      - id
+      - time
+      - location
+      - allowed_by
+      - before_digest
+      - after_digest
+    properties:
+      schema:
+        const: knowledge-mcp/edit/1
+      id:
+        $ref: common.schema.yaml#/$defs/edit_id
+      time:
+        $ref: common.schema.yaml#/$defs/time
+      location:
+        $ref: common.schema.yaml#/$defs/location
+      allowed_by:
+        $ref: document-types.schema.yaml#/$defs/allowed_by
+      whole_file:
+        description: Present when the edit replaced the whole file.
+        const: true
+      before_digest:
+        $ref: common.schema.yaml#/$defs/digest
+      after_digest:
+        $ref: common.schema.yaml#/$defs/digest

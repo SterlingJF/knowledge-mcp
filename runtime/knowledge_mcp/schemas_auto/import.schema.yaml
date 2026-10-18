@@ -1,0 +1,422 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: import.schema.yaml
+title: kb_prepare_import result
+description: >-
+  The structuredContent of a kb_prepare_import result, or problem details
+  when isError is true.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Import answer
+    description: >-
+      The passages of one source document, with the card questions for every
+      document type that applies.
+    type: object
+    required:
+      - schema
+      - location
+      - universe_specs
+      - document_types
+      - passages
+      - received
+    properties:
+      schema:
+        const: knowledge-mcp/import/1
+      location:
+        $ref: common.schema.yaml#/$defs/location
+      universe_specs:
+        description: In kbp_kinds order.
+        type: array
+        minItems: 1
+        items:
+          $ref: common.schema.yaml#/$defs/spec
+      document_types:
+        description: Every document type that applies, in kbp_kinds order.
+        type: array
+        items:
+          title: Import document type
+          type: object
+          required: [universe_spec, document_type, name, action, actor, elements]
+          properties:
+            universe_spec:
+              type: string
+              minLength: 1
+            document_type:
+              type: string
+              minLength: 1
+            name:
+              type: string
+            action:
+              description: From kbp_kinds.
+              type: [string, "null"]
+            actor:
+              description: The role that uses the document type, from kbp_kinds.
+              type: [string, "null"]
+            elements:
+              description: >-
+                Sections of the document type's card, in card order, without
+                `links` sections.
+              type: array
+              items:
+                title: Element question
+                type: object
+                required: [element, question, strength]
+                properties:
+                  element:
+                    type: string
+                    minLength: 1
+                  question:
+                    type: string
+                    minLength: 1
+                  strength:
+                    description: "`core` or `situational`, from the card."
+                    type: string
+                additionalProperties: false
+          additionalProperties: false
+      passages:
+        description: In document order.
+        type: array
+        minItems: 1
+        items:
+          title: Passage
+          type: object
+          required: [id, kind, lines, opening, under]
+          properties:
+            id:
+              type: string
+              pattern: ^p[1-9][0-9]*$
+            kind:
+              enum: [heading, paragraph, list-item, code]
+            lines:
+              description: First and last line numbers.
+              type: array
+              maxItems: 2
+              minItems: 2
+              items:
+                type: integer
+                minimum: 1
+            opening:
+              description: >-
+                The passage's first line with spaces collapsed. knowledge-mcp
+                truncates text over 80 characters at the last space within
+                the first 80 characters, or at 80 characters without spaces.
+                knowledge-mcp appends `…` after truncation.
+              type: string
+              minLength: 1
+            under:
+              description: The id of the enclosing heading passage, or null.
+              type: [string, "null"]
+              pattern: ^p[1-9][0-9]*$
+          additionalProperties: false
+      received:
+        $ref: common.schema.yaml#/$defs/received
+    additionalProperties: false
+  common.schema.yaml:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    $id: common.schema.yaml
+    title: Shared shapes
+    description: Definitions shared by the tool results and the document-types file.
+    $defs:
+      location:
+        title: Location
+        type: string
+      path:
+        title: Path
+        description: Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.
+        type: string
+        minLength: 1
+      fingerprint:
+        title: Fingerprint
+        description: A value that changes only when the file content changes, such as SHA-256 or Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing` that moved.
+        type: string
+      digest:
+        title: Digest
+        description: The SHA-256 of the text's UTF-8 bytes.
+        type: string
+        pattern: ^sha256:[0-9a-f]{64}$
+      time:
+        title: Time
+        description: ISO 8601 date and time in UTC.
+        type: string
+        pattern: ^\d{4}-\d{2}-\d{2}T.*Z$
+      edit_id:
+        title: Edit id
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      received:
+        title: Received
+        description: Digests of the texts sent in this call. Later in the session, send a digest in place of its text.
+        type: array
+        items:
+          title: Received text
+          type: object
+          required:
+            - name
+            - digest
+          properties:
+            name:
+              type: string
+            digest:
+              $ref: "#/$defs/digest"
+          additionalProperties: false
+      spec:
+        title: Spec in scope
+        type: object
+        required:
+          - id
+          - version
+          - source
+          - from_parent
+        properties:
+          id:
+            type: string
+            minLength: 1
+          version:
+            type: string
+          source:
+            description: "`bundled copy at <ref>` means knowledge-mcp used its own copy of the universe spec, taken from git ref `<ref>` of the knowledge-bus repository."
+            type: string
+            pattern: ^(sent by the harness|bundled copy at \S+)$
+          from_parent:
+            description: True when the universe spec comes from a `.knowledge-bus/` folder above the deepest `.knowledge-bus/` folder the harness sent.
+            type: boolean
+        additionalProperties: false
+      candidate:
+        title: Candidate
+        description: A document type whose alias shares a word with the file name or its nearest folder.
+        type: object
+        required:
+          - universe_spec
+          - document_type
+          - name
+          - alias
+          - action
+          - actor
+          - timing
+          - matched
+          - matched_on
+        properties:
+          universe_spec:
+            type: string
+            minLength: 1
+          document_type:
+            type: string
+            minLength: 1
+          name:
+            type: string
+          alias:
+            title: Alias
+            description: From kbp_kinds.
+            type:
+              - object
+              - "null"
+            properties:
+              kind:
+                enum:
+                  - descriptive
+                  - normative
+              form:
+                type: string
+            additionalProperties: false
+          action:
+            type:
+              - string
+              - "null"
+          actor:
+            type:
+              - string
+              - "null"
+          timing:
+            type:
+              - string
+              - "null"
+          matched:
+            description: Words shared by the alias and the file name or nearest folder, lowercased with common plural suffixes removed.
+            type: array
+            minItems: 1
+            items:
+              type: string
+          matched_on:
+            description: "`folder` means only the nearest folder name matched."
+            enum:
+              - name
+              - folder
+          role_matches:
+            description: True when `actor` and the role share a normalized word after knowledge-mcp removes stopwords. Present only when the harness sent a role.
+            type: boolean
+        additionalProperties: false
+      type_group:
+        title: Type group
+        type: object
+        required:
+          - universe_spec
+          - covers
+          - covers_matched
+          - kinds
+        properties:
+          universe_spec:
+            type: string
+            minLength: 1
+          covers:
+            type:
+              - string
+              - "null"
+          covers_matched:
+            description: Words in the path that also appear in the universe spec label or `covers`.
+            type: array
+            items:
+              type: string
+          kinds:
+            type: array
+            items:
+              title: Listed document type
+              type: object
+              required:
+                - document_type
+                - action
+                - actor
+              properties:
+                document_type:
+                  type: string
+                  minLength: 1
+                action:
+                  type:
+                    - string
+                    - "null"
+                actor:
+                  type:
+                    - string
+                    - "null"
+              additionalProperties: false
+        additionalProperties: false
+      file_change:
+        title: File change
+        oneOf:
+          - $ref: "#/$defs/created"
+          - $ref: "#/$defs/deleted"
+          - $ref: "#/$defs/moved"
+          - $ref: "#/$defs/edited"
+      created:
+        title: File created
+        type: object
+        required:
+          - change
+          - path
+        properties:
+          change:
+            const: created
+          path:
+            $ref: "#/$defs/path"
+          fingerprint:
+            $ref: "#/$defs/fingerprint"
+        additionalProperties: false
+      deleted:
+        title: File deleted
+        type: object
+        required:
+          - change
+          - path
+        properties:
+          change:
+            const: deleted
+          path:
+            $ref: "#/$defs/path"
+        additionalProperties: false
+      moved:
+        title: File moved
+        type: object
+        required:
+          - change
+          - path
+          - old_path
+        properties:
+          change:
+            const: moved
+          path:
+            description: The path after the move.
+            $ref: "#/$defs/path"
+          old_path:
+            $ref: "#/$defs/path"
+          fingerprint:
+            $ref: "#/$defs/fingerprint"
+        additionalProperties: false
+      edited:
+        title: File edited
+        type: object
+        required:
+          - change
+          - path
+          - fingerprint
+        properties:
+          change:
+            const: edited
+          path:
+            $ref: "#/$defs/path"
+          fingerprint:
+            $ref: "#/$defs/fingerprint"
+        additionalProperties: false
+  problem.schema.yaml:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    $id: problem.schema.yaml
+    title: Problem details
+    description: An error from a knowledge-mcp tool, as RFC 9457 problem details. On failure, `kb type --json` and `kb doctor --json` print a problem object as the last stderr line. Branch on `type`.
+    type: object
+    required:
+      - type
+      - title
+      - detail
+    properties:
+      type:
+        oneOf:
+          - title: Invalid arguments
+            description: An argument is unknown, missing or fails the tool's input schema, or two arguments conflict.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/argument-invalid
+          - title: Invalid folders
+            description: The call sent invalid folders or file names, or omitted universe spec text that knowledge-mcp could not retrieve.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/scope-invalid
+          - title: Unknown digest
+            description: The call sent a digest that matches no text received in this session.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/digest-unknown
+          - title: Invalid document-types file
+            description: The document-types file text sent is not valid YAML or fails document-types.schema.yaml.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/record-invalid
+          - title: Unknown document type
+            description: The requested document type is absent from the selected universe spec or universe specs.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/document-type-unknown
+          - title: kbp failed
+            description: kbp exited with an error or is missing from the install.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/kbp-failed
+          - title: Unreadable kbp output
+            description: kbp printed no JSON object, or an object with an unsupported `schema` value.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/kbp-version-skew
+          - title: knowledge-mcp failed
+            description: Any other failure inside knowledge-mcp.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/internal-error
+      title:
+        type: string
+      detail:
+        description: For MCP errors, the last text block contains the same detail.
+        type: string
+        minLength: 1
+      errors:
+        type: array
+        minItems: 1
+        items:
+          title: Argument error
+          type: object
+          required:
+            - detail
+            - pointer
+          properties:
+            detail:
+              type: string
+            pointer:
+              description: JSON Pointer into the arguments as sent, such as "#/entries/0/document_type".
+              type: string
+              pattern: ^#(/([^~/]|~[01])*)*$
+          additionalProperties: false
+    additionalProperties: false

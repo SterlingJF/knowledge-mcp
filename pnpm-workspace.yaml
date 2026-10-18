@@ -5,14 +5,14 @@ packages:
 # One week, in minutes.
 minimumReleaseAge: 10080
 
-# esbuild's install script fetches a binary its optional deps already ship.
+# Skip the esbuild install script, because esbuild's optional dependencies already ship the binary.
 allowBuilds:
   esbuild: false
 
-# Patched transitive dependencies; drop each once its parent requires the fix.
+# Drop each override once the package that depends on it requires the fixed version.
 overrides:
-  # markdownlint-cli2 0.23.3 pins 1.8.0; GHSA-r4xh-jqrq-34v2 is fixed in 1.9.0.
+  # markdownlint-cli2 0.23.3 pins smol-toml 1.8.0. smol-toml 1.9.0 fixes GHSA-r4xh-jqrq-34v2.
   smol-toml: 1.9.0
-  # micromark-extension-math 3.1.0 (through markdownlint) allows ^0.16.0;
-  # GHSA-238p-pmpm-9mq7 is fixed in 0.18.2.
+  # markdownlint pulls in micromark-extension-math 3.1.0, which allows katex ^0.16.0.
+  # katex 0.18.2 fixes GHSA-238p-pmpm-9mq7.
   micromark-extension-math>katex: 0.18.7

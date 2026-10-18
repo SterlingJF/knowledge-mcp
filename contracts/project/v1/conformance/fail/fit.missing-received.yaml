@@ -1,7 +1,0 @@
----
-# Every answer carries the digests received, empty or not.
-schema: knowledge-mcp/fit/1
-location: README.md
-universe_specs: []
-candidates: []
-every_document_type: null

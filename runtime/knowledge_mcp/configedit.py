@@ -1,10 +1,4 @@
-"""Add and remove one server entry in a host's configuration text, leaving every other byte alone.
-
-JSON files (comments and trailing commas allowed, as JSONC hosts accept) get the entry as the
-first member of its object; TOML files get its table at the end. Each edit inserts one
-contiguous piece of text, which `remove` deletes again, so a file reads byte for byte as before
-once the entry leaves. When the piece was changed since, `remove` deletes the entry itself.
-"""
+"""Preserve unrelated settings text when adding or removing server entries."""
 
 from __future__ import annotations
 
@@ -16,20 +10,21 @@ from typing import Any
 
 
 class ConfigError(ValueError):
-    """The text can't be read or edited safely; the message says why."""
+    """`line` is the line number of a syntax error, or None for errors with no line."""
 
-
-# --- JSON with comments ----------------------------------------------------------------------
+    def __init__(self, message: str, line: int | None = None) -> None:
+        super().__init__(f"line {line}: {message}" if line is not None else message)
+        self.line = line
 
 
 @dataclass
 class Node:
-    """A JSON value and where it sits in the text."""
+    """Offsets count characters in the source text."""
 
     start: int
     end: int
     value: Any = None
-    # For objects: (key, member start, value node), in order.
+    # For objects: (key, key offset, value node) for each member, in file order.
     members: list[tuple[str, int, Node]] = field(default_factory=list)
 
 
@@ -40,10 +35,9 @@ class _Parser:
 
     def fail(self, message: str) -> ConfigError:
         line = self.text.count("\n", 0, self.at) + 1
-        return ConfigError(f"line {line}: {message}")
+        return ConfigError(message, line)
 
     def blank(self) -> None:
-        """Skip whitespace and comments."""
         text = self.text
         while self.at < len(text):
             char = text[self.at]
@@ -55,7 +49,8 @@ class _Parser:
             elif text.startswith("/*", self.at):
                 end = text.find("*/", self.at + 2)
                 if end < 0:
-                    raise self.fail("unclosed comment")
+                    message = "unclosed comment"
+                    raise self.fail(message)
                 self.at = end + 2
             else:
                 return
@@ -63,7 +58,8 @@ class _Parser:
     def value(self) -> Node:
         self.blank()
         if self.at >= len(self.text):
-            raise self.fail("value expected")
+            message = "value expected"
+            raise self.fail(message)
         char = self.text[self.at]
         if char == "{":
             return self.object()
@@ -77,16 +73,20 @@ class _Parser:
             self.text, self.at
         )
         if match is None:
-            raise self.fail("value expected")
+            message = "value expected"
+            raise self.fail(message)
         self.at = match.end()
         return Node(match.start(), match.end(), json.loads(match.group()))
 
     def string(self) -> str:
         match = re.compile(r'"(?:[^"\\\n]|\\.)*"').match(self.text, self.at)
         if match is None:
-            raise self.fail("unterminated string")
+            message = "unterminated string"
+            raise self.fail(message)
         self.at = match.end()
-        return json.loads(match.group())
+        value = json.loads(match.group())
+        assert isinstance(value, str)
+        return value
 
     def object(self) -> Node:
         node = Node(self.at, self.at, {})
@@ -98,12 +98,14 @@ class _Parser:
                 node.end = self.at
                 return node
             if not self.text.startswith('"', self.at):
-                raise self.fail("quoted object key expected")
+                message = "quoted object key expected"
+                raise self.fail(message)
             begin = self.at
             key = self.string()
             self.blank()
             if not self.text.startswith(":", self.at):
-                raise self.fail("':' expected")
+                message = "':' expected"
+                raise self.fail(message)
             self.at += 1
             child = self.value()
             node.members.append((key, begin, child))
@@ -112,7 +114,8 @@ class _Parser:
             if self.text.startswith(",", self.at):
                 self.at += 1
             elif not self.text.startswith("}", self.at):
-                raise self.fail("',' or '}' expected")
+                message = "',' or '}' expected"
+                raise self.fail(message)
 
     def array(self) -> Node:
         node = Node(self.at, self.at, [])
@@ -129,25 +132,32 @@ class _Parser:
             if self.text.startswith(",", self.at):
                 self.at += 1
             elif not self.text.startswith("]", self.at):
-                raise self.fail("',' or ']' expected")
+                message = "',' or ']' expected"
+                raise self.fail(message)
 
 
 def parse_json(text: str) -> Node:
-    """The text's top value with positions; an empty text reads as an empty object."""
+    """Parse empty text as `{}`. Raise `ConfigError` for structural errors or a non-object root.
+    Malformed strings or numbers can raise `json.JSONDecodeError`.
+    """
     if not text.strip():
         return Node(0, 0, {})
     parser = _Parser(text)
     node = parser.value()
     parser.blank()
     if parser.at != len(text):
-        raise parser.fail("unexpected text after the top JSON value")
+        message = "unexpected text after the top JSON value"
+        raise parser.fail(message)
     if not isinstance(node.value, dict):
-        raise ConfigError("expected a JSON object at the top of the file")
+        message = "expected a JSON object at the top of the file"
+        raise ConfigError(message)
     return node
 
 
 def json_value(text: str) -> dict[str, Any]:
-    return parse_json(text).value
+    value = parse_json(text).value
+    assert isinstance(value, dict)
+    return value
 
 
 def _child(node: Node, key: str) -> Node | None:
@@ -158,7 +168,7 @@ def _child(node: Node, key: str) -> Node | None:
 
 
 def json_entry(text: str, path: tuple[str, ...], name: str) -> Any:
-    """The entry `name` in the object at `path`, or None."""
+    """Return None when the object at `path` or the entry is missing."""
     node: Node | None = parse_json(text)
     for key in path:
         node = (
@@ -173,30 +183,18 @@ def json_entry(text: str, path: tuple[str, ...], name: str) -> Any:
 
 def _indent_of(text: str, position: int) -> str:
     line = text.rfind("\n", 0, position) + 1
-    return re.match(r"[ \t]*", text[line:]).group()
+    match = re.match(r"[ \t]*", text[line:])
+    assert match is not None
+    return match.group()
 
 
 def _unit(text: str) -> str:
-    """The file's indentation step, from its first indented line; two spaces by default."""
+    """Indentation of the first indented line, or two spaces when no line is indented."""
     match = re.search(r"\n([ \t]+)\S", text)
     return match.group(1) if match else "  "
 
 
-def json_insert(
-    text: str, path: tuple[str, ...], name: str, entry: Any
-) -> tuple[str, str]:
-    """Add `name: entry` to the object at `path`, creating missing objects.
-
-    The entry becomes the object's first member. Returns the new text and the inserted piece.
-    """
-    if not text.strip():
-        value: Any = {name: entry}
-        for key in reversed(path):
-            value = {key: value}
-        piece = json.dumps(value, indent=2, ensure_ascii=False) + "\n"
-        return text + piece, piece
-    root = parse_json(text)
-    unit = _unit(text)
+def _insertion_node(root: Node, path: tuple[str, ...]) -> tuple[Node, list[str]]:
     node = root
     missing: list[str] = []
     for index, key in enumerate(path):
@@ -205,11 +203,32 @@ def json_insert(
             missing = list(path[index:])
             break
         if not isinstance(child.value, dict):
-            raise ConfigError(f"`{'.'.join(path[: index + 1])}` is not an object")
+            message = f"{'.'.join(path[: index + 1])} is not an object"
+            raise ConfigError(message)
         node = child
+    return node, missing
+
+
+def json_insert(
+    text: str, path: tuple[str, ...], name: str, entry: Any
+) -> tuple[str, str]:
+    """Insert `name: entry` as the first member of the object at `path`, creating missing objects.
+
+    Return the new text and the inserted piece. Raise `ConfigError` when the entry already exists
+    or a key on `path` is not an object.
+    """
+    if not text.strip():
+        value: Any = {name: entry}
+        for key in reversed(path):
+            value = {key: value}
+        piece = json.dumps(value, indent=2, ensure_ascii=False) + "\n"
+        return text + piece, piece
+    node, missing = _insertion_node(parse_json(text), path)
+    unit = _unit(text)
     if not missing and name in node.value:
-        raise ConfigError(f"an entry named {name!r} already exists")
-    value: Any = {name: entry}
+        message = f"an entry named {name!r} already exists"
+        raise ConfigError(message)
+    value = {name: entry}
     for key in reversed(missing):
         value = {key: value}
     [(key, member)] = value.items()
@@ -241,7 +260,10 @@ def json_insert(
 
 
 def json_remove(text: str, path: tuple[str, ...], name: str, piece: str | None) -> str:
-    """Delete the entry: the recorded piece when it is still there once, else the member itself."""
+    """When `piece` appears exactly once, delete it to undo the insertion byte for byte.
+
+    Otherwise delete the `name` member at `path`.
+    """
     if piece and text.count(piece) == 1:
         new = text.replace(piece, "", 1)
         if new.strip():
@@ -267,7 +289,7 @@ def json_remove(text: str, path: tuple[str, ...], name: str, piece: str | None) 
 
 
 def empty_chain(text: str, path: tuple[str, ...]) -> bool:
-    """Whether the text holds nothing but empty objects along `path`."""
+    """True when the text holds only the objects along `path`, with no other members."""
     if not text.strip():
         return True
     try:
@@ -280,10 +302,8 @@ def empty_chain(text: str, path: tuple[str, ...]) -> bool:
         if not isinstance(value, dict) or set(value) != {key}:
             return False
         value = value[key]
-    return value == {}
+    return bool(value == {})
 
-
-# --- TOML ------------------------------------------------------------------------------------
 
 _BARE = re.compile(r"^[A-Za-z0-9_-]+$")
 
@@ -301,14 +321,15 @@ def _toml_value(value: Any) -> str:
         return "true" if value else "false"
     if isinstance(value, int | float):
         return str(value)
-    raise ConfigError(f"can't write {value!r} as TOML")
+    message = f"can't write {value!r} as TOML"
+    raise ConfigError(message)
 
 
 def toml_entry(text: str, table: str, name: str) -> Any:
     try:
         data = tomllib.loads(text)
     except tomllib.TOMLDecodeError as error:
-        raise ConfigError(str(error)) from None
+        raise ConfigError(error.msg, error.lineno) from None
     servers = data.get(table, {})
     return servers.get(name) if isinstance(servers, dict) else None
 
@@ -316,9 +337,14 @@ def toml_entry(text: str, table: str, name: str) -> Any:
 def toml_insert(
     text: str, table: str, name: str, entry: dict[str, Any]
 ) -> tuple[str, str]:
-    """Append `[table.name]` with the entry's keys; returns the new text and the piece."""
+    """Append the entry as a `[table.name]` table.
+
+    Return the new text and the appended piece. Raise `ConfigError` when the entry already exists
+    or the text is not valid TOML.
+    """
     if toml_entry(text, table, name) is not None:
-        raise ConfigError(f"an entry named {name!r} already exists")
+        message = f"an entry named {name!r} already exists"
+        raise ConfigError(message)
     lines = [f"[{table}.{_toml_key(name)}]"]
     lines += [
         f"{_toml_key(key)} = {_toml_value(value)}" for key, value in entry.items()
@@ -332,11 +358,17 @@ def toml_insert(
     try:
         tomllib.loads(new)
     except tomllib.TOMLDecodeError as error:
-        raise ConfigError(f"invalid TOML after adding the table: {error}") from None
+        message = f"invalid TOML after adding the table: {error}"
+        raise ConfigError(message) from None
     return new, piece
 
 
 def toml_remove(text: str, table: str, name: str, piece: str | None) -> str:
+    """When `piece` appears exactly once, delete it to undo the insertion byte for byte.
+
+    Otherwise remove sections with bare or double-quoted entry names under a bare parent table name, including subtables.
+    Keep inline assignments and other header forms.
+    """
     if piece and text.count(piece) == 1:
         return text.replace(piece, "", 1)
     if toml_entry(text, table, name) is None:

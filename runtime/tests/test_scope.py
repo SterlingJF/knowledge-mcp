@@ -1,5 +1,3 @@
-"""The folders a host describes, rebuilt in a private temporary folder."""
-
 from __future__ import annotations
 
 import re
@@ -8,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from knowledge_mcp import bundled
-from knowledge_mcp.contract import ScopeRequest
+from knowledge_mcp.models import ScopeRequest
 from knowledge_mcp.scope import ScopeError, Workspace
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
@@ -17,9 +15,9 @@ FIXTURE_DIR = Path(__file__).parent / "fixtures"
 def request(**overrides):
     base = {
         "folders": ["docs", "rfcs"],
-        "universe_specs": [
+        "knowledge_bus_folders": [
             {
-                "depth": 0,
+                "folder": "",
                 "files": [
                     {
                         "name": "product-development.kbp.yaml",
@@ -58,7 +56,7 @@ def test_identical_requests_reuse_rebuilt_directory_path(tmp_path):
 
 
 def test_no_knowledge_bus_folder_means_the_bundled_set(tmp_path):
-    with Workspace(tmp_path).rebuilt(request(universe_specs=[])) as rebuilt:
+    with Workspace(tmp_path).rebuilt(request(knowledge_bus_folders=[])) as rebuilt:
         top = rebuilt.cwd.parent.parent
         names = sorted(path.name for path in (top / ".knowledge-bus").iterdir())
     assert names == sorted(rebuilt.bundled)
@@ -70,9 +68,9 @@ def test_no_knowledge_bus_folder_means_the_bundled_set(tmp_path):
 def test_an_empty_knowledge_bus_folder_below_definitions_stays_empty(tmp_path):
     with Workspace(tmp_path).rebuilt(
         request(
-            universe_specs=[
-                *request().model_dump()["universe_specs"],
-                {"depth": 1, "files": []},
+            knowledge_bus_folders=[
+                *request().model_dump()["knowledge_bus_folders"],
+                {"folder": "docs", "files": []},
             ]
         )
     ) as rebuilt:
@@ -84,9 +82,10 @@ def test_an_empty_knowledge_bus_folder_below_definitions_stays_empty(tmp_path):
 
 @pytest.mark.parametrize("depths", [[0], [1], [0, 2]])
 def test_a_chain_without_definitions_means_the_bundled_set(tmp_path, depths):
-    """A `.knowledge-bus/` holding only the record's plugin folder holds no definition."""
-    specs = [{"depth": depth, "files": []} for depth in depths]
-    with Workspace(tmp_path).rebuilt(request(universe_specs=specs)) as rebuilt:
+    specs = [
+        {"folder": "/".join(["docs", "rfcs"][:depth]), "files": []} for depth in depths
+    ]
+    with Workspace(tmp_path).rebuilt(request(knowledge_bus_folders=specs)) as rebuilt:
         top = rebuilt.cwd.parent.parent
         names = sorted(path.name for path in (top / ".knowledge-bus").iterdir())
         assert not (rebuilt.cwd / ".knowledge-bus").exists()
@@ -99,7 +98,7 @@ def test_a_chain_without_definitions_is_refused_for_checking(tmp_path):
     with (
         pytest.raises(ScopeError, match="send the text of each"),
         Workspace(tmp_path).rebuilt(
-            request(universe_specs=[{"depth": 0, "files": []}]), sent_only=True
+            request(knowledge_bus_folders=[{"folder": "", "files": []}]), sent_only=True
         ),
     ):
         pass
@@ -108,8 +107,12 @@ def test_a_chain_without_definitions_is_refused_for_checking(tmp_path):
 def test_a_workspace_file_is_written_as_sent(tmp_path):
     with Workspace(tmp_path).rebuilt(
         request(
-            universe_specs=[
-                {"depth": 2, "files": [], "workspace_yaml": "from_parent: []\n"}
+            knowledge_bus_folders=[
+                {
+                    "folder": "docs/rfcs",
+                    "files": [],
+                    "workspace_yaml": "from_parent: []\n",
+                }
             ]
         )
     ) as rebuilt:
@@ -133,13 +136,13 @@ def test_unsafe_folder_names_are_refused(tmp_path, folder):
 def test_invalid_definition_filenames_are_rejected(tmp_path, name):
     specs = [
         {
-            "depth": 0,
+            "folder": "",
             "files": [{"name": name, "id": "x", "version": "1", "text": "x: 1\n"}],
         }
     ]
     with (
         pytest.raises(ScopeError),
-        Workspace(tmp_path).rebuilt(request(universe_specs=specs)),
+        Workspace(tmp_path).rebuilt(request(knowledge_bus_folders=specs)),
     ):
         pass
 
@@ -148,7 +151,7 @@ def test_a_depth_beyond_the_document_folder_is_refused(tmp_path):
     with (
         pytest.raises(ScopeError),
         Workspace(tmp_path).rebuilt(
-            request(universe_specs=[{"depth": 3, "files": []}])
+            request(knowledge_bus_folders=[{"folder": "docs/rfcs/notes", "files": []}])
         ),
     ):
         pass
@@ -163,17 +166,17 @@ def test_definition_digest_reuses_text_only_in_same_workspace(tmp_path):
     )
     sent = [
         {
-            "depth": 0,
+            "folder": "",
             "files": [
                 {"name": "mine.kbp.yaml", "id": "mine", "version": "1", "text": text}
             ],
         }
     ]
-    with workspace.rebuilt(request(universe_specs=sent)) as rebuilt:
+    with workspace.rebuilt(request(knowledge_bus_folders=sent)) as rebuilt:
         [received] = rebuilt.received
     by_digest = [
         {
-            "depth": 0,
+            "folder": "",
             "files": [
                 {
                     "name": "mine.kbp.yaml",
@@ -184,29 +187,32 @@ def test_definition_digest_reuses_text_only_in_same_workspace(tmp_path):
             ],
         }
     ]
-    with workspace.rebuilt(request(universe_specs=by_digest)) as again:
+    with workspace.rebuilt(request(knowledge_bus_folders=by_digest)) as again:
         top = again.cwd.parent.parent
         assert (top / ".knowledge-bus" / "mine.kbp.yaml").read_text() == text
         assert again.received == []
     with (
         pytest.raises(ScopeError, match=r"Send the text of mine\.kbp\.yaml"),
-        Workspace(tmp_path / "other").rebuilt(request(universe_specs=by_digest)),
+        Workspace(tmp_path / "other").rebuilt(request(knowledge_bus_folders=by_digest)),
     ):
         pass
 
 
 def test_an_unknown_universe_spec_without_text_asks_for_the_text(tmp_path):
     specs = [
-        {"depth": 0, "files": [{"name": "mine.kbp.yaml", "id": "mine", "version": "1"}]}
+        {
+            "folder": "",
+            "files": [{"name": "mine.kbp.yaml", "id": "mine", "version": "1"}],
+        }
     ]
     with (
         pytest.raises(ScopeError, match=r"Send the text of mine\.kbp\.yaml"),
-        Workspace(tmp_path).rebuilt(request(universe_specs=specs)),
+        Workspace(tmp_path).rebuilt(request(knowledge_bus_folders=specs)),
     ):
         pass
 
 
-def test_host_text_overrides_matching_bundled_definition(tmp_path):
+def test_harness_text_overrides_matching_bundled_definition(tmp_path):
     text = (
         (FIXTURE_DIR / "product-development-universe-edited-label.yaml")
         .read_bytes()
@@ -214,7 +220,7 @@ def test_host_text_overrides_matching_bundled_definition(tmp_path):
     )
     specs = [
         {
-            "depth": 0,
+            "folder": "",
             "files": [
                 {
                     "name": "pd.kbp.yaml",
@@ -225,7 +231,7 @@ def test_host_text_overrides_matching_bundled_definition(tmp_path):
             ],
         }
     ]
-    with Workspace(tmp_path).rebuilt(request(universe_specs=specs)) as rebuilt:
+    with Workspace(tmp_path).rebuilt(request(knowledge_bus_folders=specs)) as rebuilt:
         assert (
             rebuilt.cwd.parent.parent / ".knowledge-bus" / "pd.kbp.yaml"
         ).read_text() == text
@@ -233,20 +239,20 @@ def test_host_text_overrides_matching_bundled_definition(tmp_path):
 
 
 def test_versions_sent_as_numbers_match_as_written():
-    spec = request().universe_specs[0].files[0]
+    spec = request().knowledge_bus_folders[0].files[0]
     assert spec.version == "0.9"
     numeric = ScopeRequest.model_validate(
         {
             "folders": [],
-            "universe_specs": [
+            "knowledge_bus_folders": [
                 {
-                    "depth": 0,
+                    "folder": "",
                     "files": [{"name": "a.kbp.yaml", "id": "a", "version": 0.1}],
                 }
             ],
         }
     )
-    assert numeric.universe_specs[0].files[0].version == "0.1"
+    assert numeric.knowledge_bus_folders[0].files[0].version == "0.1"
 
 
 def test_bundled_ref_is_the_knowledge_bus_pin():

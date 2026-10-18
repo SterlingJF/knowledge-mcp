@@ -6,7 +6,7 @@ import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-const checker = resolve(
+const script = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "check-conformance.ts",
 );
@@ -31,7 +31,7 @@ function fixture(files: Record<string, string>): string {
 }
 
 function run(root: string) {
-  const result = spawnSync(process.execPath, [checker, root], {
+  const result = spawnSync(process.execPath, [script, root], {
     encoding: "utf8",
   });
   return { status: result.status, output: result.stdout + result.stderr };
@@ -90,7 +90,7 @@ test("finds conformance suites under plugins and extensions", () => {
   assert.match(output, /2 samples/);
 });
 
-test("fails when there are no samples at all", () => {
+test("fails when the tree has schemas but no samples", () => {
   const root = fixture({ "project/v1/health.schema.yaml": schema });
   const { status, output } = run(root);
   assert.equal(status, 1);
@@ -104,4 +104,124 @@ test("passes when there are no schemas and no samples", () => {
   const { status, output } = run(root);
   assert.equal(status, 0, output);
   assert.match(output, /0 samples, 0 failures/);
+});
+
+const common = `---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: common.schema.yaml
+$defs:
+  status:
+    type: string
+    const: healthy
+`;
+
+const health = `---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: health.schema.yaml
+type: object
+required: [status]
+additionalProperties: false
+properties:
+  status:
+    $ref: common.schema.yaml#/$defs/status
+`;
+
+const listedHealth = {
+  $id: "health.schema.yaml",
+  type: "object",
+  required: ["status"],
+  additionalProperties: false,
+  properties: { status: { type: "string", const: "healthy" } },
+};
+
+function toolsJson(...outputSchemas: Array<[string, unknown]>): string {
+  const tools = outputSchemas.map(([name, outputSchema]) => ({
+    name,
+    inputSchema: { type: "object", additionalProperties: false },
+    outputSchema,
+  }));
+  return `${JSON.stringify({ tools }, null, 2)}\n`;
+}
+
+// Avoid $ref resolution errors so these tests isolate tools.json validation.
+const standalone = `---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: health.schema.yaml
+type: object
+required: [status]
+additionalProperties: false
+properties:
+  status:
+    type: string
+    const: healthy
+`;
+
+function suite(tools: string) {
+  return {
+    "extensions/mcp/v1/health.schema.yaml": standalone,
+    "extensions/mcp/v1/conformance/pass/health.ok.yaml":
+      "---\nstatus: healthy\n",
+    "extensions/mcp/v1/tools.json": tools,
+  };
+}
+
+test("resolves a $ref to another schema in the same version folder", () => {
+  const root = fixture({
+    "extensions/mcp/v1/common.schema.yaml": common,
+    "extensions/mcp/v1/health.schema.yaml": health,
+    "extensions/mcp/v1/conformance/pass/health.ok.yaml":
+      "---\nstatus: healthy\n",
+    "extensions/mcp/v1/conformance/fail/health.down.yaml":
+      "---\nstatus: down\n",
+  });
+  const { status, output } = run(root);
+  assert.equal(status, 0, output);
+  assert.match(output, /2 samples, 0 failures/);
+});
+
+test("fails when a tools.json outputSchema does not compile with the Ajv options of the TypeScript MCP SDK", () => {
+  const listed = run(fixture(suite(toolsJson(["kb_health", listedHealth]))));
+  assert.equal(listed.status, 0, listed.output);
+
+  const broken = {
+    type: "object",
+    properties: { status: { type: "string", pattern: "([" } },
+  };
+  const { status, output } = run(
+    fixture(
+      suite(toolsJson(["kb_health", listedHealth], ["kb_broken", broken])),
+    ),
+  );
+  assert.equal(status, 1, output);
+  assert.match(output, /kb_broken/);
+  assert.doesNotMatch(output, /kb_health/);
+});
+
+test("fails when a tools.json outputSchema contains $schema or has no object root", () => {
+  const dialect = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    ...listedHealth,
+  };
+  const withDialect = run(fixture(suite(toolsJson(["kb_dialect", dialect]))));
+  assert.equal(withDialect.status, 1, withDialect.output);
+  assert.match(withDialect.output, /kb_dialect/);
+  assert.match(withDialect.output, /\$schema/);
+
+  const noRoot = { oneOf: [listedHealth, { type: "object" }] };
+  const withoutRoot = run(fixture(suite(toolsJson(["kb_rootless", noRoot]))));
+  assert.equal(withoutRoot.status, 1, withoutRoot.output);
+  assert.match(withoutRoot.output, /kb_rootless/);
+});
+
+test("fails when a pass sample breaks the tools.json outputSchema with the same $id", () => {
+  const stricter = {
+    ...listedHealth,
+    properties: { status: { type: "string", const: "down" } },
+  };
+  const { status, output } = run(
+    fixture(suite(toolsJson(["kb_health", stricter]))),
+  );
+  assert.equal(status, 1, output);
+  assert.match(output, /health\.ok\.yaml/);
+  assert.match(output, /kb_health/);
 });

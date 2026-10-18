@@ -1,0 +1,13 @@
+---
+type: https://github.com/SterlingJF/knowledge-mcp/problems/digest-unknown
+title: Unknown digest
+detail:
+  This session holds no text for sha256:2222222222222222222222222222222222222222222222222222222222222222.
+  Send `record`, the text of .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+  exactly as read.
+errors:
+  - detail:
+      This session holds no text for sha256:2222222222222222222222222222222222222222222222222222222222222222.
+      Send `record`, the text of .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+      exactly as read.
+    pointer: "#/record_digest"

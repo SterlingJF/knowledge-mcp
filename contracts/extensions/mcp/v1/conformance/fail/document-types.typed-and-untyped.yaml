@@ -1,0 +1,14 @@
+---
+# An entry is typed or untyped, never both.
+schema: knowledge-mcp/document-types/1
+files:
+  docs/rfcs/0042-cache.md:
+    universe_spec: codebase-recordkeeping
+    version: "0.1"
+    document_type: design-proposal
+    no_document_type: true
+    set_by: agent
+    allowed_by:
+      basis: request
+      text: It is a design proposal.
+    time: "2026-10-10T09:15:02.118Z"

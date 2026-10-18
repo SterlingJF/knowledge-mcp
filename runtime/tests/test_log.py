@@ -1,5 +1,3 @@
-"""Test response logging and state directory selection."""
-
 from __future__ import annotations
 
 import hashlib
@@ -9,16 +7,17 @@ import subprocess
 import sys
 from pathlib import Path
 
-from tests.hosts import (
+from knowledge_mcp import log
+from tests.harness import (
     CODEBASE,
     MODULE,
     PRODUCT,
-    fit_arguments,
     knowledge_base,
     scope_arguments,
     server_parameters,
     session,
     texts,
+    type_arguments,
     write,
 )
 
@@ -35,8 +34,11 @@ def test_every_returned_text_appears_once_in_the_log(tmp_path):
     write(root, RFC)
     scope = {**scope_arguments(root, RFC), "location": str(root / RFC)}
     calls = [
-        ("kb_fit", fit_arguments(root, RFC)),
-        ("kb_fit", fit_arguments(root, RFC, location="notion://page/abc")),
+        ("kb_get_document_type", type_arguments(root, RFC)),
+        (
+            "kb_get_document_type",
+            type_arguments(root, RFC, location="notion://page/abc"),
+        ),
         ("kbp_kinds", scope),
         ("kbp_card", {**scope, "kind": "design-doc", "universe": PRODUCT}),
         ("kbp_card", {**scope, "kind": "not-a-type"}),
@@ -99,7 +101,6 @@ def test_log_uses_home_state_directory_without_overrides(tmp_path):
 
 
 def test_state_directory_prefers_override_then_xdg_then_home(tmp_path):
-    from knowledge_mcp import log
 
     home = tmp_path / "home"
     chosen = tmp_path / "my history"
@@ -109,7 +110,6 @@ def test_state_directory_prefers_override_then_xdg_then_home(tmp_path):
     assert log.directory(both, home) == chosen
     assert log.directory({"XDG_STATE_HOME": str(xdg)}, home) == xdg / "knowledge-mcp"
     assert log.directory({}, home) == home / ".local" / "state" / "knowledge-mcp"
-    # Ignore relative state paths and use the home state directory.
     relative = {"KNOWLEDGE_MCP_STATE_DIR": "history", "XDG_STATE_HOME": "state"}
     assert log.directory(relative, home) == home / ".local" / "state" / "knowledge-mcp"
 

@@ -1,60 +1,61 @@
 # contracts
 
-Every contract this project owns or conforms to, with its conformance samples.
+## Folders
 
-## Point of View
-
-Placement follows this project's point of view.
-
-| Folder                 | Direction                                            | Who defines the contract |
-| ---------------------- | ---------------------------------------------------- | ------------------------ |
-| `project/`             | this project's own modules talk to each other        | this project             |
-| `plugins/<name>/`      | outside code plugs into this project                 | this project             |
-| `extensions/<target>/` | this project reaches into another project or service | the target               |
-
-When this project plugs into a host, the host calls the contract a plugin. File it under `extensions/`.
+Put contracts for interfaces defined by other projects in `extensions/<target>/`.
+Keep `document-types.schema.yaml` beside the tool result schemas so references between the schemas resolve.
+Create `project/` for the first contract between modules in this repo.
+Create `plugins/<name>/` for the first interface that knowledge-mcp defines for outside code.
 
 ## Layout
 
 ```text
 contracts/
-├── README.md
-├── package.json                              lint
-├── redocly.yaml                              lint policy for every OpenAPI file
-├── project/                                  this project's own modules talk to each other
-│   └── v1/
-│       ├── <name>.rest.openapi.yaml          request / response
-│       ├── <name>.realtime-sse.openapi.yaml  event stream
-│       ├── <name>.schema.yaml                data shape
-│       └── conformance/
-│           ├── pass/<name>.<case>.yaml       must validate against <name>.schema.yaml
-│           └── fail/<name>.<case>.yaml       must not validate
-├── plugins/<name>/                           outside code plugs into this project
-│   └── v1/                                   same shape as project/v1
-└── extensions/                               this project reaches into another project
-    └── <target>/
-        ├── upstream/                         the target's spec, vendored read-only, with UPSTREAM.md
-        └── v1/                               this project's contracts for the target, same shape as project/v1
+├── extensions/mcp/v1/               # Tool result, error and document-types schemas
+│   ├── *.schema.yaml                # JSON Schemas and shared definitions
+│   ├── tools.json                   # tools/list snapshot from the server
+│   └── conformance/                 # Pass and fail samples per schema
+└── package.json                     # Schema lint tool dependencies
 ```
 
 ## Naming
 
-`<name>.<surface>.<kind>.yaml`: the subject, then how it is reached, then the document format. A data shape with no surface is `<name>.schema.yaml`.
+Name samples after `<name>.schema.yaml` in the same version folder.
+Write fail samples by hand as `conformance/fail/<name>.<case>.yaml`.
+`just generate_contract_snapshots` writes pass samples as `conformance/pass/<name>.<case>.yaml`.
+`just check_contracts` fails when a pass sample fails its schema or a fail sample passes its schema.
 
-A conformance sample `<name>.<case>.yaml` is checked against `<name>.schema.yaml` in the version folder that holds its `conformance/` directory.
+## Schema Files
+
+- Set `$schema` to JSON Schema 2020-12 and `$id` to the file name. Reference sibling schemas by file name, such as `problem.schema.yaml`.
+- Give the root and each `$defs` entry a `title`, unique in the version folder. datamodel-codegen uses `title` to name generated classes.
+- Use draft-07 keywords plus `$defs` for compatibility with the TypeScript MCP SDK client. The client validates each `outputSchema` with draft-07 Ajv. Avoid `unevaluatedProperties`, `dependentRequired`, `prefixItems` and `$dynamicRef`. Draft-07 Ajv ignores those keywords.
+- Include `object` in `type` for each subschema with `required` or `properties`. List each `required` name under `properties` in the same subschema.
 
 ## Commands
 
-| Command                | Purpose                                                       |
-| ---------------------- | ------------------------------------------------------------- |
-| `pnpm run lint`        | Lint every `*.openapi.yaml` outside `upstream/` with Redocly  |
-| `just check_contracts` | From the repo root: lint, then check every conformance sample |
+| Command                | Purpose                                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `just check_contracts` | Lint schemas and `tools.json`, validate samples, check that `runtime/knowledge_mcp/schemas_auto/` is current |
 
-## Not Here
+## Versions
 
-| Item                                         | Where it goes                         |
-| -------------------------------------------- | ------------------------------------- |
-| Code tests for servers, apps, and components | the module that owns the code         |
-| Generated models (`*.auto.ts`, `*_auto.py`)  | the module that uses the models       |
-| Broker or deployment topology                | infrastructure                        |
-| Packaging for another host                   | its own module, named after that host |
+Each successful `kb_*` result has a `schema` field with a schema ID, such as `knowledge-mcp/document-type/1`.
+The document-types file has `schema: knowledge-mcp/document-types/1`.
+Raise the schema version for a breaking change:
+
+- a field removed or renamed;
+- a narrower type or value list;
+- a new required field;
+- a field whose meaning changes.
+
+Raise the schema version before emitting a new field that older schemas reject.
+
+`kb_*` tool errors include an RFC 9457 `type` field with a problem type URI.
+Give a problem type a new URI when its meaning changes.
+
+## Related Locations
+
+| Item           | Location                                                                                |
+| -------------- | --------------------------------------------------------------------------------------- |
+| Contract tests | `runtime/tests/test_contract_snapshots.py`, `runtime/tests/test_contract_end_to_end.py` |

@@ -1,0 +1,118 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: import.schema.yaml
+title: kb_prepare_import result
+description: >-
+  The structuredContent of a kb_prepare_import result, or problem details
+  when isError is true.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Import answer
+    description: >-
+      The passages of one source document, with the card questions for every
+      document type that applies.
+    type: object
+    additionalProperties: false
+    required:
+      - schema
+      - location
+      - universe_specs
+      - document_types
+      - passages
+      - received
+    properties:
+      schema:
+        const: knowledge-mcp/import/1
+      location:
+        $ref: common.schema.yaml#/$defs/location
+      universe_specs:
+        description: In kbp_kinds order.
+        type: array
+        minItems: 1
+        items:
+          $ref: common.schema.yaml#/$defs/spec
+      document_types:
+        description: Every document type that applies, in kbp_kinds order.
+        type: array
+        items:
+          title: Import document type
+          type: object
+          additionalProperties: false
+          required:
+            [universe_spec, document_type, name, action, actor, elements]
+          properties:
+            universe_spec:
+              type: string
+              minLength: 1
+            document_type:
+              type: string
+              minLength: 1
+            name:
+              type: string
+            action:
+              description: From kbp_kinds.
+              type: [string, "null"]
+            actor:
+              description: The role that uses the document type, from kbp_kinds.
+              type: [string, "null"]
+            elements:
+              description: >-
+                Sections of the document type's card, in card order, without
+                `links` sections.
+              type: array
+              items:
+                title: Element question
+                type: object
+                additionalProperties: false
+                required: [element, question, strength]
+                properties:
+                  element:
+                    type: string
+                    minLength: 1
+                  question:
+                    type: string
+                    minLength: 1
+                  strength:
+                    description: "`core` or `situational`, from the card."
+                    type: string
+      passages:
+        description: In document order.
+        type: array
+        minItems: 1
+        items:
+          title: Passage
+          type: object
+          additionalProperties: false
+          required: [id, kind, lines, opening, under]
+          properties:
+            id:
+              type: string
+              pattern: ^p[1-9][0-9]*$
+            kind:
+              enum: [heading, paragraph, list-item, code]
+            lines:
+              description: First and last line numbers.
+              type: array
+              minItems: 2
+              maxItems: 2
+              items:
+                type: integer
+                minimum: 1
+            opening:
+              description: >-
+                The passage's first line with spaces collapsed. knowledge-mcp
+                truncates text over 80 characters at the last space within
+                the first 80 characters, or at 80 characters without spaces.
+                knowledge-mcp appends `…` after truncation.
+              type: string
+              minLength: 1
+            under:
+              description: The id of the enclosing heading passage, or null.
+              type: [string, "null"]
+              pattern: ^p[1-9][0-9]*$
+      received:
+        $ref: common.schema.yaml#/$defs/received

@@ -1,0 +1,32 @@
+---
+schema: knowledge-mcp/document-type/1
+location: ~/notes/docs/rfcs/0042-cache.md
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy at v0.10.0
+    from_parent: false
+  - id: product-development
+    version: "0.9"
+    source: bundled copy at v0.10.0
+    from_parent: false
+candidates: []
+every_document_type: null
+recorded:
+  path: docs/rfcs/0042-cache.md
+  label: from the document-types file
+  entry:
+    universe_spec: codebase-recordkeeping
+    version: "0.1"
+    document_type: design-proposal
+    set_by: agent
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
+        date as you work.
+      location: AGENTS.md
+    time: "2026-10-18T07:04:56.885Z"
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:2cbec7c64bdc5689634c0470cc4db35ce5680f15a2ed1d4ca71a957cdc877b1f

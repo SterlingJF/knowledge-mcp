@@ -1,46 +1,52 @@
-# Release verification
+# Release checks
 
-Publishing uses the GitHub release workflow. The workflow runs the native Homebrew checks on macOS runners.
+See the [Release workflow](../.github/workflows/release.yml).
+The `HOMEBREW_TAP_TOKEN` secret is a fine-grained token with read and write access to the tap repository's contents alone.
 
 ## Publish a release
 
-1. Write the changes under `## X.Y.Z — unreleased` in `CHANGELOG.md`.
-2. Run `just release_prepare X.Y.Z`. Preparation updates package and plugin versions and lockfiles, then promotes that changelog heading. The changes remain unstaged.
-3. Run `just release_check` to check release metadata and notes, then `just check` for the repository's normal code, format and test checks.
-4. Commit the prepared changes, then push a stable tag `vX.Y.Z` matching `runtime/pyproject.toml`. The workflow builds from that tag and its lockfiles and uses its changelog entry for release notes.
-5. Wait for the workflow to finish. The tap updates only after both architectures pass all required checks. Bottle assets are uploaded before install verification; an uploaded asset alone does not mean the release passed.
-6. Inspect the release assets and tap formula as described below.
+1. Write changes under `## Unreleased` in `CHANGELOG.md`, as one-line bullets under Added, Changed, Removed and Fixed.
+2. Run `just release_prepare X.Y.Z` to update package versions, plugin versions, `uv.lock` and `runtime/requirements.lock`.
+   The recipe renames `## Unreleased` to `## X.Y.Z` and stages nothing.
+3. Run `just release_check`, then `just check`.
+4. Commit, then push the tag `vX.Y.Z`. The tag version must match `runtime/pyproject.toml`.
+5. Wait for the workflow to pass on both architectures.
+   The workflow uploads bottles before checking installs and updates the tap after both install checks pass.
+6. [Inspect the results](#inspect-the-results).
+
+The workflow builds from the tagged commit and reads release notes from the tagged `CHANGELOG.md` entry.
 
 ## Add bottles to an existing release
 
-Open Actions → Release → Run workflow and enter the existing stable release tag in the `tag` input. The tag must match the package version in the tagged `runtime/pyproject.toml`. The workflow reuses an existing source archive and its tagged lockfiles without rewriting the tag or release notes. A release without that archive must pass the tagged metadata and changelog checks before the workflow creates or uploads its source archive. Do not move the tag or change the package version or formula revision to add bottles. Wait for the checks and inspect the results before marking the backfill complete.
+1. Open Actions → Release → Run workflow. Enter the existing tag in the `tag` field.
+   The tag version must match `runtime/pyproject.toml` at that tag.
+2. Wait for the workflow to pass, then [inspect the results](#inspect-the-results).
 
-Retries reuse published native bottle JSON and archives without replacing either. If a published pair is incomplete, use Actions → Re-run failed jobs to finish publication from the original retained build artifacts. A new run refuses to rebuild an incomplete pair.
+The workflow reuses the published source archive and preserves the tag and release notes.
+If the source archive is missing, the workflow builds an archive from the tag.
+That build requires a `## X.Y.Z` entry in the tagged `CHANGELOG.md`.
+Never move the tag or change the version or formula revision to add bottles.
 
-## Automated Homebrew checks
+A rerun reuses published bottles.
+The workflow stops if either the bottle archive or its JSON metadata is missing from a published pair.
+To recover, select Actions → Re-run failed jobs. The rerun publishes the retained build artifacts.
 
-The workflow uses these native runners:
+## Runners
 
 | Runner           | Architecture | Bottle tag      | Homebrew prefix |
 | ---------------- | ------------ | --------------- | --------------- |
 | `macos-15`       | ARM64        | `arm64_sequoia` | `/opt/homebrew` |
 | `macos-15-intel` | x86_64       | `sequoia`       | `/usr/local`    |
 
-As of October 2026, macOS 15 is [Homebrew's oldest supported Apple Silicon OS](https://docs.brew.sh/Support-Tiers); Intel macOS is Tier 3. Recheck [GitHub's runner availability](https://docs.github.com/en/actions/reference/runners/github-hosted-runners) before changing the baseline.
+On each architecture, the verify job installs from source, then from the bottle, and checks:
 
-Each architecture builds or restores its native bottle. Verification runs on a fresh macOS runner and checks:
-
-- An ordinary install has `poured_from_bottle: true`; a forced source install has `poured_from_bottle: false`.
-- `brew test`, `brew audit --strict`, linkage checks and `kb doctor` succeed.
+- `poured_from_bottle` is `false` for the source install and `true` for the bottle install.
+- `brew audit --strict`, `brew test`, `brew linkage --test` and `kb doctor` pass.
 - The installed version matches the release.
-
-These jobs provide the clean-install check when the workflow runs. Running `just check` locally tests tooling with fixtures and dry runs; it does not establish a native bottle install result.
-
-The application bottle includes its compiled Rust Python extensions. Homebrew runtime dependencies such as Python and OpenSSL may still compile on Intel.
 
 ## Inspect the results
 
-Check that the GitHub release contains the source archive and both native JSON/archive pairs:
+Check the GitHub release for these assets:
 
 | Asset          | Filename                                              |
 | -------------- | ----------------------------------------------------- |
@@ -50,19 +56,20 @@ Check that the GitHub release contains the source archive and both native JSON/a
 | Intel metadata | `knowledge-mcp--<version>.sequoia.bottle.json`        |
 | Intel bottle   | `knowledge-mcp-<version>.sequoia.bottle.tar.gz`       |
 
-Check that `SterlingJF/homebrew-tap/Formula/knowledge-mcp.rb` uses the release's source URL and checksum, bottle root URL and both bottle checksums. A same-version update must preserve the existing source URL, source checksum and formula revision. An older backfill cannot downgrade the tap.
+Check `SterlingJF/homebrew-tap/Formula/knowledge-mcp.rb` for the source URL and checksum, bottle root URL and both bottle checksums.
+The tap job rejects downgrades.
+For the same version, the tap job rejects changes to the source URL, source checksum or formula revision.
 
-For a successful run, Actions retains the formula and release manifest, the original bottle build artifacts, and install reports. Each architecture's reports include `source-install.json`, `bottle-install.json` and separate install, test, linkage and doctor logs. A failed verification may retain only partial reports or logs. Use the recorded times rather than assuming a speedup.
+Check the Actions artifacts for the formula, release manifest, bottle builds and install reports.
+Each `install-<bottle tag>` artifact contains `source-install.json`, `bottle-install.json`, and the install, test, linkage and doctor logs.
+A failed run may have incomplete reports.
+The `elapsed_seconds` field excludes dependency setup because the job installs dependencies before timing each install.
 
-The timed installs have runtime and build dependencies preinstalled, with Knowledge-MCP's downloads cleared before each install. They exclude cold dependency setup and do not measure a fresh machine's total install time.
+## Manual checks
 
-## Manual app verification
+Test each affected harness on an existing test installation. Run install and removal checks on a disposable test Mac.
 
-Use an existing test installation to check affected agent apps. Run package installation and removal checks on a disposable test Mac. These manual checks are separate from routine publishing.
-
-### Check the installed package
-
-To check source installation, use `brew install --build-from-source sterlingjf/tap/knowledge-mcp` instead of the first install command below.
+### Installed package
 
 ```sh
 brew install sterlingjf/tap/knowledge-mcp
@@ -73,24 +80,39 @@ kb --version
 kb doctor
 ```
 
-For a bottle install, the receipt has `poured_from_bottle: true`; for a source install, it has `poured_from_bottle: false`. `brew test` checks the CLI versions and MCP initialization. `kb doctor` reports the installed components, app registration status and state folder.
+For a source install, replace the first command with `brew install --build-from-source sterlingjf/tap/knowledge-mcp`.
+Check `brew info` for `poured_from_bottle: true` after a bottle install or `false` after a source install.
 
-### Check the agent apps
+### Harnesses
 
-For changes to setup behavior, use the affected app's [setup command from the README](../README.md#get-started) to register or update Knowledge-MCP. Start a new session after setup.
+1. Register knowledge-mcp with the [setup command](../README.md#get-started) for each harness under test, then start a new session.
+2. Run `kb doctor`. Check the MCP server list in Claude Code, Codex, the Claude desktop app, Pi or OpenCode.
+   Check that the knowledge-mcp entry runs `kb mcp` from the Homebrew path.
+3. In a test codebase, pick an existing file and run `kb type <path>`.
+   Ask the agent for the document type of the same file. Check that the agent calls `kb_get_document_type`.
+4. In a harness with a skills folder, check that each `kb-*` skill appears once.
+   The Claude desktop app takes skill uploads instead.
 
-Run `kb doctor` and check the app's MCP status. The CLI apps provide `claude mcp list`, `codex mcp list`, `pi mcp list` or `opencode mcp list`. The connection should run `kb mcp` through the installed Homebrew path.
+### Upgrade
 
-Choose an existing file in a test codebase. Compare `kb fit <file>` with the agent's answer when asked what that file is for. The agent should call `kb_fit`, show the matching candidates and ask one question about the intended reader or ask you to confirm its guess. For a codebase without a `.knowledge-bus/` folder, the results use the bundled universe specs.
+After a newer version reaches the tap, run:
 
-In an app that supports a skills folder, check that the bundled `kb-*` and `km-*` skills appear once. Claude Code provides the `/kb-` list; Codex, Pi and OpenCode provide skills lists. The Claude desktop app uses skill uploads instead.
+```sh
+brew upgrade knowledge-mcp
+brew test knowledge-mcp
+brew audit --strict sterlingjf/tap/knowledge-mcp
+brew info --json=v2 sterlingjf/tap/knowledge-mcp
+kb doctor
+```
 
-### Check an upgrade
+Check that `kb doctor` shows the new version and `brew info` shows `poured_from_bottle: true`.
+Check that skill links still use Homebrew's `opt/knowledge-mcp` path.
 
-After a newer version reaches the tap, run `brew upgrade knowledge-mcp`, `brew test knowledge-mcp`, `brew audit --strict sterlingjf/tap/knowledge-mcp`, `brew info --json=v2 sterlingjf/tap/knowledge-mcp` and `kb doctor`. Check the new version and the `poured_from_bottle: true` receipt. Skill links should still point through Homebrew's `opt/knowledge-mcp` path. Keep this check pending until a newer version is available.
+### Cleanup
 
-### Remove the test integration
+1. Quit the harnesses under test.
+2. Run `kb setup --remove <harness>` for each harness you registered for this check.
+3. If you installed the package for this check, run `kb doctor --verbose` to find the state folder.
+   Then run `brew uninstall knowledge-mcp`.
 
-Quit the apps under test. Use `kb setup --remove <host>` only for integrations added during this check. Uninstall the package with `brew uninstall knowledge-mcp` only if it was installed for this check.
-
-Uninstalling retains the answer log and edit record. While the package is installed, `kb doctor` shows the state folder in use.
+Uninstalling keeps the state folder. See [SECURITY.md](../SECURITY.md#known-limitations).

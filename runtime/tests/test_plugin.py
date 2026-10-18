@@ -1,5 +1,3 @@
-"""Standalone plugin installation and server startup from Claude Code and Codex manifests."""
-
 from __future__ import annotations
 
 import json
@@ -13,19 +11,17 @@ from pathlib import Path
 import pytest
 from mcp.client.stdio import StdioServerParameters
 
-from tests.hosts import MODULE, server_parameters, session, texts
+from tests.harness import MODULE, server_parameters, session, texts
 
 CLAUDE = json.loads((MODULE / ".claude-plugin" / "plugin.json").read_text())
 CODEX = json.loads((MODULE / ".codex-plugin" / "plugin.json").read_text())
 CODEX_SERVERS = json.loads((MODULE / "codex-mcp.json").read_text())
 PROJECT = tomllib.loads((MODULE / "pyproject.toml").read_text())["project"]
 
-# Baseline environment variables retained in the simulated Codex startup.
 CODEX_KEEPS = ("HOME", "PATH", "USER", "TMPDIR")
 
 
 def uv_locations() -> dict[str, str]:
-    """Return uv cache and Python installation directories for subprocess reuse."""
     found = {}
     for name, command in (
         ("UV_CACHE_DIR", "cache"),
@@ -39,7 +35,6 @@ def uv_locations() -> dict[str, str]:
 
 
 def copy_plugin(tmp_path: Path) -> Path:
-    """Copy the plugin directory to simulate installation outside the repository."""
     target = tmp_path / "installed" / "knowledge-mcp"
     shutil.copytree(
         MODULE,
@@ -65,7 +60,7 @@ def test_codex_starts_the_server_from_a_copy_of_the_folder(tmp_path):
     home = tmp_path / "home"
     home.mkdir()
     env = {name: os.environ[name] for name in CODEX_KEEPS if name in os.environ}
-    # A temporary HOME contains test logs; uv reuses its existing cache and Python installations.
+    # Explicit uv paths preserve cache access under a temporary HOME.
     env |= {"HOME": str(home), **uv_locations()}
 
     answer = version_answer(
@@ -83,7 +78,6 @@ def test_codex_starts_the_server_from_a_copy_of_the_folder(tmp_path):
 
 
 def test_codex_manifest_lists_state_directory_env_vars():
-    # Codex forwards state-directory variables listed in env_vars.
     server = CODEX_SERVERS["mcpServers"]["knowledge-mcp"]
     assert server["env_vars"] == ["KNOWLEDGE_MCP_STATE_DIR", "XDG_STATE_HOME"]
 
@@ -159,33 +153,48 @@ def test_both_manifests_name_the_same_plugin_and_skills():
     assert not (MODULE / ".mcp.json").exists()
 
 
-def test_both_manifests_describe_the_checks_and_the_records():
-    assert CLAUDE["description"] == CODEX["description"]
-    for text in (CLAUDE["description"], CODEX["interface"]["longDescription"]):
-        assert "before writing" in text
-        assert "record of each edit" in text
-        assert "each file's fit" in text
-        assert "bring in documents written elsewhere" in text
+def test_every_description_copy_is_the_package_description():
+    marketplace = json.loads(
+        (MODULE.parent / ".claude-plugin/marketplace.json").read_text()
+    )
+    copies = [
+        CLAUDE["description"],
+        CODEX["description"],
+        CODEX["interface"]["shortDescription"],
+        CODEX["interface"]["longDescription"],
+        marketplace["metadata"]["description"],
+        marketplace["plugins"][0]["description"],
+        (MODULE.parent / "README.md").read_text().splitlines()[2],
+    ]
+    assert (
+        PROJECT["description"]
+        == "Plain, structured thinking while you work. It's free, open, and local-first."
+    )
+    assert all(text == PROJECT["description"] for text in copies)
 
 
-def test_both_manifests_expose_the_bring_in_skill(tmp_path):
+def test_both_manifests_expose_the_import_skill(tmp_path):
     plugin = copy_plugin(tmp_path)
     for manifest in (CLAUDE, CODEX):
         for folder in (MODULE, plugin):
-            skill = folder / manifest["skills"] / "km-bring-in"
-            assert skill_name(skill) == "km-bring-in"
+            skill = folder / manifest["skills"] / "kb-import-document"
+            assert skill_name(skill) == "kb-import-document"
 
 
 def test_plugin_skill_names_are_unique_and_match_upstream():
     skills = sorted(path.parent.name for path in (MODULE / "skills").glob("*/SKILL.md"))
     upstream = (MODULE / "knowledge-bus" / "UPSTREAM.md").read_text()
-    copied = [name for name in skills if not name.startswith("km-")]
+    copied = [name for name in skills if name not in OWN_SKILLS]
 
     assert len(skills) == len(set(skills))
     for name in copied:
         assert f"| `skills/{name}/` " in upstream
     assert "kb-check" in copied and "kb-explore" in copied
-    assert "| `skills/km-" not in upstream
+    for name in OWN_SKILLS:
+        assert f"| `skills/{name}/` " not in upstream
+
+
+OWN_SKILLS = {"kb-import-document", "kb-track-document-types", "kb-write-document"}
 
 
 def skill_name(folder: Path) -> str:
@@ -194,12 +203,12 @@ def skill_name(folder: Path) -> str:
     return line.removeprefix("name:").strip()
 
 
-def test_km_skills_are_preserved_in_copied_plugin(tmp_path):
+def test_own_skills_are_preserved_in_copied_plugin(tmp_path):
     skills = MODULE / "skills"
     for manifest in (CLAUDE, CODEX):
         assert (MODULE / manifest["skills"]).resolve() == skills
-    own = sorted(path.name for path in skills.glob("km-*"))
-    assert own == ["km-bring-in", "km-fit-record", "km-write"]
+    own = sorted(path.name for path in skills.iterdir() if path.name in OWN_SKILLS)
+    assert own == sorted(OWN_SKILLS)
 
     plugin = copy_plugin(tmp_path)
 
@@ -212,17 +221,30 @@ def test_km_skills_are_preserved_in_copied_plugin(tmp_path):
     ("skill", "expected"),
     [
         (
-            "km-write",
-            {"kb_fit", "kbp_card", "kb_audience", "kb_record_edit", "kb_edits"},
+            "kb-write-document",
+            {
+                "kb_get_document_type",
+                "kbp_card",
+                "kb_list_audiences",
+                "kb_record_edit",
+                "kb_list_edits",
+            },
         ),
-        ("km-fit-record", {"kb_fit_record", "kb_fit"}),
         (
-            "km-bring-in",
-            {"kb_mark", "kb_fit", "kbp_card", "kb_record_edit", "kb_edits"},
+            "kb-track-document-types",
+            {"kb_prepare_document_types", "kb_get_document_type"},
+        ),
+        (
+            "kb-import-document",
+            {
+                "kb_prepare_import",
+                "kb_get_document_type",
+                "kbp_card",
+            },
         ),
     ],
 )
-def test_km_skills_reference_required_and_registered_tools(tmp_path, skill, expected):
+def test_own_skills_reference_required_and_registered_tools(tmp_path, skill, expected):
     text = (MODULE / "skills" / skill / "SKILL.md").read_text()
 
     async def steps(client):

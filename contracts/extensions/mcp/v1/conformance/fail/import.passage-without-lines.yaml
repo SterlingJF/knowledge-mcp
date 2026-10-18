@@ -1,0 +1,16 @@
+---
+# Every passage names its first and last line.
+schema: knowledge-mcp/import/1
+location: pasted in chat
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy at v0.10.0
+    from_parent: false
+document_types: []
+passages:
+  - id: p1
+    kind: paragraph
+    opening: Ana said so.
+    under: null
+received: []

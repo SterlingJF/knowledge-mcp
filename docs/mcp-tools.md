@@ -2,127 +2,301 @@
 
 <!-- BEGIN AUTO-GENERATED intro -->
 
-The server has 14 tools. It speaks MCP over stdio: each agent app starts the server with `kb mcp` or from its plugin, and the server opens no network port.
+The server serves MCP over stdio and opens no network port. Harnesses with a knowledge-mcp plugin start the server through the plugin. Other harnesses run `kb mcp`.
 
 <!-- END AUTO-GENERATED intro -->
 
-> The intro and the tool tables are generated from [source](../runtime/knowledge_mcp/tools) by `just generate_mcp_tools_doc`.
+> Generated regions come from [tools.json](../contracts/extensions/mcp/v1/tools.json), the `tools/list` response. After a tool change, run `just generate_contract_snapshots`, then `just generate_mcp_tools_doc`.
 
-## Fit a file
+## Tools
 
-| Tool     | What it does                                                                      |
-| -------- | --------------------------------------------------------------------------------- |
-| `kb_fit` | Say what a file is for: every fitting universe spec and document type, as a list. |
+<!-- BEGIN AUTO-GENERATED tools -->
 
-`kb_fit` takes what the agent read about one file and answers with every universe spec and document type that fits it, as a list. The agent sends:
+| Tool                        | Purpose                                                                                                                                                       | Result                                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `kb_get_document_type`      | Get a file's document type before writing or editing.                                                                                                         | [document-type.schema.yaml](../contracts/extensions/mcp/v1/document-type.schema.yaml)                 |
+| `kb_list_audiences`         | List the readers you can choose for a document type.                                                                                                          | [audiences.schema.yaml](../contracts/extensions/mcp/v1/audiences.schema.yaml)                         |
+| `kb_list_edits`             | List the edits recorded for `location`, oldest first, to check or undo an edit.                                                                               | [edits.schema.yaml](../contracts/extensions/mcp/v1/edits.schema.yaml)                                 |
+| `kb_prepare_document_types` | Prepare document-types text from `record` or `record_digest`, file changes and `entries`, returning changed entries and files needing a document type.        | [document-types-update.schema.yaml](../contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
+| `kb_prepare_import`         | Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`.                                    | [import.schema.yaml](../contracts/extensions/mcp/v1/import.schema.yaml)                               |
+| `kb_record_edit`            | Record an edit right after you make it, so the person can check or undo the change.                                                                           | [edit.schema.yaml](../contracts/extensions/mcp/v1/edit.schema.yaml)                                   |
+| `kbp_card`                  | Read the card for a document type before you draft or edit a document of that type.                                                                           | kbp's output, as is                                                                                   |
+| `kbp_explore`               | Write an offline HTML viewer for a universe spec under `explorer/` beside `log.jsonl`.                                                                        | kbp's output, as is                                                                                   |
+| `kbp_inspect`               | Get a universe spec and its type guidance as kbp's JSON model.                                                                                                | kbp's output, as is                                                                                   |
+| `kbp_kinds`                 | List the document types of the universe specs that apply.                                                                                                     | kbp's output, as is                                                                                   |
+| `kbp_mint`                  | Mint new `code` values of one `kind` for universe spec entries.                                                                                               | kbp's output, as is                                                                                   |
+| `kbp_self_check`            | Validate kbp's bundled protocol definition with `kbp --self-check`.                                                                                           | kbp's output, as is                                                                                   |
+| `kbp_validate`              | Validate files in the nearest supplied `.knowledge-bus/` folder and parent files named in its `workspace.yaml`, using file text or digests from this session. | kbp's output, as is                                                                                   |
+| `kbp_version`               | Get the installed knowledge-bus release and protocol version from `kbp --version`.                                                                            | kbp's output, as is                                                                                   |
 
-| Argument         | What it holds                                                                                                                                                                                                                                                                 |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`       | The file's location as plain text: a local path, a Drive link or a Notion page. knowledge-mcp logs the text and opens nothing there.                                                                                                                                          |
-| `name`           | The file name.                                                                                                                                                                                                                                                                |
-| `folders`        | Folder names from the knowledge base's top folder down to the file's folder.                                                                                                                                                                                                  |
-| `universe_specs` | One entry per folder on that chain holding a `.knowledge-bus/`, empty ones included: its `depth` in `folders`, the name and header id and version of each `*.kbp.yaml` file directly inside, and the text of `workspace.yaml` when present. Nothing under `plugins/` goes in. |
-| `hat`            | The role of the person the agent works for, when the agent can tell.                                                                                                                                                                                                          |
-| `record`         | The text of the knowledge base's fit record, `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, when it has one; `record_digest` in its place once an answer returned the digest.                                                                                            |
-| `changes`        | Files moved or deleted since the record was saved, in the shape `kb_fit_record` takes, sent with the record. knowledge-mcp applies them to the record for this answer and saves nothing.                                                                                      |
+<!-- END AUTO-GENERATED tools -->
 
-For a header whose id and version match a bundled universe spec, the agent sends the header alone: knowledge-mcp uses its bundled copy and labels the answer `bundled copy at <ref>`. Any other file's text is sent once per session; the answer returns its digest, which later calls send instead. When no folder on the chain holds a `*.kbp.yaml` file or `workspace.yaml`, the bundled universe specs apply, so a `.knowledge-bus/` holding only the fit record changes nothing. When a farther folder holds definitions and a nearer `.knowledge-bus/` holds none, `kbp` refuses the scope, and knowledge-mcp passes the refusal through as is.
+When kbp runs, the result contains one text block per non-empty stream, with stdout before stderr.
+Each block identifies the stream in `_meta.stream`.
+Tools with a `folders` argument can append a JSON text block with `_meta.stream` set to `knowledge-mcp`.
+That block lists bundled or received universe specs and, after a successful `kbp_explore` call, the `explorer` folder.
+The result contains the kbp exit code in `_meta.exit_code` and sets `isError` for a non-zero exit code.
 
-knowledge-mcp rebuilds those folders at their places in a private temporary folder, runs `kbp --kinds` from the file's rebuilt folder, and matches the file name and the folder holding it against each document type's other names. The answer lists the candidates with their `kbp --kinds` fields, matching actors first when a hat is sent. With no candidate, it lists every document type in scope instead, for the agent to choose from the file's outline or to answer "no fit". When the agent sends the fit record and the record holds the file, with its universe spec still in scope, the answer comes from the record: `recorded` holds the entry, labelled "from the record", including "no fit", and the candidates are empty. The result schema is [`fit.schema.yaml`](../contracts/project/v1/fit.schema.yaml).
+Failures in `kb_*` tools and errors before kbp runs return a problem object in `structuredContent`.
+[problem.schema.yaml](../contracts/extensions/mcp/v1/problem.schema.yaml) lists the problem types.
 
-## Before writing
+Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md](../SECURITY.md#trust-model).
 
-| Tool             | What it does                                                                                                   |
-| ---------------- | -------------------------------------------------------------------------------------------------------------- |
-| `kb_audience`    | Return who a document of one type can be for, from the document type's own universe spec.                      |
-| `kb_record_edit` | Record an edit you made to a document, right after making the edit, so the person can check and undo the edit. |
-| `kb_edits`       | List every edit recorded at a location, oldest first, with its basis and its texts.                            |
+## Arguments
 
-Before writing or editing a document, the agent follows the plugin's `km-write` skill. It settles the fit with `kb_fit`, reads the card with `kbp_card`, and states each condition on the card's "Depends on: …" lines as a guess labelled "guess", which stays open until the person confirms the value. When the guesses meet the card's "No document needed when …" line, the agent answers with the label "no document needed (guess)" and asks whether to write the document anyway. The agent keeps that answer apart from "no fit".
+<!-- BEGIN AUTO-GENERATED arguments -->
 
-`kb_audience` takes the same `location`, `folders` and `universe_specs` as `kb_fit`, plus the document type id in `kind` and, when several universe specs in scope hold that id, the universe spec in `universe`. knowledge-mcp runs `kbp --kinds` to find the universe spec and the document type's `actor`, then `kbp --inspect` on that universe spec. When the universe spec declares an `audience` frame, `choices` lists the frame's values in the universe spec's order; otherwise `choices` is empty and the agent writes for the `actor`. The result schema is [`audience.schema.yaml`](../contracts/project/v1/audience.schema.yaml).
+### `kb_get_document_type`
 
-The agent edits only when the person asked in that session, when a standing line the person wrote covers the edit, or for a change row the person accepted. After each edit it calls `kb_record_edit`:
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                     |
+| `name`                  | string                                            | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                     |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead.      |
+| `role`                  | string or null                                    | no       | The reader's role, such as maintainer. Prioritize document types by word overlap between this role and the reader role.                                                                                                                                                                                             |
+| `record`                | string or null                                    | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
+| `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
+| `changes`               | list of [FileChange](#filechange) or null         | no       | Files changed since the document-types file was last saved. Send them with `record` or `record_digest`. knowledge-mcp applies the changes to the entries for this answer only.                                                                                                                                      |
 
-| Argument         | What it holds                                                                            |
-| ---------------- | ---------------------------------------------------------------------------------------- |
-| `location`       | The document's location as plain text.                                                   |
-| `basis`          | `request`, `line` or `change_row`.                                                       |
-| `basis_text`     | The request, the standing line or the change row, quoted.                                |
-| `basis_location` | The file or place holding the line or change row, such as `AGENTS.md`.                   |
-| `before`         | The text the edit replaced, the whole file or the passage; empty for a new file.         |
-| `after`          | The text that replaced `before`.                                                         |
-| `whole_file`     | True when `before` is the whole file. Only then can `after_digest` stand in for `after`. |
+### `kb_list_audiences`
 
-`after_digest` is `sha256:` and the 64 lowercase hex digits of the SHA-256 of `after`. A passage needs its `after` text, so the agent can find the passage again to undo the edit. knowledge-mcp appends each record to `edits.jsonl` in its state folder and returns the record's id and the digests of both texts. `kb_edits` lists every record for a location, oldest first, with its texts. To undo an edit, the agent checks that the document still holds the `after` text and puts the `before` text back. No tool commits, pushes, opens issues or pull requests, or posts comments.
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `document_type`         | string                                            | yes      | A document type id, such as `design-doc`.                                                                                                                                                                                                                                                                      |
+| `universe_spec`         | string or null                                    | no       | Id of the universe spec to use when the document type appears in more than one universe spec that applies.                                                                                                                                                                                                     |
 
-## Keep the fit record
+### `kb_list_edits`
 
-| Tool            | What it does                                                                                                                                                                                          |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `kb_fit_record` | Keep the fit record, `.knowledge-bus/plugins/knowledge-mcp/record.yaml` in the knowledge base's top folder: which universe spec and document type each file is, or "no fit", and who the file is for. |
+| Argument   | Type   | Required | Meaning                                                                                                         |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `location` | string | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
 
-The fit record is `.knowledge-bus/plugins/knowledge-mcp/record.yaml` at the knowledge base's top folder: knowledge-mcp keeps its file in a plugin folder of its own inside `.knowledge-bus/`, and the host creates the folders when missing. `kbp` reads only the definitions directly inside `.knowledge-bus/`, so the record changes no universe spec in scope. The record holds one entry per file, keyed by the file's path from the top folder: the universe spec id and version and the document type id, or `no_fit: true`; who the document is for, with `confirmed` or `guessed`, when known; `made`, `fit` when the agent settled the fit or `correction` when the person stated the fit; `allowed_by`, the request, standing line or accepted change row that allowed the save; a fingerprint when the host sent one; and the time. The file's schema is [`fit-record.schema.yaml`](../contracts/project/v1/fit-record.schema.yaml).
+### `kb_prepare_document_types`
 
-The host reads and writes the record; knowledge-mcp merges. The agent sends `kb_fit_record`:
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | The knowledge base root folder as plain text, such as a local path, a Drive folder link or a Notion page. knowledge-mcp logs this text and never opens the location.                                                                                                                                                |
+| `record`                | string or null                                    | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
+| `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | no       | Every knowledge base folder that holds a `.knowledge-bus/` folder, even one with no `*.kbp.yaml` file. The bundled universe specs apply to a file when no `.knowledge-bus/` folder between the root and the file holds a `*.kbp.yaml` file or `workspace.yaml`.                                                     |
+| `listing`               | list of [ListedFile](#listedfile) or null         | no       | Every file of the knowledge base outside `.knowledge-bus/` folders.                                                                                                                                                                                                                                                 |
+| `changes`               | list of [FileChange](#filechange) or null         | no       | Files changed since the document-types file was last saved.                                                                                                                                                                                                                                                         |
+| `entries`               | list of [EntryItem](#entryitem) or null           | no       | Send your document type choices and any document types or readers specified by the person.                                                                                                                                                                                                                          |
+| `recheck`               | boolean or null                                   | no       | True to put every file with an entry back in `to_settle`, except files with a `set_by: person` entry.                                                                                                                                                                                                               |
+| `allowed_by`            | [AllowedBy](#allowedby) or null                   | no       |                                                                                                                                                                                                                                                                                                                     |
 
-| Argument                                | What it holds                                                                                                                                                                                        |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`                              | The knowledge base's location as plain text.                                                                                                                                                         |
-| `record` or `record_digest`             | The record's text as read just now, an empty text when the file is missing, or the digest an earlier answer in the session returned.                                                                 |
-| `universe_specs`                        | Every folder holding a `.knowledge-bus/`, by its path from the top folder, with the same files and `workspace.yaml` as `kb_fit` takes, and nothing under `plugins/`.                                 |
-| `listing`                               | Every file of the knowledge base outside `.knowledge-bus/`, each with an optional fingerprint, on a session's first call.                                                                            |
-| `changes`                               | Files `created`, `deleted`, `moved` (with `old_path`) or `edited` (with the new fingerprint), as an editor reports changes.                                                                          |
-| `fits`                                  | Each file's fit: `made` `fit` for a fit the agent settled, `correction` for a fit or reader the person stated; a universe spec and document type, `no_fit`, or `audience` alone for a recorded file. |
-| `refit`                                 | True to list every recorded file for settling again, corrections excepted.                                                                                                                           |
-| `basis`, `basis_text`, `basis_location` | The ground for saving: a request in the session, a standing line the person wrote, or an accepted change row.                                                                                        |
+### `kb_prepare_import`
 
-knowledge-mcp compares a listing with the record. A missing file and a new file with the same fingerprint make one move, and so do a missing file and a new file sharing a file name no other such file has, unless the two carry different fingerprints. Every other missing file is deleted, and every other new file is created. The answer lists these changes in `listing_changes`, in the shape `changes` takes. A deleted entry that held a correction or a confirmed reader comes back with a note, so the agent can ask the person whether the file moved. A moved file keeps a correction or a confirmed reader when its universe spec is in scope at the new path; a moved plain fit, like a new file, waits in `to_settle` with its candidates, as `kb_fit` gives them, and with the entry it had in `was`. Each scope's universe specs, and every document type in scope when a file matched none on its name, come once in `scopes`. For a file the person corrected, knowledge-mcp keeps the correction and lists the agent's fit as `kept`.
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | The source document's location as plain text, such as a local path, a Drive link, a Notion page or `pasted in chat`. knowledge-mcp logs this text and never opens the location.                                                                                                                                |
+| `text`                  | string                                            | yes      | The document's text, as read from its source or pasted by the person.                                                                                                                                                                                                                                          |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge base root folder down to the destination folder. Empty for the root folder or when the person named no folder.                                                                                                                                                                 |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
 
-The answer lists the `changed` entries and returns the merged `record` text with its `digest`, or `record` null when nothing changed or no ground came with the call. Right before writing, the host reads the file again: when the file still holds the text sent, the host writes the returned text; when another chat saved meanwhile, the host sends the new text with the same changes and fits, and writes the text of the second answer. When the call that merges again is the call that carried the listing, the host adds that answer's `listing_changes` to `changes` in place of the listing. Compared with the newer text, the earlier listing would drop the other chat's new files and bring back the files the other chat deleted. No chat loses the other's entries. The result schema is [`fit-record-update.schema.yaml`](../contracts/project/v1/fit-record-update.schema.yaml).
+### `kb_record_edit`
 
-## Bring in a document
+| Argument       | Type                    | Required | Meaning                                                                                                                           |
+| -------------- | ----------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `location`     | string                  | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                   |
+| `allowed_by`   | [AllowedBy](#allowedby) | yes      |                                                                                                                                   |
+| `before`       | string                  | yes      | The replaced text. Send an empty string for a new file.                                                                           |
+| `after`        | string or null          | no       | The text that replaced `before`. Omit it only for a whole-file edit sent with `after_digest`.                                     |
+| `after_digest` | string or null          | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
+| `whole_file`   | boolean or null         | no       | True when `before` is the whole file.                                                                                             |
 
-| Tool      | What it does                                                                                                                     |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `kb_mark` | Split an outside document's text into passages, and return the passages with the element questions to mark each passage against. |
+### `kbp_card`
 
-To bring in a document written elsewhere, such as a pasted chat thread, a Drive file or a Notion page, the agent follows the plugin's `km-bring-in` skill. It reads the document through its own tools or a connector and sends `kb_mark`:
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `kind`                  | string                                            | yes      | The document type id, such as `design-doc`.                                                                                                                                                                                                                                                                    |
+| `universe`              | string or null                                    | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
 
-| Argument         | What it holds                                                                                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `location`       | The document's location, as plain text: a local path, a Drive link, a Notion page, or `pasted in chat`.                                                      |
-| `text`           | The document's text.                                                                                                                                         |
-| `folders`        | Folder names from the knowledge base's top folder down to the folder the document comes into; empty for the top folder, and when the person named no folder. |
-| `universe_specs` | The `.knowledge-bus/` folders on that chain, in the shape `kb_fit` takes. With none, the bundled universe specs apply.                                       |
+### `kbp_explore`
 
-knowledge-mcp rebuilds the folders, runs `kbp --kinds`, then `kbp --card <kind> --universe <id> --format json` for every document type in scope, and keeps each card's sections that the document type keeps. knowledge-mcp skips a section the card links to another document type, and lists the element under that document type, from that document type's own card. The cards for a scope stay in memory for the session, so a second document coming into the same folder gets its answer at once. The answer lists each universe spec in scope with its source label, each document type with its name, `action` and `actor`, and each element with its id, question and strength, in the card's order.
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `universe`              | string or null                                    | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
 
-knowledge-mcp also splits the text into passages: each heading, list item and fenced code block, and each run of other lines between blank lines. Each passage has an id such as `p3`, its first and last line counting from 1, its opening words, and the id of the heading above the passage. knowledge-mcp splits by layout alone and judges nothing a passage says, so an instruction inside the document comes back as a passage like any other. A text holding no passage gets a refusal. The result schema is [`mark.schema.yaml`](../contracts/project/v1/mark.schema.yaml).
+### `kbp_inspect`
 
-The agent marks each passage `settles`, `answers in part` or `contradicts` with the universe spec, document type and element, or `fits nowhere`. It shows the marks and the edited text of each target note, files only on the person's yes or under a standing line the person wrote, and records each edit with `kb_record_edit`. No decision model runs: the agent marks the passages.
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `universe`              | string or null                                    | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
+
+### `kbp_kinds`
+
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `universe`              | string or null                                    | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
+| `format`                | `json` or `markdown` or null                      | no       | Defaults to `json`.                                                                                                                                                                                                                                                                                            |
+
+### `kbp_mint`
+
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `kind`                  | `element`, `artifact`, `frame` or `factor`        | yes      |                                                                                                                                                                                                                                                                                                                |
+| `count`                 | integer or null                                   | no       | Number of codes to mint, one by default.                                                                                                                                                                                                                                                                       |
+
+### `kbp_self_check`
+
+No arguments.
+
+### `kbp_validate`
+
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+
+### `kbp_version`
+
+No arguments.
+
+<!-- END AUTO-GENERATED arguments -->
+
+## Shapes
+
+<!-- BEGIN AUTO-GENERATED shapes -->
+
+### AllowedBy
+
+| Field      | Type                                          | Required | Meaning                                                                                                                                                                                                |
+| ---------- | --------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `basis`    | `request`, `instruction` or `accepted_change` | yes      | `request` means the person asked in this session. `instruction` means the person wrote an instruction for agents, such as in AGENTS.md. `accepted_change` means the person accepted a proposed change. |
+| `text`     | string                                        | yes      | The request, instruction or accepted change, quoted.                                                                                                                                                   |
+| `location` | string or null                                | no       | The file holding the instruction or the accepted change.                                                                                                                                               |
+
+### Audience
+
+| Field    | Type                     | Required | Meaning |
+| -------- | ------------------------ | -------- | ------- |
+| `value`  | string                   | yes      |         |
+| `status` | `confirmed` or `guessed` | yes      |         |
+
+### Digest
+
+Type: string, pattern `^sha256:[0-9a-f]{64}$`.
+
+### EntryItem
+
+| Field              | Type                          | Required | Meaning                                                                                                                                                               |
+| ------------------ | ----------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `path`             | string                        | yes      | Path from the knowledge-base root, folders joined by `/`, such as `docs/rfcs/0042-cache.md`.                                                                          |
+| `set_by`           | [SetBy](#setby)               | yes      | `agent` when you chose the document type or reader. `person` when the person stated the document type or reader.                                                      |
+| `universe_spec`    | string or null                | no       | Id of the universe spec that declares `document_type`.                                                                                                                |
+| `document_type`    | string or null                | no       |                                                                                                                                                                       |
+| `no_document_type` | boolean                       | no       |                                                                                                                                                                       |
+| `audience`         | [Audience](#audience) or null | no       | The document's reader. `value` is one of the `choices` or the `actor` from `kb_list_audiences`. Set `status` to `confirmed` only after the person confirms the value. |
+
+### FileChange
+
+Type: [FileCreated](#filecreated) or [FileDeleted](#filedeleted) or [FileMoved](#filemoved) or [FileEdited](#fileedited).
+
+### FileCreated
+
+| Field         | Type                                | Required | Meaning |
+| ------------- | ----------------------------------- | -------- | ------- |
+| `change`      | `created`                           | yes      |         |
+| `path`        | [Path](#path)                       | yes      |         |
+| `fingerprint` | [Fingerprint](#fingerprint) or null | no       |         |
+
+### FileDeleted
+
+| Field    | Type          | Required | Meaning |
+| -------- | ------------- | -------- | ------- |
+| `change` | `deleted`     | yes      |         |
+| `path`   | [Path](#path) | yes      |         |
+
+### FileEdited
+
+| Field         | Type                        | Required | Meaning |
+| ------------- | --------------------------- | -------- | ------- |
+| `change`      | `edited`                    | yes      |         |
+| `path`        | [Path](#path)               | yes      |         |
+| `fingerprint` | [Fingerprint](#fingerprint) | yes      |         |
+
+### FileMoved
+
+| Field         | Type                                | Required | Meaning                  |
+| ------------- | ----------------------------------- | -------- | ------------------------ |
+| `change`      | `moved`                             | yes      |                          |
+| `path`        | [Path](#path)                       | yes      | The path after the move. |
+| `old_path`    | [Path](#path)                       | yes      |                          |
+| `fingerprint` | [Fingerprint](#fingerprint) or null | no       |                          |
+
+### Fingerprint
+
+Type: string.
+
+### KnowledgeBusFolder
+
+| Field            | Type                          | Required | Meaning                                                                             |
+| ---------------- | ----------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `folder`         | string                        | yes      | Path from the knowledge-base root, such as `team/notes`. Empty for the root folder. |
+| `files`          | list of [SpecFile](#specfile) | no       | Every `*.kbp.yaml` file directly inside the `.knowledge-bus/` folder.               |
+| `workspace_yaml` | string or null                | no       | The text of `.knowledge-bus/workspace.yaml`.                                        |
+
+### ListedFile
+
+| Field         | Type           | Required | Meaning                                                                                                                                                                                                                                    |
+| ------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `path`        | string         | yes      | Path from the knowledge-base root, folders joined by `/`, such as `docs/rfcs/0042-cache.md`.                                                                                                                                               |
+| `fingerprint` | string or null | no       | A value that changes only when the file content changes, such as `sha256:<hex digest>` or Drive's `md5Checksum`. knowledge-mcp uses fingerprints to detect moves in `listing` and keep entries under new paths in the document-types file. |
+
+### Path
+
+Type: string.
+
+### SetBy
+
+Type: `agent` or `person`.
+
+### SpecFile
+
+| Field     | Type           | Required | Meaning                                                                                                                                                                                          |
+| --------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`    | string         | yes      | The file name, such as `universe.kbp.yaml`.                                                                                                                                                      |
+| `id`      | string         | yes      | The `id` value in the file's `universe:` or `guidance:` block.                                                                                                                                   |
+| `version` | string         | yes      | The `version` value in the file's `universe:` or `guidance:` block, as written.                                                                                                                  |
+| `text`    | string or null | no       | The full file text. Send fresh text whenever the file changes. Reuse `digest` while the text stays unchanged. Leave it out when `id` and `version` match a bundled file, except in kbp_validate. |
+| `digest`  | string or null | no       | The file's digest, as listed in `received` by an earlier tool result this session.                                                                                                               |
+
+<!-- END AUTO-GENERATED shapes -->
+
+## Terms
+
+| Term          | Meaning                                                                                 |
+| ------------- | --------------------------------------------------------------------------------------- |
+| universe spec | A `*.kbp.yaml` file that declares document types and their questions                    |
+| card          | A summary from `kbp_card` with sections, questions and conditions for one document type |
+| kind          | In `kbp_card`, a document type id. In `kbp_mint`, the category of code to mint          |
+| actor         | The role that uses a document type, such as maintainer                                  |
+| element       | A question answered by a document section                                               |
+| artifact      | A document type declared in a universe spec                                             |
+| frame         | A setting used to order, select or require document types and sections                  |
+| factor        | A question you can use to choose writing advice without changing document structure     |
 
 ## From the terminal
 
-`kb fit <file>` makes the terminal the host. It finds the knowledge base's top folder, the highest folder above the file that holds a `.knowledge-bus/` (or the folder named with `--top`), and reads what an agent would send: the file's name, its path as the location, its folders, every `.knowledge-bus/` on the folder chain with each `*.kbp.yaml` header, the text of any file that matches no bundled universe spec, `workspace.yaml`, and the fit record's text when the top folder holds one. It never reads the file itself. Then it calls `kb_fit` in its own process and prints the answer, the same JSON an agent gets. `--hat` sends the hat. A refusal exits with code 1.
-
-## knowledge-bus
-
-| Tool             | What it does                                                                                                                                                    |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `kbp_check`      | Check the universe specs in scope against the knowledge-bus protocol and return kbp's report as is.                                                             |
-| `kbp_self_check` | Check the bundled knowledge-bus protocol against itself and return the `kbp --self-check` report as is.                                                         |
-| `kbp_version`    | Return the knowledge-bus release and protocol version that `kbp --version` prints.                                                                              |
-| `kbp_mint`       | Mint codes that collide with no code in the universe specs in scope, as `kbp --mint <kind> <count>` prints the codes.                                           |
-| `kbp_inspect`    | Return the JSON model `kbp --inspect` builds for a universe spec in scope and its guidance.                                                                     |
-| `kbp_explore`    | Write the offline Explorer for a universe spec in scope into knowledge-mcp's private folder, and return kbp's receipt and the folder's path.                    |
-| `kbp_kinds`      | List every document type in scope as `kbp --kinds` prints the list: `kinds/1` for one universe spec, `kinds-set/1` for several.                                 |
-| `kbp_card`       | Return the card for one document type as `kbp --card <kind> --format markdown` prints the card: sections, guidance, conditions and their "Depends on: …" lines. |
-
-Each `kbp_*` tool runs the installed `kbp` console script and returns its stdout and stderr as is, each in its own block, with the exit code in the result's `_meta.exit_code`. A non-zero exit marks the result as an error. A last block, when present, says which files came from the bundled copies and gives the digests of text received.
-
-The tools that read universe specs take the same `location`, `folders` and `universe_specs` as `kb_fit`, and `kbp` runs from the rebuilt folder with no target. `kbp_check` runs only on text the agent sent, never on a bundled copy. `kbp_explore` writes into knowledge-mcp's state folder and names the folder in its last block.
-
-## The log
-
-Every answer adds one line to `log.jsonl` in knowledge-mcp's state folder: `$KNOWLEDGE_MCP_STATE_DIR` when set, else `$XDG_STATE_HOME/knowledge-mcp`, else `~/.local/state/knowledge-mcp`. Each line holds the time, the tool, the location text, a SHA-256 digest of the arguments and every text returned. The edit record, `edits.jsonl`, sits in the same folder, so each edit can be checked against the answers the agent had when it wrote. knowledge-mcp writes no fit record: the host saves the text `kb_fit_record` returns, and the log keeps each of those answers. For `kb_mark`, the log keeps a digest of the arguments, the document's text included, and each passage's opening words.
+Run `kb type --help` for terminal usage.

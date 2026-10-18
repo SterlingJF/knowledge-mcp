@@ -1,0 +1,10 @@
+---
+# The basis is one allowed_by object, not the basis fields of knowledge-mcp 0.2.1.
+schema: knowledge-mcp/edit/1
+id: 0123456789abcdef0123456789abcdef
+time: "2026-10-12T09:15:02.118Z"
+location: ~/notes/DESIGN.md
+basis: request
+basis_text: Add an Overview section.
+before_digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
+after_digest: sha256:1111111111111111111111111111111111111111111111111111111111111111

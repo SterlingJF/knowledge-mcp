@@ -1,5 +1,3 @@
-"""Passage boundaries: headings, paragraphs, list items and code blocks, by line."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -102,7 +100,6 @@ def test_blank_text_has_no_passages():
 
 
 def test_a_chat_thread_pasted_with_no_blank_lines_stays_one_paragraph():
-    """Keep adjacent chat messages in one paragraph when no blank line separates the messages."""
     text = (
         (FIXTURE_DIR / "chat-messages-without-blank-lines.txt")
         .read_bytes()

@@ -1,5 +1,51 @@
 # Changelog
 
+## 0.3.0
+
+### Added
+
+- `kb doctor` and `kb type` accept `--json`.
+- `kb --version` prints the knowledge-bus version on a second line.
+- The README gives [shell completion](README.md#shell-completion) steps for zsh, Bash and Fish.
+- The six `kb_*` tools publish `outputSchema` and return validated `structuredContent`.
+- The `kb_*` tools and argument validation return RFC 9457 problem details with a `type` URI. Non-zero `kbp_*` exits preserve kbp output.
+
+### Changed
+
+- `kb fit <file>` is now `kb type <path>`.
+- `--hat` is now `--role`, and `--top` is now `--root`.
+- `kb kbp --<mode>` is now `kb kbp <mode>`, including `kb kbp validate`.
+- MCP tool `kb_fit` is now `kb_get_document_type`.
+- MCP tool `kb_audience` is now `kb_list_audiences`.
+- MCP tool `kb_mark` is now `kb_prepare_import`.
+- MCP tool `kb_edits` is now `kb_list_edits`.
+- MCP tool `kb_fit_record` is now `kb_prepare_document_types`.
+- MCP tool `kbp_check` is now `kbp_validate`.
+- The `kb_get_document_type` argument `hat` is now `role`.
+- Skill `km-write` is now `kb-write-document`.
+- Skill `km-fit-record` is now `kb-track-document-types`.
+- Skill `km-bring-in` is now `kb-import-document`.
+- For a 0.2.1 `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, `kb_prepare_document_types` returns `document-types.yaml` text for the agent to save.
+- The document-types schema is now `knowledge-mcp/document-types/1`, replacing `knowledge-mcp/fit-record/1`.
+- In the document-types file, `kind` is now `document_type`.
+- In the document-types file, `no_fit` is now `no_document_type`.
+- In the document-types file, `made: fit|correction` is now `set_by: agent|person`.
+- In document-types and edit records, `allowed_by.basis` renames `line` to `instruction` and `change_row` to `accepted_change`.
+- In edit records, `basis`, `basis_text` and `basis_location` become `allowed_by.basis`, `allowed_by.text` and `allowed_by.location`.
+- kb reports its own errors on stderr with an `Error:` line and a next step.
+- kb reports its own usage errors with exit code 2 and suggests close matches. Arguments after `kb kbp <mode>` retain kbp errors and exit codes.
+- `kb setup` and `kb setup --remove` print status lines and next steps on stderr.
+- `kb doctor` prints one status line for the install and one per harness, then a fix for each problem or warning.
+- Maintainers: `just format` now formats Python and the justfile.
+- Maintainers: `just check` adds strict Python type checks, dead code detection, and checks for TOML, shell scripts, workflows, relative links and vendored files.
+- Maintainers: the pre-commit hook checks large files and validates Renovate settings. When `uv.lock` changes, the hook refreshes `runtime/requirements.lock`.
+
+### Fixed
+
+- kb rejects a shortened flag, such as `kb setup --remov`, with exit code 2 instead of running the removal.
+- `kb kbp --help` and `kb kbp -h` print help.
+- On a broken install, kb prints an error and the reinstall command instead of a traceback.
+
 ## 0.2.1
 
 ### CLI
@@ -21,11 +67,11 @@
 
 ## 0.2.0
 
-Knowledge-MCP now provides a local stdio MCP server and the `kb` CLI. Your agent can look up each file's purpose using the document definitions for your knowledge base. One install includes knowledge-bus, which supplies the document definitions, tools and skills.
+knowledge-mcp now provides a local stdio MCP server and the `kb` CLI. Your agent can look up each file's purpose using the document definitions for your knowledge base. One install includes knowledge-bus, which supplies the document definitions, tools and skills.
 
 ### Install and setup
 
-- Install with `brew install sterlingjf/tap/knowledge-mcp`. Homebrew builds Knowledge-MCP and knowledge-bus from source.
+- Install with `brew install sterlingjf/tap/knowledge-mcp`. Homebrew builds knowledge-mcp and knowledge-bus from source.
 - Connect an agent app with `kb setup <host>`. Setup adds the server to the app's settings and links the `kb-*` and `km-*` skills into the app's skills folder. `brew upgrade` refreshes the linked skills.
 
 | App                                                             | Host             |
@@ -53,7 +99,7 @@ Knowledge-MCP now provides a local stdio MCP server and the `kb` CLI. Your agent
 - `kb_record_edit` records each agent edit, the request or standing instruction that authorized the edit, and the original text. `kb_edits` lists a file's recorded edits for review or undo.
 - `kb_fit_record` prepares classification updates for files that were created, moved or deleted. Your corrections take priority over agent guesses.
 - `kb_mark` splits an external document into passages and lists predefined questions for labeling those passages.
-- Knowledge-MCP exposes each knowledge-bus CLI mode as a `kbp_*` tool: check, self-check, version, mint, inspect, explore, kinds and card. Each tool returns the `kbp` command's output unchanged.
+- knowledge-mcp exposes each knowledge-bus CLI mode as a `kbp_*` tool: check, self-check, version, mint, inspect, explore, kinds and card. Each tool returns the `kbp` command's output unchanged.
 
 ### Skills
 
@@ -64,7 +110,7 @@ Knowledge-MCP now provides a local stdio MCP server and the `kb` CLI. Your agent
 
 ### Records
 
-- The fit record stores each file's specification, document type (or "no fit") and intended reader at `.knowledge-bus/plugins/knowledge-mcp/record.yaml`. Your agent updates the record with its own file tools. Knowledge-MCP writes nothing in your knowledge base.
+- The fit record stores each file's specification, document type (or "no fit") and intended reader at `.knowledge-bus/plugins/knowledge-mcp/record.yaml`. Your agent updates the record with its own file tools. knowledge-mcp writes nothing in your knowledge base.
 - The state folder stores the answer log (every answer) and the edit record (every recorded edit). The state folder's location is selected in this order:
 
   1. `$KNOWLEDGE_MCP_STATE_DIR`, when set.

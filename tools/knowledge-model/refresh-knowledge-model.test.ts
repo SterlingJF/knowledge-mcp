@@ -8,6 +8,7 @@ import {
   mkdtempSync,
   readdirSync,
   readFileSync,
+  rmSync,
   statSync,
   writeFileSync,
 } from "node:fs";
@@ -21,10 +22,10 @@ const script = resolve(
   "refresh-knowledge-model.ts",
 );
 
-const commit = "v0.10.0";
+const tag = "v0.10.0";
 const longName = `${"a-very-long-folder-name-".repeat(5)}/${"and-a-long-file-name-".repeat(4)}.md`;
 
-const upstream: Record<string, string> = {
+const upstream = {
   "README.md": "# knowledge-bus\n",
   "protocol/knowledge-bus-protocol.yaml": "protocol: kbp\n",
   "universes/README.md": "# Universes\n",
@@ -35,9 +36,9 @@ const upstream: Record<string, string> = {
   "skills/kb-check/SKILL.md": "---\nname: kb-check\n---\n",
   "skills/kb-check/runtime/kbp.py": "print('kbp')\n",
   [`skills/kb-explore/${longName}`]: "long\n",
-};
+} satisfies Record<string, string>;
 
-/** A stand-in for GitHub's tarball endpoint: `<dir>/<ref>.tar.gz` with one top folder. */
+/** Creates <dir>/<ref>.tar.gz with one top folder to match the GitHub archive layout. */
 function source(ref: string, files: Record<string, string> = upstream): string {
   const dir = mkdtempSync(join(tmpdir(), "knowledge-bus-"));
   const top = `knowledge-bus-${ref}`;
@@ -56,8 +57,7 @@ function source(ref: string, files: Record<string, string> = upstream): string {
   return dir;
 }
 
-/** A plugin folder whose pyproject.toml pins the knowledge-bus release archive at tag `pin`. */
-function plugin(pin: string = commit): string {
+function plugin(pin: string = tag): string {
   const dir = mkdtempSync(join(tmpdir(), "plugin-"));
   writeFileSync(
     join(dir, "pyproject.toml"),
@@ -78,15 +78,9 @@ function run(dir: string, ...args: Array<string>) {
 const sha256 = (text: string): string =>
   createHash("sha256").update(text).digest("hex");
 
-test("copies every folder under universes/ and skills/, found by listing, under upstream names", () => {
+test("copies every folder under universes/ and skills/ with its upstream name", () => {
   const dir = plugin();
-  const { status, output } = run(
-    dir,
-    "--ref",
-    commit,
-    "--source",
-    source(commit),
-  );
+  const { status, output } = run(dir, "--ref", tag, "--source", source(tag));
   assert.equal(status, 0, output);
   assert.deepEqual(readdirSync(join(dir, "knowledge-bus/universes")).sort(), [
     "a-third-one",
@@ -114,26 +108,26 @@ test("copies every folder under universes/ and skills/, found by listing, under 
   assert.equal(
     existsSync(join(dir, "knowledge-bus/universes/README.md")),
     false,
-    "a file directly under universes/ is no universe spec folder",
+    "a file directly under universes/ is not a universe spec folder",
   );
   assert.equal(existsSync(join(dir, "knowledge-bus/protocol")), false);
 });
 
 test("keeps the executable bit", () => {
   const dir = plugin();
-  run(dir, "--ref", commit, "--source", source(commit));
+  run(dir, "--ref", tag, "--source", source(tag));
   const mode = statSync(join(dir, "skills/kb-check/runtime/kbp.py")).mode;
   assert.equal(mode & 0o111, 0o111);
 });
 
 test("records the ref, the date and every file's SHA-256 in UPSTREAM.md", () => {
   const dir = plugin();
-  run(dir, "--ref", commit, "--source", source(commit));
+  run(dir, "--ref", tag, "--source", source(tag));
   const notes = readFileSync(join(dir, "knowledge-bus/UPSTREAM.md"), "utf8");
   assert.match(notes, /^# Upstream\n/);
   assert.match(
     notes,
-    new RegExp(`- Ref: \`${commit}\`\\n- Fetched: \\d{4}-\\d{2}-\\d{2}\\n`),
+    new RegExp(`- Ref: \`${tag}\`\\n- Fetched: \\d{4}-\\d{2}-\\d{2}\\n`),
   );
   assert.match(
     notes,
@@ -157,25 +151,19 @@ test("records the ref, the date and every file's SHA-256 in UPSTREAM.md", () => 
   );
 });
 
-test("refuses a git pin: knowledge-bus comes from a release archive", () => {
+test("fails on a git pin, because knowledge-bus comes from a release archive", () => {
   const dir = mkdtempSync(join(tmpdir(), "plugin-"));
   writeFileSync(
     join(dir, "pyproject.toml"),
-    `[project]\nname = "knowledge-mcp"\ndependencies = [\n    "knowledge-bus @ git+https://github.com/SterlingJF/knowledge-bus@${commit}#subdirectory=checker",\n]\n`,
+    `[project]\nname = "knowledge-mcp"\ndependencies = [\n    "knowledge-bus @ git+https://github.com/SterlingJF/knowledge-bus@${tag}#subdirectory=checker",\n]\n`,
   );
-  const { status, output } = run(
-    dir,
-    "--ref",
-    commit,
-    "--source",
-    source(commit),
-  );
+  const { status, output } = run(dir, "--ref", tag, "--source", source(tag));
   assert.equal(status, 1);
   assert.match(output, /no knowledge-bus pin/);
   assert.deepEqual(readdirSync(dir), ["pyproject.toml"]);
 });
 
-test("refuses a ref that differs from the knowledge-bus pin and writes nothing", () => {
+test("fails on a ref that differs from the knowledge-bus pin and writes nothing", () => {
   const dir = plugin();
   const { status, output } = run(
     dir,
@@ -185,20 +173,14 @@ test("refuses a ref that differs from the knowledge-bus pin and writes nothing",
     source("main"),
   );
   assert.equal(status, 1);
-  assert.match(output, new RegExp(`main.*${commit}`));
+  assert.match(output, new RegExp(`main.*${tag}`));
   assert.deepEqual(readdirSync(dir), ["pyproject.toml"]);
 });
 
-test("refuses when pyproject.toml pins no knowledge-bus release archive", () => {
+test("fails when pyproject.toml pins no knowledge-bus release archive", () => {
   const dir = mkdtempSync(join(tmpdir(), "plugin-"));
   writeFileSync(join(dir, "pyproject.toml"), '[project]\nname = "x"\n');
-  const { status, output } = run(
-    dir,
-    "--ref",
-    commit,
-    "--source",
-    source(commit),
-  );
+  const { status, output } = run(dir, "--ref", tag, "--source", source(tag));
   assert.equal(status, 1);
   assert.match(output, /no knowledge-bus pin/);
   assert.deepEqual(readdirSync(dir), ["pyproject.toml"]);
@@ -207,13 +189,13 @@ test("refuses when pyproject.toml pins no knowledge-bus release archive", () => 
 test("writes nothing when the archive is missing", () => {
   const dir = plugin();
   const empty = mkdtempSync(join(tmpdir(), "knowledge-bus-"));
-  const { status, output } = run(dir, "--ref", commit, "--source", empty);
+  const { status, output } = run(dir, "--ref", tag, "--source", empty);
   assert.equal(status, 1);
-  assert.match(output, new RegExp(`${commit}\\.tar\\.gz`));
+  assert.match(output, new RegExp(`${tag}\\.tar\\.gz`));
   assert.deepEqual(readdirSync(dir), ["pyproject.toml"]);
 });
 
-test("writes nothing when the archive carries no skills", () => {
+test("writes nothing when the archive has no skills", () => {
   const dir = plugin();
   const files = Object.fromEntries(
     Object.entries(upstream).filter(([path]) => !path.startsWith("skills/")),
@@ -221,20 +203,20 @@ test("writes nothing when the archive carries no skills", () => {
   const { status, output } = run(
     dir,
     "--ref",
-    commit,
+    tag,
     "--source",
-    source(commit, files),
+    source(tag, files),
   );
   assert.equal(status, 1);
   assert.match(output, /no folders under skills\//);
   assert.deepEqual(readdirSync(dir), ["pyproject.toml"]);
 });
 
-test("a second refresh drops copies gone upstream and keeps the plugin's own skills", () => {
+test("a second refresh deletes folders that upstream removed and keeps knowledge-mcp's own skills", () => {
   const dir = plugin();
-  run(dir, "--ref", commit, "--source", source(commit));
-  mkdirSync(join(dir, "skills/km-own"), { recursive: true });
-  writeFileSync(join(dir, "skills/km-own/SKILL.md"), "own\n");
+  run(dir, "--ref", tag, "--source", source(tag));
+  mkdirSync(join(dir, "skills/kb-import-document"), { recursive: true });
+  writeFileSync(join(dir, "skills/kb-import-document/SKILL.md"), "own\n");
   const fewer = Object.fromEntries(
     Object.entries(upstream).filter(
       ([path]) =>
@@ -245,9 +227,9 @@ test("a second refresh drops copies gone upstream and keeps the plugin's own ski
   const { status, output } = run(
     dir,
     "--ref",
-    commit,
+    tag,
     "--source",
-    source(commit, fewer),
+    source(tag, fewer),
   );
   assert.equal(status, 0, output);
   assert.deepEqual(readdirSync(join(dir, "knowledge-bus/universes")).sort(), [
@@ -256,7 +238,7 @@ test("a second refresh drops copies gone upstream and keeps the plugin's own ski
   ]);
   assert.deepEqual(readdirSync(join(dir, "skills")).sort(), [
     "kb-check",
-    "km-own",
+    "kb-import-document",
   ]);
   assert.doesNotMatch(
     readFileSync(join(dir, "knowledge-bus/UPSTREAM.md"), "utf8"),
@@ -264,57 +246,55 @@ test("a second refresh drops copies gone upstream and keeps the plugin's own ski
   );
 });
 
-test("keeps knowledge-mcp's own km-write skill byte for byte", () => {
+test("keeps knowledge-mcp's own kb-write-document skill byte for byte", () => {
   const dir = plugin();
   const own = resolve(
     dirname(script),
-    "../../runtime/skills/km-write/SKILL.md",
+    "../../runtime/skills/kb-write-document/SKILL.md",
   );
-  mkdirSync(join(dir, "skills/km-write"), { recursive: true });
-  writeFileSync(join(dir, "skills/km-write/SKILL.md"), readFileSync(own));
-  const { status, output } = run(
-    dir,
-    "--ref",
-    commit,
-    "--source",
-    source(commit),
+  mkdirSync(join(dir, "skills/kb-write-document"), { recursive: true });
+  writeFileSync(
+    join(dir, "skills/kb-write-document/SKILL.md"),
+    readFileSync(own),
   );
+  const { status, output } = run(dir, "--ref", tag, "--source", source(tag));
   assert.equal(status, 0, output);
   assert.deepEqual(
-    readFileSync(join(dir, "skills/km-write/SKILL.md")),
+    readFileSync(join(dir, "skills/kb-write-document/SKILL.md")),
     readFileSync(own),
   );
   assert.doesNotMatch(
     readFileSync(join(dir, "knowledge-bus/UPSTREAM.md"), "utf8"),
-    /km-write/,
+    /kb-write-document/,
   );
 });
 
-test("refuses an upstream skill named km-*, which belongs to knowledge-mcp, and writes nothing", () => {
+test("fails on an upstream skill with the same name as a knowledge-mcp skill, and writes nothing", () => {
   const dir = plugin();
-  mkdirSync(join(dir, "skills/km-write"), { recursive: true });
-  writeFileSync(join(dir, "skills/km-write/SKILL.md"), "own\n");
+  mkdirSync(join(dir, "skills/kb-write-document"), { recursive: true });
+  writeFileSync(join(dir, "skills/kb-write-document/SKILL.md"), "own\n");
   const { status, output } = run(
     dir,
     "--ref",
-    commit,
+    tag,
     "--source",
-    source(commit, {
+    source(tag, {
       ...upstream,
-      "skills/km-write/SKILL.md": "---\nname: km-write\n---\n",
+      "skills/kb-write-document/SKILL.md":
+        "---\nname: kb-write-document\n---\n",
     }),
   );
   assert.equal(status, 1);
-  assert.match(output, /skills\/km-write\/.*knowledge-mcp/);
+  assert.match(output, /skills\/kb-write-document\/.*knowledge-mcp/);
   assert.deepEqual(readdirSync(dir).sort(), ["pyproject.toml", "skills"]);
-  assert.deepEqual(readdirSync(join(dir, "skills")), ["km-write"]);
+  assert.deepEqual(readdirSync(join(dir, "skills")), ["kb-write-document"]);
   assert.equal(
-    readFileSync(join(dir, "skills/km-write/SKILL.md"), "utf8"),
+    readFileSync(join(dir, "skills/kb-write-document/SKILL.md"), "utf8"),
     "own\n",
   );
 });
 
-test("refuses a ref that climbs out of the source", () => {
+test("fails on a ref with a .. path segment", () => {
   const { status, output } = run(
     plugin(),
     "--ref",
@@ -332,4 +312,64 @@ test("fails without a ref", () => {
   assert.equal(status, 1);
   assert.match(output, /Usage:/);
   assert.deepEqual(readdirSync(dir), ["pyproject.toml"]);
+});
+
+function refreshed(): string {
+  const dir = plugin();
+  const { status, output } = run(dir, "--ref", tag, "--source", source(tag));
+  assert.equal(status, 0, output);
+  return dir;
+}
+
+test("--check passes on an unchanged copy and leaves knowledge-mcp's own skills alone", () => {
+  const dir = refreshed();
+  mkdirSync(join(dir, "skills/kb-import-document"), { recursive: true });
+  writeFileSync(join(dir, "skills/kb-import-document/SKILL.md"), "own\n");
+  const result = spawnSync(
+    process.execPath,
+    [script, "--check", "--plugin", dir],
+    { encoding: "utf8" },
+  );
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.equal(
+    result.stdout,
+    `current: ${join(dir, "knowledge-bus/UPSTREAM.md")}\n`,
+  );
+  assert.equal(result.stderr, "");
+});
+
+test("--check names a changed file and the refresh command", () => {
+  const dir = refreshed();
+  writeFileSync(
+    join(dir, "skills/kb-check/SKILL.md"),
+    "---\nname: kb-chek\n---\n",
+  );
+  const result = spawnSync(
+    process.execPath,
+    [script, "--check", "--plugin", dir],
+    { encoding: "utf8" },
+  );
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, "");
+  assert.equal(
+    result.stderr,
+    `${join(dir, "skills/kb-check/SKILL.md")} does not match its SHA-256 in ${join(dir, "knowledge-bus/UPSTREAM.md")}: run \`just refresh_knowledge_model ${tag}\`.\n`,
+  );
+});
+
+test("--check names a file missing from UPSTREAM.md and a listed file that is gone", () => {
+  const dir = refreshed();
+  writeFileSync(join(dir, "skills/kb-check/extra.md"), "extra\n");
+  rmSync(join(dir, "knowledge-bus/universes/a-third-one/universe.kbp.yaml"));
+  const result = spawnSync(
+    process.execPath,
+    [script, "--check", "--plugin", dir],
+    { encoding: "utf8" },
+  );
+  const notes = join(dir, "knowledge-bus/UPSTREAM.md");
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.stderr.trimEnd().split("\n").sort(), [
+    `${join(dir, "knowledge-bus/universes/a-third-one/universe.kbp.yaml")} is listed in ${notes} but missing: run \`just refresh_knowledge_model ${tag}\`.`,
+    `${join(dir, "skills/kb-check/extra.md")} is not in ${notes}: delete the file, or run \`just refresh_knowledge_model ${tag}\`.`,
+  ]);
 });

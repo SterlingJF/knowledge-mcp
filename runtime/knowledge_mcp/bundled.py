@@ -1,9 +1,4 @@
-"""The universe specs and skills copied from knowledge-bus at the pinned ref.
-
-In the plugin folder they sit beside the package; an installed package carries them inside
-itself. `KNOWLEDGE_MCP_DATA` names their folder instead: the Homebrew formula sets it to a path
-that `brew upgrade` moves to the new version, so skill links keep working.
-"""
+"""Bundled universe specs, `type-guidance.kbp.yaml` files and skills."""
 
 from __future__ import annotations
 
@@ -13,11 +8,19 @@ from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 
+from knowledge_mcp.errors import InstallFault
+
 PACKAGE = Path(__file__).resolve().parent
 PLUGIN = PACKAGE.parent
 
 
 def _data() -> Path:
+    """Return an absolute `KNOWLEDGE_MCP_DATA`, else the package folder in a wheel, else the plugin
+    folder.
+
+    Homebrew sets `KNOWLEDGE_MCP_DATA` to the `opt` path, which survives `brew upgrade`, so skill
+    links keep working.
+    """
     named = os.environ.get("KNOWLEDGE_MCP_DATA", "")
     if os.path.isabs(named):
         return Path(named)
@@ -37,22 +40,45 @@ _FIELD = re.compile(r"^\s+(id|version):\s*([^#]+?)\s*(?:#.*)?$")
 
 @dataclass(frozen=True)
 class Copy:
-    """One bundled `*.kbp.yaml` file."""
-
     name: str
     id: str
     version: str
     path: Path
 
 
+def _missing() -> InstallFault:
+    return InstallFault(f"Bundled files are missing from {DATA}.")
+
+
 @cache
 def ref() -> str:
-    """The knowledge-bus ref of the copies, as recorded in UPSTREAM.md."""
-    match = _REF.search(UPSTREAM.read_text(encoding="utf-8"))
+    """Raise `InstallFault` when UPSTREAM.md is missing or names no ref."""
+    try:
+        text = UPSTREAM.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        raise _missing() from None
+    match = _REF.search(text)
     if match is None:
-        msg = f"{UPSTREAM} has no pinned ref. Run `just refresh_knowledge_model <ref>`."
-        raise RuntimeError(msg)
+        msg = f"{UPSTREAM} names no knowledge-bus ref."
+        raise InstallFault(msg)
     return match.group(1)
+
+
+def fault() -> InstallFault | None:
+    """Return an `InstallFault` when the bundled universe specs, skills or ref are missing."""
+    if not any(UNIVERSES.glob("*/*.kbp.yaml")) or not skills():
+        return _missing()
+    try:
+        ref()
+    except InstallFault as error:
+        return error
+    return None
+
+
+def require() -> None:
+    found = fault()
+    if found is not None:
+        raise found
 
 
 def label() -> str:
@@ -60,7 +86,11 @@ def label() -> str:
 
 
 def header(text: str) -> tuple[str, str] | None:
-    """The id and version in a definition file's header, as written."""
+    """Return `id` and `version` from the `universe:` or `guidance:` block.
+
+    Read the lines directly, so a file with invalid YAML elsewhere still gives its header. Return
+    None when either field is missing.
+    """
     found: dict[str, str] = {}
     inside = False
     for line in text.splitlines():
@@ -79,7 +109,7 @@ def header(text: str) -> tuple[str, str] | None:
 
 @cache
 def copies() -> tuple[Copy, ...]:
-    """Every bundled `*.kbp.yaml` file, named `<folder>.<file>` so the names stay apart."""
+    """Use `<folder>.<file>` names because the bundled folders share file names."""
     found = []
     for path in sorted(UNIVERSES.glob("*/*.kbp.yaml")):
         identity = header(path.read_text(encoding="utf-8"))
@@ -89,16 +119,16 @@ def copies() -> tuple[Copy, ...]:
 
 
 def skills() -> list[Path]:
-    """Every bundled skill folder: knowledge-bus's kb-* and knowledge-mcp's own km-*."""
+    if not SKILLS.is_dir():
+        return []
     return sorted(
         path
         for path in SKILLS.iterdir()
         if path.is_dir()
-        and path.name.startswith(("kb-", "km-"))
+        and path.name.startswith("kb-")
         and (path / "SKILL.md").is_file()
     )
 
 
 def index() -> dict[tuple[str, str], Copy]:
-    """Bundled files by the id and version in their headers."""
     return {(copy.id, copy.version): copy for copy in copies()}

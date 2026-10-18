@@ -1,12 +1,58 @@
 extend-exclude = [
-    # Copied as is from knowledge-bus by `just refresh_knowledge_model`.
-    "runtime/skills/kb-*",
-    "runtime/knowledge-bus",
+  # Vendored from knowledge-bus by `just refresh_knowledge_model`.
+  "runtime/skills/kb-check",
+  "runtime/skills/kb-evolve",
+  "runtime/skills/kb-explore",
+  "runtime/skills/kb-ingest",
+  "runtime/skills/kb-uncover-decision",
+  "runtime/skills/kb-uncover-question",
+  "runtime/knowledge-bus",
+  # Generated and ruff-formatted by `just generate_contract_types`.
+  "runtime/knowledge_mcp/models_auto",
+  # Prettier and markdownlint handle Markdown.
+  "*.md",
 ]
 
 [lint]
-select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+select = [
+  "ARG",
+  "B",
+  "BLE",
+  "C90",
+  "E",
+  "ERA",
+  "F",
+  "FIX",
+  "I",
+  "PGH",
+  "PL",
+  "RET",
+  "RUF",
+  "S110",
+  "S112",
+  "SIM",
+  "T20",
+  "TID251",
+  "TRY",
+  "UP",
+]
 ignore = ["E501"]
+
+[lint.mccabe]
+max-complexity = 10
 
 [lint.isort]
 known-first-party = ["knowledge_mcp"]
+
+[lint.flake8-tidy-imports.banned-api]
+"argparse".msg = "kb parses its command line with Click."
+
+[lint.per-file-ignores]
+# cli.py imports main, setup and local_type inside the command functions, so kb --version and kb --help skip loading those modules.
+"runtime/knowledge_mcp/cli.py" = ["PLC0415"]
+# MCP tool functions take one parameter per inputSchema argument.
+"runtime/knowledge_mcp/tools/**" = ["PLR0913", "PLR0917"]
+# Repo scripts are not part of kb. They print to the terminal and parse flags with argparse.
+"runtime/scripts/**" = ["T20", "TID251"]
+# Tests compare results with literal expected values.
+"runtime/tests/**" = ["PLR2004"]

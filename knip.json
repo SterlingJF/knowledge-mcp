@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": [
+    "tools/oxlint/anti-slop/rules/**",
+    "tools/oxlint/anti-slop/shared/**"
+  ],
+  "ignoreBinaries": ["just", "ruby", "uv"],
+  "workspaces": {
+    ".": {
+      "entry": ["tools/*/*.ts", "tools/oxlint/anti-slop/index.ts"],
+      "project": ["tools/**/*.ts"]
+    }
+  }
+}

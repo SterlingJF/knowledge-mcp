@@ -1,0 +1,235 @@
+---
+schema: knowledge-mcp/document-types-update/1
+location: ~/notes
+based_on: sha256:2cbec7c64bdc5689634c0470cc4db35ce5680f15a2ed1d4ca71a957cdc877b1f
+record:
+  "# Your agent rewrites this file with text from knowledge-mcp when files change\
+  \ or you correct an entry.\n# An entry with `set_by: person` overrides any later\
+  \ entry by the agent.\nschema: knowledge-mcp/document-types/1\nfiles:\n  ideas.txt:\n\
+  \    no_document_type: true\n    set_by: agent\n    allowed_by:\n      basis: instruction\n\
+  \      text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up\
+  \ to date as you work.\n      location: AGENTS.md\n    time: '2026-10-18T07:04:56.885Z'\n"
+digest: sha256:d06776ba5744a3b90a7607c6e257013177e784125987eb3f2145c8d0e65d6566
+changed:
+  - path: docs/rfcs/0042-caching.md
+    change: moved
+    old_path: docs/rfcs/0042-cache.md
+    was:
+      universe_spec: codebase-recordkeeping
+      version: "0.1"
+      document_type: design-proposal
+      set_by: agent
+      allowed_by:
+        basis: instruction
+        text:
+          Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
+          date as you work.
+        location: AGENTS.md
+      time: "2026-10-18T07:04:56.885Z"
+to_settle:
+  - path: docs/rfcs/0042-caching.md
+    scope: 0
+    candidates:
+      - universe_spec: codebase-recordkeeping
+        document_type: design-proposal
+        name: Design proposal
+        alias:
+          kind: descriptive
+          form: RFC, enhancement proposal or design document in a proposals folder
+        action: accept or reject a proposed design
+        actor: the maintainers who decide on designs
+        timing: before anyone builds the design
+        matched:
+          - rfc
+        matched_on: folder
+      - universe_spec: product-development
+        document_type: design-doc
+        name: Design doc
+        alias:
+          kind: descriptive
+          form: RFC / RFD
+        action: agree to or object to one proposed approach
+        actor: reviewer
+        timing: before the work starts
+        matched:
+          - rfc
+        matched_on: folder
+    old_path: docs/rfcs/0042-cache.md
+    was:
+      universe_spec: codebase-recordkeeping
+      version: "0.1"
+      document_type: design-proposal
+      set_by: agent
+      allowed_by:
+        basis: instruction
+        text:
+          Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
+          date as you work.
+        location: AGENTS.md
+      time: "2026-10-18T07:04:56.885Z"
+scopes:
+  - universe_specs:
+      - id: codebase-recordkeeping
+        version: "0.1"
+        source: bundled copy at v0.10.0
+        from_parent: false
+      - id: product-development
+        version: "0.9"
+        source: bundled copy at v0.10.0
+        from_parent: false
+    every_document_type:
+      - universe_spec: codebase-recordkeeping
+        covers:
+          "The written documents of a codebase: files in its repository, commit
+          messages, change descriptions, issue reports and release notes."
+        covers_matched: []
+        kinds:
+          - document_type: readme
+            action: decide whether to try the project or one of its packages
+            actor: a first-time visitor
+          - document_type: license-file
+            action: decide whether the licence allows the planned use of the code
+            actor: anyone who plans to use, copy or change the code
+          - document_type: release-notes
+            action: decide whether to upgrade to a new release
+            actor: a user
+          - document_type: security-policy
+            action: report a vulnerability privately to the maintainers
+            actor: a person who finds a vulnerability in the software
+          - document_type: contributing-guide
+            action: prepare a change the maintainers will accept
+            actor: a contributor
+          - document_type: commit-message
+            action: decide whether to keep or undo a past change
+            actor: a maintainer or contributor
+          - document_type: code-of-conduct
+            action: report unacceptable behaviour by someone taking part in the project
+            actor: anyone who takes part in the project
+          - document_type: agent-instructions
+            action: follow the project's rules for building, testing and changing the code
+            actor: a coding agent
+          - document_type: change-description
+            action: decide whether to merge a change
+            actor: a maintainer
+          - document_type: design-proposal
+            action: accept or reject a proposed design
+            actor: the maintainers who decide on designs
+          - document_type: release-procedure
+            action: publish a release by following the project's steps
+            actor: the maintainer who publishes the release
+          - document_type: architecture-overview
+            action: learn how the main parts of the code work together
+            actor: a contributor or security reviewer
+          - document_type: notice-file
+            action:
+              include the required attribution notices in a redistributed copy of
+              the software
+            actor: anyone who redistributes the software, on its own or inside another work
+          - document_type: folder-readme
+            action: find the files to read or change in a folder
+            actor: a contributor or maintainer
+          - document_type: issue-report
+            action: decide whether to fix a reported bug or build a requested feature
+            actor: a maintainer
+          - document_type: code-owners
+            action: find who must approve a change to each file or folder
+            actor: a contributor
+          - document_type: documentation-set
+            action:
+              complete a task with the software, such as installing it or fixing an
+              error
+            actor: a user
+          - document_type: funding-file
+            action: give money to the project's maintainers
+            actor: a sponsor
+          - document_type: roadmap
+            action: choose which planned work to wait for or help build
+            actor: a user or contributor
+          - document_type: development-guide
+            action: build, run and test the code from a local copy of the repository
+            actor: a contributor
+      - universe_spec: product-development
+        covers:
+          The reasoning around deliberate work — what makes it worth doing, what
+          it should be, and whether it held up. The work may produce something made or
+          put in place, a service rendered, or something learned; for a recipient — including
+          your own later self — who simply receives it, free to take it or leave it, or
+          paying for it.
+        covers_matched: []
+        kinds:
+          - document_type: product-strategy-canvas
+            action: choose what an offering will aim for next and what it will refuse
+            actor: whoever leads the offering
+          - document_type: business-model-canvas
+            action:
+              check whether a business can deliver an offering its customers value
+              and earn more than providing it costs
+            actor: whoever starts, runs or funds the business
+          - document_type: lean-canvas
+            action: choose which assumption in a new venture's business model to test next
+            actor: whoever is starting the venture
+          - document_type: startup-canvas
+            action: decide what a new venture will aim for and how it will make money
+            actor: whoever is founding the venture, with any backers
+          - document_type: swot-analysis
+            action:
+              compare our strengths and weaknesses with the opportunities and threats
+              outside us
+            actor: whoever sets the plan
+          - document_type: pestle-analysis
+            action:
+              check which political, economic, social, technological, legal and environmental
+              conditions affect the work
+            actor: whoever sets the plan
+          - document_type: competitor-analysis
+            action:
+              find where the offering can differ from the other options people have,
+              including doing nothing
+            actor: whoever decides what to offer or how to present it
+          - document_type: persona-profile
+            action:
+              decide which kind of person, in which circumstance, to design the solution
+              for
+            actor: whoever designs the solution or studies the people it is for
+          - document_type: opportunity-assessment
+            action: decide whether to pursue a problem at all
+            actor: whoever would fund or approve the work
+          - document_type: risk-assessment
+            action: decide which risks to reduce, accept or watch, and who handles each
+            actor: the person accountable for the work
+          - document_type: design-doc
+            action: agree to or object to one proposed approach
+            actor: reviewer
+          - document_type: brand-identity-guide
+            action: apply the brand's look and wording correctly on your own
+            actor: anyone writing or designing for the brand
+          - document_type: scenario-walkthrough
+            action:
+              check, step by step, that one person can reach one goal through the
+              solution
+            actor: reviewer
+          - document_type: success-metrics
+            action: decide which numbers to improve next and which to keep where they are
+            actor: whoever runs the offering day to day
+          - document_type: architecture-overview
+            action: find which parts of the system a change will affect
+            actor: whoever will change the system
+          - document_type: system-context-diagram
+            action:
+              find what the system is responsible for and which outside people and
+              systems it works with
+            actor: anyone new to the system
+          - document_type: decision-brief
+            action: choose one of several options by a set date
+            actor: the person accountable for the choice
+          - document_type: decision-record
+            action:
+              check whether a past decision still applies, and record a replacement
+              when it no longer does
+            actor: future reader
+          - document_type: experiment-plan
+            action: commit to a test's prediction and its measures in advance
+            actor: whoever runs the test
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:2cbec7c64bdc5689634c0470cc4db35ce5680f15a2ed1d4ca71a957cdc877b1f

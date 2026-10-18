@@ -1,0 +1,14 @@
+---
+# Every listed edit holds the text it replaced, for undo.
+schema: knowledge-mcp/edits/1
+location: ~/notes/DESIGN.md
+edits:
+  - id: 0123456789abcdef0123456789abcdef
+    time: "2026-10-12T09:15:02.118Z"
+    location: ~/notes/DESIGN.md
+    allowed_by:
+      basis: request
+      text: Add an Overview section.
+    before_digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
+    after: "## Overview\n"
+    after_digest: sha256:1111111111111111111111111111111111111111111111111111111111111111

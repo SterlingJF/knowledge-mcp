@@ -1,12 +1,10 @@
-"""Test edit authorization, stored text, persistence and manual undo."""
-
 from __future__ import annotations
 
 import hashlib
 import json
 from pathlib import Path
 
-from tests.hosts import server_parameters, session, texts, write
+from tests.harness import server_parameters, session, texts, write
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
 
@@ -46,7 +44,6 @@ def test_edit_listing_returns_text_for_manual_undo(tmp_path):
     path = write(root, DESIGN, BEFORE)
     location = str(path)
     request = "Add an Overview section to DESIGN.md."
-    # Write the edited text before recording the edit.
     path.write_text(AFTER)
     recorded, listed = ask(
         tmp_path / "state",
@@ -54,13 +51,15 @@ def test_edit_listing_returns_text_for_manual_undo(tmp_path):
             "kb_record_edit",
             {
                 "location": location,
-                "basis": "request",
-                "basis_text": request,
+                "allowed_by": {
+                    "basis": "request",
+                    "text": request,
+                },
                 "before": BEFORE,
                 "after": AFTER,
             },
         ),
-        ("kb_edits", {"location": location}),
+        ("kb_list_edits", {"location": location}),
     )
 
     receipt = answer(recorded)
@@ -73,23 +72,21 @@ def test_edit_listing_returns_text_for_manual_undo(tmp_path):
     assert edits["schema"] == "knowledge-mcp/edits/1"
     [edit] = edits["edits"]
     assert edit["id"] == receipt["id"]
-    assert edit["basis"] == "request"
-    assert edit["basis_text"] == request
+    assert edit["allowed_by"] == {"basis": "request", "text": request}
     assert edit["location"] == location
-    # Check that the file matches the recorded after digest, then restore the before text.
     assert digest(path.read_text()) == edit["after_digest"]
     path.write_text(path.read_text().replace(edit["after"], edit["before"]))
     assert path.read_text() == BEFORE
 
     entries = logged(tmp_path / "state")
-    assert [entry["tool"] for entry in entries] == ["kb_record_edit", "kb_edits"]
+    assert [entry["tool"] for entry in entries] == ["kb_record_edit", "kb_list_edits"]
     assert [entry["returned"] for entry in entries] == [
         texts(recorded),
         texts(listed),
     ]
 
 
-def test_edit_records_preserve_standing_line_and_change_row_authorization(tmp_path):
+def test_edit_records_preserve_instruction_and_accepted_change_authorization(tmp_path):
     location = "https://www.notion.so/team/Design-0123456789abcdef"
     line = "Agents may fill in empty sections of design notes."
     row = "Overview: add the personality line. Evidence: brand review."
@@ -99,9 +96,11 @@ def test_edit_records_preserve_standing_line_and_change_row_authorization(tmp_pa
             "kb_record_edit",
             {
                 "location": location,
-                "basis": "line",
-                "basis_text": line,
-                "basis_location": "AGENTS.md",
+                "allowed_by": {
+                    "basis": "instruction",
+                    "text": line,
+                    "location": "AGENTS.md",
+                },
                 "before": "",
                 "after": "## Overview\n",
             },
@@ -110,25 +109,26 @@ def test_edit_records_preserve_standing_line_and_change_row_authorization(tmp_pa
             "kb_record_edit",
             {
                 "location": location,
-                "basis": "change_row",
-                "basis_text": row,
+                "allowed_by": {
+                    "basis": "accepted_change",
+                    "text": row,
+                },
                 "before": "## Overview\n",
                 "after_digest": digest("## Overview\n\nCalm.\n"),
                 "whole_file": True,
             },
         ),
-        ("kb_edits", {"location": location}),
+        ("kb_list_edits", {"location": location}),
     )
 
     first, second = (edit for edit in answer(recorded[-1])["edits"])
-    assert (first["basis"], first["basis_text"], first["basis_location"]) == (
-        "line",
-        line,
-        "AGENTS.md",
-    )
+    assert first["allowed_by"] == {
+        "basis": "instruction",
+        "text": line,
+        "location": "AGENTS.md",
+    }
     assert first["before"] == ""
-    assert (second["basis"], second["basis_text"]) == ("change_row", row)
-    assert "basis_location" not in second
+    assert second["allowed_by"] == {"basis": "accepted_change", "text": row}
     assert "after" not in second
     assert second["after_digest"] == digest("## Overview\n\nCalm.\n")
     assert second["whole_file"] is True
@@ -143,8 +143,10 @@ def test_edit_records_persist_across_sessions_per_location(tmp_path):
             "kb_record_edit",
             {
                 "location": location,
-                "basis": "request",
-                "basis_text": "Fix the typo.",
+                "allowed_by": {
+                    "basis": "request",
+                    "text": "Fix the typo.",
+                },
                 "before": BEFORE,
                 "after": after,
             },
@@ -154,9 +156,9 @@ def test_edit_records_persist_across_sessions_per_location(tmp_path):
     ask(state, record("/kb/a.md", AFTER + "More.\n"))
     [a, b, c] = ask(
         state,
-        ("kb_edits", {"location": "/kb/a.md"}),
-        ("kb_edits", {"location": "/kb/b.md"}),
-        ("kb_edits", {"location": "/kb/c.md"}),
+        ("kb_list_edits", {"location": "/kb/a.md"}),
+        ("kb_list_edits", {"location": "/kb/b.md"}),
+        ("kb_list_edits", {"location": "/kb/c.md"}),
     )
 
     assert [edit["after"] for edit in answer(a)["edits"]] == [AFTER, AFTER + "More.\n"]
@@ -175,8 +177,10 @@ def test_edit_record_uses_private_state_file(tmp_path):
             "kb_record_edit",
             {
                 "location": str(path),
-                "basis": "request",
-                "basis_text": "Add an Overview.",
+                "allowed_by": {
+                    "basis": "request",
+                    "text": "Add an Overview.",
+                },
                 "before": BEFORE,
                 "after": AFTER,
             },
@@ -193,8 +197,10 @@ def test_edit_record_uses_private_state_file(tmp_path):
 def test_invalid_after_data_creates_no_records(tmp_path):
     base = {
         "location": "/kb/a.md",
-        "basis": "request",
-        "basis_text": "Fix the typo.",
+        "allowed_by": {
+            "basis": "request",
+            "text": "Fix the typo.",
+        },
         "before": BEFORE,
     }
     passage, malformed, upper = ask(
@@ -213,12 +219,12 @@ def test_invalid_after_data_creates_no_records(tmp_path):
         tmp_path / "state",
         ("kb_record_edit", base),
         ("kb_record_edit", {**base, "after": AFTER, "after_digest": digest(BEFORE)}),
-        ("kb_edits", {"location": "/kb/a.md"}),
+        ("kb_list_edits", {"location": "/kb/a.md"}),
     )
 
     assert missing.is_error and "`after`" in texts(missing)[0]
     assert mismatched.is_error and "`after_digest`" in texts(mismatched)[0]
-    # Passage edits require after text so undo can locate the edited passage.
+    # Undo needs the replacement text to locate the edited passage.
     assert passage.is_error and "`whole_file`" in texts(passage)[0]
     assert malformed.is_error and "64 lowercase hex" in texts(malformed)[0]
     assert upper.is_error and "64 lowercase hex" in texts(upper)[0]
@@ -228,8 +234,10 @@ def test_invalid_after_data_creates_no_records(tmp_path):
 def test_an_unknown_basis_is_refused(tmp_path):
     arguments = {
         "location": "/kb/a.md",
-        "basis": "the agent thought it best",
-        "basis_text": "",
+        "allowed_by": {
+            "basis": "the agent thought it best",
+            "text": "",
+        },
         "before": BEFORE,
         "after": AFTER,
     }
@@ -237,7 +245,6 @@ def test_an_unknown_basis_is_refused(tmp_path):
 
     assert result.is_error
     assert "basis" in texts(result)[0]
-    # Framework argument validation rejects the call, and the server logs the error response.
     [entry] = logged(tmp_path / "state")
     assert entry["tool"] == "kb_record_edit"
     assert entry["location"] == "/kb/a.md"

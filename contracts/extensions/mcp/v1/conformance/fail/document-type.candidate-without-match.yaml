@@ -1,0 +1,17 @@
+---
+# A candidate names the words that matched.
+schema: knowledge-mcp/document-type/1
+location: README.md
+universe_specs: []
+candidates:
+  - universe_spec: codebase-recordkeeping
+    document_type: readme
+    name: Readme
+    alias: null
+    action: null
+    actor: null
+    timing: null
+    matched: []
+    matched_on: name
+every_document_type: null
+received: []

@@ -37,10 +37,47 @@ const project = {
 };
 const multiDocument = `---\n${stringify(environment)}---\n${stringify(project)}`;
 
-type Recorded = {
+interface Lockfile {
+  path: string;
+  contents: string;
+}
+interface Recorded {
   args: Array<string>;
-  lockfiles: Array<{ path: string; contents: string }>;
-};
+  lockfiles: Array<Lockfile>;
+}
+
+function isStrings(value: unknown): value is Array<string> {
+  return (
+    Array.isArray(value) && value.every((item) => typeof item === "string")
+  );
+}
+
+function isLockfile(value: unknown): value is Lockfile {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "path" in value &&
+    typeof value.path === "string" &&
+    "contents" in value &&
+    typeof value.contents === "string"
+  );
+}
+
+function readRecord(path: string): Recorded {
+  const value: unknown = JSON.parse(readFileSync(path, "utf8"));
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    !("args" in value) ||
+    !isStrings(value.args) ||
+    !("lockfiles" in value) ||
+    !Array.isArray(value.lockfiles) ||
+    !value.lockfiles.every(isLockfile)
+  ) {
+    throw new Error(`${path} contains no scanner record`);
+  }
+  return { args: value.args, lockfiles: value.lockfiles };
+}
 
 const fixtureDirectories: Array<string> = [];
 after(() => {
@@ -57,7 +94,7 @@ function fixture(contents = multiDocument, status = 0, output = false) {
   const recordPath = join(rootDir, "record.json");
   writeFileSync(join(rootDir, "pnpm-lock.yaml"), contents);
   writeFileSync(join(rootDir, "uv.lock"), "version = 1\n");
-  writeFileSync(join(rootDir, "osv-scanner.toml"), "# Test config\n");
+  writeFileSync(join(rootDir, "osv-scanner.toml"), "");
   writeFileSync(
     scanner,
     `#!/usr/bin/env node
@@ -73,12 +110,10 @@ process.exitCode = ${status};
   return { rootDir, scanner, recordPath };
 }
 
-test("delivers both document graphs, original uv lock and original configuration", () => {
+test("passes both pnpm documents, uv.lock and osv-scanner.toml to the scanner", () => {
   const input = fixture();
   assert.equal(scanDependencies(input), 0);
-  const recorded = JSON.parse(
-    readFileSync(input.recordPath, "utf8"),
-  ) as Recorded;
+  const recorded = readRecord(input.recordPath);
   assert.deepEqual(recorded.args.slice(0, 2), ["scan", "source"]);
   assert.equal(recorded.lockfiles.length, 3);
   assert.deepEqual(parse(recorded.lockfiles[0].contents), environment);
@@ -97,12 +132,10 @@ test("delivers both document graphs, original uv lock and original configuration
   );
 });
 
-test("supports ordinary single-document project lockfiles", () => {
+test("scans a single-document pnpm lockfile", () => {
   const input = fixture(stringify(project));
   assert.equal(scanDependencies(input), 0);
-  const recorded = JSON.parse(
-    readFileSync(input.recordPath, "utf8"),
-  ) as Recorded;
+  const recorded = readRecord(input.recordPath);
   assert.equal(recorded.lockfiles.length, 2);
   assert.deepEqual(parse(recorded.lockfiles[0].contents), project);
 });
@@ -120,9 +153,7 @@ test("adds every Cargo lockfile outside hidden, node_modules and target folders"
     writeFileSync(join(input.rootDir, folder, "Cargo.lock"), "version = 4\n");
   }
   assert.equal(scanDependencies(input), 0);
-  const recorded = JSON.parse(
-    readFileSync(input.recordPath, "utf8"),
-  ) as Recorded;
+  const recorded = readRecord(input.recordPath);
   assert.deepEqual(
     recorded.lockfiles.slice(3).map((lockfile) => lockfile.path),
     [
@@ -132,18 +163,16 @@ test("adds every Cargo lockfile outside hidden, node_modules and target folders"
   );
 });
 
-test("preserves vulnerability and connectivity exit statuses and cleans on failure", () => {
+test("returns the scanner exit status and removes the temporary files on failure", () => {
   for (const status of [1, 127]) {
     const input = fixture(multiDocument, status);
     assert.equal(scanDependencies(input), status);
-    const recorded = JSON.parse(
-      readFileSync(input.recordPath, "utf8"),
-    ) as Recorded;
+    const recorded = readRecord(input.recordPath);
     assert.equal(existsSync(dirname(recorded.lockfiles[0].path)), false);
   }
 });
 
-test("scanner termination returns the signal exit status", () => {
+test("returns 128 plus the signal number when a signal stops the scanner", () => {
   const input = fixture();
   writeFileSync(
     input.scanner,
@@ -152,7 +181,7 @@ test("scanner termination returns the signal exit status", () => {
   assert.equal(scanDependencies(input), 128 + constants.signals.SIGTERM);
 });
 
-test("refuses parser errors, empty documents and malformed lock mappings before scanning", () => {
+test("rejects parser errors, empty documents and malformed lock mappings before scanning", () => {
   for (const contents of [
     "",
     "---\n",

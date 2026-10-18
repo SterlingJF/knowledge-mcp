@@ -1,0 +1,11 @@
+---
+# Keys are paths inside the knowledge base.
+schema: knowledge-mcp/document-types/1
+files:
+  ../outside.md:
+    no_document_type: true
+    set_by: agent
+    allowed_by:
+      basis: request
+      text: Record the files.
+    time: "2026-10-10T09:15:02.118Z"

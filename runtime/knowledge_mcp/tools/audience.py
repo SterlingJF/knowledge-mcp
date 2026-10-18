@@ -1,87 +1,87 @@
-"""`kb_audience`: the choices a card's own universe spec names for who a document is for."""
-
 from __future__ import annotations
 
-import json
-from typing import Annotated, Any
+from typing import Annotated
 
-from mcp.types import CallToolResult, TextContent
+from mcp.server import MCPServer
+from mcp.types import CallToolResult
 from pydantic import Field
 
-from knowledge_mcp import audience, kbp
-from knowledge_mcp.contract import ScopeRequest
-from knowledge_mcp.scope import SENT, ScopeError, Workspace
+from knowledge_mcp import audience, kbp, problems
+from knowledge_mcp.models import ScopeRequest
+from knowledge_mcp.models_auto.audiences_schema import AudiencesAnswer
+from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
-from knowledge_mcp.tools.kbp import READS, Folders, Location, Universe, UniverseSpecs
+from knowledge_mcp.tools.document_type import scope_specs
+from knowledge_mcp.tools.kbp import READS, Folders, KnowledgeBusFolders, Location
 
 DESCRIPTION = """\
-Return who a document of one type can be for, from the document type's own universe spec. When \
-the universe spec declares an `audience` frame, `choices` holds its values, as `kbp --inspect` \
-reports them; otherwise `choices` is empty and `actor` names who uses the document type. Send \
-the same `location`, `folders` and `universe_specs` as `kb_fit`, and the document type id. When \
-you can't tell who the document is for, ask the person and offer only these choices; with no \
-choices, write for the `actor`.\
+List the readers you can choose for a document type. Returns the document type's `actor`, plus the audience question and its `choices` from the universe spec. Appends the answer to `log.jsonl` and opens no knowledge-base file.
 """
 
+UniverseSpec = Annotated[
+    str | None,
+    Field(
+        description=(
+            "Id of the universe spec to use when the document type appears in more than one "
+            "universe spec that applies."
+        )
+    ),
+]
 
-def register(mcp: Any, workspace: Workspace) -> None:
+
+def register(mcp: MCPServer, workspace: Workspace) -> None:
     @mcp.tool(
-        name="kb_audience",
-        title="Who is this document for?",
+        name="kb_list_audiences",
+        title="List reader choices",
         description=DESCRIPTION,
         annotations=READS,
     )
-    def kb_audience(
+    def kb_list_audiences(
         location: Location,
         folders: Folders,
-        universe_specs: UniverseSpecs,
-        kind: Annotated[
-            str, Field(description="The document type id, such as `design-doc`.")
+        knowledge_bus_folders: KnowledgeBusFolders,
+        document_type: Annotated[
+            str, Field(description="A document type id, such as `design-doc`.")
         ],
-        universe: Universe = None,
+        universe_spec: UniverseSpec = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
             folders=folders,
-            universe_specs=universe_specs,
-            kind=kind,
-            universe=universe,
+            knowledge_bus_folders=knowledge_bus_folders,
+            document_type=document_type,
+            universe_spec=universe_spec,
         )
-        request = ScopeRequest(folders=folders, universe_specs=universe_specs)
-        try:
-            with workspace.rebuilt(request) as rebuilt:
-                listed = kbp.run(["--kinds"], rebuilt.cwd)
-                if listed.code != 0:
-                    return respond.printed("kb_audience", location, arguments, listed)
-                spec, item = audience.holder(json.loads(listed.stdout), kind, universe)
-                inspected = kbp.run(
-                    ["--inspect", "--universe", spec["id"]], rebuilt.cwd
-                )
-                if inspected.code != 0:
-                    return respond.printed(
-                        "kb_audience", location, arguments, inspected
-                    )
-                declared, choices = audience.frame(json.loads(inspected.stdout))
-        except (ScopeError, audience.AudienceError) as error:
-            return respond.refusal("kb_audience", location, arguments, str(error))
+        request = ScopeRequest(
+            folders=folders, knowledge_bus_folders=knowledge_bus_folders
+        )
+        with workspace.rebuilt(request) as rebuilt:
+            listed = kbp.run(["--kinds"], rebuilt.cwd)
+            if listed.code != 0:
+                raise problems.KbpFailed(listed, "kinds")
+            listing = kbp.parsed(listed, "kinds", kbp.KINDS)
+            spec, item = audience.holder(listing, document_type, universe_spec)
+            inspected = kbp.run(["--inspect", "--universe", spec["id"]], rebuilt.cwd)
+            if inspected.code != 0:
+                raise problems.KbpFailed(inspected, "inspect")
+            model = kbp.parsed(inspected, "inspect", kbp.EXPLORER_MODEL)
+            declared, choices = audience.frame(model)
 
         result = {
             "schema": audience.SCHEMA,
             "location": location,
-            "universe_spec": {
-                "id": spec["id"],
-                "version": spec["version"],
-                "source": rebuilt.sources.get(spec["id"], SENT),
-            },
-            "kind": kind,
+            "universe_spec": spec["id"],
+            "universe_specs": [
+                found
+                for found in scope_specs(listing, rebuilt)
+                if found["id"] == spec["id"]
+            ],
+            "document_type": document_type,
             "actor": item["actor"],
             "frame": declared,
             "choices": choices,
             "received": rebuilt.received,
         }
         return respond.answer(
-            "kb_audience",
-            location,
-            arguments,
-            [TextContent(type="text", text=respond.compact(result))],
+            "kb_list_audiences", location, arguments, AudiencesAnswer, result
         )

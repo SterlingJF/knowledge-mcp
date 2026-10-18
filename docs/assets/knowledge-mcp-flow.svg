@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title description">
-<title id="title">Knowledge-MCP applies your thinking guides to an ordinary request</title>
+<title id="title">Before drafting a proposal, the agent asks the questions the proposal requires</title>
 <desc id="description">The team needs approval to change tools. Switching back will be costly. Before drafting, the agent identifies the reviewer and purpose. Approval requires the question about imposed limits. Costly reversal requires the question about work order. The proposal draws on the problem statement and risk notes. The agent checks gaps, then drafts.</desc>
 <defs>
   <marker id="arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M 2 2 L 9 6 L 2 10" fill="none" stroke="#456354" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
@@ -17,14 +17,14 @@
 </style>
 <rect width="1280" height="640" fill="#fffaf0"/>
 
-<text x="48" y="80" class="title">Plain, structured thinking while you work.</text>
+<text x="48" y="80" class="title">Before the agent drafts a proposal</text>
 <text x="48" y="112" class="label">YOU ASK</text>
 <rect x="48" y="128" width="1184" height="112" rx="16" fill="#ffffff" stroke="#d4ddd1" stroke-width="1.5"/>
 <text x="72" y="176" class="request">Draft a proposal to move our team to a new tool.</text>
 <text x="72" y="208" class="request">We need approval. Moving back will be costly.</text>
 
 <path class="arrow" d="M 808 248 V 280"/>
-<text x="840" y="272" class="detail">Knowledge-MCP applies your guides.</text>
+<text x="840" y="272" class="detail">knowledge-mcp supplies the questions.</text>
 <text x="384" y="272" class="label">BEFORE DRAFTING</text>
 
 <rect x="384" y="288" width="848" height="240" rx="16" fill="#ffffff" stroke="#cbd9ca" stroke-width="1.5"/>

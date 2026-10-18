@@ -1,47 +1,48 @@
-"""One tool per `kbp` mode; each returns what kbp prints, as is."""
-
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
+from mcp.server import MCPServer
 from mcp.types import CallToolResult, ToolAnnotations
 from pydantic import Field
 
 from knowledge_mcp import bundled, kbp, log
-from knowledge_mcp.contract import (
-    FOLDERS,
-    LOCATION,
-    UNIVERSE_SPECS,
-    ScopeFolder,
+from knowledge_mcp.models import (
+    KNOWLEDGE_BUS_FOLDERS,
+    KnowledgeBusFolder,
     ScopeRequest,
 )
-from knowledge_mcp.scope import Rebuilt, ScopeError, Workspace
+from knowledge_mcp.scope import Rebuilt, Workspace
 from knowledge_mcp.tools import respond
 
-Location = Annotated[str, Field(description=LOCATION)]
-Folders = Annotated[list[str], Field(description=FOLDERS)]
-UniverseSpecs = Annotated[list[ScopeFolder], Field(description=UNIVERSE_SPECS)]
+Location = Annotated[
+    str,
+    Field(
+        description="A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location."
+    ),
+]
+Folders = Annotated[
+    list[str],
+    Field(
+        description='Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.'
+    ),
+]
+KnowledgeBusFolders = Annotated[
+    list[KnowledgeBusFolder], Field(description=KNOWLEDGE_BUS_FOLDERS)
+]
 Universe = Annotated[
     str | None,
     Field(
-        description="The id of one universe spec in scope, when several are in scope."
+        description="Id of the universe spec to use when several universe specs apply."
     ),
 ]
 
-READS = ToolAnnotations(
-    read_only_hint=True, idempotent_hint=True, open_world_hint=False
-)
-
-SCOPE_NOTE = (
-    " kbp runs from the document's folder, rebuilt from what you send, so it uses the "
-    "nearest `.knowledge-bus/` and the parent folder's universe specs named in "
-    "`workspace.yaml`."
-)
+# READS omits idempotent_hint because MCP defines that hint only for tools that change state.
+READS = ToolAnnotations(read_only_hint=True, open_world_hint=False)
 
 
 def note(rebuilt: Rebuilt, **extra: Any) -> dict[str, Any]:
-    """Which files came from the bundled copies, and the digests of text sent in this call."""
     found: dict[str, Any] = {}
     if rebuilt.bundled:
         found["source"] = bundled.label()
@@ -51,7 +52,7 @@ def note(rebuilt: Rebuilt, **extra: Any) -> dict[str, Any]:
     return found | extra
 
 
-def register(mcp: Any, workspace: Workspace) -> None:
+def register(mcp: MCPServer, workspace: Workspace) -> None:
     def scoped(
         tool: str,
         location: str,
@@ -63,40 +64,36 @@ def register(mcp: Any, workspace: Workspace) -> None:
         request = ScopeRequest.model_validate(
             {
                 "folders": arguments["folders"],
-                "universe_specs": arguments["universe_specs"],
+                "knowledge_bus_folders": arguments.get("knowledge_bus_folders", []),
             }
         )
-        try:
-            with workspace.rebuilt(request, sent_only=sent_only) as rebuilt:
-                output = kbp.run(argv, rebuilt.cwd)
-        except ScopeError as error:
-            return respond.refusal(tool, location, arguments, str(error))
+        with workspace.rebuilt(request, sent_only=sent_only) as rebuilt:
+            output = kbp.run(argv, rebuilt.cwd)
         return respond.printed(tool, location, arguments, output, note(rebuilt))
 
     @mcp.tool(
-        name="kbp_check",
-        title="Check universe specs",
+        name="kbp_validate",
+        title="Validate universe specs",
         description=(
-            "Check the universe specs in scope against the knowledge-bus protocol and return "
-            "kbp's report as is. The check runs only on text you send: send each `*.kbp.yaml` "
-            "file's text, or the digest an earlier answer returned." + SCOPE_NOTE
+            "Validate files in the nearest supplied `.knowledge-bus/` folder and parent files named in its `workspace.yaml`, using file text or digests from this session. Return kbp's report and exit code. Ignores bundled files. Appends the result to `log.jsonl`."
         ),
         annotations=READS,
     )
-    def check(
-        location: Location, folders: Folders, universe_specs: UniverseSpecs
+    def validate(
+        location: Location, folders: Folders, knowledge_bus_folders: KnowledgeBusFolders
     ) -> CallToolResult:
         arguments = respond.sent(
-            folders=folders, universe_specs=universe_specs, location=location
+            folders=folders,
+            knowledge_bus_folders=knowledge_bus_folders,
+            location=location,
         )
-        return scoped("kbp_check", location, arguments, [], sent_only=True)
+        return scoped("kbp_validate", location, arguments, [], sent_only=True)
 
     @mcp.tool(
         name="kbp_self_check",
-        title="Check the protocol",
+        title="Validate the bundled protocol",
         description=(
-            "Check the bundled knowledge-bus protocol against itself and return the "
-            "`kbp --self-check` report as is."
+            "Validate kbp's bundled protocol definition with `kbp --self-check`. Returns kbp's report and exit code. Appends the result to `log.jsonl`."
         ),
         annotations=READS,
     )
@@ -106,9 +103,9 @@ def register(mcp: Any, workspace: Workspace) -> None:
 
     @mcp.tool(
         name="kbp_version",
-        title="knowledge-bus version",
+        title="Get the knowledge-bus version",
         description=(
-            "Return the knowledge-bus release and protocol version that `kbp --version` prints."
+            "Get the installed knowledge-bus release and protocol version from `kbp --version`. Returns kbp's text and exit code. Appends the result to `log.jsonl`."
         ),
         annotations=READS,
     )
@@ -120,27 +117,23 @@ def register(mcp: Any, workspace: Workspace) -> None:
         name="kbp_mint",
         title="Mint codes",
         description=(
-            "Mint codes that collide with no code in the universe specs in scope, as "
-            "`kbp --mint <kind> <count>` prints the codes." + SCOPE_NOTE
+            "Mint new `code` values of one `kind` for universe spec entries. Skips values already declared in the universe specs that apply and returns kbp's list and exit code. Writes no universe spec file, so add the returned values to the universe specs yourself. Appends the result to `log.jsonl`."
         ),
-        annotations=ToolAnnotations(read_only_hint=True, open_world_hint=False),
+        annotations=READS,
     )
     def mint(
         location: Location,
         folders: Folders,
-        universe_specs: UniverseSpecs,
-        kind: Annotated[
-            Literal["element", "artifact", "frame", "factor"],
-            Field(description="The kind of code to mint."),
-        ],
+        knowledge_bus_folders: KnowledgeBusFolders,
+        kind: Literal["element", "artifact", "frame", "factor"],
         count: Annotated[
             int | None,
-            Field(ge=1, le=100, description="The number of codes; 1 when left out."),
+            Field(ge=1, le=100, description="Number of codes to mint, one by default."),
         ] = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             folders=folders,
-            universe_specs=universe_specs,
+            knowledge_bus_folders=knowledge_bus_folders,
             location=location,
             kind=kind,
             count=count,
@@ -151,22 +144,21 @@ def register(mcp: Any, workspace: Workspace) -> None:
 
     @mcp.tool(
         name="kbp_inspect",
-        title="Inspect universe specs",
+        title="Inspect a universe spec",
         description=(
-            "Return the JSON model `kbp --inspect` builds for a universe spec in scope and its "
-            "guidance." + SCOPE_NOTE
+            "Get a universe spec and its type guidance as kbp's JSON model. Returns the JSON and exit code. Appends the result to `log.jsonl`."
         ),
         annotations=READS,
     )
     def inspect(
         location: Location,
         folders: Folders,
-        universe_specs: UniverseSpecs,
+        knowledge_bus_folders: KnowledgeBusFolders,
         universe: Universe = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             folders=folders,
-            universe_specs=universe_specs,
+            knowledge_bus_folders=knowledge_bus_folders,
             location=location,
             universe=universe,
         )
@@ -175,56 +167,43 @@ def register(mcp: Any, workspace: Workspace) -> None:
 
     @mcp.tool(
         name="kbp_explore",
-        title="Write the Explorer",
+        title="Write a viewer",
         description=(
-            "Write the offline Explorer for a universe spec in scope into knowledge-mcp's "
-            "private folder, and return kbp's receipt and the folder's path. Open its "
-            "`index.html` in a browser to browse the universe spec." + SCOPE_NOTE
+            "Write an offline HTML viewer for a universe spec under `explorer/` beside `log.jsonl`. Returns kbp's JSON summary, exit code and viewer folder path. Replaces the previous viewer when folder paths, file names, file order, file contents and `universe` are unchanged. Appends the result to `log.jsonl`."
         ),
+        # `--replace` overwrites the earlier viewer in the same folder, so the tool is destructive.
         annotations=ToolAnnotations(
-            read_only_hint=False, destructive_hint=False, open_world_hint=False
+            read_only_hint=False, destructive_hint=True, open_world_hint=False
         ),
     )
     def explore(
         location: Location,
         folders: Folders,
-        universe_specs: UniverseSpecs,
+        knowledge_bus_folders: KnowledgeBusFolders,
         universe: Universe = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             folders=folders,
-            universe_specs=universe_specs,
+            knowledge_bus_folders=knowledge_bus_folders,
             location=location,
             universe=universe,
         )
-        request = ScopeRequest(folders=folders, universe_specs=universe_specs)
-        try:
-            with workspace.rebuilt(request) as rebuilt:
-                output_dir = (
-                    log.directory()
-                    / "explorer"
-                    / f"{rebuilt.key[:16]}-{universe or 'scope'}"
-                )
-                output_dir.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-                argv = [
-                    "--explore",
-                    *(["--universe", universe] if universe else []),
-                    "--output",
-                    str(output_dir),
-                    "--replace",
-                ]
-                output = kbp.run(
-                    argv,
-                    rebuilt.cwd,
-                    KNOWLEDGE_BUS_EXPLORER_BUNDLE=str(
-                        bundled.EXPLORER / "explorer-viewer.js"
-                    ),
-                    KNOWLEDGE_BUS_EXPLORER_BUNDLE_MANIFEST=str(
-                        bundled.EXPLORER / "explorer-viewer.json"
-                    ),
-                )
-        except ScopeError as error:
-            return respond.refusal("kbp_explore", location, arguments, str(error))
+        request = ScopeRequest(
+            folders=folders, knowledge_bus_folders=knowledge_bus_folders
+        )
+        with workspace.rebuilt(request) as rebuilt:
+            output_dir = (
+                log.directory() / "explorer" / f"{rebuilt.key[:16]}-{universe or 'all'}"
+            )
+            output_dir.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+            argv = [
+                "--explore",
+                *(["--universe", universe] if universe else []),
+                "--output",
+                str(output_dir),
+                "--replace",
+            ]
+            output = kbp.run(argv, rebuilt.cwd)
         written = {"explorer": str(output_dir)} if output.code == 0 else {}
         return respond.printed(
             "kbp_explore", location, arguments, output, note(rebuilt, **written)
@@ -234,24 +213,23 @@ def register(mcp: Any, workspace: Workspace) -> None:
         name="kbp_kinds",
         title="List document types",
         description=(
-            "List every document type in scope as `kbp --kinds` prints the list: `kinds/1` for "
-            "one universe spec, `kinds-set/1` for several." + SCOPE_NOTE
+            "List the document types of the universe specs that apply. Returns kbp's list and exit code. Appends the result to `log.jsonl`."
         ),
         annotations=READS,
     )
     def kinds(
         location: Location,
         folders: Folders,
-        universe_specs: UniverseSpecs,
+        knowledge_bus_folders: KnowledgeBusFolders,
         universe: Universe = None,
         format: Annotated[
             Literal["json", "markdown"] | None,
-            Field(description="`json` when left out."),
+            Field(description="Defaults to `json`."),
         ] = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             folders=folders,
-            universe_specs=universe_specs,
+            knowledge_bus_folders=knowledge_bus_folders,
             location=location,
             universe=universe,
             format=format,
@@ -267,16 +245,14 @@ def register(mcp: Any, workspace: Workspace) -> None:
         name="kbp_card",
         title="Read a card",
         description=(
-            "Return the card for one document type as `kbp --card <kind> --format markdown` "
-            'prints the card: sections, guidance, conditions and their "Depends on: …" lines. '
-            "Read the card before writing the document." + SCOPE_NOTE
+            "Read the card for a document type before you draft or edit a document of that type. Returns kbp's Markdown card with purpose, writing advice and section questions, plus the exit code. Appends the result to `log.jsonl`."
         ),
         annotations=READS,
     )
     def card(
         location: Location,
         folders: Folders,
-        universe_specs: UniverseSpecs,
+        knowledge_bus_folders: KnowledgeBusFolders,
         kind: Annotated[
             str, Field(description="The document type id, such as `design-doc`.")
         ],
@@ -284,7 +260,7 @@ def register(mcp: Any, workspace: Workspace) -> None:
     ) -> CallToolResult:
         arguments = respond.sent(
             folders=folders,
-            universe_specs=universe_specs,
+            knowledge_bus_folders=knowledge_bus_folders,
             location=location,
             kind=kind,
             universe=universe,

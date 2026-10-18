@@ -106,7 +106,7 @@ test("the caveats name the variable and the history folder it points to", () => 
   const caveats = /^ {2}def caveats\n([\s\S]*?)\n {2}end$/m.exec(formula());
   assert.ok(caveats);
   const text = caveats[1];
-  assert.match(text, /run `kb setup --remove <host>` for each app\./);
+  assert.match(text, /run `kb setup --remove <harness>` for each harness\./);
   assert.match(
     text,
     /stay after the uninstall, in \$KNOWLEDGE_MCP_STATE_DIR when set,\s+else \$XDG_STATE_HOME\/knowledge-mcp, else ~\/\.local\/state\/knowledge-mcp\./,

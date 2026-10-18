@@ -1,8 +1,15 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [],
+  "plugins": ["typescript", "unicorn", "oxc", "import", "vitest"],
+  "jsPlugins": [
+    "@stylistic/eslint-plugin",
+    {
+      "name": "anti-slop",
+      "specifier": "./tools/oxlint/anti-slop/index.ts"
+    }
+  ],
   "categories": {
-    "correctness": "off"
+    "correctness": "error"
   },
   "options": {
     "typeAware": true
@@ -11,73 +18,69 @@
     "builtin": true
   },
   "ignorePatterns": [
-    "**/.nx/**",
-    "**/.svelte-kit/**",
     "**/build/**",
-    "**/coverage/**",
     "**/dist/**",
-    "**/snap/**",
-    "**/vite.config.*.timestamp-*.*"
+    "tools/oxlint/anti-slop/rules/**",
+    "tools/oxlint/anti-slop/shared/**"
   ],
   "overrides": [
     {
-      "files": ["**/*.{js,ts,tsx}"],
-      "jsPlugins": ["@stylistic/eslint-plugin"],
+      "files": ["**/*.{js,ts}"],
       "env": {
-        "es2020": true,
-        "browser": true
+        "node": true,
+        "es2023": true
       },
-      "plugins": ["typescript", "import"],
       "rules": {
-        "for-direction": "error",
-        "no-async-promise-executor": "error",
+        "complexity": ["error", 10],
+        "eqeqeq": "error",
+        "max-depth": ["error", 4],
+        "max-lines-per-function": ["error", 80],
+        "max-nested-callbacks": ["error", 3],
+        "max-params": ["error", 4],
         "no-case-declarations": "error",
-        "no-class-assign": "error",
-        "no-compare-neg-zero": "error",
-        "no-cond-assign": "error",
-        "no-constant-binary-expression": "error",
-        "no-constant-condition": "error",
-        "no-control-regex": "error",
-        "no-debugger": "error",
-        "no-delete-var": "error",
-        "no-dupe-else-if": "error",
-        "no-duplicate-case": "error",
-        "no-empty-character-class": "error",
-        "no-empty-pattern": "error",
-        "no-empty-static-block": "error",
-        "no-ex-assign": "error",
-        "no-extra-boolean-cast": "error",
+        "no-console": "error",
+        "no-empty": [
+          "error",
+          {
+            "allowEmptyCatch": false
+          }
+        ],
         "no-fallthrough": "error",
-        "no-global-assign": "error",
-        "no-invalid-regexp": "error",
-        "no-irregular-whitespace": "error",
-        "no-loss-of-precision": "error",
-        "no-misleading-character-class": "error",
-        "no-nonoctal-decimal-escape": "error",
+        "no-param-reassign": "error",
         "no-regex-spaces": "error",
-        "no-self-assign": "error",
-        "no-shadow": "warn",
-        "no-shadow-restricted-names": "error",
-        "no-sparse-arrays": "error",
-        "no-unsafe-finally": "error",
-        "no-unsafe-optional-chaining": "error",
-        "no-unused-labels": "error",
-        "no-unused-private-class-members": "error",
-        "no-useless-backreference": "error",
-        "no-useless-catch": "error",
-        "no-useless-escape": "error",
+        "no-shadow": "error",
+        "no-unused-vars": [
+          "error",
+          {
+            "argsIgnorePattern": "^_",
+            "caughtErrors": "all",
+            "caughtErrorsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_"
+          }
+        ],
         "no-var": "error",
-        "no-with": "error",
+        "no-warning-comments": "error",
         "prefer-const": "error",
-        "require-yield": "error",
-        "use-isnan": "error",
-        "valid-typeof": "error",
+        "@stylistic/spaced-comment": "error",
+        "anti-slop/no-chained-type-assertions": "error",
+        "anti-slop/no-known-value-widening": "error",
+        "anti-slop/no-module-mocking": "error",
+        "anti-slop/no-object-parameters": "error",
+        "anti-slop/no-reduce-accumulator-copy": "error",
+        "anti-slop/no-reflect-apply": "error",
+        "anti-slop/no-reflect-get": "error",
+        "anti-slop/no-unknown-returns": "error",
+        "anti-slop/no-unknown-type-aliases": "error",
+        "anti-slop/no-unsafe-dictionary-type": "error",
+        "anti-slop/no-widen-then-assert": "error",
+        "anti-slop/require-safety-comment-for-type-assertion": "error",
         "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
         "import/first": "error",
         "import/newline-after-import": "error",
         "import/no-commonjs": "error",
+        "import/no-cycle": "error",
         "import/no-duplicates": "error",
-        "@stylistic/spaced-comment": "error",
+        "oxc/no-accumulating-spread": "error",
         "typescript/array-type": [
           "error",
           {
@@ -88,8 +91,16 @@
         "typescript/ban-ts-comment": [
           "error",
           {
-            "ts-expect-error": false,
-            "ts-ignore": "allow-with-description"
+            "ts-expect-error": "allow-with-description",
+            "ts-ignore": true,
+            "ts-nocheck": true
+          }
+        ],
+        "typescript/consistent-type-assertions": [
+          "error",
+          {
+            "assertionStyle": "as",
+            "objectLiteralTypeAssertions": "never"
           }
         ],
         "typescript/consistent-type-imports": [
@@ -99,26 +110,70 @@
           }
         ],
         "typescript/method-signature-style": ["error", "property"],
-        "typescript/no-duplicate-enum-values": "error",
-        "typescript/no-extra-non-null-assertion": "error",
-        "typescript/no-for-in-array": "error",
+        "typescript/no-explicit-any": "error",
         "typescript/no-inferrable-types": [
           "error",
           {
             "ignoreParameters": true
           }
         ],
-        "typescript/no-misused-new": "error",
+        "typescript/no-floating-promises": [
+          "error",
+          {
+            "allowForKnownSafeCalls": [
+              {
+                "from": "package",
+                "name": ["describe", "it", "suite", "test"],
+                "package": "node:test"
+              }
+            ]
+          }
+        ],
+        "typescript/no-misused-promises": "error",
         "typescript/no-namespace": "error",
-        "typescript/no-non-null-asserted-optional-chain": "error",
+        "typescript/no-non-null-assertion": "error",
+        "typescript/no-unnecessary-condition": "error",
         "typescript/no-unnecessary-type-assertion": "error",
+        "typescript/no-unsafe-argument": "error",
+        "typescript/no-unsafe-assignment": "error",
+        "typescript/no-unsafe-call": "error",
         "typescript/no-unsafe-function-type": "error",
-        "typescript/no-wrapper-object-types": "error",
-        "typescript/prefer-as-const": "error",
-        "typescript/prefer-for-of": "warn",
-        "typescript/require-await": "warn",
-        "typescript/triple-slash-reference": "error",
-        "typescript/no-unnecessary-condition": "error"
+        "typescript/no-unsafe-member-access": "error",
+        "typescript/no-unsafe-return": "error",
+        "typescript/no-unsafe-type-assertion": "error",
+        "typescript/only-throw-error": "error",
+        "typescript/prefer-for-of": "error",
+        "typescript/prefer-promise-reject-errors": "error",
+        "typescript/require-await": "error",
+        "typescript/return-await": "error",
+        "typescript/switch-exhaustiveness-check": "error",
+        "typescript/use-unknown-in-catch-callback-variable": "error",
+        "unicorn/no-abusive-eslint-disable": "error",
+        "vitest/no-commented-out-tests": "error"
+      }
+    },
+    {
+      "files": ["tools/**"],
+      "rules": {
+        "no-console": "off"
+      }
+    },
+    {
+      // tools/formula predates these rules and stays unchanged for 0.3.0.
+      "files": ["tools/formula/**"],
+      "rules": {
+        "complexity": "off",
+        "max-depth": "off",
+        "max-lines-per-function": "off",
+        "typescript/await-thenable": "off",
+        "typescript/no-non-null-assertion": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-type-assertion": "off",
+        "anti-slop/no-chained-type-assertions": "off",
+        "anti-slop/no-known-value-widening": "off",
+        "anti-slop/no-unsafe-dictionary-type": "off",
+        "anti-slop/require-safety-comment-for-type-assertion": "off"
       }
     }
   ]

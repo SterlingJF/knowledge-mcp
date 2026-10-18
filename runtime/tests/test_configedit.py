@@ -1,5 +1,3 @@
-"""Test insertion and removal of server entries across host configuration formats."""
-
 from __future__ import annotations
 
 import json
