@@ -12,6 +12,7 @@ from jsonschema.exceptions import best_match
 
 # kbp_* tools return kbp's output with no output schema.
 RESULTS = {
+    "kb_prepare_conventions": "conventions-update",
     "kb_prepare_document_move": "document-move",
     "kb_get_document_type": "document-type",
     "kb_list_audiences": "audiences",
@@ -74,3 +75,10 @@ def record_issues(data: Any) -> list[str]:
         place = "/".join(str(part) for part in best.absolute_path) or "the file"
         issues.append(f"{place}: {best.message}")
     return issues
+
+
+def convention_issues(data: Any) -> list[str]:
+    return [
+        f"{'/'.join(map(str, e.absolute_path))}: {e.message}"
+        for e in Draft202012Validator(listed("conventions")).iter_errors(data)
+    ]

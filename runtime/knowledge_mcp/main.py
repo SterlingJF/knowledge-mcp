@@ -19,6 +19,7 @@ from knowledge_mcp import problems, schemas, version
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import (
     audience,
+    conventions,
     document_move,
     document_type,
     document_types,
@@ -129,6 +130,7 @@ def build_server(workspace: Workspace | None = None) -> MCPServer:
         log_level="WARNING",
     )
     workspace = workspace or Workspace()
+    conventions.register(mcp, workspace)
     document_move.register(mcp, workspace)
     document_type.register(mcp, workspace)
     audience.register(mcp, workspace)

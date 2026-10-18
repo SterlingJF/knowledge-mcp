@@ -14,6 +14,7 @@ TOOLS = {
     "kb_record_edit",
     "kb_list_edits",
     "kb_prepare_document_types",
+    "kb_prepare_conventions",
     "kb_prepare_document_move",
     "kbp_validate",
     "kbp_self_check",
@@ -54,6 +55,7 @@ def test_authorization_meanings_reach_the_listed_input_schemas(tmp_path):
             "kb_record_edit",
             "kb_prepare_document_types",
             "kb_prepare_document_move",
+            "kb_prepare_conventions",
         }:
             fields = tool.input_schema["$defs"]["AllowedBy"]["properties"]
             for name in ("basis", "text", "location"):

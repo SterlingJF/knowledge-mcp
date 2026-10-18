@@ -1,0 +1,58 @@
+---
+schema: knowledge-mcp/document-types-update/1
+location: ~/notes
+based_on: sha256:254c9d9b1e0c23210d457077093af2ff130050d088d122464bdfd3151a1b77b3
+record: null
+digest: null
+listing_changes: []
+changed: []
+to_settle: []
+scopes: []
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:26e1a2e3eb624c01072a1e666fbe8e50c40fff8a398cf06a55123d795cbd0dcb
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:254c9d9b1e0c23210d457077093af2ff130050d088d122464bdfd3151a1b77b3
+filing:
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    status: proposed
+    proposal:
+      folder: Proposals
+      name: Shared Cache.md
+      path: Proposals/Shared Cache.md
+      folder_new: true
+      name_style: convention
+      evidence: []
+      folder_counts: []
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      digest: sha256:26e1a2e3eb624c01072a1e666fbe8e50c40fff8a398cf06a55123d795cbd0dcb
+      definition:
+        universe_spec: codebase-recordkeeping
+        document_type: design-proposal
+        folder:
+          - Proposals
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first document heading.
+        set_by: person
+        allowed_by:
+          basis: instruction
+          text:
+            Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up
+            to date as you work.
+          location: AGENTS.md
+        time: "2026-10-18T09:13:54.666110Z"
+  - path: ideas.txt
+    universe_spec: null
+    document_type: null
+    status: no_document_type
+    proposal: null

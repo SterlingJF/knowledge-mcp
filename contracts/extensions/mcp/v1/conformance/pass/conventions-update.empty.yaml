@@ -1,0 +1,14 @@
+---
+schema: knowledge-mcp/conventions-update/1
+location: ~/notes
+file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+status: unchanged
+based_on: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+current: []
+changes: []
+allowed_by: null
+record: null
+digest: null
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

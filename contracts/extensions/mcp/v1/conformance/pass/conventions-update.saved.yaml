@@ -1,0 +1,40 @@
+---
+schema: knowledge-mcp/conventions-update/1
+location: ~/notes
+file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+status: ready
+based_on: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+current: []
+changes:
+  - change: upsert
+    universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    folder:
+      - Proposals
+    name:
+      separator: " "
+      case: as-written
+      parts:
+        - part: content
+    content:
+      label: document title
+      instruction: Read the first document heading.
+    set_by: person
+allowed_by:
+  basis: instruction
+  text:
+    Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+    as you work.
+  location: AGENTS.md
+record:
+  "schema: knowledge-mcp/conventions/1\nfrom_parent: []\nconventions:\n- universe_spec:\
+  \ codebase-recordkeeping\n  document_type: design-proposal\n  folder:\n  - Proposals\n\
+  \  name:\n    separator: ' '\n    case: as-written\n    parts:\n    - part: content\n\
+  \  content:\n    label: document title\n    instruction: Read the first document\
+  \ heading.\n  set_by: person\n  allowed_by:\n    basis: instruction\n    text: Keep\
+  \ the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date\n     \
+  \ as you work.\n    location: AGENTS.md\n  time: '2026-10-18T09:13:54.666110Z'\n"
+digest: sha256:26e1a2e3eb624c01072a1e666fbe8e50c40fff8a398cf06a55123d795cbd0dcb
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

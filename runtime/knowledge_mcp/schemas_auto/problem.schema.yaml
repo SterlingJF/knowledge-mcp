@@ -2,9 +2,9 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: problem.schema.yaml
 title: Problem details
-description: An error from a knowledge-mcp tool, as RFC 9457 problem details. On failure, `kb
-  type --json` and `kb doctor --json` print a problem object as the last stderr line. Branch
-  on `type`.
+description: An error from a knowledge-mcp tool, as RFC 9457 problem details. On failure,
+  `kb type --json` and `kb doctor --json` print a problem object as the last stderr
+  line. Branch on `type`.
 type: object
 required:
   - type
@@ -14,12 +14,12 @@ properties:
   type:
     oneOf:
       - title: Invalid arguments
-        description: An argument is unknown, missing or fails the tool's input schema, or two
-          arguments conflict.
+        description: An argument is unknown, missing or fails the tool's input schema,
+          or two arguments conflict.
         const: https://github.com/SterlingJF/knowledge-mcp/problems/argument-invalid
       - title: Invalid folders
-        description: The call sent invalid folders or file names, or omitted universe spec text
-          that knowledge-mcp could not retrieve.
+        description: The call sent invalid folders or file names, or omitted universe
+          spec text that knowledge-mcp could not retrieve.
         const: https://github.com/SterlingJF/knowledge-mcp/problems/scope-invalid
       - title: Unknown digest
         description: The call sent a digest that matches no text received in this session.
@@ -28,14 +28,15 @@ properties:
         description: The document-types file text sent is not valid YAML or fails document-types.schema.yaml.
         const: https://github.com/SterlingJF/knowledge-mcp/problems/record-invalid
       - title: Unknown document type
-        description: The requested document type is absent from the selected universe spec or
-          universe specs.
+        description: The requested document type is absent from the selected universe
+          spec or universe specs.
         const: https://github.com/SterlingJF/knowledge-mcp/problems/document-type-unknown
       - title: kbp failed
         description: kbp exited with an error or is missing from the install.
         const: https://github.com/SterlingJF/knowledge-mcp/problems/kbp-failed
       - title: Unreadable kbp output
-        description: kbp printed no JSON object, or an object with an unsupported `schema` value.
+        description: kbp printed no JSON object, or an object with an unsupported `schema`
+          value.
         const: https://github.com/SterlingJF/knowledge-mcp/problems/kbp-version-skew
       - title: knowledge-mcp failed
         description: Any other failure inside knowledge-mcp.
@@ -44,6 +45,12 @@ properties:
         const: https://github.com/SterlingJF/knowledge-mcp/problems/move-invalid
       - title: Incomplete move input
         const: https://github.com/SterlingJF/knowledge-mcp/problems/move-input-incomplete
+      - title: Invalid conventions
+        const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-invalid
+      - title: Unsupported conventions
+        const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-unsupported
+      - title: Invalid filing values
+        const: https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid
   title:
     type: string
   detail:

@@ -26,10 +26,10 @@ recorded:
         Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
         date as you work.
       location: AGENTS.md
-    time: "2026-10-18T08:09:02.818Z"
+    time: "2026-10-18T09:13:51.812Z"
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
-    digest: sha256:681a4c67c3bce0e1e8f906ca7b2a4bb89f692bbafd4bd78dc0127a004cb04492
+    digest: sha256:254c9d9b1e0c23210d457077093af2ff130050d088d122464bdfd3151a1b77b3
 filing:
   - path: docs/rfcs/0042-cache.md
     universe_spec: codebase-recordkeeping

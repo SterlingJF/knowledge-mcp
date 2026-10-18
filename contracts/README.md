@@ -11,7 +11,7 @@ Create `plugins/<name>/` for the first interface that knowledge-mcp defines for 
 
 ```text
 contracts/
-├── extensions/mcp/v1/               # Tool result, error and document-types schemas
+├── extensions/mcp/v1/               # Tool result, error and configuration schemas
 │   ├── *.schema.yaml                # JSON Schemas and shared definitions
 │   ├── tools.json                   # tools/list snapshot from the server
 │   └── conformance/                 # Pass and fail samples per schema
@@ -42,6 +42,8 @@ Write fail samples by hand as `conformance/fail/<name>.<case>.yaml`.
 
 Each successful `kb_*` result has a `schema` field with a schema ID, such as `knowledge-mcp/document-type/1`.
 The document-types file has `schema: knowledge-mcp/document-types/1`.
+The root conventions file has `schema: knowledge-mcp/conventions/1`.
+Filing assessments add convention sources and missing values while retaining their `/1` schema IDs.
 Raise the schema version when the stored file changes, or when an answer field is removed or renamed, changes meaning or becomes narrower.
 A new answer field keeps the version. Each server sends its output schema with its answers.
 

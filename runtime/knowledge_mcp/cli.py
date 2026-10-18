@@ -559,7 +559,7 @@ def setup(harness: str, remove: bool) -> None:
         "kb never opens the file, so the file can be missing. "
         "Its folder must exist. Each lookup adds a line to log.jsonl "
         "in the state folder."
-        "\n\nProposed folders and names follow saved files of the same document type. "
+        "\n\nProposed folders and names follow conventions or typed peers. "
         "Both proposal columns show <none> when no proposal applies."
         "\n\nColumns: TYPE SPEC MATCHED-BY USED-BY PROPOSED-FOLDER PROPOSED-NAME TITLE."
     ),
@@ -567,6 +567,17 @@ def setup(harness: str, remove: bool) -> None:
         (
             "Show the document type of an RFC written for maintainers",
             ("kb type docs/rfcs/0042-cache.md --role maintainer",),
+        ),
+        (
+            "Supply a project property and document title for a saved convention",
+            (
+                "kb type inbox/cache.md --filing-values "
+                "'[" + '{"path":"inbox/cache.md",'
+                '"universe_spec":"product-development",'
+                '"document_type":"decision-record",'
+                '"properties":{"project":"Atlas"},'
+                '"content":"Use a shared cache"}' + "]'",
+            ),
         ),
     ],
 )
@@ -596,11 +607,44 @@ def setup(harness: str, remove: bool) -> None:
     is_flag=True,
     help="Print the kb_get_document_type answer as JSON",
 )
-def type_(path: Path, role: str | None, root: Path | None, as_json: bool) -> None:
+@click.option(
+    "--filing-values",
+    metavar="<json>",
+    help="Supply naming properties and content values as a JSON array",
+)
+def type_(
+    path: Path,
+    role: str | None,
+    root: Path | None,
+    as_json: bool,
+    filing_values: str | None,
+) -> None:
     from knowledge_mcp import local_type
 
+    supplied = None
+    if filing_values is not None:
+        try:
+            supplied = json.loads(filing_values)
+        except ValueError:
+            message = "Pass --filing-values a JSON array of naming values."
+            raise UsageFault(
+                message,
+                "Correct the JSON array, then resend --filing-values. "
+                "Run kb type --help for a complete example.",
+            ) from None
+        if not isinstance(supplied, list) or any(
+            not isinstance(v, dict) for v in supplied
+        ):
+            message = "Pass --filing-values a JSON array of naming values."
+            raise UsageFault(
+                message,
+                "Correct the JSON array, then resend --filing-values. "
+                "Run kb type --help for a complete example.",
+            )
     try:
-        text, failed = local_type.document_type(path, root=root, role=role)
+        text, failed = local_type.document_type(
+            path, root=root, role=role, filing_values=supplied
+        )
     except ValueError as error:
         raise KbError(str(error)) from error
     answer = json.loads(text)
@@ -619,6 +663,12 @@ def type_(path: Path, role: str | None, root: Path | None, as_json: bool) -> Non
             if answer["type"].endswith("internal-error")
             else f"Correct the reported file or value, then run {command} again."
         )
+        fix = (
+            "Correct the naming values and repeat the original command with "
+            "--filing-values and the same flags. Run kb type --help for an example."
+            if answer["type"].endswith("filing-values-invalid")
+            else fix
+        )
         raise ToolFault(answer, fix)
     if answer["every_document_type"] is not None:
         click.echo(
@@ -628,6 +678,18 @@ def type_(path: Path, role: str | None, root: Path | None, as_json: bool) -> Non
     if as_json:
         _json(answer)
     else:
+        for assessment in answer.get("filing", []):
+            if assessment["status"] == "values_needed":
+                names = [v["name"] for v in assessment["needed"]]
+                needed = (
+                    names[0]
+                    if len(names) == 1
+                    else ", ".join(names[:-1]) + " and " + names[-1]
+                )
+                click.echo(
+                    f"Naming needs {needed}. Supply the values with --filing-values.",
+                    err=True,
+                )
         _type_table(
             answer,
             local_type.type_catalog(path, root, role)

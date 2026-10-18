@@ -113,7 +113,13 @@ def _invalid_arguments(tool: str, error: ValidationError) -> Error:
     detail = f"Invalid arguments for {tool}. " + " ".join(
         f"{message}." for message, _ in found
     )
-    return Error(detail, code="argument-invalid", errors=found)
+    code = (
+        "conventions-invalid"
+        if tool == "kb_prepare_conventions"
+        and any(place.startswith("#/changes/") for _, place in found)
+        else "argument-invalid"
+    )
+    return Error(detail, code=code, errors=found)
 
 
 def from_exception(error: BaseException, tool: str) -> Error:

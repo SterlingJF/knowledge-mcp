@@ -1,0 +1,28 @@
+---
+schema: knowledge-mcp/conventions-update/1
+location: ~/notes
+file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+status: permission_needed
+based_on: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+current: []
+changes:
+  - change: upsert
+    universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    folder:
+      - Proposals
+    name:
+      separator: " "
+      case: as-written
+      parts:
+        - part: content
+    content:
+      label: document title
+      instruction: Read the first document heading.
+    set_by: person
+allowed_by: null
+record: null
+digest: null
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

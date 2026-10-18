@@ -805,6 +805,7 @@ class TestCommands:
                         root, "docs/rfcs/0042-cache.md", role="maintainer"
                     ),
                     "listing": [{"path": "docs/rfcs/0042-cache.md"}],
+                    "conventions": "",
                 },
             )
 

@@ -8,6 +8,7 @@ from mcp.server import MCPServer
 from mcp.types import CallToolResult, ToolAnnotations
 from pydantic import Field
 
+from knowledge_mcp import conventions as naming
 from knowledge_mcp import document_type, filing, problems
 from knowledge_mcp import document_types as records
 from knowledge_mcp.models import (
@@ -17,11 +18,13 @@ from knowledge_mcp.models import (
     KnowledgeBusFolder,
     ListedFile,
 )
+from knowledge_mcp.models_auto.common_schema import FilingValue
 from knowledge_mcp.models_auto.document_types_update_schema import (
     DocumentTypesUpdateAnswer,
 )
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
+from knowledge_mcp.tools.conventions import ConventionsDigest, ConventionsText
 from knowledge_mcp.tools.document_type import (
     RecordDigest,
     RecordText,
@@ -29,7 +32,7 @@ from knowledge_mcp.tools.document_type import (
 from knowledge_mcp.type_scope import Scopes
 
 DESCRIPTION = """\
-Prepare document-types text from `record` or `record_digest`, file changes and `entries`, returning changed entries, proposed names and folders, and files needing a document type. Include `allowed_by` to receive text when entries change or migration requires saving. Appends the answer to `log.jsonl` and opens no knowledge-base file.
+Prepare document-types text and filing assessments from supplied configuration, file changes and entries. Include `allowed_by` to receive changed text. Append the answer to `log.jsonl` and open no knowledge-base file.
 """
 
 MIGRATED = (
@@ -97,13 +100,19 @@ class Request:
     entries: list[EntryItem]
     recheck: bool
     allowed_by: AllowedBy | None
+    conventions: str | None = None
+    conventions_digest: str | None = None
+    filing_values: list[FilingValue] | None = None
 
 
 def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
+    convention = naming.Filing.read(
+        workspace, sent.conventions, sent.conventions_digest, sent.filing_values
+    )
     files = records.parse(text)
     migrated = records.is_old(text)
     based_on = workspace.remember(text)
-    scopes = Scopes(workspace, sent.folders)
+    scopes = Scopes(workspace, sent.folders, conventions=convention)
     from_listing = _listing_events(files, sent.listing)
     merged = records.merge(
         files,
@@ -123,7 +132,11 @@ def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
     for path, entry in merged.files.items():
         universe, kind, _ = records.named(entry)
         assessments[(path, universe or "", kind or "")] = filing.assess(
-            path, (universe, kind), merged.files, listing=current, scopes=scopes
+            path,
+            (universe, kind),
+            merged.files,
+            listing=current,
+            scopes=scopes,
         )
     for item in to_settle:
         scope = scopes.at(item["path"])
@@ -170,6 +183,8 @@ def _merge(workspace: Workspace, text: str, sent: Request) -> dict[str, Any]:
         ],
         "received": list(scopes.received.values()),
     }
+    if sent.conventions is not None:
+        result["received"].append({"name": naming.PLACE, "digest": convention.digest})
     if from_listing is not None:
         result["listing_changes"] = [records.as_change(event) for event in from_listing]
     if changed and sent.allowed_by is None:
@@ -246,6 +261,9 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             ),
         ] = None,
         allowed_by: AllowedBy | None = None,
+        conventions: ConventionsText = None,
+        conventions_digest: ConventionsDigest = None,
+        filing_values: list[FilingValue] | None = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
@@ -257,6 +275,9 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             entries=entries,
             recheck=recheck,
             allowed_by=allowed_by,
+            conventions=conventions,
+            conventions_digest=conventions_digest,
+            filing_values=filing_values,
         )
         text = records.received_text(record, record_digest, workspace.recall)
         sent = Request(
@@ -267,6 +288,9 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             entries=entries or [],
             recheck=bool(recheck),
             allowed_by=allowed_by,
+            conventions=conventions,
+            conventions_digest=conventions_digest,
+            filing_values=filing_values,
         )
         result = _merge(workspace, text, sent)
         if record is not None:

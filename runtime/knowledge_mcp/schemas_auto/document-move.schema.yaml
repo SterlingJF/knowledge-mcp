@@ -188,6 +188,241 @@ $defs:
         minimum: 0
       detail: *id001
     additionalProperties: false
+  conventions.schema.yaml:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    $id: conventions.schema.yaml
+    title: Naming and filing conventions
+    description: Saved conventions for document types at the knowledge-base root.
+    type: object
+    required:
+      - schema
+      - from_parent
+      - conventions
+    properties:
+      schema:
+        const: knowledge-mcp/conventions/1
+      from_parent:
+        type: array
+        items:
+          $ref: "#/$defs/reference"
+      conventions:
+        type: array
+        items:
+          $ref: "#/$defs/saved_convention"
+    additionalProperties: false
+    $defs:
+      part:
+        title: Convention part
+        oneOf:
+          - title: Convention document type part
+            type: object
+            required:
+              - part
+            properties:
+              part:
+                const: document_type
+            additionalProperties: false
+          - title: Convention date part
+            type: object
+            required:
+              - part
+              - property
+              - format
+            properties:
+              part:
+                const: date
+              property:
+                type: string
+                minLength: 1
+              format:
+                enum:
+                  - YYYY-MM-DD
+                  - YYYY-MM
+                  - YYYY
+            additionalProperties: false
+          - title: Convention property part
+            type: object
+            required:
+              - part
+              - property
+            properties:
+              part:
+                const: property
+              property:
+                type: string
+                minLength: 1
+            additionalProperties: false
+          - title: Convention content part
+            type: object
+            required:
+              - part
+            properties:
+              part:
+                const: content
+            additionalProperties: false
+          - title: Convention literal part
+            type: object
+            required:
+              - part
+              - value
+            properties:
+              part:
+                const: literal
+              value:
+                $ref: "#/$defs/segment"
+            additionalProperties: false
+      name:
+        title: Convention name
+        type: object
+        required:
+          - separator
+          - parts
+        properties:
+          separator:
+            enum:
+              - " "
+              - "-"
+              - _
+          case:
+            default: as-written
+            enum:
+              - as-written
+              - lower
+          parts:
+            type: array
+            minItems: 1
+            items:
+              $ref: "#/$defs/part"
+        additionalProperties: false
+      content:
+        title: Convention content
+        type: object
+        required:
+          - label
+          - instruction
+        properties:
+          label:
+            type: string
+            minLength: 1
+          instruction:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      reference:
+        title: Convention reference
+        type: object
+        required:
+          - universe_spec
+          - document_type
+        properties:
+          universe_spec:
+            type: string
+            minLength: 1
+          document_type:
+            type: string
+            minLength: 1
+        additionalProperties: false
+      saved_convention:
+        title: Saved convention
+        type: object
+        if:
+          type: object
+          anyOf:
+            - type: object
+              required:
+                - folder
+              properties:
+                folder:
+                  type: array
+                  contains:
+                    type: object
+                    required:
+                      - part
+                    properties:
+                      part:
+                        const: content
+            - type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: object
+                  required:
+                    - parts
+                  properties:
+                    parts:
+                      type: array
+                      contains:
+                        type: object
+                        required:
+                          - part
+                        properties:
+                          part:
+                            const: content
+        then:
+          type: object
+          required:
+            - content
+          properties:
+            content:
+              $ref: "#/$defs/content"
+        else:
+          type: object
+          not:
+            required:
+              - content
+            properties:
+              content: true
+        required:
+          - universe_spec
+          - document_type
+          - folder
+          - name
+          - set_by
+          - allowed_by
+          - time
+        properties:
+          universe_spec:
+            type: string
+            minLength: 1
+          document_type:
+            type: string
+            minLength: 1
+          folder:
+            type: array
+            items:
+              anyOf:
+                - $ref: "#/$defs/segment"
+                - $ref: "#/$defs/part"
+          name:
+            $ref: "#/$defs/name"
+          content:
+            $ref: "#/$defs/content"
+          set_by:
+            $ref: document-types.schema.yaml#/$defs/set_by
+          allowed_by:
+            $ref: document-types.schema.yaml#/$defs/allowed_by
+          time:
+            $ref: common.schema.yaml#/$defs/time
+        additionalProperties: false
+      segment:
+        title: Convention segment
+        type: string
+        not:
+          enum:
+            - .
+            - ..
+            - .knowledge-bus
+            - .obsidian
+            - .git
+            - node_modules
+            - .venv
+            - __pycache__
+            - .mypy_cache
+            - .pytest_cache
+            - .ruff_cache
+        pattern: ^[^#|^:/\\\[\]\u0000-\u001f\u007f-\u009f]+$
+        minLength: 1
   common.schema.yaml:
     $schema: https://json-schema.org/draft/2020-12/schema
     $id: common.schema.yaml
@@ -475,12 +710,13 @@ $defs:
           path:
             $ref: "#/$defs/path"
           folder_new:
-            const: false
+            type: boolean
           name_style:
             enum:
               - lower-kebab
               - lower-snake
               - unchanged
+              - convention
           evidence:
             type: array
             items:
@@ -495,6 +731,11 @@ $defs:
         type: object
         oneOf:
           - type: object
+            not:
+              required:
+                - needed
+              properties:
+                needed: true
             required:
               - status
               - proposal
@@ -512,6 +753,11 @@ $defs:
                 type: string
                 minLength: 1
           - type: object
+            not:
+              required:
+                - needed
+              properties:
+                needed: true
             required:
               - status
               - proposal
@@ -534,6 +780,11 @@ $defs:
                 type: string
                 minLength: 1
           - type: object
+            not:
+              required:
+                - needed
+              properties:
+                needed: true
             required:
               - status
               - proposal
@@ -550,6 +801,32 @@ $defs:
                 type: "null"
               document_type:
                 type: "null"
+          - type: object
+            required:
+              - status
+              - proposal
+              - universe_spec
+              - document_type
+              - needed
+              - convention
+            properties:
+              status:
+                const: values_needed
+              proposal:
+                type: "null"
+              universe_spec:
+                type: string
+                minLength: 1
+              document_type:
+                type: string
+                minLength: 1
+              needed:
+                type: array
+                minItems: 1
+                items:
+                  $ref: "#/$defs/needed_value"
+              convention:
+                $ref: "#/$defs/convention_source"
         required:
           - path
           - universe_spec
@@ -577,10 +854,18 @@ $defs:
               - listing_needed
               - evidence_incomplete
               - destination_occupied
+              - values_needed
           proposal:
             anyOf:
               - $ref: "#/$defs/filing_proposal"
               - type: "null"
+          convention:
+            $ref: "#/$defs/convention_source"
+          needed:
+            type: array
+            minItems: 1
+            items:
+              $ref: "#/$defs/needed_value"
         additionalProperties: false
       move_path:
         title: Move path
@@ -621,6 +906,63 @@ $defs:
             minimum: 0
           target_path:
             $ref: "#/$defs/move_path"
+        additionalProperties: false
+      filing_value:
+        title: Filing value
+        type: object
+        required:
+          - path
+          - universe_spec
+          - document_type
+        properties:
+          path:
+            $ref: "#/$defs/path"
+          universe_spec:
+            type: string
+            minLength: 1
+          document_type:
+            type: string
+            minLength: 1
+          properties:
+            default: {}
+            type: object
+            additionalProperties:
+              type: string
+          content:
+            type: string
+        additionalProperties: false
+      convention_source:
+        title: Convention source
+        type: object
+        required:
+          - file
+          - folder
+          - digest
+          - definition
+        properties:
+          file:
+            const: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+          folder:
+            const: ""
+          digest:
+            $ref: "#/$defs/digest"
+          definition:
+            $ref: conventions.schema.yaml#/$defs/saved_convention
+        additionalProperties: false
+      needed_value:
+        title: Needed value
+        type: object
+        required:
+          - source
+          - name
+        properties:
+          source:
+            enum:
+              - property
+              - content
+          name:
+            type: string
+            minLength: 1
         additionalProperties: false
   document-types.schema.yaml:
     $schema: https://json-schema.org/draft/2020-12/schema
@@ -796,6 +1138,12 @@ $defs:
             const: https://github.com/SterlingJF/knowledge-mcp/problems/move-invalid
           - title: Incomplete move input
             const: https://github.com/SterlingJF/knowledge-mcp/problems/move-input-incomplete
+          - title: Invalid conventions
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-invalid
+          - title: Unsupported conventions
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-unsupported
+          - title: Invalid filing values
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid
       title:
         type: string
       detail:

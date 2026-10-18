@@ -1,0 +1,225 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: conventions.schema.yaml
+title: Naming and filing conventions
+description: Saved conventions for document types at the knowledge-base root.
+type: object
+additionalProperties: false
+required:
+  - schema
+  - from_parent
+  - conventions
+properties:
+  schema:
+    const: knowledge-mcp/conventions/1
+  from_parent:
+    type: array
+    items:
+      $ref: "#/$defs/reference"
+  conventions:
+    type: array
+    items:
+      $ref: "#/$defs/saved_convention"
+$defs:
+  part:
+    title: Convention part
+    oneOf:
+      - title: Convention document type part
+        type: object
+        additionalProperties: false
+        required:
+          - part
+        properties:
+          part:
+            const: document_type
+      - title: Convention date part
+        type: object
+        additionalProperties: false
+        required:
+          - part
+          - property
+          - format
+        properties:
+          part:
+            const: date
+          property:
+            type: string
+            minLength: 1
+          format:
+            enum:
+              - YYYY-MM-DD
+              - YYYY-MM
+              - YYYY
+      - title: Convention property part
+        type: object
+        additionalProperties: false
+        required:
+          - part
+          - property
+        properties:
+          part:
+            const: property
+          property:
+            type: string
+            minLength: 1
+      - title: Convention content part
+        type: object
+        additionalProperties: false
+        required:
+          - part
+        properties:
+          part:
+            const: content
+      - title: Convention literal part
+        type: object
+        additionalProperties: false
+        required:
+          - part
+          - value
+        properties:
+          part:
+            const: literal
+          value:
+            $ref: "#/$defs/segment"
+  name:
+    title: Convention name
+    type: object
+    additionalProperties: false
+    required:
+      - separator
+      - parts
+    properties:
+      separator:
+        enum:
+          - " "
+          - "-"
+          - _
+      case:
+        enum:
+          - as-written
+          - lower
+        default: as-written
+      parts:
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/part"
+  content:
+    title: Convention content
+    type: object
+    additionalProperties: false
+    required:
+      - label
+      - instruction
+    properties:
+      label:
+        type: string
+        minLength: 1
+      instruction:
+        type: string
+        minLength: 1
+  reference:
+    title: Convention reference
+    type: object
+    additionalProperties: false
+    required:
+      - universe_spec
+      - document_type
+    properties:
+      universe_spec: &id001
+        type: string
+        minLength: 1
+      document_type: &id002
+        type: string
+        minLength: 1
+  saved_convention:
+    title: Saved convention
+    type: object
+    additionalProperties: false
+    required:
+      - universe_spec
+      - document_type
+      - folder
+      - name
+      - set_by
+      - allowed_by
+      - time
+    properties:
+      universe_spec: *id001
+      document_type: *id002
+      folder:
+        type: array
+        items:
+          anyOf:
+            - $ref: "#/$defs/segment"
+            - $ref: "#/$defs/part"
+      name:
+        $ref: "#/$defs/name"
+      content:
+        $ref: "#/$defs/content"
+      set_by:
+        $ref: document-types.schema.yaml#/$defs/set_by
+      allowed_by:
+        $ref: document-types.schema.yaml#/$defs/allowed_by
+      time:
+        $ref: common.schema.yaml#/$defs/time
+    if:
+      type: object
+      anyOf:
+        - type: object
+          required:
+            - folder
+          properties:
+            folder:
+              type: array
+              contains: &id003
+                type: object
+                required:
+                  - part
+                properties:
+                  part:
+                    const: content
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: object
+              required:
+                - parts
+              properties:
+                parts:
+                  type: array
+                  contains: *id003
+    then:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          $ref: "#/$defs/content"
+    else:
+      type: object
+      not:
+        required:
+          - content
+        properties:
+          content: true
+  segment:
+    title: Convention segment
+    type: string
+    minLength: 1
+    pattern: ^[^#|^:/\\\[\]\u0000-\u001f\u007f-\u009f]+$
+    not:
+      enum:
+        - .
+        - ..
+        - .knowledge-bus
+        - .obsidian
+        - .git
+        - node_modules
+        - .venv
+        - __pycache__
+        - .mypy_cache
+        - .pytest_cache
+        - .ruff_cache

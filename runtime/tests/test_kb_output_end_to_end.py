@@ -335,6 +335,7 @@ def test_type_table_pipe_terminal_json_and_mcp_share_the_answer(tmp_path):
                 **type_arguments(root, "docs/rfcs/design-proposal.md"),
                 "role": "maintainer",
                 "listing": [{"path": "docs/rfcs/design-proposal.md"}],
+                "conventions": "",
             },
         )
         assert not result.is_error

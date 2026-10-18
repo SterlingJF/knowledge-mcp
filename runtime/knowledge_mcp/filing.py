@@ -131,6 +131,10 @@ def assess(
     )
     if universe is None or kind is None:
         return _untyped(result, path, files)
+    if scopes.conventions is not None:
+        assessed = scopes.conventions.assess(result, listing)
+        if assessed is not None:
+            return assessed
     if listing is None:
         result["status"] = "listing_needed"
         return result

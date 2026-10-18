@@ -10,6 +10,7 @@ from typing import Any
 import pytest
 import yaml
 
+from knowledge_mcp import document_types as records
 from tests.document_types_harness import Harness, KnowledgeBase
 from tests.harness import (
     BUNDLED,
@@ -41,6 +42,8 @@ from tests.kb_cli import (
     run_kb,
     run_kbp,
 )
+from tests.test_conventions_end_to_end import PLACE, stored
+from tests.test_filing_end_to_end import typed as convention_entry
 from tests.test_kb_end_to_end import fixture_home, snapshot
 
 RFC = "docs/rfcs/0042-cache.md"
@@ -70,7 +73,11 @@ APPROVED_HELP: dict[tuple[str, ...], tuple[set[str], set[str], set[str]]] = {
     (): (set(COMMANDS), {"--help", "--version"}, set()),
     ("mcp",): (set(), {"--help"}, set()),
     ("setup",): (set(), {"--help", "--remove"}, set()),
-    ("type",): (set(), {"--help", "--role", "--root", "--json"}, set()),
+    ("type",): (
+        set(),
+        {"--help", "--role", "--root", "--json", "--filing-values"},
+        set(),
+    ),
     ("doctor",): (set(), {"--help", "--verbose", "--json"}, set()),
     ("kbp",): (set(KBP_MODES), {"--help", "--version"}, set()),
     **{("kbp", mode): (set(), {"--help"}, set()) for mode in KBP_MODE_FLAGS},
@@ -121,7 +128,12 @@ def test_kb_type_and_the_get_document_type_tool_rank_by_the_role_given(tmp_path)
         for role in by_role:
             result = await client.call_tool(
                 "kb_get_document_type",
-                {**type_arguments(root, RFC), "role": role, "listing": [{"path": RFC}]},
+                {
+                    **type_arguments(root, RFC),
+                    "role": role,
+                    "listing": [{"path": RFC}],
+                    "conventions": "",
+                },
             )
             assert not result.is_error, texts(result)
             found[role] = json.loads(texts(result)[0])
@@ -202,8 +214,11 @@ def test_the_fit_command_and_the_hat_and_top_flags_give_way_to_type_role_and_roo
 
 
 def test_the_kb_type_help_example_runs_where_its_folder_exists(tmp_path):
-    root = knowledge_base(tmp_path / "codebase", {"": [CODEBASE]})
+    root = knowledge_base(tmp_path / "codebase", {"": [CODEBASE, PRODUCT]})
     (root / Path(RFC).parent).mkdir(parents=True)
+    (root / "inbox").mkdir()
+    write(root, PLACE, stored())
+    write(root, DOCUMENT_TYPES, records.dump({"inbox/cache.md": convention_entry()}))
     home = tmp_path / "home"
     home.mkdir()
     page = run_kb(home, "type", "--help").stdout
@@ -219,8 +234,16 @@ def test_the_kb_type_help_example_runs_where_its_folder_exists(tmp_path):
     for example in examples:
         done = run_kb(home, *shlex.split(example)[1:], *flag, cwd=root)
         assert done.returncode == 0, example + "\n" + done.stdout + done.stderr
-        assert json.loads(done.stdout)["candidates"], done.stdout
+        answer = json.loads(done.stdout)
+        if "--filing-values" in shlex.split(example):
+            assert (
+                answer["filing"][0]["proposal"]["path"]
+                == "Decisions/Use a shared cache.md"
+            )
+        else:
+            assert answer["candidates"], done.stdout
     assert not (root / RFC).exists()
+    assert not (root / "inbox/cache.md").exists()
 
 
 def test_kb_type_reads_a_path_through_a_parent_folder_as_the_folder_it_names(tmp_path):
@@ -284,6 +307,7 @@ def test_setup_remove_restores_home_with_the_flag_on_either_side(tmp_path, remov
 
 
 APPROVED_TOOLS = {
+    "kb_prepare_conventions",
     "kb_prepare_document_move",
     "kb_get_document_type",
     "kb_list_audiences",
@@ -301,6 +325,7 @@ APPROVED_TOOLS = {
     "kbp_card",
 }
 NAMED_VERBS = {
+    "kb_prepare_conventions": "Prepare",
     "kb_prepare_document_move": "Prepare",
     "kb_get_document_type": "Get",
     "kb_list_audiences": "List",
@@ -356,6 +381,10 @@ def tool(server: dict[str, Any], name: str) -> Any:
 
 def test_mcp_lists_the_approved_tool_names(server):
     assert set(server["tools"]) == APPROVED_TOOLS
+    assert (
+        tool(server, "kb_prepare_conventions").title
+        == "Prepare naming and filing conventions"
+    )
     assert tool(server, "kb_prepare_document_move").title == "Prepare a document move"
 
 

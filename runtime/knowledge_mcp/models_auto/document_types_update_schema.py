@@ -2,16 +2,28 @@
 
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
-from . import common_schema, document_types_schema, problem_schema
+from ._internal import (
+    Candidate,
+    Digest,
+    Entry,
+    FileChange,
+    FilingAssessment,
+    Location,
+    Path,
+    Received,
+    SpecInScope,
+    TypeGroup,
+)
+from . import problem_schema
 
 
 class Scope(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    universe_specs: list[common_schema.SpecInScope]
+    universe_specs: list[SpecInScope]
     every_document_type: Annotated[
-        list[common_schema.TypeGroup] | None,
+        list[TypeGroup] | None,
         Field(
             description="Null unless a `to_settle` file references this group through `scope` and has no candidate matching its file name."
         ),
@@ -22,16 +34,16 @@ class ChangedEntry(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    path: common_schema.Path
+    path: Path
     change: Annotated[
         Literal["settled", "corrected", "moved", "deleted", "kept", "fingerprint"],
         Field(
             description="knowledge-mcp retains every classification field when the universe spec and document type apply at the destination. After a conflicting move, knowledge-mcp retains the original entry and lists the destination in to_settle. Other values name classification, deletion or fingerprint updates."
         ),
     ]
-    old_path: common_schema.Path | None = None
-    entry: document_types_schema.Entry | None = None
-    was: document_types_schema.Entry | None = None
+    old_path: Path | None = None
+    entry: Entry | None = None
+    was: Entry | None = None
     note: str | None = None
 
 
@@ -39,11 +51,11 @@ class FileToSettle(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    path: common_schema.Path
+    path: Path
     scope: Annotated[int, Field(description="The index into `scopes`.", ge=0)]
-    candidates: list[common_schema.Candidate]
-    old_path: common_schema.Path | None = None
-    was: document_types_schema.Entry | None = None
+    candidates: list[Candidate]
+    old_path: Path | None = None
+    was: Entry | None = None
 
 
 class DocumentTypesUpdateAnswer(BaseModel):
@@ -53,9 +65,9 @@ class DocumentTypesUpdateAnswer(BaseModel):
     schema_: Annotated[
         Literal["knowledge-mcp/document-types-update/1"], Field(alias="schema")
     ]
-    location: common_schema.Location
+    location: Location
     based_on: Annotated[
-        common_schema.Digest,
+        Digest,
         Field(
             description="Digest of the document-types text sent as `record`, or named by `record_digest`."
         ),
@@ -80,7 +92,7 @@ class DocumentTypesUpdateAnswer(BaseModel):
         ),
     ] = None
     listing_changes: Annotated[
-        list[common_schema.FileChange] | None,
+        list[FileChange] | None,
         Field(
             description="File changes that knowledge-mcp found by comparing `listing` with the entries. Present only when the call sent `listing`."
         ),
@@ -98,8 +110,8 @@ class DocumentTypesUpdateAnswer(BaseModel):
             description="Groups of universe specs that apply, one group for each set of sent `.knowledge-bus/` folders above a file."
         ),
     ]
-    received: common_schema.Received
-    filing: list[common_schema.FilingAssessment]
+    received: Received
+    filing: list[FilingAssessment]
 
 
 type KbPrepareDocumentTypesResult = Annotated[

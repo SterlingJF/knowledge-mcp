@@ -2,7 +2,8 @@
 
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
-from . import common_schema, problem_schema
+from ._internal import Location, Received, SpecInScope
+from . import problem_schema
 
 
 class ElementQuestion(BaseModel):
@@ -74,10 +75,9 @@ class ImportAnswer(BaseModel):
         extra="forbid",
     )
     schema_: Annotated[Literal["knowledge-mcp/import/1"], Field(alias="schema")]
-    location: common_schema.Location
+    location: Location
     universe_specs: Annotated[
-        list[common_schema.SpecInScope],
-        Field(description="In kbp_kinds order.", min_length=1),
+        list[SpecInScope], Field(description="In kbp_kinds order.", min_length=1)
     ]
     document_types: Annotated[
         list[ImportDocumentType],
@@ -86,7 +86,7 @@ class ImportAnswer(BaseModel):
     passages: Annotated[
         list[Passage], Field(description="In document order.", min_length=1)
     ]
-    received: common_schema.Received
+    received: Received
 
 
 type KbPrepareImportResult = Annotated[

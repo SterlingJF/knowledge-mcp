@@ -37,6 +37,9 @@ class ProblemDetails(BaseModel):
         "https://github.com/SterlingJF/knowledge-mcp/problems/internal-error",
         "https://github.com/SterlingJF/knowledge-mcp/problems/move-invalid",
         "https://github.com/SterlingJF/knowledge-mcp/problems/move-input-incomplete",
+        "https://github.com/SterlingJF/knowledge-mcp/problems/conventions-invalid",
+        "https://github.com/SterlingJF/knowledge-mcp/problems/conventions-unsupported",
+        "https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid",
     ]
     title: str
     detail: Annotated[

@@ -4,6 +4,9 @@
 
 ### Added
 
+- `kb_prepare_conventions` prepares the conventions file: a folder and a name pattern per document type.
+- Filing proposals follow a saved convention and list any value the agent still has to supply.
+- `kb type --filing-values` takes the values a convention needs.
 - `kb_get_document_type` and `kb_prepare_document_types` answers include `filing`: a proposed folder and name, based on where files of the same document type already live.
 - `kb_prepare_document_move` prepares an accepted move or rename, with the new text of every note whose links change. An ambiguous link blocks the move.
 - `kb type` shows the proposed folder and name.

@@ -2,7 +2,8 @@
 
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
-from . import common_schema, problem_schema
+from ._internal import Location, Received, SpecInScope
+from . import problem_schema
 
 
 class AudienceFrame(BaseModel):
@@ -34,7 +35,7 @@ class AudiencesAnswer(BaseModel):
         extra="forbid",
     )
     schema_: Annotated[Literal["knowledge-mcp/audiences/1"], Field(alias="schema")]
-    location: common_schema.Location
+    location: Location
     universe_spec: Annotated[
         str,
         Field(
@@ -43,7 +44,7 @@ class AudiencesAnswer(BaseModel):
         ),
     ]
     universe_specs: Annotated[
-        list[common_schema.SpecInScope],
+        list[SpecInScope],
         Field(
             description="The universe spec named by `universe_spec`.",
             max_length=1,
@@ -65,7 +66,7 @@ class AudiencesAnswer(BaseModel):
     choices: Annotated[
         list[AudienceChoice], Field(description="In universe spec order.")
     ]
-    received: common_schema.Received
+    received: Received
 
 
 type KbListAudiencesResult = Annotated[

@@ -1,0 +1,72 @@
+---
+schema: knowledge-mcp/document-type/1
+location: ~/notes/docs/rfcs/0042-cache.md
+universe_specs:
+  - id: codebase-recordkeeping
+    version: "0.1"
+    source: bundled copy at v0.10.0
+    from_parent: false
+  - id: product-development
+    version: "0.9"
+    source: bundled copy at v0.10.0
+    from_parent: false
+candidates: []
+every_document_type: null
+recorded:
+  path: docs/rfcs/0042-cache.md
+  label: from the document-types file
+  entry:
+    universe_spec: codebase-recordkeeping
+    version: "0.1"
+    document_type: design-proposal
+    set_by: agent
+    allowed_by:
+      basis: instruction
+      text:
+        Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
+        date as you work.
+      location: AGENTS.md
+    time: "2026-10-18T09:13:51.812Z"
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:254c9d9b1e0c23210d457077093af2ff130050d088d122464bdfd3151a1b77b3
+  - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+    digest: sha256:26e1a2e3eb624c01072a1e666fbe8e50c40fff8a398cf06a55123d795cbd0dcb
+filing:
+  - path: docs/rfcs/0042-cache.md
+    universe_spec: codebase-recordkeeping
+    document_type: design-proposal
+    status: proposed
+    proposal:
+      folder: Proposals
+      name: Shared Cache.md
+      path: Proposals/Shared Cache.md
+      folder_new: true
+      name_style: convention
+      evidence: []
+      folder_counts: []
+    convention:
+      file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder: ""
+      digest: sha256:26e1a2e3eb624c01072a1e666fbe8e50c40fff8a398cf06a55123d795cbd0dcb
+      definition:
+        universe_spec: codebase-recordkeeping
+        document_type: design-proposal
+        folder:
+          - Proposals
+        name:
+          separator: " "
+          case: as-written
+          parts:
+            - part: content
+        content:
+          label: document title
+          instruction: Read the first document heading.
+        set_by: person
+        allowed_by:
+          basis: instruction
+          text:
+            Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up
+            to date as you work.
+          location: AGENTS.md
+        time: "2026-10-18T09:13:54.666110Z"

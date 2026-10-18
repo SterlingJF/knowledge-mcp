@@ -187,6 +187,100 @@ def story(client: Client) -> Any:
                 "search": needed["search"],
             },
         )
+        empty = await ask(
+            "conventions-update.empty",
+            "kb_prepare_conventions",
+            {"location": NOTES, "conventions": ""},
+        )
+        answers["conventions.empty"] = {
+            "schema": "knowledge-mcp/conventions/1",
+            "from_parent": [],
+            "conventions": empty["current"],
+        }
+        convention = {
+            "change": "upsert",
+            "universe_spec": CODEBASE,
+            "document_type": "design-proposal",
+            "folder": ["Proposals"],
+            "name": {"separator": " ", "parts": [{"part": "content"}]},
+            "content": {
+                "label": "document title",
+                "instruction": "Read the first document heading.",
+            },
+            "set_by": "person",
+        }
+        convention_args = {**update, "conventions": "", "changes": [convention]}
+        await ask(
+            "conventions-update.permission-needed",
+            "kb_prepare_conventions",
+            convention_args,
+        )
+        saved_conventions = await ask(
+            "conventions-update.saved",
+            "kb_prepare_conventions",
+            {**convention_args, "allowed_by": INSTRUCTION},
+        )
+        conventions_text = saved_conventions["record"]
+        answers["conventions.saved"] = yaml.safe_load(conventions_text)
+        naming = {
+            "conventions": conventions_text,
+            "filing_values": [
+                {
+                    "path": RFC,
+                    "universe_spec": CODEBASE,
+                    "document_type": "design-proposal",
+                    "content": "Shared Cache",
+                }
+            ],
+        }
+        await ask(
+            "document-type.convention",
+            "kb_get_document_type",
+            {
+                **document(RFC),
+                "name": Path(RFC).name,
+                "record": record,
+                "listing": [{"path": RFC}],
+                **naming,
+            },
+        )
+        await ask(
+            "document-type.convention-values-needed",
+            "kb_get_document_type",
+            {
+                **document(RFC),
+                "name": Path(RFC).name,
+                "record": record,
+                "listing": [{"path": RFC}],
+                "conventions": conventions_text,
+            },
+        )
+        await ask(
+            "document-types-update.convention",
+            "kb_prepare_document_types",
+            {
+                **update,
+                "record": record,
+                "listing": [{"path": RFC}, {"path": IDEAS}],
+                **naming,
+            },
+        )
+        await ask(
+            "conventions-update.removed",
+            "kb_prepare_conventions",
+            {
+                **update,
+                "conventions": conventions_text,
+                "changes": [
+                    {
+                        "change": "remove",
+                        "universe_spec": CODEBASE,
+                        "document_type": "design-proposal",
+                    }
+                ],
+                "allowed_by": INSTRUCTION,
+            },
+        )
         await ask(
             "audiences.frame",
             "kb_list_audiences",
@@ -261,13 +355,18 @@ def masked(sample: str, answer: Any) -> Any:
             changes |= key == "id" and stem == "edits" and not top
             changes |= (
                 key in ("record", "digest", "based_on")
-                and stem == "document-types-update"
+                and stem in ("document-types-update", "conventions-update")
                 and top
             )
             changes |= stem == "document-move" and (
                 (top and key in ("record", "digest")) or key == "record_digest"
             )
-            changes |= key == "digest" and node.get("name") == RECORD
+            changes |= key == "digest" and (
+                node.get("name")
+                in (RECORD, ".knowledge-bus/plugins/knowledge-mcp/conventions.yaml")
+                or node.get("file")
+                == ".knowledge-bus/plugins/knowledge-mcp/conventions.yaml"
+            )
             found[key] = (
                 MASKED if changes and value is not None else mask(value, top=False)
             )

@@ -82,7 +82,7 @@ Give each module a README.md, a CI job and a map region under Project map. Add a
 
 ```text
 contracts/
-├── extensions/mcp/v1/               # Tool result, error and document-types schemas
+├── extensions/mcp/v1/               # Tool result, error and configuration schemas
 │   ├── *.schema.yaml                # JSON Schemas and shared definitions
 │   ├── tools.json                   # tools/list snapshot from the server
 │   └── conformance/                 # Pass and fail samples per schema

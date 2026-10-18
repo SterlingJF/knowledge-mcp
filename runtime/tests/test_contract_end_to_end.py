@@ -23,6 +23,9 @@ MODES = ["legacy", "auto"]
 
 BASE = "https://github.com/SterlingJF/knowledge-mcp/problems/"
 CODES = {
+    "conventions-invalid",
+    "conventions-unsupported",
+    "filing-values-invalid",
     "argument-invalid",
     "scope-invalid",
     "digest-unknown",
@@ -37,6 +40,7 @@ CODES = {
 PROBLEM_FIELDS = {"type", "title", "detail", "errors"}
 
 TAGS = {
+    "kb_prepare_conventions": "knowledge-mcp/conventions-update/1",
     "kb_get_document_type": "knowledge-mcp/document-type/1",
     "kb_list_audiences": "knowledge-mcp/audiences/1",
     "kb_prepare_import": "knowledge-mcp/import/1",
@@ -253,6 +257,7 @@ def test_each_kb_tool_answers_with_structured_content_equal_to_its_text(tmp_path
     """The text block supports clients that display text without structured content."""
     results = calls(
         tmp_path,
+        ("kb_prepare_conventions", {"location": NOTES, "conventions": ""}),
         ("kb_get_document_type", type_call()),
         ("kb_list_audiences", audiences_call("design-doc")),
         ("kb_prepare_import", import_call()),
@@ -289,12 +294,16 @@ def test_each_kb_tool_answers_with_structured_content_equal_to_its_text(tmp_path
 def test_the_two_folder_tools_take_one_folder_shape(tmp_path):
     listed = tools(tmp_path)
     shapes = []
-    for name in ("kb_get_document_type", "kb_prepare_document_types"):
+    for name in (
+        "kb_get_document_type",
+        "kb_prepare_document_types",
+        "kb_prepare_conventions",
+    ):
         schema = listed[name].input_schema
         assert "universe_specs" not in schema["properties"], name
         folders = resolved(schema, schema["properties"]["knowledge_bus_folders"])
         shapes.append(resolved(schema, folders["items"]))
-    assert shapes[0] == shapes[1]
+    assert all(shape == shapes[0] for shape in shapes)
 
     folders = [root_folder()]
     typed, prepared = calls(

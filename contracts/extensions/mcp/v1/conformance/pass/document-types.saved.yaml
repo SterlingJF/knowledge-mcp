@@ -12,7 +12,7 @@ files:
         Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
         date as you work.
       location: AGENTS.md
-    time: "2026-10-18T08:09:02.818Z"
+    time: "2026-10-18T09:13:51.812Z"
   ideas.txt:
     no_document_type: true
     set_by: agent
@@ -22,4 +22,4 @@ files:
         Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
         date as you work.
       location: AGENTS.md
-    time: "2026-10-18T08:09:02.818Z"
+    time: "2026-10-18T09:13:51.812Z"

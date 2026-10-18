@@ -2,7 +2,8 @@
 
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
-from . import common_schema, document_types_schema, problem_schema
+from ._internal import AllowedBy, Digest, EditId, Location, Time
+from . import problem_schema
 
 
 class Edit(BaseModel):
@@ -13,10 +14,10 @@ class Edit(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    id: common_schema.EditId
-    time: common_schema.Time
-    location: common_schema.Location
-    allowed_by: document_types_schema.AllowedBy
+    id: EditId
+    time: Time
+    location: Location
+    allowed_by: AllowedBy
     whole_file: Annotated[
         Literal[True] | None,
         Field(description="Present when `before` is the whole file."),
@@ -24,14 +25,14 @@ class Edit(BaseModel):
     before: Annotated[
         str, Field(description="The replaced text, or an empty string for a new file.")
     ]
-    before_digest: common_schema.Digest
+    before_digest: Digest
     after: Annotated[
         str | None,
         Field(
             description="Absent when the kb_record_edit call for a whole-file edit sent `after_digest` and no `after`."
         ),
     ] = None
-    after_digest: common_schema.Digest
+    after_digest: Digest
 
 
 class EditsAnswer(BaseModel):
@@ -43,7 +44,7 @@ class EditsAnswer(BaseModel):
         extra="forbid",
     )
     schema_: Annotated[Literal["knowledge-mcp/edits/1"], Field(alias="schema")]
-    location: common_schema.Location
+    location: Location
     edits: list[Edit]
 
 

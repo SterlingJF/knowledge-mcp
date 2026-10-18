@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from knowledge_mcp import document_types as records
 from knowledge_mcp import kbp, problems
 from knowledge_mcp.models import KnowledgeBusFolder, ScopeRequest
 from knowledge_mcp.scope import SENT, Rebuilt, ScopeError, Workspace
+
+if TYPE_CHECKING:
+    from knowledge_mcp.conventions import Filing
 
 
 def kinds_of(listing: dict[str, Any]) -> records.Kinds:
@@ -66,6 +69,7 @@ class Scopes:
     folders: list[KnowledgeBusFolder]
     found: dict[tuple[tuple[str, ...], ...], Scope] = field(default_factory=dict)
     received: dict[str, dict[str, Any]] = field(default_factory=dict)
+    conventions: Filing | None = None
 
     def __post_init__(self) -> None:
         seen = set()

@@ -12,23 +12,24 @@ The server serves MCP over stdio and opens no network port. Harnesses with a kno
 
 <!-- BEGIN AUTO-GENERATED tools -->
 
-| Tool                        | Purpose                                                                                                                                                                             | Result                                                                                                |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `kb_get_document_type`      | Get a file's document type and proposed name and folder from saved entries and the complete listing.                                                                                | [document-type.schema.yaml](../contracts/extensions/mcp/v1/document-type.schema.yaml)                 |
-| `kb_list_audiences`         | List the readers you can choose for a document type.                                                                                                                                | [audiences.schema.yaml](../contracts/extensions/mcp/v1/audiences.schema.yaml)                         |
-| `kb_list_edits`             | List the edits recorded for `location`, oldest first, to check or undo an edit.                                                                                                     | [edits.schema.yaml](../contracts/extensions/mcp/v1/edits.schema.yaml)                                 |
-| `kb_prepare_document_move`  | Prepare a document move from supplied text, a complete listing and permission.                                                                                                      | [document-move.schema.yaml](../contracts/extensions/mcp/v1/document-move.schema.yaml)                 |
-| `kb_prepare_document_types` | Prepare document-types text from `record` or `record_digest`, file changes and `entries`, returning changed entries, proposed names and folders, and files needing a document type. | [document-types-update.schema.yaml](../contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
-| `kb_prepare_import`         | Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`.                                                          | [import.schema.yaml](../contracts/extensions/mcp/v1/import.schema.yaml)                               |
-| `kb_record_edit`            | Record an edit right after you make it, so the person can check or undo the change.                                                                                                 | [edit.schema.yaml](../contracts/extensions/mcp/v1/edit.schema.yaml)                                   |
-| `kbp_card`                  | Read the card for a document type before you draft or edit a document of that type.                                                                                                 | kbp's output, as is                                                                                   |
-| `kbp_explore`               | Write an offline HTML viewer for a universe spec under `explorer/` beside `log.jsonl`.                                                                                              | kbp's output, as is                                                                                   |
-| `kbp_inspect`               | Get a universe spec and its type guidance as kbp's JSON model.                                                                                                                      | kbp's output, as is                                                                                   |
-| `kbp_kinds`                 | List the document types of the universe specs that apply.                                                                                                                           | kbp's output, as is                                                                                   |
-| `kbp_mint`                  | Mint new `code` values of one `kind` for universe spec entries.                                                                                                                     | kbp's output, as is                                                                                   |
-| `kbp_self_check`            | Validate kbp's bundled protocol definition with `kbp --self-check`.                                                                                                                 | kbp's output, as is                                                                                   |
-| `kbp_validate`              | Validate files in the nearest supplied `.knowledge-bus/` folder and parent files named in its `workspace.yaml`, using file text or digests from this session.                       | kbp's output, as is                                                                                   |
-| `kbp_version`               | Get the installed knowledge-bus release and protocol version from `kbp --version`.                                                                                                  | kbp's output, as is                                                                                   |
+| Tool                        | Purpose                                                                                                                                                       | Result                                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `kb_get_document_type`      | Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing.                                             | [document-type.schema.yaml](../contracts/extensions/mcp/v1/document-type.schema.yaml)                 |
+| `kb_list_audiences`         | List the readers you can choose for a document type.                                                                                                          | [audiences.schema.yaml](../contracts/extensions/mcp/v1/audiences.schema.yaml)                         |
+| `kb_list_edits`             | List the edits recorded for `location`, oldest first, to check or undo an edit.                                                                               | [edits.schema.yaml](../contracts/extensions/mcp/v1/edits.schema.yaml)                                 |
+| `kb_prepare_conventions`    | Prepare conventions text from supplied configuration and proposed changes.                                                                                    | [conventions-update.schema.yaml](../contracts/extensions/mcp/v1/conventions-update.schema.yaml)       |
+| `kb_prepare_document_move`  | Prepare a document move from supplied text, a complete listing and permission.                                                                                | [document-move.schema.yaml](../contracts/extensions/mcp/v1/document-move.schema.yaml)                 |
+| `kb_prepare_document_types` | Prepare document-types text and filing assessments from supplied configuration, file changes and entries.                                                     | [document-types-update.schema.yaml](../contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
+| `kb_prepare_import`         | Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`.                                    | [import.schema.yaml](../contracts/extensions/mcp/v1/import.schema.yaml)                               |
+| `kb_record_edit`            | Record an edit right after you make it, so the person can check or undo the change.                                                                           | [edit.schema.yaml](../contracts/extensions/mcp/v1/edit.schema.yaml)                                   |
+| `kbp_card`                  | Read the card for a document type before you draft or edit a document of that type.                                                                           | kbp's output, as is                                                                                   |
+| `kbp_explore`               | Write an offline HTML viewer for a universe spec under `explorer/` beside `log.jsonl`.                                                                        | kbp's output, as is                                                                                   |
+| `kbp_inspect`               | Get a universe spec and its type guidance as kbp's JSON model.                                                                                                | kbp's output, as is                                                                                   |
+| `kbp_kinds`                 | List the document types of the universe specs that apply.                                                                                                     | kbp's output, as is                                                                                   |
+| `kbp_mint`                  | Mint new `code` values of one `kind` for universe spec entries.                                                                                               | kbp's output, as is                                                                                   |
+| `kbp_self_check`            | Validate kbp's bundled protocol definition with `kbp --self-check`.                                                                                           | kbp's output, as is                                                                                   |
+| `kbp_validate`              | Validate files in the nearest supplied `.knowledge-bus/` folder and parent files named in its `workspace.yaml`, using file text or digests from this session. | kbp's output, as is                                                                                   |
+| `kbp_version`               | Get the installed knowledge-bus release and protocol version from `kbp --version`.                                                                            | kbp's output, as is                                                                                   |
 
 <!-- END AUTO-GENERATED tools -->
 
@@ -60,6 +61,9 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 | `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
 | `changes`               | list of [FileChange](#filechange) or null         | no       | Files changed since the document-types file was last saved. Send them with `record` or `record_digest`. knowledge-mcp applies the changes to the entries for this answer only.                                                                                                                                      |
 | `listing`               | list of [ListedFile](#listedfile) or null         | no       |                                                                                                                                                                                                                                                                                                                     |
+| `conventions`           | string or null                                    | no       | Current root conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                        |
+| `conventions_digest`    | string or null                                    | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                                                                                                                                                                                                                                |
+| `filing_values`         | list of [FilingValue](#filingvalue) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
 
 ### `kb_list_audiences`
 
@@ -76,6 +80,17 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 | Argument   | Type   | Required | Meaning                                                                                                         |
 | ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------- |
 | `location` | string | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
+
+### `kb_prepare_conventions`
+
+| Argument                | Type                                              | Required | Meaning                                                                                                         |
+| ----------------------- | ------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
+| `conventions`           | string or null                                    | no       | Current root conventions file text. Send empty text when the file is absent.                                    |
+| `conventions_digest`    | string or null                                    | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                            |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | no       |                                                                                                                 |
+| `changes`               | list of [Change](#change)                         | no       |                                                                                                                 |
+| `allowed_by`            | [AllowedBy](#allowedby) or null                   | no       |                                                                                                                 |
 
 ### `kb_prepare_document_move`
 
@@ -108,6 +123,9 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 | `entries`               | list of [EntryItem](#entryitem) or null           | no       | Send your document type choices and any document types or readers specified by the person.                                                                                                                                                                                                                          |
 | `recheck`               | boolean or null                                   | no       | True to put every file with an entry back in `to_settle`, except files with a `set_by: person` entry.                                                                                                                                                                                                               |
 | `allowed_by`            | [AllowedBy](#allowedby) or null                   | no       |                                                                                                                                                                                                                                                                                                                     |
+| `conventions`           | string or null                                    | no       | Current root conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                        |
+| `conventions_digest`    | string or null                                    | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                                                                                                                                                                                                                                |
+| `filing_values`         | list of [FilingValue](#filingvalue) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
 
 ### `kb_prepare_import`
 
@@ -214,6 +232,63 @@ No arguments.
 | `value`  | string                   | yes      |         |
 | `status` | `confirmed` or `guessed` | yes      |         |
 
+### Change
+
+Type: [UpsertConvention](#upsertconvention) or [RemoveConvention](#removeconvention).
+
+### ConventionContent
+
+| Field         | Type   | Required | Meaning |
+| ------------- | ------ | -------- | ------- |
+| `label`       | string | yes      |         |
+| `instruction` | string | yes      |         |
+
+### ConventionContentPart
+
+| Field  | Type      | Required | Meaning |
+| ------ | --------- | -------- | ------- |
+| `part` | `content` | yes      |         |
+
+### ConventionDatePart
+
+| Field      | Type                              | Required | Meaning |
+| ---------- | --------------------------------- | -------- | ------- |
+| `part`     | `date`                            | yes      |         |
+| `property` | string                            | yes      |         |
+| `format`   | `YYYY-MM-DD`, `YYYY-MM` or `YYYY` | yes      |         |
+
+### ConventionDocumentTypePart
+
+| Field  | Type            | Required | Meaning |
+| ------ | --------------- | -------- | ------- |
+| `part` | `document_type` | yes      |         |
+
+### ConventionLiteralPart
+
+| Field   | Type                                    | Required | Meaning |
+| ------- | --------------------------------------- | -------- | ------- |
+| `part`  | `literal`                               | yes      |         |
+| `value` | [ConventionSegment](#conventionsegment) | yes      |         |
+
+### ConventionName
+
+| Field       | Type                            | Required | Meaning |
+| ----------- | ------------------------------- | -------- | ------- |
+| `separator` | ` `, `-` or `_`                 | yes      |         |
+| `case`      | `as-written` or `lower` or null | no       |         |
+| `parts`     | list of [Part](#part)           | yes      |         |
+
+### ConventionPropertyPart
+
+| Field      | Type       | Required | Meaning |
+| ---------- | ---------- | -------- | ------- |
+| `part`     | `property` | yes      |         |
+| `property` | string     | yes      |         |
+
+### ConventionSegment
+
+Type: string, pattern `^[^#|^:/\\\[\]\u0000-\u001f\u007f-\u009f]+$`.
+
 ### Digest
 
 Type: string, pattern `^sha256:[0-9a-f]{64}$`.
@@ -265,6 +340,16 @@ Type: [FileCreated](#filecreated) or [FileDeleted](#filedeleted) or [FileMoved](
 | `old_path`    | [Path](#path)                       | yes      |                          |
 | `fingerprint` | [Fingerprint](#fingerprint) or null | no       |                          |
 
+### FilingValue
+
+| Field           | Type           | Required | Meaning |
+| --------------- | -------------- | -------- | ------- |
+| `path`          | [Path](#path)  | yes      |         |
+| `universe_spec` | string         | yes      |         |
+| `document_type` | string         | yes      |         |
+| `properties`    | object or null | no       |         |
+| `content`       | string or null | no       |         |
+
 ### Fingerprint
 
 Type: string.
@@ -304,9 +389,21 @@ Type: string.
 
 Type: string, pattern `^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$`.
 
+### Part
+
+Type: [ConventionDocumentTypePart](#conventiondocumenttypepart) or [ConventionDatePart](#conventiondatepart) or [ConventionPropertyPart](#conventionpropertypart) or [ConventionContentPart](#conventioncontentpart) or [ConventionLiteralPart](#conventionliteralpart).
+
 ### Path
 
 Type: string.
+
+### RemoveConvention
+
+| Field           | Type     | Required | Meaning |
+| --------------- | -------- | -------- | ------- |
+| `change`        | `remove` | yes      |         |
+| `universe_spec` | string   | yes      |         |
+| `document_type` | string   | yes      |         |
 
 ### SetBy
 
@@ -321,6 +418,18 @@ Type: `agent` or `person`.
 | `version` | string         | yes      | The `version` value in the file's `universe:` or `guidance:` block, as written.                                                                                                                  |
 | `text`    | string or null | no       | The full file text. Send fresh text whenever the file changes. Reuse `digest` while the text stays unchanged. Leave it out when `id` and `version` match a bundled file, except in kbp_validate. |
 | `digest`  | string or null | no       | The file's digest, as listed in `received` by an earlier tool result this session.                                                                                                               |
+
+### UpsertConvention
+
+| Field           | Type                                                             | Required | Meaning |
+| --------------- | ---------------------------------------------------------------- | -------- | ------- |
+| `change`        | `upsert`                                                         | yes      |         |
+| `universe_spec` | string                                                           | yes      |         |
+| `document_type` | string                                                           | yes      |         |
+| `folder`        | list of [ConventionSegment](#conventionsegment) or [Part](#part) | yes      |         |
+| `name`          | [ConventionName](#conventionname)                                | yes      |         |
+| `content`       | [ConventionContent](#conventioncontent) or null                  | no       |         |
+| `set_by`        | [SetBy](#setby)                                                  | yes      |         |
 
 <!-- END AUTO-GENERATED shapes -->
 

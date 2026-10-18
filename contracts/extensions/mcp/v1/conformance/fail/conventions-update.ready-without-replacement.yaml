@@ -1,0 +1,14 @@
+---
+schema: knowledge-mcp/conventions-update/1
+location: vault
+file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+status: ready
+based_on: sha256:0000000000000000000000000000000000000000000000000000000000000000
+current: []
+changes: []
+allowed_by:
+  basis: accepted_change
+  text: Save the convention.
+record: null
+digest: null
+received: []

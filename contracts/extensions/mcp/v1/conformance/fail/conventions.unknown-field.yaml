@@ -1,0 +1,21 @@
+---
+schema: knowledge-mcp/conventions/1
+from_parent: []
+conventions:
+  - universe_spec: product-development
+    document_type: decision-record
+    folder:
+      - Decisions
+    name:
+      separator: " "
+      parts:
+        - part: content
+    content:
+      label: document title
+      instruction: Read the first heading.
+    set_by: person
+    allowed_by:
+      basis: accepted_change
+      text: Save the convention.
+    time: "2026-10-18T00:00:00Z"
+extra: true

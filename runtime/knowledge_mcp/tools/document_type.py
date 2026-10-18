@@ -6,6 +6,7 @@ from mcp.server import MCPServer
 from mcp.types import CallToolResult
 from pydantic import Field
 
+from knowledge_mcp import conventions as naming
 from knowledge_mcp import document_type, filing, problems
 from knowledge_mcp import document_types as records
 from knowledge_mcp.models import (
@@ -13,15 +14,16 @@ from knowledge_mcp.models import (
     KnowledgeBusFolder,
     ListedFile,
 )
-from knowledge_mcp.models_auto.common_schema import Digest
+from knowledge_mcp.models_auto.common_schema import Digest, FilingValue
 from knowledge_mcp.models_auto.document_type_schema import DocumentTypeAnswer
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
+from knowledge_mcp.tools.conventions import ConventionsDigest, ConventionsText
 from knowledge_mcp.tools.kbp import READS, Folders, Location
 from knowledge_mcp.type_scope import Scopes
 
 DESCRIPTION = """\
-Get a file's document type and proposed name and folder from saved entries and the complete listing. Return saved classification or candidate document types. Appends the answer to `log.jsonl` and opens no knowledge-base file.
+Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing. Return saved classification or candidate document types. Appends the answer to `log.jsonl` and opens no knowledge-base file.
 """
 
 
@@ -100,6 +102,9 @@ def get_document_type(
     record_digest: str | None,
     changes: list[FileChange] | None,
     inventory_listing: list[ListedFile] | None = None,
+    conventions: str | None = None,
+    conventions_digest: str | None = None,
+    filing_values: list[FilingValue] | None = None,
 ) -> dict[str, Any]:
     received: list[dict[str, Any]] = []
     files = _saved_files(workspace, record, record_digest, changes, received)
@@ -152,9 +157,21 @@ def get_document_type(
                 universe_specs=specs,
             ),
         )
+    convention = naming.Filing.read(
+        workspace, conventions, conventions_digest, filing_values
+    )
+    scopes.conventions = convention
+    if conventions is not None:
+        received.append({"name": naming.PLACE, "digest": convention.digest})
     current = filing.inventory(workspace, location, inventory_listing, changes)
     result["filing"] = [
-        filing.assess(subject, (u, k), files or {}, listing=current, scopes=scopes)
+        filing.assess(
+            subject,
+            (u, k),
+            files or {},
+            listing=current,
+            scopes=scopes,
+        )
         for u, k in filing.choices(result)
     ]
     result["received"] = list(scopes.received.values()) + received
@@ -178,6 +195,9 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
         record_digest: RecordDigest = None,
         changes: Changes = None,
         listing: list[ListedFile] | None = None,
+        conventions: ConventionsText = None,
+        conventions_digest: ConventionsDigest = None,
+        filing_values: list[FilingValue] | None = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
@@ -189,6 +209,9 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             record_digest=record_digest,
             changes=changes,
             listing=listing,
+            conventions=conventions,
+            conventions_digest=conventions_digest,
+            filing_values=filing_values,
         )
         result = get_document_type(
             workspace,
@@ -201,6 +224,9 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             record_digest=record_digest,
             changes=changes,
             inventory_listing=listing,
+            conventions=conventions,
+            conventions_digest=conventions_digest,
+            filing_values=filing_values,
         )
         return respond.answer(
             "kb_get_document_type", location, arguments, DocumentTypeAnswer, result

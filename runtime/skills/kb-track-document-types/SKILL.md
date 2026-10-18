@@ -8,6 +8,9 @@ description: Use at session start and after creating, moving or deleting a knowl
 1. **Read the document-types file.** Read `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` at the root folder with your own tools.
    If missing, read `.knowledge-bus/plugins/knowledge-mcp/record.yaml` for migration.
    Use an empty string when both files are missing.
+   Read the root conventions file alongside the document-types file.
+   Send its text as `conventions` on each preparation call, or empty text when absent.
+   Reuse `conventions_digest` only while the file remains unchanged.
 2. **Start the session.** Call `kb_prepare_document_types` with:
    - `location`: the root folder, as text.
    - `record`: the text read in the previous step.
@@ -19,7 +22,8 @@ description: Use at session start and after creating, moving or deleting a knowl
 3. **Update after each file change.** Keep the complete listing current after creates, moves, renames, edits and deletions. After each change, call `kb_prepare_document_types` with the same `location` and `knowledge_bus_folders`. Include `changes` and the current `record` or `record_digest`.
    After saving `record`, send the returned `digest` as `record_digest` instead of `record` on the next call.
    Follow any `note` in `changed`.
-4. **Review names and folders.** Show `filing` proposals beside typed files. Keep proposals conditional while choosing a document type.
+4. **Review names and folders.** Show missing naming values beside each affected typed file.
+   Follow `kb-write-document` to collect values for a file under review. Show `filing` proposals beside typed files. Keep proposals conditional while choosing a document type.
    Prepare accepted moves through the Names, folders and moves sequence in `kb-write-document` before changing files.
    Save the prepared document-types text with the move and link repairs. Valid moves retain every classification field.
    Resolve destination type conflicts explicitly, preserving the original entry while choosing another folder or changing universe specs separately.
@@ -45,5 +49,8 @@ description: Use at session start and after creating, moving or deleting a knowl
 
 9. **Recheck on request.** When the person requests a recheck, set `recheck` to true. The tool preserves entries with `set_by: person`.
    Choose a document type for each file in `to_settle`.
+   After an accepted convention change, refresh filing assessments on request.
+   Keep existing document paths until a proposal is accepted.
+   Keep convention changes separate from classification changes and document moves.
 10. **Keep entries in the document-types file.** Change entries through `kb_prepare_document_types` or the prepared document-types text from `kb_prepare_document_move`.
     Keep document text out of the document-types file.

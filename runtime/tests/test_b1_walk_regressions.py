@@ -171,8 +171,9 @@ def test_s2_help_and_lookup_inventory_description():
 
 def test_s3_import_requests_name_and_folder_without_peers():
     skill = (SKILLS / "kb-import-document/SKILL.md").read_text()
-    assert "When no typed peers exist, ask the person for a name and folder." in skill
-    assert "When typed peers exist, use the filing assessment" in skill
+    assert "Use the applicable convention before peer evidence." in skill
+    assert "Without a convention, use the peer proposal." in skill
+    assert "Without a usable proposal, ask the person for a name and folder." in skill
 
 
 def test_s4_review_filing_before_writing():

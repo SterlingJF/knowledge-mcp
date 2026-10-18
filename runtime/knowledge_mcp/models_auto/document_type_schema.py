@@ -2,7 +2,17 @@
 
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
-from . import common_schema, document_types_schema, problem_schema
+from ._internal import (
+    Candidate,
+    Entry,
+    FilingAssessment,
+    Location,
+    Path,
+    Received,
+    SpecInScope,
+    TypeGroup,
+)
+from . import problem_schema
 
 
 class Recorded(BaseModel):
@@ -13,9 +23,9 @@ class Recorded(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    path: common_schema.Path
+    path: Path
     label: Literal["from the document-types file"]
-    entry: document_types_schema.Entry
+    entry: Entry
 
 
 class DocumentTypeAnswer(BaseModel):
@@ -23,16 +33,16 @@ class DocumentTypeAnswer(BaseModel):
         extra="forbid",
     )
     schema_: Annotated[Literal["knowledge-mcp/document-type/1"], Field(alias="schema")]
-    location: common_schema.Location
-    universe_specs: list[common_schema.SpecInScope]
+    location: Location
+    universe_specs: list[SpecInScope]
     candidates: Annotated[
-        list[common_schema.Candidate],
+        list[Candidate],
         Field(
             description="Candidates with `role_matches` true come first. knowledge-mcp then ranks more file-name matches first, followed by more words in `matched`. Ties keep kbp order."
         ),
     ]
     every_document_type: Annotated[
-        list[common_schema.TypeGroup] | None,
+        list[TypeGroup] | None,
         Field(
             description="Null when `recorded` is present or a candidate matched on the file name. Groups with a non-empty `covers_matched` come first."
         ),
@@ -44,8 +54,8 @@ class DocumentTypeAnswer(BaseModel):
             title="Recorded",
         ),
     ] = None
-    received: common_schema.Received
-    filing: list[common_schema.FilingAssessment]
+    received: Received
+    filing: list[FilingAssessment]
 
 
 type KbGetDocumentTypeResult = Annotated[

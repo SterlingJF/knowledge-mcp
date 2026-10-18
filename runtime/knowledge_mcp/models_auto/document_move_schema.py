@@ -1,24 +1,25 @@
 # Generated from contracts/extensions/mcp/v1 by just generate_contract_types. Edit the schemas, not this file.
 
 from pydantic import BaseModel, ConfigDict, Field
-from . import common_schema, document_types_schema, problem_schema
+from ._internal import AllowedBy, Digest, MovePath, Path, Received
 from typing import Annotated, Literal
+from . import problem_schema
 
 
 class DocumentDigest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    path: common_schema.Path
-    digest: common_schema.Digest
+    path: Path
+    digest: Digest
 
 
 class MoveInputs(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    listing_digest: common_schema.Digest
-    record_digest: common_schema.Digest
+    listing_digest: Digest
+    record_digest: Digest
     documents: list[DocumentDigest]
 
 
@@ -26,10 +27,10 @@ class MoveWrite(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    old_path: common_schema.MovePath
-    path: common_schema.MovePath
-    before_digest: common_schema.Digest
-    after_digest: common_schema.Digest
+    old_path: MovePath
+    path: MovePath
+    before_digest: Digest
+    after_digest: Digest
     text: str
 
 
@@ -37,11 +38,11 @@ class MoveLink(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    source_path: common_schema.MovePath
+    source_path: MovePath
     start: Annotated[int, Field(ge=0)]
     end: Annotated[int, Field(ge=0)]
-    target_before: common_schema.Path
-    target_after: common_schema.Path
+    target_before: Path
+    target_after: Path
     replacement: str | None
 
 
@@ -63,9 +64,9 @@ class DocumentMoveAnswer(BaseModel):
     schema_: Annotated[Literal["knowledge-mcp/document-move/1"], Field(alias="schema")]
     location: str
     status: Literal["texts_needed", "ready", "blocked", "unchanged"]
-    old_path: common_schema.MovePath
-    path: common_schema.MovePath
-    allowed_by: document_types_schema.AllowedBy
+    old_path: MovePath
+    path: MovePath
+    allowed_by: AllowedBy
     search: list[str]
     based_on: Annotated[MoveInputs, Field(title="Move inputs")]
     writes: list[MoveWrite]
@@ -73,7 +74,7 @@ class DocumentMoveAnswer(BaseModel):
     digest: Annotated[str | None, Field(pattern="^sha256:[0-9a-f]{64}$")]
     links: list[MoveLink]
     issues: list[MoveIssue]
-    received: common_schema.Received
+    received: Received
 
 
 type KbPrepareDocumentMoveResult = Annotated[

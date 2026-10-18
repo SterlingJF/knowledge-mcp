@@ -11,7 +11,7 @@ from typing import Any
 import anyio
 import yaml
 
-from knowledge_mcp import bundled, problems
+from knowledge_mcp import bundled, conventions, problems
 from knowledge_mcp import document_types as records
 from knowledge_mcp.errors import ToolFault, UsageFault
 from knowledge_mcp.main import build_server
@@ -75,7 +75,11 @@ def _spec_files(
 
 
 def arguments(
-    file: Path, *, root: Path | None = None, role: str | None = None
+    file: Path,
+    *,
+    root: Path | None = None,
+    role: str | None = None,
+    filing_values: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """kb reads each `.knowledge-bus/` folder from the root down to the file's folder. kb never reads
     the file itself, so the file may be missing. Raise UsageFault when the file's folder does not
@@ -161,6 +165,9 @@ def arguments(
         if saved.is_file():
             sent["record"] = _record_text(saved, command)
             break
+    config = root / conventions.PLACE
+    sent["conventions"] = config.read_text(encoding="utf-8") if config.is_file() else ""
+    sent.update({"filing_values": filing_values} if filing_values is not None else {})
     if role:
         sent["role"] = role
     return sent
@@ -209,10 +216,14 @@ def type_catalog(
 
 
 def document_type(
-    file: Path, *, root: Path | None = None, role: str | None = None
+    file: Path,
+    *,
+    root: Path | None = None,
+    role: str | None = None,
+    filing_values: list[dict[str, Any]] | None = None,
 ) -> tuple[str, bool]:
     """Append the kb_get_document_type answer to `log.jsonl`. Return the JSON answer and failure flag."""
-    sent = arguments(file, root=root, role=role)
+    sent = arguments(file, root=root, role=role, filing_values=filing_values)
     server = build_server()
 
     async def call() -> Any:

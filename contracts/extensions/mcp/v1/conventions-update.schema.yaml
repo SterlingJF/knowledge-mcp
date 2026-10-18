@@ -1,0 +1,179 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: conventions-update.schema.yaml
+title: kb_prepare_conventions result
+description: Prepared conventions text or problem details.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Conventions update answer
+    type: object
+    additionalProperties: false
+    required:
+      - schema
+      - location
+      - file
+      - status
+      - based_on
+      - current
+      - changes
+      - allowed_by
+      - record
+      - digest
+      - received
+    properties:
+      schema:
+        const: knowledge-mcp/conventions-update/1
+      location:
+        $ref: common.schema.yaml#/$defs/location
+      file:
+        const: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      status:
+        enum:
+          - ready
+          - permission_needed
+          - unchanged
+      based_on:
+        $ref: common.schema.yaml#/$defs/digest
+      current:
+        type: array
+        items:
+          $ref: conventions.schema.yaml#/$defs/saved_convention
+      changes:
+        type: array
+        items:
+          $ref: "#/$defs/change"
+      allowed_by:
+        anyOf:
+          - $ref: document-types.schema.yaml#/$defs/allowed_by
+          - type: "null"
+      record:
+        type:
+          - string
+          - "null"
+      digest:
+        anyOf:
+          - $ref: common.schema.yaml#/$defs/digest
+          - type: "null"
+      received:
+        $ref: common.schema.yaml#/$defs/received
+    if:
+      required:
+        - status
+      properties:
+        status:
+          const: ready
+      type: object
+    then:
+      properties:
+        status:
+          const: ready
+        record:
+          type: string
+        digest:
+          $ref: common.schema.yaml#/$defs/digest
+        allowed_by:
+          $ref: document-types.schema.yaml#/$defs/allowed_by
+      type: object
+    else:
+      properties:
+        record:
+          type: "null"
+        digest:
+          type: "null"
+      type: object
+  change:
+    title: Convention change
+    oneOf:
+      - $ref: "#/$defs/upsert"
+      - $ref: "#/$defs/remove"
+  upsert:
+    title: Upsert convention
+    type: object
+    additionalProperties: false
+    required:
+      - change
+      - universe_spec
+      - document_type
+      - folder
+      - name
+      - set_by
+    properties:
+      change:
+        const: upsert
+      universe_spec: &id002
+        type: string
+        minLength: 1
+      document_type: &id003
+        type: string
+        minLength: 1
+      folder:
+        type: array
+        items:
+          anyOf:
+            - $ref: conventions.schema.yaml#/$defs/segment
+            - $ref: conventions.schema.yaml#/$defs/part
+      name:
+        $ref: conventions.schema.yaml#/$defs/name
+      content:
+        $ref: conventions.schema.yaml#/$defs/content
+      set_by:
+        $ref: document-types.schema.yaml#/$defs/set_by
+    if:
+      type: object
+      anyOf:
+        - type: object
+          required:
+            - folder
+          properties:
+            folder:
+              type: array
+              contains: &id001
+                type: object
+                required:
+                  - part
+                properties:
+                  part:
+                    const: content
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: object
+              required:
+                - parts
+              properties:
+                parts:
+                  type: array
+                  contains: *id001
+    then:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          $ref: conventions.schema.yaml#/$defs/content
+    else:
+      type: object
+      not:
+        required:
+          - content
+        properties:
+          content: true
+  remove:
+    title: Remove convention
+    type: object
+    additionalProperties: false
+    required:
+      - change
+      - universe_spec
+      - document_type
+    properties:
+      change:
+        const: remove
+      universe_spec: *id002
+      document_type: *id003

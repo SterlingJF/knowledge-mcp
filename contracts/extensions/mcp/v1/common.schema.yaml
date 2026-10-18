@@ -10,16 +10,16 @@ $defs:
   path:
     title: Path
     description:
-      Path from the knowledge base's root folder, with `/` between folders, such
-      as `docs/rfcs/0042-cache.md`.
+      Path from the knowledge base's root folder, with `/` between folders,
+      such as `docs/rfcs/0042-cache.md`.
     type: string
     minLength: 1
   fingerprint:
     title: Fingerprint
     description:
-      A value that changes only when the file content changes, such as SHA-256 or
-      Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing`
-      that moved.
+      A value that changes only when the file content changes, such as
+      SHA-256 or Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints
+      to find files in `listing` that moved.
     type: string
   digest:
     title: Digest
@@ -38,8 +38,8 @@ $defs:
   received:
     title: Received
     description:
-      Digests of the texts sent in this call. Later in the session, send a digest
-      in place of its text.
+      Digests of the texts sent in this call. Later in the session, send
+      a digest in place of its text.
     type: array
     items:
       title: Received text
@@ -70,20 +70,20 @@ $defs:
         type: string
       source:
         description:
-          "`bundled copy at <ref>` means knowledge-mcp used its own copy of the universe
-          spec, taken from git ref `<ref>` of the knowledge-bus repository."
+          "`bundled copy at <ref>` means knowledge-mcp used its own copy
+          of the universe spec, taken from git ref `<ref>` of the knowledge-bus repository."
         type: string
         pattern: ^(sent by the harness|bundled copy at \S+)$
       from_parent:
         description:
-          True when the universe spec comes from a `.knowledge-bus/` folder above
-          the deepest `.knowledge-bus/` folder the harness sent.
+          True when the universe spec comes from a `.knowledge-bus/` folder
+          above the deepest `.knowledge-bus/` folder the harness sent.
         type: boolean
   candidate:
     title: Candidate
     description:
-      A document type whose alias shares a word with the file name or its nearest
-      folder.
+      A document type whose alias shares a word with the file name or its
+      nearest folder.
     type: object
     additionalProperties: false
     required:
@@ -133,8 +133,8 @@ $defs:
           - "null"
       matched:
         description:
-          Words shared by the alias and the file name or nearest folder, lowercased
-          with common plural suffixes removed.
+          Words shared by the alias and the file name or nearest folder,
+          lowercased with common plural suffixes removed.
         type: array
         minItems: 1
         items:
@@ -146,8 +146,8 @@ $defs:
           - folder
       role_matches:
         description:
-          True when `actor` and the role share a normalized word after knowledge-mcp
-          removes stopwords. Present only when the harness sent a role.
+          True when `actor` and the role share a normalized word after
+          knowledge-mcp removes stopwords. Present only when the harness sent a role.
         type: boolean
   type_group:
     title: Type group
@@ -167,7 +167,9 @@ $defs:
           - string
           - "null"
       covers_matched:
-        description: Words in the path that also appear in the universe spec label or `covers`.
+        description:
+          Words in the path that also appear in the universe spec label
+          or `covers`.
         type: array
         items:
           type: string
@@ -301,12 +303,13 @@ $defs:
       path:
         $ref: "#/$defs/path"
       folder_new:
-        const: false
+        type: boolean
       name_style:
         enum:
           - lower-kebab
           - lower-snake
           - unchanged
+          - convention
       evidence:
         type: array
         items:
@@ -343,10 +346,18 @@ $defs:
           - listing_needed
           - evidence_incomplete
           - destination_occupied
+          - values_needed
       proposal:
         anyOf:
           - $ref: "#/$defs/filing_proposal"
           - type: "null"
+      convention: &id007
+        $ref: "#/$defs/convention_source"
+      needed: &id006
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/needed_value"
     oneOf:
       - type: object
         required:
@@ -363,6 +374,11 @@ $defs:
             type: string
             minLength: 1
           document_type: *id003
+        not:
+          required:
+            - needed
+          properties:
+            needed: true
       - type: object
         required:
           - status
@@ -383,6 +399,11 @@ $defs:
             type: string
             minLength: 1
           document_type: *id004
+        not:
+          required:
+            - needed
+          properties:
+            needed: true
       - type: object
         required:
           - status
@@ -399,9 +420,37 @@ $defs:
           universe_spec: &id005
             type: "null"
           document_type: *id005
+        not:
+          required:
+            - needed
+          properties:
+            needed: true
+      - type: object
+        required:
+          - status
+          - proposal
+          - universe_spec
+          - document_type
+          - needed
+          - convention
+        properties:
+          status:
+            const: values_needed
+          proposal:
+            type: "null"
+          universe_spec:
+            type: string
+            minLength: 1
+          document_type:
+            type: string
+            minLength: 1
+          needed: *id006
+          convention: *id007
   move_path:
     title: Move path
-    description: Path relative to the knowledge-base root, with forward slashes between folders.
+    description:
+      Path relative to the knowledge-base root, with forward slashes between
+      folders.
     pattern: ^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$
     type: string
     minLength: 1
@@ -431,9 +480,66 @@ $defs:
     properties:
       source_path:
         $ref: "#/$defs/move_path"
-      start: &id006
+      start: &id008
         type: integer
         minimum: 0
-      end: *id006
+      end: *id008
       target_path:
         $ref: "#/$defs/move_path"
+  filing_value:
+    title: Filing value
+    type: object
+    additionalProperties: false
+    required:
+      - path
+      - universe_spec
+      - document_type
+    properties:
+      path:
+        $ref: "#/$defs/path"
+      universe_spec:
+        type: string
+        minLength: 1
+      document_type:
+        type: string
+        minLength: 1
+      properties:
+        type: object
+        additionalProperties:
+          type: string
+        default: {}
+      content:
+        type: string
+  convention_source:
+    title: Convention source
+    type: object
+    additionalProperties: false
+    required:
+      - file
+      - folder
+      - digest
+      - definition
+    properties:
+      file:
+        const: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
+      folder:
+        const: ""
+      digest:
+        $ref: "#/$defs/digest"
+      definition:
+        $ref: conventions.schema.yaml#/$defs/saved_convention
+  needed_value:
+    title: Needed value
+    type: object
+    additionalProperties: false
+    required:
+      - source
+      - name
+    properties:
+      source:
+        enum:
+          - property
+          - content
+      name:
+        type: string
+        minLength: 1
