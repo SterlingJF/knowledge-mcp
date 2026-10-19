@@ -14,6 +14,7 @@
 
 ### Changed
 
+- Update bundled MCP SDK to 2.2.0.
 - CLI migration: `kb fit <file>` becomes `kb type <path>`, `--hat` becomes `--role`, and `--top` becomes `--root`. Use `kb kbp <mode>` instead of `kb kbp --<mode>`, including `kb kbp validate`. Arguments after the mode retain upstream grammar, output and exit codes.
 - Renamed MCP tools as follows. The former `hat` argument to `kb_get_document_type` is now `role`.
 

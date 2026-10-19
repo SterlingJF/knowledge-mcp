@@ -14,7 +14,7 @@ dependencies = [
   "jsonschema==4.26.0",
   # Provides kbp. After changing this pin, run uv lock, then `just refresh_knowledge_model <tag>`.
   "knowledge-bus @ https://github.com/SterlingJF/knowledge-bus/releases/download/v0.10.0/knowledge_bus-0.10.0.tar.gz",
-  "mcp==2.0.0",
+  "mcp==2.2.0",
   "pydantic==2.13.4",
   "pyyaml==6.0.3",
 ]
