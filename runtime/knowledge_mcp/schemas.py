@@ -30,7 +30,9 @@ RESULTS = {
 def bundle(name: str) -> dict[str, Any]:
     """Load `schemas_auto/<name>.schema.yaml`, which holds the schema and every schema it references."""
     place = resources.files("knowledge_mcp") / "schemas_auto" / f"{name}.schema.yaml"
-    loaded: dict[str, Any] = yaml.safe_load(place.read_text(encoding="utf-8"))
+
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    loaded: dict[str, Any] = yaml.load(place.read_text(encoding="utf-8"), Loader=loader)
     return loaded
 
 

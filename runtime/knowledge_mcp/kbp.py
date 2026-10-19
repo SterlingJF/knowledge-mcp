@@ -99,3 +99,27 @@ def parsed(output: Printed, mode: str, expected: tuple[str, ...]) -> dict[str, A
         )
         raise problems.KbpVersionSkew(msg)
     return data
+
+
+def query_scope(
+    cwd: Path, *, cards: bool = False, **env: str
+) -> tuple[Printed, list[Printed]]:
+    """Validate kinds freshly, optionally building all cards in one isolated child."""
+    if not cards:
+        return run(["--kinds"], cwd, **env), []
+    cli()
+    done = subprocess.run(
+        [sys.executable, "-P", str(Path(__file__).with_name("kbp_worker.py"))],
+        stdin=subprocess.DEVNULL,
+        cwd=cwd,
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",
+        env={**os.environ, "PYTHONIOENCODING": "utf-8", **env, **explorer_bundle()},
+        timeout=TIMEOUT_SECONDS,
+        check=False,
+    )
+
+    done.check_returncode()
+    listed, outputs = json.loads(done.stdout)
+    return Printed(*listed), [Printed(*output) for output in outputs]

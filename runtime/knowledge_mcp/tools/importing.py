@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import os
-from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
 from typing import Annotated, Any
 
 from mcp.server import MCPServer
@@ -25,17 +22,13 @@ Prepare an import by splitting `text` into passages and listing questions for do
 CACHED_SCOPES = 16
 
 
-def workers() -> int:
-    return min(8, os.cpu_count() or 1)
-
-
 def register(mcp: MCPServer, workspace: Workspace) -> None:
     cards_by_scope: dict[str, dict[tuple[str, str], dict[str, Any]]] = {}
 
     def cards(
-        listing: dict[str, Any], rebuilt_key: str, cwd: Path
+        listing: dict[str, Any], rebuilt_key: str, printed: list[kbp.Printed]
     ) -> dict[tuple[str, str], dict[str, Any]]:
-        """Return cached cards when available. Otherwise, run `kbp --card` for every document type in parallel.
+        """Return cached cards when available, otherwise check the batch's card results.
 
         Raise KbpFailed when kbp fails to print a card.
         """
@@ -43,13 +36,6 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             return cards_by_scope[rebuilt_key]
         wanted = importing.pairs(listing)
 
-        def card(pair: tuple[str, str]) -> kbp.Printed:
-            spec, kind = pair
-            argv = ["--card", kind, "--universe", spec, "--format", "json"]
-            return kbp.run(argv, cwd)
-
-        with ThreadPoolExecutor(max_workers=workers()) as pool:
-            printed = list(pool.map(card, wanted))
         for output in printed:
             if output.code != 0:
                 raise problems.KbpFailed(output, "card")
@@ -112,11 +98,13 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             folders=folders, knowledge_bus_folders=knowledge_bus_folders
         )
         with workspace.rebuilt(request) as rebuilt:
-            listed = kbp.run(["--kinds"], rebuilt.cwd)
+            listed, printed = kbp.query_scope(
+                rebuilt.cwd, cards=rebuilt.key not in cards_by_scope
+            )
             if listed.code != 0:
                 raise problems.KbpFailed(listed, "kinds")
             listing = kbp.parsed(listed, "kinds", kbp.KINDS)
-            found = cards(listing, rebuilt.key, rebuilt.cwd)
+            found = cards(listing, rebuilt.key, printed)
 
         result = {
             "schema": importing.SCHEMA,

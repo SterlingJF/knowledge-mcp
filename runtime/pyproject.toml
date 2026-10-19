@@ -25,6 +25,7 @@ kb = "knowledge_mcp.cli:main"
 [dependency-groups]
 dev = [
   "pytest==9.1.1",
+  "pytest-xdist==3.8.0",
 ]
 
 [build-system]

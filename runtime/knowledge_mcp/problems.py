@@ -5,14 +5,11 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
-from mcp.server.mcpserver.exceptions import ToolError
-from pydantic import ValidationError
-
-from knowledge_mcp import schemas
 from knowledge_mcp.errors import REINSTALL, REPORT
-from knowledge_mcp.models_auto.problem_schema import ProblemDetails
 
 if TYPE_CHECKING:
+    from pydantic import ValidationError
+
     from knowledge_mcp.kbp import Printed
 
 BASE = "https://github.com/SterlingJF/knowledge-mcp/problems/"
@@ -45,6 +42,11 @@ class Error(Exception):
 
     def details(self) -> dict[str, Any]:
         """The problem object, validated against problem.schema.yaml."""
+        from knowledge_mcp import schemas  # noqa: PLC0415
+        from knowledge_mcp.models_auto.problem_schema import (  # noqa: PLC0415
+            ProblemDetails,
+        )
+
         problem: dict[str, Any] = {
             "type": BASE + self.code,
             "title": schemas.title(self.code),
@@ -124,6 +126,9 @@ def _invalid_arguments(tool: str, error: ValidationError) -> Error:
 
 def from_exception(error: BaseException, tool: str) -> Error:
     """Unwrap the MCP SDK's ToolError first. Map an unknown exception to internal-error."""
+    from mcp.server.mcpserver.exceptions import ToolError  # noqa: PLC0415
+    from pydantic import ValidationError  # noqa: PLC0415
+
     if isinstance(error, ToolError) and error.__cause__ is not None:
         error = error.__cause__
     if isinstance(error, Error):

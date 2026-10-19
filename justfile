@@ -198,7 +198,7 @@ check_runtime: check_mcp_tools_doc check_knowledge_mcp_lock (_contract_models '-
   uv run --locked ruff format --check runtime
   uv run --locked mypy
   uv run --locked vulture
-  cd runtime && uv run --locked pytest
+  cd runtime && uv run --locked pytest -n auto --maxprocesses 4 --dist loadfile
 
 # Export uv.lock to runtime/requirements.lock. The plugin installs its dependencies from this hashed lockfile.
 generate_knowledge_mcp_lock:
