@@ -1180,10 +1180,14 @@ for (const publication of [
       );
     check(["check_knowledge_mcp_lock", fixture.checkout]);
     const path = join(fixture.checkout, "runtime/pyproject.toml");
-    writeFileSync(
-      path,
-      readFileSync(path, "utf8").replace('"mcp==2.0.0"', '"mcp==2.1.0"'),
+    const original = readFileSync(path, "utf8");
+    const changed = original.replace(/(["'])mcp==([^"']+)\1/, "$1mcp>=$2$1");
+    assert.notEqual(
+      changed,
+      original,
+      "fixture must widen the exact MCP pin to make lock metadata stale",
     );
+    writeFileSync(path, changed);
     const external: Array<string> = [];
     const run: Runner = (command, args, options) => {
       if (command === "git") {
