@@ -51,7 +51,6 @@ def table(rows: list[tuple[str, ...]]) -> str:
 
 
 def cell(text: str) -> str:
-    """Text for one table cell: one line, pipes escaped."""
     return " ".join(text.split()).replace("|", "\\|")
 
 
@@ -130,7 +129,16 @@ def regions(tools: list[dict[str, Any]]) -> dict[str, str]:
         "tools": table(summary),
         "arguments": "\n\n".join(arguments),
         "shapes": "\n\n".join(
-            f"### {n}\n\n{fields(s, 'Field')}" for n, s in sorted(shapes.items())
+            "\n\n".join(
+                part
+                for part in (
+                    f"### {name}",
+                    shape.get("description", ""),
+                    fields(shape, "Field"),
+                )
+                if part
+            )
+            for name, shape in sorted(shapes.items())
         ),
     }
 

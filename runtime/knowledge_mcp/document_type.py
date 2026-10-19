@@ -16,10 +16,7 @@ S_PLURAL = re.compile(r"(.{2,}[^isu])s")
 
 SCHEMA = "knowledge-mcp/document-type/1"
 
-ROLE = (
-    "The reader's role, such as maintainer. Prioritize document types by word overlap "
-    "between this role and the reader role."
-)
+ROLE = "The reader's role, such as maintainer. Put document types for that role first."
 
 # Ignore common words and extensions to avoid unrelated alias matches.
 STOPWORDS = frozenset(

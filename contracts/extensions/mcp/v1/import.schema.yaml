@@ -95,7 +95,7 @@ $defs:
             kind:
               enum: [heading, paragraph, list-item, code]
             lines:
-              description: First and last line numbers.
+              description: Inclusive first and last line numbers in the source text, starting at one.
               type: array
               minItems: 2
               maxItems: 2

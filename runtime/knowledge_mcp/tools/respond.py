@@ -14,7 +14,10 @@ from knowledge_mcp.kbp import Printed
 
 
 def sent(**arguments: Any) -> dict[str, Any]:
-    """Drop None arguments and unset model fields, so the logged digest covers only the arguments the agent sent."""
+    """Prepare arguments for logging: drop None values and serialize models without unset fields.
+
+    Wrapper-supplied defaults remain in the digest when they are not None.
+    """
     return {
         name: _plain(value) for name, value in arguments.items() if value is not None
     }

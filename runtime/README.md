@@ -28,7 +28,7 @@ runtime/
 
 ## Upgrade knowledge-bus
 
-1. Point the `knowledge-bus` pin in `pyproject.toml` at the release source archive, `https://github.com/SterlingJF/knowledge-bus/releases/download/<tag>/knowledge_bus-<version>.tar.gz`.
+1. Point the `knowledge-bus` pin in `runtime/pyproject.toml` at the release source archive, `https://github.com/SterlingJF/knowledge-bus/releases/download/<tag>/knowledge_bus-<version>.tar.gz`.
 2. From the repo root, run `uv lock`, then `just generate_knowledge_mcp_lock`.
 3. Check that the knowledge-bus hash in `uv.lock` matches the hash in the release `SHA256SUMS` file. Stop if the hashes differ.
 4. Run `just refresh_knowledge_model <tag>`.

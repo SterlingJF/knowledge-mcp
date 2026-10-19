@@ -243,7 +243,7 @@ function textBlock(text: string, heading: string): Array<string> | undefined {
   return undefined;
 }
 
-/** Records invalid tree lines and paths. */
+/** Reports invalid tree lines and paths; returns top-level names for coverage checks. */
 function checkTree(source: string, lines: Array<string>): Set<string> {
   const top = new Set<string>();
   const base = lines[0] === "." ? "" : lines[0].replace(/\/$/, "");

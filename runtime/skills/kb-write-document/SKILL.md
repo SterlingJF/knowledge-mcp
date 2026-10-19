@@ -53,7 +53,8 @@ Show each convention, its declaring folder, parent mark and inactive reason.
 Resolve broken parent selections before proposing moves.
 A selected convention keeps its declaring folder as the filing base.
 For example, a company convention using `Contracts` still files under the company folder when Finance selects the convention.
-Save a reviewed local convention to file under `Finance/Contracts`.
+To file documents under `Finance/Contracts`, save a reviewed local convention in
+`Finance/.knowledge-bus/plugins/knowledge-mcp/conventions.yaml` with `Contracts` as its folder.
 
 ## Templates
 

@@ -15,7 +15,7 @@ from knowledge_mcp.tools import respond
 from knowledge_mcp.tools.document_type import RecordDigest, RecordText
 from knowledge_mcp.tools.kbp import READS
 
-DESCRIPTION = "Prepare a document move from supplied text, a complete listing and permission. Return search strings for referring documents, then replacement text after the confirmed search. Check link targets before and after the move. Append the answer to log.jsonl and open no knowledge-base file."
+DESCRIPTION = "Prepare a document move from supplied text, a complete listing and permission. Return search strings for referring documents, then replacement text and link target checks after the confirmed search. Follow `kb-write-document` to apply the move and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file."
 
 
 def register(mcp: MCPServer, workspace: Workspace) -> None:

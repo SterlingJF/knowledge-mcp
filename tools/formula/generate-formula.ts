@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 
-// Writes the Homebrew formula for knowledge-mcp from the package's source archive and uv.lock.
-// The formula builds everything from source: knowledge-mcp from its release archive, and one
-// resource per Python package the plugin's requirements.lock installs on macOS, each from the
-// source archive uv.lock records (knowledge-bus from its own release archive). It refuses a
-// package uv.lock holds no source archive for, and a version that differs from pyproject.toml.
+// Generate a Homebrew formula
 
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";

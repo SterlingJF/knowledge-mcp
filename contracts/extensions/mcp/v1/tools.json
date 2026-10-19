@@ -41,7 +41,7 @@
               }
             ],
             "default": null,
-            "description": "The reader's role, such as maintainer. Prioritize document types by word overlap between this role and the reader role.",
+            "description": "The reader's role, such as maintainer. Put document types for that role first.",
             "title": "Role"
           },
           "record": {
@@ -180,9 +180,11 @@
             "additionalProperties": false,
             "properties": {
               "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
+                "$ref": "#/$defs/ConventionsFolder",
+                "description": "The declaring folder relative to the knowledge-base root; empty for the root."
               },
               "text": {
+                "description": "Complete conventions text, or an empty string to report an absent file.",
                 "title": "Text",
                 "type": "string"
               },
@@ -195,7 +197,8 @@
                     "type": "null"
                   }
                 ],
-                "default": null
+                "default": null,
+                "description": "A digest from this session, in place of unchanged conventions text."
               }
             },
             "required": [
@@ -209,7 +212,8 @@
             "additionalProperties": false,
             "properties": {
               "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
+                "$ref": "#/$defs/ConventionsFolder",
+                "description": "The declaring folder relative to the knowledge-base root; empty for the root."
               },
               "text": {
                 "anyOf": [
@@ -221,10 +225,12 @@
                   }
                 ],
                 "default": null,
+                "description": "Complete conventions text, or an empty string to report an absent file.",
                 "title": "Text"
               },
               "digest": {
-                "$ref": "#/$defs/Digest"
+                "$ref": "#/$defs/Digest",
+                "description": "A digest from this session, in place of unchanged conventions text."
               }
             },
             "required": [
@@ -654,6 +660,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -1023,7 +1030,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -1643,6 +1650,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -1652,17 +1660,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -1789,12 +1801,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -1820,6 +1835,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -1882,21 +1898,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -1910,9 +1931,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -2718,6 +2741,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -3087,7 +3111,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -3707,6 +3731,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -3716,17 +3741,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -3853,12 +3882,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -3884,6 +3916,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -3946,21 +3979,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -3974,9 +4012,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -4409,7 +4449,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -5029,6 +5069,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -5038,17 +5079,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -5175,12 +5220,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -5206,6 +5254,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -5268,21 +5317,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -5296,9 +5350,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -5513,6 +5569,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -6020,9 +6077,11 @@
             "additionalProperties": false,
             "properties": {
               "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
+                "$ref": "#/$defs/ConventionsFolder",
+                "description": "The declaring folder relative to the knowledge-base root; empty for the root."
               },
               "text": {
+                "description": "Complete conventions text, or an empty string to report an absent file.",
                 "title": "Text",
                 "type": "string"
               },
@@ -6035,7 +6094,8 @@
                     "type": "null"
                   }
                 ],
-                "default": null
+                "default": null,
+                "description": "A digest from this session, in place of unchanged conventions text."
               }
             },
             "required": [
@@ -6049,7 +6109,8 @@
             "additionalProperties": false,
             "properties": {
               "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
+                "$ref": "#/$defs/ConventionsFolder",
+                "description": "The declaring folder relative to the knowledge-base root; empty for the root."
               },
               "text": {
                 "anyOf": [
@@ -6061,10 +6122,12 @@
                   }
                 ],
                 "default": null,
+                "description": "Complete conventions text, or an empty string to report an absent file.",
                 "title": "Text"
               },
               "digest": {
-                "$ref": "#/$defs/Digest"
+                "$ref": "#/$defs/Digest",
+                "description": "A digest from this session, in place of unchanged conventions text."
               }
             },
             "required": [
@@ -6437,6 +6500,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -6806,7 +6870,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -7426,6 +7490,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -7435,17 +7500,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -7572,12 +7641,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -7603,6 +7675,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -7665,21 +7738,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -7693,9 +7771,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -7971,6 +8051,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -8340,7 +8421,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -8960,6 +9041,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -8969,17 +9051,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -9106,12 +9192,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -9137,6 +9226,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -9199,21 +9289,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -9227,9 +9322,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -9807,9 +9904,11 @@
             "additionalProperties": false,
             "properties": {
               "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
+                "$ref": "#/$defs/ConventionsFolder",
+                "description": "The declaring folder relative to the knowledge-base root; empty for the root."
               },
               "text": {
+                "description": "Complete conventions text, or an empty string to report an absent file.",
                 "title": "Text",
                 "type": "string"
               },
@@ -9822,7 +9921,8 @@
                     "type": "null"
                   }
                 ],
-                "default": null
+                "default": null,
+                "description": "A digest from this session, in place of unchanged conventions text."
               }
             },
             "required": [
@@ -9836,7 +9936,8 @@
             "additionalProperties": false,
             "properties": {
               "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
+                "$ref": "#/$defs/ConventionsFolder",
+                "description": "The declaring folder relative to the knowledge-base root; empty for the root."
               },
               "text": {
                 "anyOf": [
@@ -9848,10 +9949,12 @@
                   }
                 ],
                 "default": null,
+                "description": "Complete conventions text, or an empty string to report an absent file.",
                 "title": "Text"
               },
               "digest": {
-                "$ref": "#/$defs/Digest"
+                "$ref": "#/$defs/Digest",
+                "description": "A digest from this session, in place of unchanged conventions text."
               }
             },
             "required": [
@@ -10732,7 +10835,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -11352,6 +11455,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -11361,17 +11465,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -11498,12 +11606,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -11529,6 +11640,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -11591,21 +11703,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -11619,9 +11736,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -11645,6 +11764,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -12102,7 +12222,7 @@
     {
       "name": "kb_prepare_document_move",
       "title": "Prepare a document move",
-      "description": "Prepare a document move from supplied text, a complete listing and permission. Return search strings for referring documents, then replacement text after the confirmed search. Check link targets before and after the move. Append the answer to log.jsonl and open no knowledge-base file.",
+      "description": "Prepare a document move from supplied text, a complete listing and permission. Return search strings for referring documents, then replacement text and link target checks after the confirmed search. Follow `kb-write-document` to apply the move and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file.",
       "inputSchema": {
         "properties": {
           "location": {
@@ -12310,22 +12430,27 @@
           },
           "LinkBinding": {
             "additionalProperties": false,
+            "description": "An independently verified original target for a complete internal link token.",
             "properties": {
               "source_path": {
-                "$ref": "#/$defs/MovePath"
+                "$ref": "#/$defs/MovePath",
+                "description": "The document containing the link, at its original path."
               },
               "start": {
+                "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                 "minimum": 0,
                 "title": "Start",
                 "type": "integer"
               },
               "end": {
+                "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                 "minimum": 0,
                 "title": "End",
                 "type": "integer"
               },
               "target_path": {
-                "$ref": "#/$defs/MovePath"
+                "$ref": "#/$defs/MovePath",
+                "description": "The link's established target in the original inventory, before any move."
               }
             },
             "required": [
@@ -12453,7 +12578,7 @@
         "type": "object",
         "$id": "document-move.schema.yaml",
         "title": "kb_prepare_document_move result",
-        "description": "Replacement text and link target checks for an accepted document move, or a request for referring document text.",
+        "description": "Prepared replacement text and link target checks against supplied inputs for an accepted document move, or a request for referring document text. The agent applies the move and verifies the saved files.",
         "oneOf": [
           {
             "$ref": "#/$defs/answer"
@@ -12551,6 +12676,7 @@
                 "$ref": "document-types.schema.yaml#/$defs/allowed_by"
               },
               "search": {
+                "description": "Fixed strings to search case-insensitively across Markdown files; echo the complete array after searching.",
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -12558,6 +12684,7 @@
               },
               "based_on": {
                 "title": "Move inputs",
+                "description": "Input digests for the agent to recheck before applying writes.",
                 "type": "object",
                 "required": [
                   "listing_digest",
@@ -12595,12 +12722,14 @@
                 "additionalProperties": false
               },
               "writes": {
+                "description": "Prepared document replacements for the agent to apply as one operation with `record`.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/write"
                 }
               },
               "record": {
+                "description": "Prepared document-types text for the agent to save with the document writes, or null when no writes are prepared.",
                 "type": [
                   "string",
                   "null"
@@ -12676,10 +12805,12 @@
                 "$ref": "common.schema.yaml#/$defs/move_path"
               },
               "start": {
+                "description": "Zero-based Unicode code-point offset of the complete link token in the original supplied text.",
                 "type": "integer",
                 "minimum": 0
               },
               "end": {
+                "description": "Exclusive Unicode code-point offset after the complete original link token.",
                 "type": "integer",
                 "minimum": 0
               },
@@ -12690,6 +12821,7 @@
                 "$ref": "common.schema.yaml#/$defs/path"
               },
               "replacement": {
+                "description": "The complete replacement link token, or null when the original token needs no change.",
                 "type": [
                   "string",
                   "null"
@@ -12753,6 +12885,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -13122,7 +13255,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -13742,6 +13875,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -13751,17 +13885,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -13888,12 +14026,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -13919,6 +14060,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -13981,21 +14123,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -14009,9 +14156,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -14338,7 +14487,7 @@
     {
       "name": "kb_prepare_document_moves",
       "title": "Prepare document moves",
-      "description": "Prepare moves together from supplied text and a complete listing. Return search strings, affected documents and replacement text while preserving link targets. Append the answer to log.jsonl and open no knowledge-base file.",
+      "description": "Prepare moves together from supplied text and a complete listing. Return search strings, affected documents and link target checks; include `allowed_by` to receive replacement text after the confirmed search. Follow `kb-write-document` to apply the moves and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file.",
       "inputSchema": {
         "properties": {
           "location": {
@@ -14570,22 +14719,27 @@
           },
           "LinkBinding": {
             "additionalProperties": false,
+            "description": "An independently verified original target for a complete internal link token.",
             "properties": {
               "source_path": {
-                "$ref": "#/$defs/MovePath"
+                "$ref": "#/$defs/MovePath",
+                "description": "The document containing the link, at its original path."
               },
               "start": {
+                "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                 "minimum": 0,
                 "title": "Start",
                 "type": "integer"
               },
               "end": {
+                "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                 "minimum": 0,
                 "title": "End",
                 "type": "integer"
               },
               "target_path": {
-                "$ref": "#/$defs/MovePath"
+                "$ref": "#/$defs/MovePath",
+                "description": "The link's established target in the original inventory, before any move."
               }
             },
             "required": [
@@ -14713,7 +14867,7 @@
         "type": "object",
         "$id": "document-moves.schema.yaml",
         "title": "kb_prepare_document_moves result",
-        "description": "Replacement text and target checks for moves prepared together.",
+        "description": "Prepared replacement text and link target checks against supplied inputs for moves prepared together. The agent applies the moves and verifies the saved files.",
         "oneOf": [
           {
             "$ref": "#/$defs/answer"
@@ -14816,6 +14970,7 @@
                 ]
               },
               "search": {
+                "description": "Fixed strings to search case-insensitively across Markdown files; echo the complete array after searching.",
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -14823,6 +14978,7 @@
               },
               "based_on": {
                 "title": "Move inputs",
+                "description": "Input digests for the agent to recheck before applying writes.",
                 "type": "object",
                 "required": [
                   "listing_digest",
@@ -14864,12 +15020,14 @@
                 "additionalProperties": false
               },
               "writes": {
+                "description": "Prepared document replacements for the agent to apply as one operation with `record`.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/write"
                 }
               },
               "record": {
+                "description": "Prepared document-types text for the agent to save with the document writes, or null when no writes are prepared.",
                 "type": [
                   "string",
                   "null"
@@ -14964,10 +15122,12 @@
                 "$ref": "common.schema.yaml#/$defs/move_path"
               },
               "start": {
+                "description": "Zero-based Unicode code-point offset of the complete link token in the original supplied text.",
                 "type": "integer",
                 "minimum": 0
               },
               "end": {
+                "description": "Exclusive Unicode code-point offset after the complete original link token.",
                 "type": "integer",
                 "minimum": 0
               },
@@ -14978,6 +15138,7 @@
                 "$ref": "common.schema.yaml#/$defs/path"
               },
               "replacement": {
+                "description": "The complete replacement link token, or null when the original token needs no change.",
                 "type": [
                   "string",
                   "null"
@@ -15041,6 +15202,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -15410,7 +15572,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -16030,6 +16192,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -16039,17 +16202,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -16176,12 +16343,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -16207,6 +16377,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -16269,21 +16440,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -16297,9 +16473,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -16626,7 +16804,7 @@
     {
       "name": "kb_prepare_document_types",
       "title": "Prepare the document-types file",
-      "description": "Prepare document-types text and filing assessments by comparing a complete listing with saved entries. Retain observed events through follow-up classification calls. Include `allowed_by` to receive changed text. Append the answer to `log.jsonl` and open no knowledge-base file.\n",
+      "description": "Prepare document-types text by comparing a complete listing with saved entries. Return observed events, pending classifications and filing assessments. Include `allowed_by` to receive changed text for the agent to save through `kb-track-document-types`. Append the answer to `log.jsonl` and open no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -16893,9 +17071,11 @@
             "additionalProperties": false,
             "properties": {
               "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
+                "$ref": "#/$defs/ConventionsFolder",
+                "description": "The declaring folder relative to the knowledge-base root; empty for the root."
               },
               "text": {
+                "description": "Complete conventions text, or an empty string to report an absent file.",
                 "title": "Text",
                 "type": "string"
               },
@@ -16908,7 +17088,8 @@
                     "type": "null"
                   }
                 ],
-                "default": null
+                "default": null,
+                "description": "A digest from this session, in place of unchanged conventions text."
               }
             },
             "required": [
@@ -16922,7 +17103,8 @@
             "additionalProperties": false,
             "properties": {
               "folder": {
-                "$ref": "#/$defs/ConventionsFolder"
+                "$ref": "#/$defs/ConventionsFolder",
+                "description": "The declaring folder relative to the knowledge-base root; empty for the root."
               },
               "text": {
                 "anyOf": [
@@ -16934,10 +17116,12 @@
                   }
                 ],
                 "default": null,
+                "description": "Complete conventions text, or an empty string to report an absent file.",
                 "title": "Text"
               },
               "digest": {
-                "$ref": "#/$defs/Digest"
+                "$ref": "#/$defs/Digest",
+                "description": "A digest from this session, in place of unchanged conventions text."
               }
             },
             "required": [
@@ -17148,6 +17332,7 @@
             "additionalProperties": false,
             "properties": {
               "folder": {
+                "description": "Folder relative to the knowledge-base root; empty for the root.",
                 "title": "Folder",
                 "type": "string"
               },
@@ -17161,6 +17346,7 @@
                   }
                 ],
                 "default": false,
+                "description": "Include descendants; false limits the review to direct children.",
                 "title": "Recursive"
               }
             },
@@ -17407,7 +17593,7 @@
                 ]
               },
               "digest": {
-                "description": "Digest of `record`, or null when `record` is null. Send a non-null digest as `record_digest` in the next call.",
+                "description": "Digest of `record`, or null when `record` is null. Send a non-null digest as `record_digest` after saving `record`.",
                 "type": [
                   "string",
                   "null"
@@ -17606,6 +17792,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -17975,7 +18162,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -18595,6 +18782,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -18604,17 +18792,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -18741,12 +18933,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -18772,6 +18967,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -18834,21 +19030,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -18862,9 +19063,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -19463,7 +19666,7 @@
                       ]
                     },
                     "lines": {
-                      "description": "First and last line numbers.",
+                      "description": "Inclusive first and last line numbers in the source text, starting at one.",
                       "type": "array",
                       "maxItems": 2,
                       "minItems": 2,
@@ -19701,6 +19904,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -20070,7 +20274,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -20690,6 +20894,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -20699,17 +20904,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -20836,12 +21045,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -20867,6 +21079,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -20929,21 +21142,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -20957,9 +21175,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }
@@ -21214,25 +21434,30 @@
             "additionalProperties": false,
             "properties": {
               "id": {
+                "description": "An opaque id shared by every edit in the same operation.",
                 "minLength": 1,
                 "title": "Id",
                 "type": "string"
               },
               "index": {
+                "description": "The edit's unique one-based position within the operation.",
                 "minimum": 1,
                 "title": "Index",
                 "type": "integer"
               },
               "count": {
+                "description": "Total edits in the operation, including referring documents and the document-types file.",
                 "minimum": 1,
                 "title": "Count",
                 "type": "integer"
               },
               "old_path": {
-                "$ref": "#/$defs/Path"
+                "$ref": "#/$defs/Path",
+                "description": "Original path; equal to `path` for a stationary referring document."
               },
               "path": {
-                "$ref": "#/$defs/Path"
+                "$ref": "#/$defs/Path",
+                "description": "Final path after the operation."
               }
             },
             "required": [
@@ -21349,6 +21574,7 @@
                 "const": "knowledge-mcp/conventions/1"
               },
               "from_parent": {
+                "description": "Explicitly selected parent conventions. Each retains its declaring folder as the filing base.",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/reference"
@@ -21718,7 +21944,7 @@
               },
               "received": {
                 "title": "Received",
-                "description": "Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+                "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
                 "type": "array",
                 "items": {
                   "title": "Received text",
@@ -22338,6 +22564,7 @@
               },
               "move_binding": {
                 "title": "Link binding",
+                "description": "An independently verified original target for a complete internal link token.",
                 "type": "object",
                 "required": [
                   "source_path",
@@ -22347,17 +22574,21 @@
                 ],
                 "properties": {
                   "source_path": {
+                    "description": "The document containing the link, at its original path.",
                     "$ref": "#/$defs/move_path"
                   },
                   "start": {
+                    "description": "Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "end": {
+                    "description": "Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
                     "type": "integer",
                     "minimum": 0
                   },
                   "target_path": {
+                    "description": "The link's established target in the original inventory, before any move.",
                     "$ref": "#/$defs/move_path"
                   }
                 },
@@ -22484,12 +22715,15 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "The declaring folder relative to the knowledge-base root; empty for the root.",
                     "$ref": "#/$defs/conventions_folder"
                   },
                   "text": {
+                    "description": "Complete conventions text, or an empty string to report an absent file.",
                     "type": "string"
                   },
                   "digest": {
+                    "description": "A digest from this session, in place of unchanged conventions text.",
                     "$ref": "#/$defs/digest"
                   }
                 },
@@ -22515,6 +22749,7 @@
                     "$ref": "#/$defs/convention_source"
                   },
                   "base_folder": {
+                    "description": "The declaring folder used as the filing base, including for a selected parent convention.",
                     "$ref": "#/$defs/conventions_folder"
                   }
                 },
@@ -22577,21 +22812,26 @@
                 ],
                 "properties": {
                   "id": {
+                    "description": "An opaque id shared by every edit in the same operation.",
                     "type": "string",
                     "minLength": 1
                   },
                   "index": {
+                    "description": "The edit's unique one-based position within the operation.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "count": {
+                    "description": "Total edits in the operation, including referring documents and the document-types file.",
                     "type": "integer",
                     "minimum": 1
                   },
                   "old_path": {
+                    "description": "Original path; equal to `path` for a stationary referring document.",
                     "$ref": "#/$defs/path"
                   },
                   "path": {
+                    "description": "Final path after the operation.",
                     "$ref": "#/$defs/path"
                   }
                 },
@@ -22605,9 +22845,11 @@
                 ],
                 "properties": {
                   "folder": {
+                    "description": "Folder relative to the knowledge-base root; empty for the root.",
                     "type": "string"
                   },
                   "recursive": {
+                    "description": "Include descendants; false limits the review to direct children.",
                     "default": false,
                     "type": "boolean"
                   }

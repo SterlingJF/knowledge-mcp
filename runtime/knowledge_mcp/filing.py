@@ -121,7 +121,7 @@ def _peers(
     return peers, False
 
 
-def assess(  # noqa: PLR0913 - provisional rendering preserves single-file occupancy behavior.
+def assess(  # noqa: PLR0913 - Batch reviews defer occupancy checks until all destinations are known.
     path: str,
     type_id: tuple[str | None, str | None],
     files: records.Files,

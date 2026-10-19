@@ -69,12 +69,12 @@ class ReceivedText(BaseModel):
 type Received = Annotated[
     list[ReceivedText],
     Field(
-        description="Digests of the texts sent in this call. Later in the session, send a digest in place of its text.",
+        description="Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
         title="Received",
     ),
 ]
 """
-Digests of the texts sent in this call. Later in the session, send a digest in place of its text.
+Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.
 """
 
 
@@ -272,13 +272,37 @@ class MoveDocument(BaseModel):
 
 
 class LinkBinding(BaseModel):
+    """
+    An independently verified original target for a complete internal link token.
+    """
+
     model_config = ConfigDict(
         extra="forbid",
     )
-    source_path: MovePath
-    start: Annotated[int, Field(ge=0)]
-    end: Annotated[int, Field(ge=0)]
-    target_path: MovePath
+    source_path: Annotated[
+        MovePath,
+        Field(description="The document containing the link, at its original path."),
+    ]
+    start: Annotated[
+        int,
+        Field(
+            description="Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.",
+            ge=0,
+        ),
+    ]
+    end: Annotated[
+        int,
+        Field(
+            description="Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.",
+            ge=0,
+        ),
+    ]
+    target_path: Annotated[
+        MovePath,
+        Field(
+            description="The link's established target in the original inventory, before any move."
+        ),
+    ]
 
 
 class FilingValue(BaseModel):
@@ -313,18 +337,48 @@ class ConventionFile1(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    folder: ConventionsFolder
-    text: str
-    digest: Digest | None = None
+    folder: Annotated[
+        ConventionsFolder,
+        Field(
+            description="The declaring folder relative to the knowledge-base root; empty for the root."
+        ),
+    ]
+    text: Annotated[
+        str,
+        Field(
+            description="Complete conventions text, or an empty string to report an absent file."
+        ),
+    ]
+    digest: Annotated[
+        Digest | None,
+        Field(
+            description="A digest from this session, in place of unchanged conventions text."
+        ),
+    ] = None
 
 
 class ConventionFile2(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    folder: ConventionsFolder
-    text: str | None = None
-    digest: Digest
+    folder: Annotated[
+        ConventionsFolder,
+        Field(
+            description="The declaring folder relative to the knowledge-base root; empty for the root."
+        ),
+    ]
+    text: Annotated[
+        str | None,
+        Field(
+            description="Complete conventions text, or an empty string to report an absent file."
+        ),
+    ] = None
+    digest: Annotated[
+        Digest,
+        Field(
+            description="A digest from this session, in place of unchanged conventions text."
+        ),
+    ]
 
 
 type ConventionFile = Annotated[
@@ -344,19 +398,52 @@ class EditOperation(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    id: Annotated[str, Field(min_length=1)]
-    index: Annotated[int, Field(ge=1)]
-    count: Annotated[int, Field(ge=1)]
-    old_path: Path
-    path: Path
+    id: Annotated[
+        str,
+        Field(
+            description="An opaque id shared by every edit in the same operation.",
+            min_length=1,
+        ),
+    ]
+    index: Annotated[
+        int,
+        Field(
+            description="The edit's unique one-based position within the operation.",
+            ge=1,
+        ),
+    ]
+    count: Annotated[
+        int,
+        Field(
+            description="Total edits in the operation, including referring documents and the document-types file.",
+            ge=1,
+        ),
+    ]
+    old_path: Annotated[
+        Path,
+        Field(
+            description="Original path; equal to `path` for a stationary referring document."
+        ),
+    ]
+    path: Annotated[Path, Field(description="Final path after the operation.")]
 
 
 class FilingReview(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    folder: str
-    recursive: bool | None = False
+    folder: Annotated[
+        str,
+        Field(
+            description="Folder relative to the knowledge-base root; empty for the root."
+        ),
+    ]
+    recursive: Annotated[
+        bool | None,
+        Field(
+            description="Include descendants; false limits the review to direct children."
+        ),
+    ] = False
 
 
 type FileChange = Annotated[
@@ -382,7 +469,12 @@ class FolderConvention(BaseModel):
     universe_spec: str
     document_type: str
     source: ConventionSource
-    base_folder: ConventionsFolder
+    base_folder: Annotated[
+        ConventionsFolder,
+        Field(
+            description="The declaring folder used as the filing base, including for a selected parent convention."
+        ),
+    ]
 
 
 class InactiveConvention(BaseModel):
@@ -597,7 +689,12 @@ class NamingAndFilingConventions(BaseModel):
         extra="forbid",
     )
     schema_: Annotated[Literal["knowledge-mcp/conventions/1"], Field(alias="schema")]
-    from_parent: list[ConventionReference]
+    from_parent: Annotated[
+        list[ConventionReference],
+        Field(
+            description="Explicitly selected parent conventions. Each retains its declaring folder as the filing base."
+        ),
+    ]
     conventions: list[SavedConvention]
 
 

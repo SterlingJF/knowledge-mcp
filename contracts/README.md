@@ -48,36 +48,25 @@ Templates describe proposals; saved conventions contain accepted patterns withou
 The root conventions file has `schema: knowledge-mcp/conventions/1`.
 Filing assessments add convention sources and missing values while retaining their `/1` schema IDs.
 Raise the schema version when the stored file changes, or when an answer field is removed or renamed, changes meaning or becomes narrower.
-A new answer field keeps the version. Each server sends its output schema with its answers.
+A new answer field keeps the version. The server publishes output schemas in `tools/list` and validates its structured answers against them.
 
 `kb_*` tool errors include an RFC 9457 `type` field with a problem type URI.
 Give a problem type a new URI when its meaning changes.
 
-## Related Locations
-
-| Item           | Location                                                                                |
-| -------------- | --------------------------------------------------------------------------------------- |
-| Contract tests | `runtime/tests/test_contract_snapshots.py`, `runtime/tests/test_contract_end_to_end.py` |
+Contract tests live in `runtime/tests/test_contract_snapshots.py` and `runtime/tests/test_contract_end_to_end.py`.
 
 ## Team conventions
 
-`folder-conventions.schema.yaml` describes `kb_list_conventions` answers.
-Supply conventions files beside relevant `.knowledge-bus/` folders, including explicit absence markers.
-A team file creates a boundary. Each team selects declarations directly from the nearest parent conventions file.
-Source metadata names the declaring folder, file suffix, digest, complete convention and parent mark.
-Filing folders remain relative to the declaring folder.
-The answer reports inactive declarations for unavailable document types and different universe spec definitions.
-Legacy conventions arguments describe root configuration. Explicit file inputs reject simultaneous legacy arguments.
+`folder-conventions.schema.yaml` describes `kb_list_conventions` answers. Supply a `conventions_files` entry for each relevant `.knowledge-bus/` folder. Use empty text to mark an absent file; an existing empty file is invalid. After sending full text, reuse the returned digest only while the file remains unchanged.
+
+A team's conventions file establishes a boundary: parent conventions apply only when explicitly selected from declarations in the nearest parent file. Selected conventions still file relative to their declaring folder. Answers identify each convention's source folder and file, digest, accepted pattern and whether it comes from a parent. Use that evidence to explain proposals and check for changed configuration before applying them.
+
+The answer lists inactive declarations when a document type is unavailable or its universe spec definition differs. Resolve those issues before preparing moves. The older `conventions` and `conventions_digest` arguments describe root configuration; send either those arguments or explicit `conventions_files`, never both.
 
 ## Preparing moves together
 
-`kb_prepare_document_moves` resolves links against the original inventory and prepares the complete final mapping.
-Echo the returned search strings after searching every Markdown document.
-A preview returns affected documents; `allowed_by` permits replacement text.
-Non-ready answers contain empty writes and a null record.
+`kb_prepare_document_moves` resolves links against the original inventory and prepares all destinations together. Search every Markdown document for the returned search strings, supply matching documents in full, and echo the strings exactly with search confirmation. Without permission, the answer previews affected documents. With `allowed_by` and no blocking issues, it returns replacement text and a prepared document-types file. Non-ready answers contain empty writes and a null record.
 
-Edit answers use `knowledge-mcp/edit/2` and `knowledge-mcp/edits/2`.
-The existing v1 contract directory contains both updated answer schemas.
-Optional operation metadata groups whole-file edits for guarded whole-list undo.
-Listing continues reading ungrouped entries and converts legacy permission fields.
-Document-types and conventions stored formats remain at `/1`.
+The agent must recheck the inventory, configuration and document digests before applying changes. It applies the moves and link repairs, verifies targets and records each final write. The [writing skill](../runtime/skills/kb-write-document/SKILL.md#many-files-at-once) defines application, recovery and undo requirements.
+
+Edit answers use `knowledge-mcp/edit/2` and `knowledge-mcp/edits/2`; their schema files remain in the `v1` contract directory. Optional operation metadata groups whole-file edits for whole-list undo, which requires complete records and matching current file digests. Listing still reads ungrouped entries and converts legacy permission fields. Document-types and conventions stored formats remain at `/1`.

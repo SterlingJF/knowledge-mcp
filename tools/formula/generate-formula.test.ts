@@ -112,7 +112,7 @@ test("the caveats name the variable and the history folder it points to", () => 
     /stay after the uninstall, in \$KNOWLEDGE_MCP_STATE_DIR when set,\s+else \$XDG_STATE_HOME\/knowledge-mcp, else ~\/\.local\/state\/knowledge-mcp\./,
   );
   assert.match(text, /`kb doctor` shows the folder in use\./);
-  // The history folder stays: the caveats offer no command that deletes it.
+  // Uninstall instructions must preserve the user's history.
   assert.doesNotMatch(text, /rm -r/);
 });
 

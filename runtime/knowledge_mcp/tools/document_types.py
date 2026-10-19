@@ -36,7 +36,7 @@ from knowledge_mcp.tools.document_type import (
 from knowledge_mcp.type_scope import Scopes
 
 DESCRIPTION = """\
-Prepare document-types text and filing assessments by comparing a complete listing with saved entries. Retain observed events through follow-up classification calls. Include `allowed_by` to receive changed text. Append the answer to `log.jsonl` and open no knowledge-base file.
+Prepare document-types text by comparing a complete listing with saved entries. Return observed events, pending classifications and filing assessments. Include `allowed_by` to receive changed text for the agent to save through `kb-track-document-types`. Append the answer to `log.jsonl` and open no knowledge-base file.
 """
 
 MIGRATED = (

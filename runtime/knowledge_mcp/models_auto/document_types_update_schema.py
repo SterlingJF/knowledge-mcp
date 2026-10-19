@@ -99,7 +99,7 @@ class DocumentTypesUpdateAnswer(BaseModel):
     digest: Annotated[
         str | None,
         Field(
-            description="Digest of `record`, or null when `record` is null. Send a non-null digest as `record_digest` in the next call.",
+            description="Digest of `record`, or null when `record` is null. Send a non-null digest as `record_digest` after saving `record`.",
             pattern="^sha256:[0-9a-f]{64}$",
         ),
     ]

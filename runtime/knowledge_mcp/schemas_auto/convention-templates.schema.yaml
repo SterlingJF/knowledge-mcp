@@ -192,7 +192,7 @@ $defs:
         pattern: ^[0-9a-f]{32}$
       received:
         title: Received
-        description: Digests of the texts sent in this call. Later in the session, send a digest in place of its text.
+        description: Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.
         type: array
         items:
           title: Received text
@@ -628,6 +628,7 @@ $defs:
         additionalProperties: false
       move_binding:
         title: Link binding
+        description: An independently verified original target for a complete internal link token.
         type: object
         required:
           - source_path
@@ -636,14 +637,18 @@ $defs:
           - target_path
         properties:
           source_path:
+            description: The document containing the link, at its original path.
             $ref: "#/$defs/move_path"
           start:
+            description: Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.
             type: integer
             minimum: 0
           end:
+            description: Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path.
             type: integer
             minimum: 0
           target_path:
+            description: The link's established target in the original inventory, before any move.
             $ref: "#/$defs/move_path"
         additionalProperties: false
       filing_value:
@@ -730,10 +735,13 @@ $defs:
           - folder
         properties:
           folder:
+            description: The declaring folder relative to the knowledge-base root; empty for the root.
             $ref: "#/$defs/conventions_folder"
           text:
+            description: Complete conventions text, or an empty string to report an absent file.
             type: string
           digest:
+            description: A digest from this session, in place of unchanged conventions text.
             $ref: "#/$defs/digest"
         additionalProperties: false
       folder_convention:
@@ -752,6 +760,7 @@ $defs:
           source:
             $ref: "#/$defs/convention_source"
           base_folder:
+            description: The declaring folder used as the filing base, including for a selected parent convention.
             $ref: "#/$defs/conventions_folder"
         additionalProperties: false
       inactive_convention:
@@ -797,17 +806,22 @@ $defs:
           - path
         properties:
           id:
+            description: An opaque id shared by every edit in the same operation.
             type: string
             minLength: 1
           index:
+            description: The edit's unique one-based position within the operation.
             type: integer
             minimum: 1
           count:
+            description: Total edits in the operation, including referring documents and the document-types file.
             type: integer
             minimum: 1
           old_path:
+            description: Original path; equal to `path` for a stationary referring document.
             $ref: "#/$defs/path"
           path:
+            description: Final path after the operation.
             $ref: "#/$defs/path"
         additionalProperties: false
       filing_review:
@@ -817,8 +831,10 @@ $defs:
           - folder
         properties:
           folder:
+            description: Folder relative to the knowledge-base root; empty for the root.
             type: string
           recursive:
+            description: Include descendants; false limits the review to direct children.
             default: false
             type: boolean
         additionalProperties: false
@@ -969,6 +985,7 @@ $defs:
       schema:
         const: knowledge-mcp/conventions/1
       from_parent:
+        description: Explicitly selected parent conventions. Each retains its declaring folder as the filing base.
         type: array
         items:
           $ref: "#/$defs/reference"

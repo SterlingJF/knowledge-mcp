@@ -4,62 +4,39 @@
 
 ### Added
 
-- `kb doctor` and `kb type` accept `--json`.
-- `kb --version` prints the knowledge-bus version on a second line.
-- The README gives [shell completion](README.md#shell-completion) steps for zsh, Bash and Fish.
-- The `kb_*` tools publish `outputSchema` and return validated `structuredContent`.
-- The `kb_*` tools and argument validation return RFC 9457 problem details with a `type` URI. Non-zero `kbp_*` exits preserve kbp output.
-- Session-start reviews show new, moved and deleted files with filing assessments, unresolved document types and complete counts in a 50-file preview.
-- `kb_prepare_document_moves` prepares a whole list of accepted moves at once and repairs the links between notes that move together.
-- An accepted list can be undone from the edit records; an undo that conflicts with a later change stops and lists the affected files.
-- Two moves to the same path, or a move into a path another file needs, block the list and name each affected move.
-- A team folder keeps its own conventions and takes from the parent folder only the conventions it lists in `from_parent`.
-- The agent can list the conventions in effect for a folder, with the folder each convention comes from.
-- Filing proposals and moves block when the destination's universe specs lack the document type or define it differently.
-- `kb_list_convention_templates` lists the ACE, PARA and Johnny.Decimal templates with their published sources, offline.
-- The skills take the person through each convention a template proposes before the agent saves it.
-- `kb_prepare_conventions` prepares the conventions file: a folder and a name pattern per document type.
-- Filing proposals follow a saved convention and list any value the agent still has to supply.
-- `kb type --filing-values` takes the values a convention needs.
-- `kb_get_document_type` and `kb_prepare_document_types` answers include `filing`: a proposed folder and name, based on where files of the same document type already live.
-- `kb_prepare_document_move` prepares an accepted move or rename, with the new text of every note whose links change. An ambiguous link blocks the move.
-- `kb type` shows the proposed folder and name.
+- Naming and filing proposals follow saved conventions or the folders holding files of the same document type. `kb type` shows the proposed name and folder; `--filing-values` supplies values read from the document.
+- Conventions can start from existing folders, from scratch, or from offline ACE, PARA and Johnny.Decimal templates with published sources. The agent reviews each proposal with you and saves accepted patterns using `kb_prepare_conventions`.
+- Team folders keep their own conventions and explicitly select parent conventions. `kb_list_conventions` shows which conventions apply and where each comes from.
+- At session start, review new, moved and deleted files, their proposed names and folders, and files still needing a document type. Reviews show totals and preview up to 50 files.
+- `kb_prepare_document_move` and `kb_prepare_document_moves` prepare accepted moves and link repairs from agent-supplied documents. Preparation blocks conflicting destinations, incompatible document types and ambiguous or unsupported links. The agent applies and records the changes; undo can restore a whole list and stops if later edits conflict.
+- `kb doctor` and `kb type` accept `--json`. The `kb_*` tools publish `outputSchema`, return validated `structuredContent`, and use RFC 9457 problem details for errors. Non-zero `kbp_*` exits preserve kbp output.
+- Shell completion is available for zsh, Bash and Fish; see the [setup steps](README.md#shell-completion).
 
 ### Changed
 
-- `kb fit <file>` is now `kb type <path>`.
-- `--hat` is now `--role`, and `--top` is now `--root`.
-- `kb kbp --<mode>` is now `kb kbp <mode>`, including `kb kbp validate`.
-- MCP tool `kb_fit` is now `kb_get_document_type`.
-- MCP tool `kb_audience` is now `kb_list_audiences`.
-- MCP tool `kb_mark` is now `kb_prepare_import`.
-- MCP tool `kb_edits` is now `kb_list_edits`.
-- MCP tool `kb_fit_record` is now `kb_prepare_document_types`.
-- MCP tool `kbp_check` is now `kbp_validate`.
-- The `kb_get_document_type` argument `hat` is now `role`.
-- Skill `km-write` is now `kb-write-document`.
-- Skill `km-fit-record` is now `kb-track-document-types`.
-- Skill `km-bring-in` is now `kb-import-document`.
-- For a 0.2.1 `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, `kb_prepare_document_types` returns `document-types.yaml` text for the agent to save.
-- The document-types schema is now `knowledge-mcp/document-types/1`, replacing `knowledge-mcp/fit-record/1`.
-- In the document-types file, `kind` is now `document_type`.
-- In the document-types file, `no_fit` is now `no_document_type`.
-- In the document-types file, `made: fit|correction` is now `set_by: agent|person`.
-- In document-types and edit records, `allowed_by.basis` renames `line` to `instruction` and `change_row` to `accepted_change`.
-- In edit records, `basis`, `basis_text` and `basis_location` become `allowed_by.basis`, `allowed_by.text` and `allowed_by.location`.
-- kb reports its own errors on stderr with an `Error:` line and a next step.
-- kb reports its own usage errors with exit code 2 and suggests close matches. Arguments after `kb kbp <mode>` retain kbp errors and exit codes.
-- `kb setup` and `kb setup --remove` print status lines and next steps on stderr.
-- `kb doctor` prints one status line for the install and one per harness, then a fix for each problem or warning.
-- Maintainers: `just format` now formats Python and the justfile.
-- Maintainers: `just check` adds strict Python type checks, dead code detection, and checks for TOML, shell scripts, workflows, relative links and vendored files.
-- Maintainers: the pre-commit hook checks large files and validates Renovate settings. When `uv.lock` changes, the hook refreshes `runtime/requirements.lock`.
+- CLI migration: `kb fit <file>` becomes `kb type <path>`, `--hat` becomes `--role`, and `--top` becomes `--root`. Use `kb kbp <mode>` instead of `kb kbp --<mode>`, including `kb kbp validate`. Arguments after the mode retain upstream grammar, output and exit codes.
+- Renamed MCP tools as follows. The former `hat` argument to `kb_get_document_type` is now `role`.
+
+| Previous tool   | Replacement                 |
+| --------------- | --------------------------- |
+| `kb_fit`        | `kb_get_document_type`      |
+| `kb_audience`   | `kb_list_audiences`         |
+| `kb_mark`       | `kb_prepare_import`         |
+| `kb_edits`      | `kb_list_edits`             |
+| `kb_fit_record` | `kb_prepare_document_types` |
+| `kbp_check`     | `kbp_validate`              |
+
+- Skill migration: `km-write` → `kb-write-document`, `km-fit-record` → `kb-track-document-types`, and `km-bring-in` → `kb-import-document`.
+- `kb_prepare_document_types` converts a 0.2.1 `.knowledge-bus/plugins/knowledge-mcp/record.yaml` to `document-types.yaml` text for the agent to save. The schema changes from `knowledge-mcp/fit-record/1` to `knowledge-mcp/document-types/1`; `kind` becomes `document_type`, `no_fit` becomes `no_document_type`, and `made: fit|correction` becomes `set_by: agent|person`.
+- Edit answers use `knowledge-mcp/edit/2` and `knowledge-mcp/edits/2`, with optional operation metadata for whole-list undo. Legacy ungrouped edit records remain readable. Edit permission fields `basis`, `basis_text` and `basis_location` move under `allowed_by` as `basis`, `text` and `location`. In document-types and edit records, basis values `line` and `change_row` become `instruction` and `accepted_change`.
+- CLI errors go to stderr with an `Error:` line and a next step. Usage errors exit 2 and suggest close matches. Setup and removal report status and next steps on stderr; doctor reports the install and each harness with fixes for problems and warnings. `kb --version` prints the knowledge-bus version on a second line.
+- Maintainer checks now include strict Python typing, dead code detection, TOML, shell scripts, workflows, relative links and vendored-file integrity. `just format` includes Python and the justfile. Pre-commit checks large files and Renovate settings, and refreshes `runtime/requirements.lock` when `uv.lock` changes.
 
 ### Fixed
 
-- kb rejects a shortened flag, such as `kb setup --remov`, with exit code 2 instead of running the removal.
+- Shortened flags such as `kb setup --remov` fail with exit code 2 instead of running the removal.
 - `kb kbp --help` and `kb kbp -h` print help.
-- On a broken install, kb prints an error and the reinstall command instead of a traceback.
+- Broken installs report an error and a reinstall command instead of a traceback.
 
 ## 0.2.1
 

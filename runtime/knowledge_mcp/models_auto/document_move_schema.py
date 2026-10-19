@@ -15,6 +15,10 @@ class DocumentDigest(BaseModel):
 
 
 class MoveInputs(BaseModel):
+    """
+    Input digests for the agent to recheck before applying writes.
+    """
+
     model_config = ConfigDict(
         extra="forbid",
     )
@@ -39,11 +43,28 @@ class MoveLink(BaseModel):
         extra="forbid",
     )
     source_path: MovePath
-    start: Annotated[int, Field(ge=0)]
-    end: Annotated[int, Field(ge=0)]
+    start: Annotated[
+        int,
+        Field(
+            description="Zero-based Unicode code-point offset of the complete link token in the original supplied text.",
+            ge=0,
+        ),
+    ]
+    end: Annotated[
+        int,
+        Field(
+            description="Exclusive Unicode code-point offset after the complete original link token.",
+            ge=0,
+        ),
+    ]
     target_before: Path
     target_after: Path
-    replacement: str | None
+    replacement: Annotated[
+        str | None,
+        Field(
+            description="The complete replacement link token, or null when the original token needs no change."
+        ),
+    ]
 
 
 class MoveIssue(BaseModel):
@@ -67,10 +88,31 @@ class DocumentMoveAnswer(BaseModel):
     old_path: MovePath
     path: MovePath
     allowed_by: AllowedBy
-    search: list[str]
-    based_on: Annotated[MoveInputs, Field(title="Move inputs")]
-    writes: list[MoveWrite]
-    record: str | None
+    search: Annotated[
+        list[str],
+        Field(
+            description="Fixed strings to search case-insensitively across Markdown files; echo the complete array after searching."
+        ),
+    ]
+    based_on: Annotated[
+        MoveInputs,
+        Field(
+            description="Input digests for the agent to recheck before applying writes.",
+            title="Move inputs",
+        ),
+    ]
+    writes: Annotated[
+        list[MoveWrite],
+        Field(
+            description="Prepared document replacements for the agent to apply as one operation with `record`."
+        ),
+    ]
+    record: Annotated[
+        str | None,
+        Field(
+            description="Prepared document-types text for the agent to save with the document writes, or null when no writes are prepared."
+        ),
+    ]
     digest: Annotated[str | None, Field(pattern="^sha256:[0-9a-f]{64}$")]
     links: list[MoveLink]
     issues: list[MoveIssue]
@@ -80,7 +122,7 @@ class DocumentMoveAnswer(BaseModel):
 type KbPrepareDocumentMoveResult = Annotated[
     DocumentMoveAnswer | problem_schema.ProblemDetails,
     Field(
-        description="Replacement text and link target checks for an accepted document move, or a request for referring document text.",
+        description="Prepared replacement text and link target checks against supplied inputs for an accepted document move, or a request for referring document text. The agent applies the move and verifies the saved files.",
         title="kb_prepare_document_move result",
     ),
 ]

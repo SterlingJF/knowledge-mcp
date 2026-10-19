@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Native Homebrew metadata and its canonical archive form one immutable release pair.
+// Publish and restore bottle metadata with its archive.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {

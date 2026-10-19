@@ -25,29 +25,30 @@ For releases, see [docs/release-check.md](docs/release-check.md).
 
 Renovate updates `uv.lock` but not `runtime/requirements.lock`. When a Renovate PR fails `check_knowledge_mcp_lock`, check out the branch and run `just generate_knowledge_mcp_lock`. Commit and push `runtime/requirements.lock`.
 
-## Lint and format
+## Focused checks
 
-| Files                                       | Linters                                             | Formatter                             | Config                                                    | Recipe                                                       |
-| ------------------------------------------- | --------------------------------------------------- | ------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------ |
-| `runtime/knowledge_mcp/` Python             | Ruff, strict mypy, Vulture                          | Ruff                                  | `ruff.toml`, `pyproject.toml`                             | `check_runtime`                                              |
-| `runtime/tests/`, `runtime/scripts/` Python | Ruff; Vulture on tests                              | Ruff                                  | `ruff.toml`, `pyproject.toml`                             | `check_runtime`                                              |
-| `tools/` TypeScript                         | Type-aware oxlint, anti-slop rules, tsc, Knip       | Prettier                              | `.oxlintrc.json`, `tsconfig.json`, `knip.json`            | `check_root`                                                 |
-| Markdown                                    | markdownlint-cli2, relative links                   | Prettier, markdownlint fixes          | `.markdownlint-cli2.jsonc`                                | `check_root`                                                 |
-| YAML                                        | Strict yamllint                                     | Prettier                              | `.yamllint.yml`                                           | `check_root`                                                 |
-| GitHub workflows                            | actionlint, shellcheck, yamllint                    | Prettier                              | `.yamllint.yml`                                           | `check_root`                                                 |
-| JSON Schemas and conformance samples        | Sourcemeta jsonschema, strict Ajv 2020-12           | Prettier                              | `justfile`, `tools/conformance/`                          | `check_contracts`                                            |
-| `tools.json` schemas                        | jsonschema, snapshot test                           | `generate_contract_snapshots`         | `justfile`                                                | `check_contracts`, `check_runtime`                           |
-| TOML                                        | Tombi                                               | Prettier TOML plugin                  | `.prettierrc.json`                                        | `check_root`                                                 |
-| JSON                                        | Prettier; Renovate validator; plugin manifest tests | Prettier                              | `.prettierrc.json`, `.pre-commit-config.yaml`             | `check_root`, `check_staged`, `check_runtime`                |
-| `justfile`                                  | just, shellcheck on Bash recipes                    | `just --fmt`                          | `justfile`                                                | `check_root`                                                 |
-| `.husky/` hooks                             | shellcheck (sh)                                     | None                                  | `justfile`                                                | `check_root`                                                 |
-| Generated models in `models_auto/`          | Strict mypy, drift check                            | Ruff through datamodel-code-generator | `pyproject.toml`                                          | `check_runtime`                                              |
-| Schema bundles, tool reference, module maps | Drift checks                                        | `generate_*` recipes                  | `justfile`                                                | `check_contracts`, `check_runtime`, `check_root`             |
-| Lockfiles                                   | Locked installs, export comparison, OSV             | None (generated)                      | `.pre-commit-config.yaml`, `justfile`, `osv-scanner.toml` | `check_runtime`, `check_staged`, `scan_dependencies_or_warn` |
-| `runtime/tests/fixtures/`                   | Exact-byte tests                                    | None                                  | `.prettierignore`, `.markdownlint-cli2.jsonc`             | `check_runtime`                                              |
-| Vendored universe specs and six skills      | SHA-256 comparison                                  | None                                  | `runtime/knowledge-bus/UPSTREAM.md`                       | `check_root`                                                 |
-| Vendored rules in `tools/oxlint/anti-slop/` | tsc, rule tests                                     | Prettier                              | `tools/oxlint/anti-slop/UPSTREAM.md`                      | `check_root`                                                 |
-| Newly added files                           | Large-file limit: 5,120 KB                          | None                                  | `.pre-commit-config.yaml`                                 | `check_staged`                                               |
+Use the recipe for the area you changed while developing; run the full checks before a pull request.
+
+| Area                      | Command                | Checks                                                                                           |
+| ------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------ |
+| Runtime Python            | `just check_runtime`   | Ruff, strict mypy, Vulture, tests and generated-file drift                                       |
+| Schemas                   | `just check_contracts` | Schema lint, conformance samples and generated bundles                                           |
+| Docs and repository tools | `just check_root`      | Markdown and relative links, TypeScript, configuration, shell scripts, workflows and module maps |
+| Staged files              | `just check_staged`    | Pre-commit checks, including the 5,120 KB limit for added files and Renovate validation          |
+
+The [justfile](justfile) defines each check. Python rules live in [ruff.toml](ruff.toml) and [pyproject.toml](pyproject.toml); repository tooling uses [package.json](package.json) and its referenced configs. The [Markdown config](.markdownlint-cli2.jsonc) includes relative-link checks. [Prettier exclusions](.prettierignore) identify files whose formatting must be preserved.
+
+## Generated and vendored files
+
+Edit YAML schemas in `contracts/extensions/mcp/v1/`, then run `just generate_contract_types` for runtime models and bundles. Run `just generate_contract_snapshots` to refresh `tools.json` and passing conformance samples, then `just generate_mcp_tools_doc` for the tool reference. Write failing conformance samples by hand. See the [contract rules](contracts/README.md).
+
+Keep these boundaries when editing:
+
+- Preserve exact bytes in `runtime/tests/fixtures/`; tests depend on them.
+- Refresh bundled universe specs and the six knowledge-bus skills through `just refresh_knowledge_model <tag>`, following the [upgrade steps](runtime/README.md#upgrade-knowledge-bus). Their hashes are recorded in [UPSTREAM.md](runtime/knowledge-bus/UPSTREAM.md).
+- Replace vendored anti-slop rules from their source, following [their provenance instructions](tools/oxlint/anti-slop/UPSTREAM.md).
+- Generate `runtime/requirements.lock` from `uv.lock` with `just generate_knowledge_mcp_lock`.
+- Update copied module maps from their source READMEs as described below.
 
 ## Project map
 

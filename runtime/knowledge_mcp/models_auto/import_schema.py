@@ -48,7 +48,11 @@ class Passage(BaseModel):
     kind: Literal["heading", "paragraph", "list-item", "code"]
     lines: Annotated[
         list[Line],
-        Field(description="First and last line numbers.", max_length=2, min_length=2),
+        Field(
+            description="Inclusive first and last line numbers in the source text, starting at one.",
+            max_length=2,
+            min_length=2,
+        ),
     ]
     opening: Annotated[
         str,

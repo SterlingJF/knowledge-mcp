@@ -859,7 +859,7 @@ KNOWLEDGE_BUS_TERMS = {
     '"guidance"': r"(?i)(?<![\w-])guidance(?![\w-])",
     '"definitions"': r"(?i)(?<![\w-])definitions?(?![\w-])",
 }
-# The README Features list uses "universe spec" in full, by the owner's B7 copy.
+# The README may use protocol terms such as "universe spec", but not "Knowledge Bus".
 README_TERMS = {name: KNOWLEDGE_BUS_TERMS[name] for name in ('"Knowledge Bus"',)}
 COMMAND_OUTPUTS = [
     ["--version"],

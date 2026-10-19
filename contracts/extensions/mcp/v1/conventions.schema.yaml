@@ -13,6 +13,9 @@ properties:
   schema:
     const: knowledge-mcp/conventions/1
   from_parent:
+    description:
+      Explicitly selected parent conventions. Each retains its declaring folder
+      as the filing base.
     type: array
     items:
       $ref: "#/$defs/reference"

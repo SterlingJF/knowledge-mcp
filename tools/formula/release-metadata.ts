@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Product versions and changelog notes share one release authority.
+// Keep package and manifest versions aligned with the changelog release.
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";

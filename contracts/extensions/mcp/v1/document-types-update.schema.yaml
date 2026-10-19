@@ -46,7 +46,7 @@ $defs:
       digest:
         description:
           Digest of `record`, or null when `record` is null. Send a non-null
-          digest as `record_digest` in the next call.
+          digest as `record_digest` after saving `record`.
         type:
           - string
           - "null"

@@ -559,7 +559,7 @@ def setup(harness: str, remove: bool) -> None:
         "kb never opens the file, so the file can be missing. "
         "Its folder must exist. Each lookup adds a line to log.jsonl "
         "in the state folder."
-        "\n\nProposed folders and names follow conventions or typed peers. "
+        "\n\nProposed folders and names follow saved conventions or files of the same document type. "
         "Both proposal columns show <none> when no proposal applies."
         "\n\nColumns: TYPE SPEC MATCHED-BY USED-BY PROPOSED-FOLDER PROPOSED-NAME TITLE."
     ),
@@ -836,9 +836,9 @@ def _mode_command(flag: str, upstream: ModuleType) -> click.Command:
 
 
 def run(argv: Sequence[str]) -> int:
-    """Print errors and next steps on stderr for ClickException, KbError and unexpected exceptions.
+    """Report ClickException, KbError and unexpected exceptions on stderr, with repair steps.
 
-    With --json, append a problem object for ClickException, KbError and unexpected exceptions.
+    Add JSON problem details when --json is present.
     """
     _state_warning()
     try:

@@ -115,8 +115,7 @@ def get_document_type(
     listing = scope.listing
     specs = scope.specs
     if files is not None and changes:
-        # records.lookup reads only the requested file's entry, so a wrong document-type list
-        # for the other changed paths does no harm.
+        # Apply pending changes for this lookup without saving the document-types file.
         files = records.merge(
             files,
             records.MergeRequest(

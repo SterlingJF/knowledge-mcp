@@ -44,9 +44,13 @@ $defs:
       allowed_by:
         $ref: document-types.schema.yaml#/$defs/allowed_by
       search:
+        description:
+          Fixed strings to search case-insensitively across Markdown files; echo
+          the complete array after searching.
         type: array
         items: *id001
       based_on:
+        description: Input digests for the agent to recheck before applying writes.
         title: Move inputs
         type: object
         additionalProperties: false
@@ -72,10 +76,14 @@ $defs:
                   $ref: common.schema.yaml#/$defs/path
                 digest: *id002
       writes:
+        description: Prepared document replacements for the agent to apply as one operation with `record`.
         type: array
         items:
           $ref: "#/$defs/write"
-      record: &id005
+      record:
+        description:
+          Prepared document-types text for the agent to save with the document
+          writes, or null when no writes are prepared.
         type:
           - string
           - "null"
@@ -155,13 +163,21 @@ $defs:
     properties:
       source_path:
         $ref: common.schema.yaml#/$defs/move_path
-      start: &id003
+      start:
+        description: Zero-based Unicode code-point offset of the complete link token in the original supplied text.
         type: integer
         minimum: 0
-      end: *id003
+      end:
+        description: Exclusive Unicode code-point offset after the complete original link token.
+        type: integer
+        minimum: 0
       target_before: *id004
       target_after: *id004
-      replacement: *id005
+      replacement:
+        description: The complete replacement link token, or null when the original token needs no change.
+        type:
+          - string
+          - "null"
   issue:
     title: Move issue
     type: object
@@ -174,7 +190,10 @@ $defs:
       - detail
     properties:
       code: *id001
-      source_path: *id005
+      source_path:
+        type:
+          - string
+          - "null"
       start:
         type:
           - integer
@@ -187,5 +206,6 @@ $defs:
         minimum: 0
       detail: *id001
 description:
-  Replacement text and link target checks for an accepted document move, or a request
-  for referring document text.
+  Prepared replacement text and link target checks against supplied inputs for an
+  accepted document move, or a request for referring document text. The agent applies
+  the move and verifies the saved files.

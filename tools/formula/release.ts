@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Root release recipes share this policy; Homebrew owns bottle mechanics.
+// Coordinate release recipes and run Homebrew commands to build, merge and test bottles.
 import { spawnSync } from "node:child_process";
 import {
   appendFileSync,

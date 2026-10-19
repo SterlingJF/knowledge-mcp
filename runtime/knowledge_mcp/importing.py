@@ -8,7 +8,10 @@ SCHEMA = "knowledge-mcp/import/1"
 
 
 def pairs(listing: dict[str, Any]) -> list[tuple[str, str]]:
-    """Accept `kbp --kinds` output for one universe spec or several."""
+    """List (universe spec id, document type id) pairs from `kbp --kinds` output.
+
+    Accept listings for one universe spec or several.
+    """
     return [
         (group["universe_spec"]["id"], kind["kind"])
         for group in listing.get("universe_specs", [listing])

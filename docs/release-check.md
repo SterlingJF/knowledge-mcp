@@ -5,7 +5,7 @@ The `HOMEBREW_TAP_TOKEN` secret is a fine-grained token with read and write acce
 
 ## Publish a release
 
-1. Write changes under `## Unreleased` in `CHANGELOG.md`, as one-line bullets under Added, Changed, Removed and Fixed.
+1. Record user-visible changes under `## Unreleased` in `CHANGELOG.md`, grouped under Added, Changed, Removed and Fixed. Include upgrade steps for breaking changes.
 2. Run `just release_prepare X.Y.Z` to update package versions, plugin versions, `uv.lock` and `runtime/requirements.lock`.
    The recipe renames `## Unreleased` to `## X.Y.Z` and stages nothing.
 3. Run `just release_check`, then `just check`.

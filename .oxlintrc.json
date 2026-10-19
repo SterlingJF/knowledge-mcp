@@ -159,7 +159,7 @@
       }
     },
     {
-      // tools/formula predates these rules and stays unchanged for 0.3.0.
+      // Legacy release code uses larger functions and unchecked type assertions.
       "files": ["tools/formula/**"],
       "rules": {
         "complexity": "off",

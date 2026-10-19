@@ -8,6 +8,12 @@ The server serves MCP over stdio and opens no network port. Harnesses with a kno
 
 > Generated regions come from [tools.json](../contracts/extensions/mcp/v1/tools.json), the `tools/list` response. After a tool change, run `just generate_contract_snapshots`, then `just generate_mcp_tools_doc`.
 
+## File access and side effects
+
+The agent supplies document text, inventories and configuration, then applies prepared file changes with its own tools. Preparation tools return text for the agent to save; tool calls also append answers to the state log. `kb_record_edit` stores edit history there, and `kbp_explore` writes offline viewers. See [data handling and retention](../SECURITY.md#trust-model).
+
+The included [writing skill](../runtime/skills/kb-write-document/SKILL.md) and [tracking skill](../runtime/skills/kb-track-document-types/SKILL.md) cover approval, link searches, configuration checks, applying changes and guarded undo. The [naming and filing guide](naming-and-filing.md) explains the workflow for readers.
+
 ## Tools
 
 <!-- BEGIN AUTO-GENERATED tools -->
@@ -22,7 +28,7 @@ The server serves MCP over stdio and opens no network port. Harnesses with a kno
 | `kb_prepare_conventions`       | Prepare conventions text from supplied configuration and proposed changes.                                                                                    | [conventions-update.schema.yaml](../contracts/extensions/mcp/v1/conventions-update.schema.yaml)       |
 | `kb_prepare_document_move`     | Prepare a document move from supplied text, a complete listing and permission.                                                                                | [document-move.schema.yaml](../contracts/extensions/mcp/v1/document-move.schema.yaml)                 |
 | `kb_prepare_document_moves`    | Prepare moves together from supplied text and a complete listing.                                                                                             | [document-moves.schema.yaml](../contracts/extensions/mcp/v1/document-moves.schema.yaml)               |
-| `kb_prepare_document_types`    | Prepare document-types text and filing assessments by comparing a complete listing with saved entries.                                                        | [document-types-update.schema.yaml](../contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
+| `kb_prepare_document_types`    | Prepare document-types text by comparing a complete listing with saved entries.                                                                               | [document-types-update.schema.yaml](../contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
 | `kb_prepare_import`            | Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`.                                    | [import.schema.yaml](../contracts/extensions/mcp/v1/import.schema.yaml)                               |
 | `kb_record_edit`               | Record an edit right after you make it, so the person can check or undo the change.                                                                           | [edit.schema.yaml](../contracts/extensions/mcp/v1/edit.schema.yaml)                                   |
 | `kbp_card`                     | Read the card for a document type before you draft or edit a document of that type.                                                                           | kbp's output, as is                                                                                   |
@@ -45,8 +51,6 @@ The result contains the kbp exit code in `_meta.exit_code` and sets `isError` fo
 Failures in `kb_*` tools and errors before kbp runs return a problem object in `structuredContent`.
 [problem.schema.yaml](../contracts/extensions/mcp/v1/problem.schema.yaml) lists the problem types.
 
-Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md](../SECURITY.md#trust-model).
-
 ## Arguments
 
 <!-- BEGIN AUTO-GENERATED arguments -->
@@ -59,7 +63,7 @@ Each tool call adds a line to `log.jsonl` in the state folder. See [SECURITY.md]
 | `name`                  | string                                            | yes      |                                                                                                                                                                                                                                                                                                                     |
 | `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                     |
 | `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | Every folder containing .knowledge-bus/, including peer folders. Include empty configuration folders. Classification uses the ancestors of the subject document; filing compares peers under the applicable universe specs.                                                                                         |
-| `role`                  | string or null                                    | no       | The reader's role, such as maintainer. Prioritize document types by word overlap between this role and the reader role.                                                                                                                                                                                             |
+| `role`                  | string or null                                    | no       | The reader's role, such as maintainer. Put document types for that role first.                                                                                                                                                                                                                                      |
 | `record`                | string or null                                    | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
 | `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
 | `changes`               | list of [FileChange](#filechange) or null         | no       | Files changed since the document-types file was last saved. Send them with `record` or `record_digest`. knowledge-mcp applies the changes to the entries for this answer only.                                                                                                                                      |
@@ -261,6 +265,8 @@ No arguments.
 
 ### AllowedBy
 
+The person's permission for the save or the edit.
+
 | Field      | Type                                          | Required | Meaning                                                                                                                                                                                                |
 | ---------- | --------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `basis`    | `request`, `instruction` or `accepted_change` | yes      | `request` means the person asked in this session. `instruction` means the person wrote an instruction for agents, such as in AGENTS.md. `accepted_change` means the person accepted a proposed change. |
@@ -268,6 +274,8 @@ No arguments.
 | `location` | string or null                                | no       | The file holding the instruction or the accepted change.                                                                                                                                               |
 
 ### Audience
+
+The document's reader, and whether the person confirmed the value.
 
 | Field    | Type                     | Required | Meaning |
 | -------- | ------------------------ | -------- | ------- |
@@ -311,19 +319,19 @@ Type: [ConventionFile1](#conventionfile1) or [ConventionFile2](#conventionfile2)
 
 ### ConventionFile1
 
-| Field    | Type                                    | Required | Meaning |
-| -------- | --------------------------------------- | -------- | ------- |
-| `folder` | [ConventionsFolder](#conventionsfolder) | yes      |         |
-| `text`   | string                                  | yes      |         |
-| `digest` | [Digest](#digest) or null               | no       |         |
+| Field    | Type                                    | Required | Meaning                                                                       |
+| -------- | --------------------------------------- | -------- | ----------------------------------------------------------------------------- |
+| `folder` | [ConventionsFolder](#conventionsfolder) | yes      | The declaring folder relative to the knowledge-base root; empty for the root. |
+| `text`   | string                                  | yes      | Complete conventions text, or an empty string to report an absent file.       |
+| `digest` | [Digest](#digest) or null               | no       | A digest from this session, in place of unchanged conventions text.           |
 
 ### ConventionFile2
 
-| Field    | Type                                    | Required | Meaning |
-| -------- | --------------------------------------- | -------- | ------- |
-| `folder` | [ConventionsFolder](#conventionsfolder) | yes      |         |
-| `text`   | string or null                          | no       |         |
-| `digest` | [Digest](#digest)                       | yes      |         |
+| Field    | Type                                    | Required | Meaning                                                                       |
+| -------- | --------------------------------------- | -------- | ----------------------------------------------------------------------------- |
+| `folder` | [ConventionsFolder](#conventionsfolder) | yes      | The declaring folder relative to the knowledge-base root; empty for the root. |
+| `text`   | string or null                          | no       | Complete conventions text, or an empty string to report an absent file.       |
+| `digest` | [Digest](#digest)                       | yes      | A digest from this session, in place of unchanged conventions text.           |
 
 ### ConventionLiteralPart
 
@@ -364,6 +372,8 @@ Type: string, pattern `^(?:[^/\\\u0000]+(?:/[^/\\\u0000]+)*)?$`.
 
 ### Digest
 
+The SHA-256 of the text's UTF-8 bytes.
+
 Type: string, pattern `^sha256:[0-9a-f]{64}$`.
 
 ### DocumentMove
@@ -375,13 +385,13 @@ Type: string, pattern `^sha256:[0-9a-f]{64}$`.
 
 ### EditOperation
 
-| Field      | Type          | Required | Meaning |
-| ---------- | ------------- | -------- | ------- |
-| `id`       | string        | yes      |         |
-| `index`    | integer       | yes      |         |
-| `count`    | integer       | yes      |         |
-| `old_path` | [Path](#path) | yes      |         |
-| `path`     | [Path](#path) | yes      |         |
+| Field      | Type          | Required | Meaning                                                                                  |
+| ---------- | ------------- | -------- | ---------------------------------------------------------------------------------------- |
+| `id`       | string        | yes      | An opaque id shared by every edit in the same operation.                                 |
+| `index`    | integer       | yes      | The edit's unique one-based position within the operation.                               |
+| `count`    | integer       | yes      | Total edits in the operation, including referring documents and the document-types file. |
+| `old_path` | [Path](#path) | yes      | Original path; equal to `path` for a stationary referring document.                      |
+| `path`     | [Path](#path) | yes      | Final path after the operation.                                                          |
 
 ### EntryItem
 
@@ -432,10 +442,10 @@ Type: [FileCreated](#filecreated) or [FileDeleted](#filedeleted) or [FileMoved](
 
 ### FilingReview
 
-| Field       | Type            | Required | Meaning |
-| ----------- | --------------- | -------- | ------- |
-| `folder`    | string          | yes      |         |
-| `recursive` | boolean or null | no       |         |
+| Field       | Type            | Required | Meaning                                                          |
+| ----------- | --------------- | -------- | ---------------------------------------------------------------- |
+| `folder`    | string          | yes      | Folder relative to the knowledge-base root; empty for the root.  |
+| `recursive` | boolean or null | no       | Include descendants; false limits the review to direct children. |
 
 ### FilingValue
 
@@ -449,6 +459,8 @@ Type: [FileCreated](#filecreated) or [FileDeleted](#filedeleted) or [FileMoved](
 
 ### Fingerprint
 
+A value that changes only when the file content changes, such as SHA-256 or Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing` that moved.
+
 Type: string.
 
 ### KnowledgeBusFolder
@@ -461,12 +473,14 @@ Type: string.
 
 ### LinkBinding
 
-| Field         | Type                  | Required | Meaning |
-| ------------- | --------------------- | -------- | ------- |
-| `source_path` | [MovePath](#movepath) | yes      |         |
-| `start`       | integer               | yes      |         |
-| `end`         | integer               | yes      |         |
-| `target_path` | [MovePath](#movepath) | yes      |         |
+An independently verified original target for a complete internal link token.
+
+| Field         | Type                  | Required | Meaning                                                                                                                                                                                                        |
+| ------------- | --------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source_path` | [MovePath](#movepath) | yes      | The document containing the link, at its original path.                                                                                                                                                        |
+| `start`       | integer               | yes      | Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.                                                                   |
+| `end`         | integer               | yes      | Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path. |
+| `target_path` | [MovePath](#movepath) | yes      | The link's established target in the original inventory, before any move.                                                                                                                                      |
 
 ### ListedFile
 
@@ -484,6 +498,8 @@ Type: string.
 
 ### MovePath
 
+Path relative to the knowledge-base root, with forward slashes between folders.
+
 Type: string, pattern `^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$`.
 
 ### Part
@@ -491,6 +507,8 @@ Type: string, pattern `^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$`.
 Type: [ConventionDocumentTypePart](#conventiondocumenttypepart) or [ConventionDatePart](#conventiondatepart) or [ConventionPropertyPart](#conventionpropertypart) or [ConventionContentPart](#conventioncontentpart) or [ConventionLiteralPart](#conventionliteralpart).
 
 ### Path
+
+Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.
 
 Type: string.
 
@@ -503,6 +521,8 @@ Type: string.
 | `document_type` | string   | yes      |         |
 
 ### SetBy
+
+`person` when the person stated the document type or reader. An entry the person set wins over any later entry by the agent.
 
 Type: `agent` or `person`.
 
