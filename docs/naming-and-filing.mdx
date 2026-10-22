@@ -1,0 +1,101 @@
+---
+title: "Naming and filing conventions"
+sidebarTitle: "Naming and filing"
+description: "Set naming and filing conventions for each document type, start from templates such as ACE, PARA or Johnny.Decimal, and keep links working when files move."
+---
+
+Naming and filing conventions tell knowledge-mcp where each type of document belongs and how to name it. When a file needs a new name or folder, knowledge-mcp proposes both from the conventions for the folder it's in. Your assistant shows you the proposal and only moves the file once you accept.
+
+## From file to proposal
+
+1. Your assistant works out the document type from the file name and folder, and reads the content if it needs to.
+2. It passes knowledge-mcp the folder's conventions and any values the name uses, such as a recorded date or a title.
+3. knowledge-mcp proposes a name and a folder.
+4. Your assistant shows you the proposal and prepares the move and any link repairs with knowledge-mcp. Once you accept, it makes the changes with its own file tools.
+5. It then updates the saved document types, so the file keeps its type after the move.
+
+## Start from a template
+
+Pick a template, and your assistant uses it to propose naming and filing conventions for each type of note. You can accept, change or drop each one before any file moves.
+
+These templates are for a knowledge base of notes, not a codebase. Codebase records stay in the folders the codebase already uses.
+
+- **ACE (Atlas, Calendar, Efforts):** Nick Milo's folder system. Atlas holds knowledge, Calendar holds time and Efforts holds action. Your assistant proposes a folder based on what each document is for. knowledge-mcp also suggests names: daily notes are named by their date, as in Obsidian, and other Calendar notes by date and then title.
+- **A customized ACE:** keep your own folder names, for example an Atlas split into notes your assistant writes and notes you write. Your assistant adjusts its proposals to match.
+- **PARA (Projects, Areas, Resources, Archives):** Tiago Forte's system sorts information into four folders by how actionable it is. Your assistant proposes a folder based on what each document is for, with project, area or topic subfolders taken from the document's recorded properties.
+- **Johnny.Decimal:** Johnny Noble and Lucy Butcher's system numbers areas, categories and IDs, keeps files only in ID folders and starts file names with the date. Your assistant keeps any numbers you've given it and proposes date-first names. If a number is missing, it asks you instead of picking one.
+- **A mix:** you can combine patterns, for example ACE folders with decision records numbered in order in a single folder.
+
+## Start from the folders you already keep
+
+If you already keep files of a document type in particular folders, knowledge-mcp proposes a convention based on where they are. Accept it to keep your current structure.
+
+## Write your own conventions
+
+For each document type, a convention says which folder it goes in and how its file name is built. A name can use:
+
+- **Fixed and recorded values:** fixed text, the document type, a recorded date, or a property such as a project code.
+- **A value from the content:** something your assistant reads from the document, such as the title, the client or another party. It can go in the file name or the folder.
+
+### Examples
+
+- **Meeting notes:** filed in Calendar and named by date, then title.
+- **Decision records:** filed in one folder and numbered in order, following Michael Nygard's practice. Your assistant uses the numbers already recorded and checks the history so it never reuses one. knowledge-mcp doesn't hand out numbers itself.
+- **Invoices:** filed in the client's folder and named by date and client.
+
+Change, add or remove a convention whenever your work changes. Files already in place keep their names and folders until you accept a new proposal, either one file at a time or a whole folder at once.
+
+## Conventions across teams and folders
+
+Conventions apply by folder. A team that has its own conventions chooses which of its parent folder's conventions to keep.
+
+- Conventions set for the whole knowledge base apply in every folder, except team folders with their own conventions.
+- A team or department with its own conventions picks each parent convention it wants to keep. Those conventions still file documents relative to the parent folder they came from.
+- The parent folder is the nearest folder above that has its own conventions.
+
+For example, a village hall keeps conventions for hall bookings and upkeep in its top folder. The management committee keeps conventions for its minutes in the committee folder and also keeps the hall upkeep conventions from the parent folder, because the committee signs off hirer checklists.
+
+In a company, the finance team keeps conventions for invoices in its own folder and also keeps the contract conventions from the company folder, because finance files signed contracts too.
+
+## Conventions in effect for a folder
+
+Ask your assistant which conventions apply in any folder. It lists them by document type, says which folder each one comes from and marks the ones taken from the parent folder.
+
+## Teams that use words differently
+
+Each team can keep its own terms in its folder, next to its document types and conventions. Each term means one thing. In a team folder, knowledge-mcp builds proposals from that team's document types and conventions. That way two teams can deliberately file the same type of document in different places, and both conventions stay visible.
+
+## Review many files at once
+
+Ask your assistant to review a folder, and its subfolders if you want them too. It shows you the full list of proposed moves, including any missing values and blocked moves. Drop or change any row, then accept the rest in one go.
+
+knowledge-mcp prepares the moves together, so links between the files being moved keep working. Your assistant makes the changes and records them. Undo restores the whole list only if the files haven't changed since the move and every edit was recorded. Otherwise, it tells you which files to check.
+
+## Keep links working
+
+Moves keep Markdown links and Obsidian wikilinks working, including embeds and links to headings or blocks. Your assistant checks notes across the whole knowledge base, including ones outside the folder you're reviewing. knowledge-mcp prepares the link repairs, and your assistant checks the links once the repairs are made.
+
+A move waits if the link search didn't finish, a target is unclear, the destination is already taken or the destination doesn't allow that document type. Internal links that can't be repaired need fixing before the move goes ahead. Your assistant sorts these out and checks for changed files before it moves anything. If a write fails, recovery keeps later edits made in other sessions and lists any files that still need attention.
+
+## What your assistant does
+
+- The writing and tracking skills that come with knowledge-mcp tell your assistant to read the conventions that apply at the start of each session and before it starts work.
+- When a file could be more than one document type, your assistant lists the types for your role first and asks you to confirm.
+- Each proposal says which document type it's for, which convention it follows and which folder that convention comes from.
+- If a proposed folder doesn't exist yet, the proposal marks it as new, and your assistant creates it with the move once you accept.
+- Your assistant only moves or renames a file when you ask, when you accept a proposal, or when you've written a standing instruction that tells it to.
+- knowledge-mcp logs its answers in the state folder. Your assistant makes the file changes and records the edits, so you can review or undo them.
+
+## Files with no convention
+
+- If a document type has no convention, knowledge-mcp proposes a folder based on where files of that type already are. You can keep that as a convention.
+- A file with no document type stays where it is, with its current name. It shows up in the list of files that still need a document type when your assistant reviews the knowledge base at the start of a session.
+- If files with no document type keep arriving, ask your assistant to add a new document type using the knowledge-bus skills that come with knowledge-mcp. Each proposed change shows its evidence and waits for your answer.
+
+## Sources
+
+- Nick Milo: [ACE folder framework](https://blog.linkingyourthinking.com/notes/ace-folder-framework), [expansion and contraction](https://blog.linkingyourthinking.com/notes/the-ace-folder-framework-flexes-for-you), [detailed structure](https://blog.linkingyourthinking.com/notes/a-deeper-dive-into-how-ace-works).
+- Obsidian: [Daily notes](https://obsidian.md/help/plugins/daily-notes).
+- Tiago Forte: [The PARA Method](https://fortelabs.com/blog/para/).
+- Johnny.Decimal: [Numbers](https://johnnydecimal.com/documentation/the-numbers), [IDs](https://johnnydecimal.com/documentation/ids), [saving files](https://johnnydecimal.com/documentation/saving-files), [naming files](https://johnnydecimal.com/documentation/naming-files).
+- Michael Nygard: [Decision records](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions).

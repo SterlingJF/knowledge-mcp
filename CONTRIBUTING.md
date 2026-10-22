@@ -21,33 +21,39 @@ just check
 
 Run `just format` to format files and apply lint fixes. Run `just --list` to list public recipes.
 
-For releases, see [docs/release-check.md](docs/release-check.md).
+For releases, see [RELEASING.md](RELEASING.md).
 
-Renovate updates `uv.lock` but not `runtime/requirements.lock`. When a Renovate PR fails `check_knowledge_mcp_lock`, check out the branch and run `just generate_knowledge_mcp_lock`. Commit and push `runtime/requirements.lock`.
+`uv.lock` is the canonical Python dependency lock.
 
 ## Focused checks
 
 Use the recipe for the area you changed while developing; run the full checks before a pull request.
 
-| Area                      | Command                | Checks                                                                                           |
-| ------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------ |
-| Runtime Python            | `just check_runtime`   | Ruff, strict mypy, Vulture, tests and generated-file drift                                       |
-| Schemas                   | `just check_contracts` | Schema lint, conformance samples and generated bundles                                           |
-| Docs and repository tools | `just check_root`      | Markdown and relative links, TypeScript, configuration, shell scripts, workflows and module maps |
-| Staged files              | `just check_staged`    | Pre-commit checks, including the 5,120 KB limit for added files and Renovate validation          |
+| Files                        | Tools                                                      | Command                      |
+| ---------------------------- | ---------------------------------------------------------- | ---------------------------- |
+| Runtime Python               | Ruff, strict mypy, Vulture                                 | `just check_runtime`         |
+| TypeScript                   | Oxlint, TypeScript, Prettier                               | `just check_root`            |
+| Markdown                     | markdownlint, relative-link checks, Prettier               | `just check_root`            |
+| JSON and JSONC               | Prettier                                                   | `just check_root`            |
+| TOML                         | tombi, Prettier                                            | `just check_root`            |
+| Shell hooks and Bash recipes | ShellCheck                                                 | `just check_root`            |
+| YAML                         | yamllint, Prettier                                         | `just check_root`            |
+| GitHub workflows             | actionlint, yamllint, Prettier                             | `just check_root`            |
+| Contract schemas and samples | JSON Schema lint, conformance and bundle checks            | `just check_contracts`       |
+| `renovate.json`              | Renovate config validator                                  | `just check_renovate_config` |
+| Staged files                 | Pre-commit checks, including the 5,120 KB added-file limit | `just check_staged`          |
 
 The [justfile](justfile) defines each check. Python rules live in [ruff.toml](ruff.toml) and [pyproject.toml](pyproject.toml); repository tooling uses [package.json](package.json) and its referenced configs. The [Markdown config](.markdownlint-cli2.jsonc) includes relative-link checks. [Prettier exclusions](.prettierignore) identify files whose formatting must be preserved.
 
 ## Generated and vendored files
 
-Edit YAML schemas in `contracts/extensions/mcp/v1/`, then run `just generate_contract_types` for runtime models and bundles. Run `just generate_contract_snapshots` to refresh `tools.json` and passing conformance samples, then `just generate_mcp_tools_doc` for the tool reference. Write failing conformance samples by hand. See the [contract rules](contracts/README.md).
+Edit YAML schemas in `contracts/extensions/mcp/v1/`, then run `just generate_contract_types` for runtime models and bundles. Run `just generate_contract_snapshots` to refresh `tools.json` and passing conformance samples, then `just generate_mcp_tools_doc` for the tool reference. See the [contract rules](contracts/README.md).
 
 Keep these boundaries when editing:
 
 - Preserve exact bytes in `runtime/tests/fixtures/`; tests depend on them.
 - Refresh bundled universe specs and the six knowledge-bus skills through `just refresh_knowledge_model <tag>`, following the [upgrade steps](runtime/README.md#upgrade-knowledge-bus). Their hashes are recorded in [UPSTREAM.md](runtime/knowledge-bus/UPSTREAM.md).
 - Replace vendored anti-slop rules from their source, following [their provenance instructions](tools/oxlint/anti-slop/UPSTREAM.md).
-- Generate `runtime/requirements.lock` from `uv.lock` with `just generate_knowledge_mcp_lock`.
 - Update copied module maps from their source READMEs as described below.
 
 ## Project map
@@ -69,10 +75,14 @@ Give each module a README.md, a CI job and a map region under Project map. Add a
 │   ├── readme-regions/              # Module maps for CONTRIBUTING.md
 │   ├── formula/                     # Release, bottle and Homebrew formula scripts
 │   └── ...                          # conformance, dependencies, knowledge-model, oxlint
-├── docs/                            # MCP tool reference, release runbook, README images
+├── docs/                            # Docs site
 ├── .github/workflows/               # CI jobs and release workflow
+├── .github/assets/                  # README assets
 ├── .husky/                          # Git hooks
-├── .claude-plugin/, .agents/        # Claude Code and Codex marketplace entries
+├── .claude-plugin/, .codex-plugin/  # Plugin manifests
+├── .agents/
+├── .claude/
+├── codex-mcp.json                   # Codex MCP server entry
 ├── justfile                         # Repo commands
 └── ...                              # Top-level docs, LICENSE, configs, lockfiles
 ```
@@ -98,18 +108,15 @@ contracts/
 
 ```text
 runtime/
-├── .claude-plugin/, .codex-plugin/  # Claude Code and Codex plugin manifests
-├── codex-mcp.json                   # Codex MCP server entry
 ├── knowledge_mcp/
 │   ├── cli.py                       # kb entry point
 │   ├── main.py                      # MCP server entry point
-│   ├── start.py                     # Plugin entry point with cached environment
 │   ├── tools/                       # MCP tool modules
 │   ├── models_auto/, schemas_auto/  # Generated models and schema bundles
 │   └── ...                          # Setup, settings, validation, imports and file history
 ├── knowledge-bus/                   # Vendored spec files
 ├── skills/                          # Six knowledge-bus skills and three knowledge-mcp skills
-├── scripts/                         # docs/mcp-tools.md region generator
+├── scripts/                         # docs/mcp-tools.mdx region generator
 └── tests/                           # Unit and end-to-end tests
 ```
 

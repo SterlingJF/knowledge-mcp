@@ -4,7 +4,8 @@
 
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { dirname, isAbsolute, resolve as resolvePath } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
 import { parse } from "smol-toml";
@@ -14,12 +15,12 @@ const description =
   "Help harnesses read, write and import knowledge with universe specs";
 const usage =
   "Usage: generate-formula --sdist <knowledge_mcp-<version>.tar.gz> --out <Formula/knowledge-mcp.rb> " +
-  "[--url <release asset url>] [--lock uv.lock] [--requirements runtime/requirements.lock] " +
+  "[--url <release asset url>] [--lock uv.lock] --requirements <uv export output> " +
   "[--pyproject runtime/pyproject.toml]";
 
 /** Native libraries and build tools some source archives need, by package name. */
 const native: Record<string, { build?: Array<string>; run?: Array<string> }> = {
-  cryptography: { build: ["pkgconf", "rust"], run: ["openssl@3"] },
+  cryptography: { build: ["pkgconf", "rust"], run: ["openssl@4"] },
   "pydantic-core": { build: ["rust"] },
   "rpds-py": { build: ["rust"] },
   pyyaml: { run: ["libyaml"] },
@@ -55,6 +56,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       sdist: readFileSync(options.sdist),
       url: options.url,
       lock: readFileSync(options.lock, "utf8"),
+      lockDirectory: dirname(resolvePath(options.lock)),
       requirements: readFileSync(options.requirements, "utf8"),
       pyproject: readFileSync(options.pyproject, "utf8"),
     });
@@ -76,15 +78,12 @@ function readArgs() {
         out: { type: "string" },
         url: { type: "string" },
         lock: { type: "string", default: "uv.lock" },
-        requirements: {
-          type: "string",
-          default: "runtime/requirements.lock",
-        },
+        requirements: { type: "string" },
         pyproject: { type: "string", default: "runtime/pyproject.toml" },
       },
       strict: true,
     });
-    if (!values.sdist || !values.out) fail(usage);
+    if (!values.sdist || !values.out || !values.requirements) fail(usage);
     return values as Required<typeof values>;
   } catch (error) {
     return fail(
@@ -99,6 +98,8 @@ export function generate(input: {
   sdist: Buffer;
   url?: string;
   lock: string;
+  /** Directory of uv.lock, required for relative source paths. */
+  lockDirectory?: string;
   requirements: string;
   pyproject: string;
 }): string {
@@ -113,7 +114,11 @@ export function generate(input: {
     fail(`${url} is not the source archive of knowledge-mcp ${version}.`);
   }
   const sha256 = createHash("sha256").update(input.sdist).digest("hex");
-  const resources = resolve(requirementsFor(input.requirements), input.lock);
+  const resources = resolve(
+    requirementsFor(input.requirements, input.lock, input.lockDirectory),
+    input.lock,
+    input.lockDirectory,
+  );
   return render({
     url,
     sha256,
@@ -121,8 +126,12 @@ export function generate(input: {
   });
 }
 
-/** The packages requirements.lock installs on macOS with CPython 3.14. */
-export function requirementsFor(text: string): Array<Requirement> {
+/** The packages the uv export selects on macOS with CPython 3.14. */
+export function requirementsFor(
+  text: string,
+  lockText?: string,
+  lockDirectory?: string,
+): Array<Requirement> {
   const found: Array<Requirement> = [];
   const joined = text.replace(/\\\n/g, " ");
   for (const raw of joined.split("\n")) {
@@ -136,7 +145,26 @@ export function requirementsFor(text: string): Array<Requirement> {
     const direct = /^([A-Za-z0-9._-]+)\s*@\s*(\S+)$/.exec(requirement.trim());
     if (pinned) found.push({ name: normal(pinned[1]), version: pinned[2] });
     else if (direct) found.push({ name: normal(direct[1]), url: direct[2] });
-    else fail(`requirements.lock: can't read ${JSON.stringify(line)}`);
+    else if (requirement.startsWith("file:")) {
+      const url = localURL(requirement);
+      const entries = lockText === undefined ? [] : packagesFor(lockText);
+      const matches = entries.filter(
+        (entry) =>
+          entry.source?.path !== undefined &&
+          lockedURL(entry, lockDirectory) === url,
+      );
+      if (matches.length !== 1)
+        fail(`uv.lock must bind exactly one package to ${url}.`);
+      const entry = matches[0];
+      localResource(entry, lockDirectory);
+      const hashes = [...raw.matchAll(/--hash=(\S+)/g)].map(
+        (match) => match[1],
+      );
+      if (hashes.length && !hashes.includes(entry.sdist!.hash!)) {
+        fail(`uv export hash differs from uv.lock for ${entry.name}.`);
+      }
+      found.push({ name: normal(entry.name), version: entry.version, url });
+    } else fail(`uv export: can't read ${JSON.stringify(line)}`);
   }
   return found;
 }
@@ -145,16 +173,10 @@ export function requirementsFor(text: string): Array<Requirement> {
 export function resolve(
   requirements: Array<Requirement>,
   lockText: string,
+  lockDirectory?: string,
 ): Array<Resource> {
-  const lock = parse(lockText) as {
-    package?: Array<{
-      name: string;
-      version: string;
-      source?: { url?: string };
-      sdist?: { url?: string; hash?: string };
-    }>;
-  };
-  const packages = lock.package ?? [];
+  const packages = packagesFor(lockText);
+  const names = new Set<string>();
   return requirements
     .map((requirement) => {
       const entry = packages.find(
@@ -163,13 +185,20 @@ export function resolve(
           (requirement.version === undefined ||
             item.version === requirement.version) &&
           (requirement.url === undefined ||
-            item.source?.url === requirement.url),
+            (item.source?.path !== undefined
+              ? lockedURL(item, lockDirectory) === requirement.url
+              : item.source?.url === requirement.url)),
       );
       if (!entry) {
         return fail(
           `uv.lock has no ${requirement.name} ${requirement.version ?? requirement.url}.`,
         );
       }
+      const name = normal(entry.name);
+      if (names.has(name)) fail(`duplicate formula resource ${name}.`);
+      names.add(name);
+      if (entry.source?.path !== undefined)
+        return localResource(entry, lockDirectory);
       const url = entry.sdist?.url ?? entry.source?.url;
       const hash = entry.sdist?.hash;
       if (
@@ -184,6 +213,59 @@ export function resolve(
       return { name: entry.name, url, sha256: hash.slice("sha256:".length) };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+interface LockedPackage {
+  name: string;
+  version: string;
+  source?: { url?: string; path?: string };
+  sdist?: { url?: string; hash?: string };
+}
+
+function packagesFor(text: string): Array<LockedPackage> {
+  return (parse(text) as { package?: Array<LockedPackage> }).package ?? [];
+}
+
+function localURL(text: string): string {
+  const url = new URL(text);
+  if (url.protocol !== "file:" || url.host || url.search || url.hash) {
+    return fail(`unsupported local archive URL ${text}.`);
+  }
+  return pathToFileURL(fileURLToPath(url)).href;
+}
+
+function lockedURL(entry: LockedPackage, directory?: string): string {
+  const path = entry.source?.path;
+  if (!path || (!isAbsolute(path) && directory === undefined)) {
+    return fail(`local archive needs its uv.lock directory for ${entry.name}.`);
+  }
+  return pathToFileURL(isAbsolute(path) ? path : resolvePath(directory!, path))
+    .href;
+}
+
+function localResource(entry: LockedPackage, directory?: string): Resource {
+  const url = lockedURL(entry, directory);
+  const hash = entry.sdist?.hash;
+  if (
+    typeof entry.name !== "string" ||
+    !/^[A-Za-z0-9]+(?:[A-Za-z0-9._-]*[A-Za-z0-9])?$/.test(entry.name) ||
+    typeof entry.version !== "string" ||
+    !entry.version ||
+    !hash ||
+    !/^sha256:[0-9a-f]{64}$/.test(hash) ||
+    !/\.(tar\.gz|zip)$/.test(fileURLToPath(url)) ||
+    (entry.sdist?.url !== undefined && localURL(entry.sdist.url) !== url)
+  ) {
+    return fail(
+      `uv.lock records no bound local source archive for ${entry.name} ${entry.version}.`,
+    );
+  }
+  const actual = createHash("sha256")
+    .update(readFileSync(fileURLToPath(url)))
+    .digest("hex");
+  if (actual !== hash.slice(7))
+    fail(`local archive hash differs from uv.lock for ${entry.name}.`);
+  return { name: entry.name, url, sha256: actual };
 }
 
 function normal(name: string): string {
@@ -318,6 +400,7 @@ ${resources.join("\n")}
     (bin/"kb").write_env_script libexec/"bin/kb",
                                 KNOWLEDGE_MCP_COMMAND: opt_bin/"kb",
                                 KNOWLEDGE_MCP_DATA:    opt_libexec/site_packages/"knowledge_mcp"
+    generate_completions_from_executable(bin/"kb", shell_parameter_format: :click)
   end
 
   def caveats
@@ -335,6 +418,9 @@ ${resources.join("\n")}
   end
 
   test do
+    assert_path_exists bash_completion/"kb"
+    assert_path_exists zsh_completion/"_kb"
+    assert_path_exists fish_completion/"kb.fish"
     assert_match "kb #{version}", shell_output("#{bin}/kb --version")
     assert_match "Knowledge Bus", shell_output("#{bin}/kb kbp --version")
     initialize = { jsonrpc: "2.0", id: 1, method: "initialize",

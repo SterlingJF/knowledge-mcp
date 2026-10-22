@@ -30,7 +30,7 @@ def ask(state: Path, *calls: tuple[str, dict]) -> list:
 
 def answer(result) -> dict:
     assert not result.is_error, texts(result)
-    [text] = texts(result)
+    *_, text = texts(result)
     return json.loads(text)
 
 
@@ -302,3 +302,65 @@ def test_invalid_group_metadata_creates_no_record(tmp_path):
     )
     assert all(r.is_error for r in results[:-1])
     assert answer(results[-1])["edits"] == []
+
+
+def test_physical_crlf_revision_reopens_complete_history_and_preserves_later_edit(
+    tmp_path,
+):
+    """Scripted I/O proves history fidelity, not model usefulness or human approval."""
+    before = BEFORE.replace("\n", "\r\n")
+    after = AFTER.replace("\n", "\r\n")
+    path = tmp_path / DESIGN
+    path.write_bytes(before.encode())
+    state = tmp_path / "state"
+    authority = {
+        "basis": "request",
+        "text": "Synthetic native test: insert the supplied overview.",
+    }
+    # The host owns file writes; the server only records the supplied facts.
+    path.write_bytes(after.encode())
+    [recorded] = ask(
+        state,
+        (
+            "kb_record_edit",
+            {
+                "location": str(path),
+                "allowed_by": authority,
+                "before": before,
+                "after": after,
+                "whole_file": True,
+            },
+        ),
+    )
+    receipt = answer(recorded)
+    [reopened] = ask(state, ("kb_list_edits", {"location": str(path)}))
+    [entry] = answer(reopened)["edits"]
+    assert entry == {
+        "id": receipt["id"],
+        "time": receipt["time"],
+        "location": str(path),
+        "allowed_by": authority,
+        "whole_file": True,
+        "before": before,
+        "after": after,
+        "before_digest": digest(before),
+        "after_digest": digest(after),
+    }
+    assert path.read_bytes() == after.encode()
+    later = after + "\r\nLater factual correction: retain blue.\r\n"
+    path.write_bytes(later.encode())
+    assert digest(path.read_bytes().decode()) != entry["after_digest"]
+    [still_listed] = ask(state, ("kb_list_edits", {"location": str(path)}))
+    assert answer(still_listed)["edits"] == [entry]
+    assert path.read_bytes() == later.encode()
+    # Independent disposable copy: restore only while the recorded digest matches.
+    copy = tmp_path / "undo.md"
+    copy.write_bytes(after.encode())
+    assert digest(copy.read_bytes().decode()) == entry["after_digest"]
+    copy.write_bytes(entry["before"].encode())
+    assert copy.read_bytes() == before.encode()
+    assert [line["tool"] for line in logged(state)] == [
+        "kb_record_edit",
+        "kb_list_edits",
+        "kb_list_edits",
+    ]

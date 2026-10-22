@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -289,3 +290,55 @@ def test_bundled_headers_reduce_first_call_argument_size(codebase, tmp_path):
     [result] = ask(tmp_path, ("kb_get_document_type", type_arguments(codebase, RFC)))
     assert texts(result)
     assert len(headers) * 20 < len(full)
+
+
+def test_supplied_scope_changes_do_not_leak_cached_parent_candidates(tmp_path):
+    """One process must honor empty/explicit child scope without touching the base."""
+    root = knowledge_base(tmp_path / "base", {"": [CODEBASE, PRODUCT], "team": []})
+    document = "team/rfcs/0042-cache.md"
+    write(root, document, "# Cache\r\n")
+    state = tmp_path / "state"
+    empty = type_arguments(root, document, send_text=True)
+    inherited = json.loads(json.dumps(empty))
+    for scope in inherited["knowledge_bus_folders"]:
+        for spec in scope["files"]:
+            spec["digest"] = (
+                "sha256:" + hashlib.sha256(spec.pop("text").encode()).hexdigest()
+            )
+    inherited["knowledge_bus_folders"][-1]["workspace_yaml"] = (
+        "from_parent:\n  - product-development\n"
+    )
+    before = {
+        str(p.relative_to(root)): p.read_bytes() for p in root.rglob("*") if p.is_file()
+    }
+    failed, selected, failed_again = ask(
+        state,
+        ("kb_get_document_type", empty),
+        ("kb_get_document_type", inherited),
+        ("kb_get_document_type", empty),
+    )
+    assert failed.is_error and failed_again.is_error
+    assert texts(failed) == texts(failed_again)
+    answer = fit(selected)
+    assert candidates(answer) == [(PRODUCT, "design-doc")]
+    assert answer["universe_specs"] == [
+        {
+            "id": PRODUCT,
+            "version": "0.9",
+            "source": "sent by the harness",
+            "from_parent": True,
+        }
+    ]
+    assert "role_matches" not in answer["candidates"][0]
+    assert answer["received"] == []
+    assert {
+        str(p.relative_to(root)): p.read_bytes() for p in root.rglob("*") if p.is_file()
+    } == before
+    lines = [
+        json.loads(line)
+        for line in (state / "knowledge-mcp/log.jsonl").read_text().splitlines()
+    ]
+    assert [line["tool"] for line in lines] == ["kb_get_document_type"] * 3
+    assert [line["returned"] for line in lines] == [
+        texts(r) for r in (failed, selected, failed_again)
+    ]

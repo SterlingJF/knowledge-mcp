@@ -47,6 +47,13 @@ class EditsAnswer(BaseModel):
     schema_: Annotated[Literal["knowledge-mcp/edits/2"], Field(alias="schema")]
     location: Location
     edits: list[Edit]
+    card: Annotated[
+        str | None,
+        Field(
+            description="The latest edit as markdown. Absent when no edit is recorded. Show it in your reply unchanged.",
+            min_length=1,
+        ),
+    ] = None
 
 
 type KbListEditsResult = Annotated[

@@ -1309,7 +1309,7 @@ $defs:
       title:
         type: string
       detail:
-        description: For MCP errors, the last text block contains the same detail.
+        description: Error detail; raw-stream MCP wrappers may omit it from text.
         type: string
         minLength: 1
       errors:

@@ -138,12 +138,12 @@ class Scopes:
                     )
                     if text is None:
                         copy = bundled.index().get((spec.id, spec.version))
-                        text = copy.path.read_text(encoding="utf-8") if copy else ""
+                        text = copy.path.read_bytes().decode("utf-8") if copy else ""
                     texts.append(records.digest(text))
                 return tuple(sorted(texts))
         copies = [c for c in bundled.copies() if c.id == identity]
         return tuple(
-            sorted(records.digest(c.path.read_text(encoding="utf-8")) for c in copies)
+            sorted(records.digest(c.path.read_bytes().decode("utf-8")) for c in copies)
         )
 
     def same_definition(self, first: str, second: str, identity: str) -> bool:

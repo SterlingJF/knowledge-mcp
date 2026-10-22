@@ -1,0 +1,51 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: kbp-output.schema.yaml
+title: kbp tool result
+description: >-
+  The structuredContent of every kbp tool. Raw upstream text remains in the
+  original content blocks. Failures use the existing problem details shape.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Kbp output answer
+    description: >-
+      A receipt for a successful upstream call, without parsing or rewriting
+      its text. This contract describes the wrapper, not upstream formats.
+    type: object
+    additionalProperties: false
+    required: [schema, stdout, stderr, exit_code]
+    properties:
+      schema:
+        const: knowledge-mcp/kbp-output/1
+      stdout:
+        description: The exact captured stdout, including whitespace.
+        type: string
+      stderr:
+        description: The exact captured stderr, including whitespace.
+        type: string
+      exit_code:
+        description: Zero on success; nonzero exits return problem details.
+        const: 0
+      note:
+        title: Kbp output note
+        description: The existing knowledge-mcp receipt, when present.
+        type: object
+        additionalProperties: false
+        properties:
+          source:
+            description: The bundled source label.
+            type: string
+          bundled:
+            description: Bundled universe spec identifiers.
+            type: array
+            items:
+              type: string
+          received:
+            $ref: common.schema.yaml#/$defs/received
+          explorer:
+            description: The existing viewer folder path, on successful explore.
+            type: string

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Knowledge-MCP",
+  "colors": {
+    "primary": "#2b3d4c",
+    "light": "#a0bbd3",
+    "dark": "#000000"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get started",
+        "pages": ["index", "quick-start"]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "work-with-documents",
+          "review-incoming-material",
+          "organize-files"
+        ]
+      },
+      {
+        "group": "Help",
+        "pages": ["history-and-help"]
+      },
+      {
+        "group": "Reference",
+        "pages": ["naming-and-filing", "mcp-tools"]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "GitHub",
+          "href": "https://github.com/SterlingJF/knowledge-mcp",
+          "icon": "github"
+        }
+      ]
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "https://github.com/SterlingJF/knowledge-mcp/issues"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Try Knowledge-MCP",
+      "href": "/quick-start"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/SterlingJF/knowledge-mcp"
+    }
+  },
+  "background": {
+    "color": {
+      "light": "#ffffff",
+      "dark": "#0b0c0e"
+    }
+  },
+  "appearance": {
+    "default": "dark",
+    "strict": true
+  }
+}

@@ -18,3 +18,7 @@ operation:
   count: 4
   old_path: A.md
   path: Decisions/Alpha.md
+card: |
+  `Saved` · **Edit saved**
+
+  The edit to `batch-vault` is recorded.

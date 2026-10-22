@@ -1,12 +1,12 @@
 {
   "name": "knowledge-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Plain, structured thinking while you work. It's free, open, and local-first.",
   "author": { "name": "Sterling Freeman" },
   "homepage": "https://github.com/SterlingJF/knowledge-mcp",
   "repository": "https://github.com/SterlingJF/knowledge-mcp",
   "license": "MIT",
-  "skills": "./skills/",
+  "skills": "./runtime/skills/",
   "mcpServers": "./codex-mcp.json",
   "interface": {
     "displayName": "knowledge-mcp",

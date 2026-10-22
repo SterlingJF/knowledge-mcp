@@ -13,6 +13,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACTS = ROOT / "contracts" / "extensions" / "mcp" / "v1"
 RECIPE = "just generate_mcp_tools_doc"
+REPO = "https://github.com/SterlingJF/knowledge-mcp/blob/main"
 
 
 def first_sentence(text: str) -> str:
@@ -106,7 +107,7 @@ def regions(tools: list[dict[str, Any]]) -> dict[str, str]:
             message = f"tools.json: {tool['name']} has an outputSchema with no $id. Run just generate_contract_snapshots."
             raise SystemExit(message)
         result = (
-            f"[{output['$id']}](../contracts/extensions/mcp/v1/{output['$id']})"
+            f"[{output['$id']}]({REPO}/contracts/extensions/mcp/v1/{output['$id']})"
             if output
             else "kbp's output, as is"
         )
@@ -150,7 +151,7 @@ def main() -> int:
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "doc", type=Path, help="the tools doc, such as docs/mcp-tools.md"
+        "doc", type=Path, help="the tools doc, such as docs/mcp-tools.mdx"
     )
     parser.add_argument(
         "--check", action="store_true", help="fail when the doc is stale"
@@ -162,7 +163,7 @@ def main() -> int:
     updated = text
     for name, body in regions(tools).items():
         pattern = re.compile(
-            rf"(<!-- BEGIN AUTO-GENERATED {name} -->\n\n).*?(\n\n<!-- END AUTO-GENERATED {name} -->)",
+            rf"(\{{/\* BEGIN AUTO-GENERATED {name} \*/\}}\n\n).*?(\n\n\{{/\* END AUTO-GENERATED {name} \*/\}})",
             re.DOTALL,
         )
         if not pattern.search(updated):

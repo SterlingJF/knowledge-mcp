@@ -112,7 +112,7 @@ def copies() -> tuple[Copy, ...]:
     """Use `<folder>.<file>` names because the bundled folders share file names."""
     found = []
     for path in sorted(UNIVERSES.glob("*/*.kbp.yaml")):
-        identity = header(path.read_text(encoding="utf-8"))
+        identity = header(path.read_text(encoding="utf-8").removeprefix("\ufeff"))
         if identity is not None:
             found.append(Copy(f"{path.parent.name}.{path.name}", *identity, path))
     return tuple(found)

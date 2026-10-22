@@ -15,9 +15,10 @@ from mcp.client import Client
 from mcp.client.stdio import StdioServerParameters, stdio_client
 from mcp.shared.exceptions import MCPError
 
-from knowledge_mcp import kbp
+from knowledge_mcp import kbp, schemas
 from tests.harness import BUNDLED, CODEBASE, PRODUCT, header, texts
 from tests.kb_cli import kb_mcp
+from tests.test_proposal_end_to_end import DEMO as PROPOSAL
 
 MODES = ["legacy", "auto"]
 
@@ -53,6 +54,7 @@ TAGS = {
     "kb_list_edits": "knowledge-mcp/edits/2",
     "kb_prepare_document_move": "knowledge-mcp/document-move/1",
     "kb_prepare_document_moves": "knowledge-mcp/document-moves/1",
+    "kb_prepare_proposal": "knowledge-mcp/proposal/1",
 }
 ISSUES = "https://github.com/SterlingJF/knowledge-mcp/issues"
 
@@ -186,7 +188,7 @@ def own_text(result: Any) -> list[str]:
 def answer_of(result: Any, tool: str) -> dict[str, Any]:
     assert not result.is_error, texts(result)
     assert result.structured_content is not None, f"{tool}: no structured content"
-    [text] = texts(result)
+    *_, text = texts(result)
     assert result.structured_content == json.loads(text), tool
     return result.structured_content
 
@@ -218,14 +220,12 @@ def resolved(schema: dict[str, Any], node: Any) -> Any:
 
 
 @pytest.mark.parametrize("mode", MODES)
-def test_every_kb_tool_lists_a_result_schema_with_an_object_root(tmp_path, mode):
+def test_every_tool_lists_a_result_schema_with_an_object_root(tmp_path, mode):
     listed = tools(tmp_path, mode)
 
     assert {name for name in listed if name.startswith("kb_")} == set(TAGS)
+    assert set(listed) == set(schemas.RESULTS)
     for name, tool in listed.items():
-        if name.startswith("kbp_"):
-            assert tool.output_schema is None, name
-            continue
         schema = tool.output_schema
         assert schema is not None, f"{name} lists no outputSchema"
         assert schema.get("type") == "object", name
@@ -305,6 +305,7 @@ def test_each_kb_tool_answers_with_structured_content_equal_to_its_text(tmp_path
                 knowledge_bus_folders=[],
             ),
         ),
+        ("kb_prepare_proposal", PROPOSAL),
     )
 
     for tool, result in zip(TAGS, results, strict=True):

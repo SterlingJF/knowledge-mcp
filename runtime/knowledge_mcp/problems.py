@@ -68,7 +68,8 @@ class KbpFailed(Error):
     code = "kbp-failed"
 
     def __init__(self, output: Printed, mode: str) -> None:
-        super().__init__(f"kbp --{mode} exited with code {output.code}.")
+        flag = "" if mode == "validate" else " --" + mode.replace("_", "-")
+        super().__init__(f"kbp{flag} exited with code {output.code}.")
         self.output = output
 
 

@@ -1,0 +1,12 @@
+---
+# A source is a place in a file or the person's words, not both.
+schema: knowledge-mcp/proposal/1
+summary: Rollout as background, build lead decides
+card: "`PROPOSED CHANGES`"
+rows:
+  - proposed:
+      label: Approval
+      text: Build lead decides at Thursday's review
+    sources:
+      - said: The build lead decides at Thursday's review.
+        file: meeting-notes.md

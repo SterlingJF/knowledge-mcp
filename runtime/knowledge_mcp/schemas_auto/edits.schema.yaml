@@ -26,6 +26,10 @@ $defs:
         type: array
         items:
           $ref: "#/$defs/edit"
+      card:
+        description: The latest edit as markdown. Absent when no edit is recorded. Show it in your reply unchanged.
+        type: string
+        minLength: 1
     additionalProperties: false
   edit:
     title: Edit
@@ -1182,7 +1186,7 @@ $defs:
       title:
         type: string
       detail:
-        description: For MCP errors, the last text block contains the same detail.
+        description: Error detail; raw-stream MCP wrappers may omit it from text.
         type: string
         minLength: 1
       errors:

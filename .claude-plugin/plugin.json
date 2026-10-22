@@ -1,13 +1,13 @@
 {
   "name": "knowledge-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Plain, structured thinking while you work. It's free, open, and local-first.",
   "author": { "name": "Sterling Freeman" },
   "homepage": "https://github.com/SterlingJF/knowledge-mcp",
   "repository": "https://github.com/SterlingJF/knowledge-mcp",
   "license": "MIT",
   "keywords": ["knowledge-mcp", "knowledge-bus", "knowledge-base", "mcp"],
-  "skills": "./skills/",
+  "skills": "./runtime/skills/",
   "mcpServers": {
     "knowledge-mcp": {
       "command": "uv",
@@ -15,13 +15,13 @@
         "run",
         "--directory",
         "${CLAUDE_PLUGIN_ROOT}",
-        "--no-project",
-        "--python",
-        "3.14",
+        "--locked",
+        "--package",
+        "knowledge-mcp",
+        "--no-dev",
         "--",
-        "python",
-        "-m",
-        "knowledge_mcp.start"
+        "kb",
+        "mcp"
       ]
     }
   }

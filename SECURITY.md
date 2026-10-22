@@ -31,7 +31,7 @@ Report vulnerabilities in the knowledge-bus package, its universe specs or the c
 
 The harness starts the MCP server over stdio. The server opens no network port, makes no network call and opens no file in your knowledge base. Your agent reads the files and passes their text to the tools as arguments. `kb type` enumerates file paths under the root and reads universe specs, workspace settings, conventions and the document-types file. It does not read document contents.
 
-The Claude Code and Codex plugins start the server through uv. uv downloads Python 3.14 when it is missing. The launcher reuses an environment for the same lockfile and Python version, or asks uv to build an environment from `runtime/requirements.lock`. uv downloads packages missing from its cache. `kb setup` registers the installed `kb mcp` command instead.
+The Claude Code and Codex plugins start the server through uv. uv downloads Python 3.14 when it is missing. uv manages the plugin root’s `.venv` from `uv.lock` using `uv run --locked`. uv downloads packages missing from its cache. `kb setup` registers the installed `kb mcp` command instead.
 
 kb uses `$KNOWLEDGE_MCP_STATE_DIR` when the path is absolute after `~` expansion. Otherwise, kb uses `$XDG_STATE_HOME/knowledge-mcp` when the XDG path is absolute after `~` expansion. The fallback is `~/.local/state/knowledge-mcp`. kb creates `log.jsonl`, `edits.jsonl` and `setup/state.json` with mode 0600. Keep the state folder outside every knowledge base.
 
@@ -50,7 +50,7 @@ Outside the state folder:
 - **Knowledge-base configuration.** Your agent writes `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the root to retain each file's document type, reader and permission. It writes `conventions.yaml` in the same configuration folder under the root or a team folder for accepted naming and filing patterns and parent selections. The [document-types schema](contracts/extensions/mcp/v1/document-types.schema.yaml) and [conventions schema](contracts/extensions/mcp/v1/conventions.schema.yaml) define those files.
 - **Temporary spec copies.** The server and `kb type` write universe specs and `workspace.yaml` files for kbp in `knowledge-mcp-*/` under the system temporary folder, with mode 0700. Each call removes its copies; process exit also removes the temporary folder.
 - **Harness settings.** `kb setup` writes one `knowledge-mcp` entry in each harness's settings file and links the bundled skills into its skills folder. The Claude desktop app takes skill uploads instead.
-- **Plugin environments.** The launcher asks uv to build hash-checked environments from `runtime/requirements.lock`. It stores them under `$XDG_CACHE_HOME/knowledge-mcp/environments` when `$XDG_CACHE_HOME` is absolute, otherwise `~/.cache/knowledge-mcp/environments`.
+- **Plugin environments.** uv manages `.venv` in the installed plugin root using `uv.lock`.
 
 ## Known Limitations
 

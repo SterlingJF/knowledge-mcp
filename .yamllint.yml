@@ -13,6 +13,9 @@ rules:
     forbid-in-block-mappings: true
   line-length:
     max: 120
+    # A proposal card holds markdown table rows, which can't wrap.
+    ignore: |
+      contracts/extensions/mcp/v1/conformance/pass/proposal.*.yaml
   octal-values:
     forbid-explicit-octal: true
     forbid-implicit-octal: true

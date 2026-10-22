@@ -47,7 +47,7 @@ class ProblemDetails(BaseModel):
     detail: Annotated[
         str,
         Field(
-            description="For MCP errors, the last text block contains the same detail.",
+            description="Error detail; raw-stream MCP wrappers may omit it from text.",
             min_length=1,
         ),
     ]

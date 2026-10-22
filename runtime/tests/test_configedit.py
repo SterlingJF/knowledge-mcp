@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import json
+import re
 import tomllib
 from pathlib import Path
 
 import pytest
+from json5.loader import ModelLoader, loads
+from json5.model import Infinity, UnaryOp
 
 from knowledge_mcp.configedit import (
     ConfigError,
@@ -121,3 +124,92 @@ def test_toml_insert_rejects_inline_server_tables():
     assert isinstance(
         refused.value.__cause__ or refused.value.__context__, tomllib.TOMLDecodeError
     )
+
+
+@pytest.mark.parametrize("newline", ["\n", "\r\n", "\r"])
+@pytest.mark.parametrize("ending", ["", "\n"])
+def test_jsonc_preserves_comments_unicode_and_newlines(newline, ending):
+    text = (
+        newline.join(
+            [
+                "\ufeff{/* before */",
+                '  "mcpServers": { /* keep inside */ "other": {"url": "https://é.test/😀"}, },',
+                '  "array": [1, false, null,], /* after */',
+                "}",
+            ]
+        )
+        + ending
+    )
+    new, piece = json_insert(text, PATH, "knowledge-mcp", ENTRY)
+    assert json_entry(new, PATH, "knowledge-mcp") == ENTRY
+    assert new.replace(piece, "", 1).encode() == text.encode()
+    assert json_remove(new, PATH, "knowledge-mcp", piece).encode() == text.encode()
+    removed = json_remove(new, PATH, "knowledge-mcp", None)
+    assert "/* keep inside */" in removed
+    assert '"other": {"url": "https://é.test/😀"}' in removed
+    assert '"array": [1, false, null,], /* after */' in removed
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        '{"a": 1 "b": 2}',
+        '{"a": [1 2]}',
+        '{"a": /* unfinished',
+        '{"a": "unterminated}',
+        '{"a": 1} trailing',
+    ],
+)
+def test_jsonc_rejects_malformed_settings(text):
+    with pytest.raises((ConfigError, json.JSONDecodeError)):
+        json_insert(text, PATH, "knowledge-mcp", ENTRY)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "{true: 1}",
+        '{"x": NaN}',
+        '{"x": Infinity}',
+        "{'x': 1}",
+        '{"x": +1}',
+        '{"x": 0x10}',
+    ],
+)
+def test_jsonc_rejects_json5_only_literals(text):
+    with pytest.raises((ConfigError, json.JSONDecodeError)):
+        json_insert(text, PATH, "knowledge-mcp", ENTRY)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "{ /* keep empty object comment */ }",
+        '{"other": 1, /* before */ "knowledge-mcp": {}, /* after */}',
+        '{"knowledge-mcp": {}, /* next */ "other": 1}',
+        '{"other": 1, /* last */ "knowledge-mcp": {}}',
+    ],
+)
+def test_jsonc_removal_without_receipt_keeps_unrelated_comments(text):
+    if json_entry(text, (), "knowledge-mcp") is None:
+        text, _ = json_insert(text, (), "knowledge-mcp", ENTRY)
+    removed = json_remove(text, (), "knowledge-mcp", None)
+    assert re.findall(r"/\*.*?\*/", removed) == re.findall(r"/\*.*?\*/", text)
+    assert json_entry(removed, (), "knowledge-mcp") is None
+    assert json_entry(removed, (), "other") == json_entry(text, (), "other")
+
+
+@pytest.mark.parametrize(
+    "constant", ["Infinity", "-Infinity", "+Infinity", "NaN", "-NaN", "+NaN"]
+)
+def test_jsonc_signed_non_json_constants_are_rejected(constant):
+    text = '{"x": ' + constant + "}"
+    if constant == "-Infinity":
+        model = loads(text, loader=ModelLoader()).value.key_value_pairs[0][1]
+        assert isinstance(model, UnaryOp)
+        assert isinstance(model.value, Infinity)
+    with pytest.raises((ConfigError, json.JSONDecodeError)):
+        json_insert(text, PATH, "knowledge-mcp", ENTRY)
+    if constant == "-Infinity":
+        with pytest.raises(ConfigError, match="line 1: JSON number expected"):
+            json_insert(text, PATH, "knowledge-mcp", ENTRY)

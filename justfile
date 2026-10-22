@@ -152,7 +152,7 @@ check_contracts: (_contract_bundles 'check')
   pnpm --dir contracts exec jsonschema lint --exclude description_trailing_period --exclude top_level_examples --exclude const_with_type --exclude enum_with_type --exclude orphan_definitions --exclude properties_default --exclude top_level_description --exclude unnecessary_allof_wrapper --exclude unnecessary_allof_ref_wrapper_modern "${schema_dir}"
   node tools/conformance/check-conformance.ts contracts
 
-contract_bundles := 'folder-conventions convention-templates conventions conventions-update document-move document-moves document-type audiences import document-types-update edit edits document-types problem'
+contract_bundles := 'kbp-output folder-conventions convention-templates conventions conventions-update document-move document-moves document-type audiences import document-types-update edit edits document-types proposal problem'
 
 # Generate runtime/knowledge_mcp/models_auto and schemas_auto from the contract schemas.
 generate_contract_types: _contract_models (_contract_bundles 'write')
@@ -192,38 +192,25 @@ _contract_bundles MODE:
     fi
   done
 
-# Lint, type-check and test runtime/, and scan runtime/ for dead code. Check that models_auto, requirements.lock and docs/mcp-tools.md are current.
-check_runtime: check_mcp_tools_doc check_knowledge_mcp_lock (_contract_models '--check')
+# Lint, type-check and test runtime/, and scan runtime/ for dead code. Check that models_auto and docs/mcp-tools.mdx are current.
+check_runtime: check_mcp_tools_doc (_contract_models '--check')
   uv run --locked ruff check runtime
   uv run --locked ruff format --check runtime
   uv run --locked mypy
   uv run --locked vulture
   cd runtime && uv run --locked pytest -n auto --maxprocesses 4 --dist loadfile
 
-# Export uv.lock to runtime/requirements.lock. The plugin installs its dependencies from this hashed lockfile.
-generate_knowledge_mcp_lock:
-  uv export --color never --locked --quiet --package knowledge-mcp --no-dev --no-emit-workspace --no-header --format requirements-txt > runtime/requirements.lock
-
-# Check runtime/requirements.lock matches uv.lock.
-check_knowledge_mcp_lock SOURCE='.':
-  #!/usr/bin/env bash
-  set -euo pipefail
-  if ! diff -u {{ quote(SOURCE + '/runtime/requirements.lock') }} <(uv export --color never --project {{ quote(SOURCE) }} --locked --quiet --package knowledge-mcp --no-dev --no-emit-workspace --no-header --format requirements-txt); then
-    printf '\nruntime/requirements.lock is stale: run just generate_knowledge_mcp_lock.\n' >&2
-    exit 1
-  fi
-
 # Copy the knowledge-bus universe specs and skills at TAG into runtime/. TAG must match the pin in runtime/pyproject.toml.
 refresh_knowledge_model TAG:
   node tools/knowledge-model/refresh-knowledge-model.ts --ref {{ quote(TAG) }} --plugin runtime
 
-# Write the generated regions of docs/mcp-tools.md from tools.json.
+# Write the generated regions of docs/mcp-tools.mdx from tools.json.
 generate_mcp_tools_doc:
-  uv run --locked --package knowledge-mcp python runtime/scripts/generate_tools_doc.py docs/mcp-tools.md
+  uv run --locked --package knowledge-mcp python runtime/scripts/generate_tools_doc.py docs/mcp-tools.mdx
 
-# Check the generated regions of docs/mcp-tools.md match tools.json.
+# Check the generated regions of docs/mcp-tools.mdx match tools.json.
 check_mcp_tools_doc:
-  uv run --locked --package knowledge-mcp python runtime/scripts/generate_tools_doc.py docs/mcp-tools.md --check
+  uv run --locked --package knowledge-mcp python runtime/scripts/generate_tools_doc.py docs/mcp-tools.mdx --check
 
 # Build the source archive that the Homebrew formula installs.
 build_knowledge_mcp SOURCE='.' OUT='dist':
@@ -231,15 +218,21 @@ build_knowledge_mcp SOURCE='.' OUT='dist':
 
 # Write the Homebrew formula for the source archive SDIST.
 generate_formula SDIST OUT='dist/knowledge-mcp.rb' SOURCE='.':
+  #!/usr/bin/env bash
+  set -euo pipefail
   mkdir -p "$(dirname {{ quote(OUT) }})"
-  node tools/formula/generate-formula.ts --sdist {{ quote(SDIST) }} --out {{ quote(OUT) }} --lock {{ quote(SOURCE + '/uv.lock') }} --requirements {{ quote(SOURCE + '/runtime/requirements.lock') }} --pyproject {{ quote(SOURCE + '/runtime/pyproject.toml') }}
+  requirements=$(mktemp)
+  trap 'rm -f "$requirements"' EXIT
+  uv export --color never --project {{ quote(SOURCE) }} --locked --package knowledge-mcp --no-dev --no-emit-workspace --no-header --format requirements-txt > "$requirements"
+  node tools/formula/generate-formula.ts --sdist {{ quote(SDIST) }} --out {{ quote(OUT) }} --lock {{ quote(SOURCE + '/uv.lock') }} --requirements "$requirements" --pyproject {{ quote(SOURCE + '/runtime/pyproject.toml') }}
 
-# Set the release version to VERSION in the manifests, CHANGELOG.md, uv.lock and runtime/requirements.lock.
+# Set the release version to VERSION in the manifests, CHANGELOG.md and uv.lock.
 release_prepare VERSION:
   node tools/formula/release-metadata.ts prepare --version {{ quote(VERSION) }}
 
-# Check the release versions, release notes and runtime/requirements.lock.
-release_check: check_knowledge_mcp_lock
+# Check the release versions, release notes and uv.lock.
+release_check:
+  uv lock --check
   node tools/formula/release-metadata.ts check
 
 # Resolve the release TAG to its commit and write dist/release.json.

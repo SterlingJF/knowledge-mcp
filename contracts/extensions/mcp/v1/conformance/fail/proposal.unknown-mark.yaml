@@ -1,0 +1,13 @@
+---
+# Marks are supported, partly, conflicting or suggested.
+schema: knowledge-mcp/proposal/1
+summary: Focus proposal on retiring the evening build
+card: "`PROPOSED CHANGES`"
+rows:
+  - proposed:
+      label: Title
+      text: Evening build retirement
+    mark: likely
+    sources:
+      - file: meeting-notes.md
+        line_number: 15

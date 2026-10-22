@@ -110,7 +110,9 @@ def test_leaf_help_has_examples_side_effects_and_exit_codes(tmp_path, leaf):
             in done.stdout
         )
     if leaf == "setup":
-        assert "kb backs up existing settings files" in " ".join(done.stdout.split())
+        text = " ".join(done.stdout.split())
+        assert "Backs up settings files before editing." in text
+        assert "upload" not in text.lower()
     if leaf == "doctor":
         assert "changes no file" in done.stdout
 
@@ -125,7 +127,8 @@ def test_setup_feedback_repeat_and_remove(tmp_path, harness):
         f"Registered knowledge-mcp with {TITLES[harness]} in {home / CONFIGS[harness]}; backup at "
         in added.stderr
     )
-    assert "Start a new " in added.stderr or "Restart the " in added.stderr
+    for chore in ("Start a new ", "Restart", "ZIP", "Upload", "doctor"):
+        assert chore not in added.stderr
     assert entry(home, harness)
     recorded = snapshot(home)
     again = live(home, "setup", harness)
@@ -135,6 +138,8 @@ def test_setup_feedback_repeat_and_remove(tmp_path, harness):
         in again.stderr
     )
     assert f"kb setup --remove {harness}, then kb setup {harness}." in again.stderr
+    for chore in ("Start a new ", "Restart", "ZIP", "Upload", "doctor"):
+        assert chore not in again.stderr
     assert snapshot(home) == recorded
     removed = live(home, "setup", "--remove", harness)
     assert removed.returncode == 0 and removed.stdout == ""
@@ -164,18 +169,6 @@ def test_absent_harness_warns_and_still_writes(tmp_path, harness):
         in done.stderr
     )
     assert entry(home, harness)
-
-
-def test_desktop_zip_command_uses_runtime_skills_in_a_subshell(tmp_path):
-    done = live(fixture_home(tmp_path), "setup", "claude-desktop")
-    [line] = [line for line in done.stderr.splitlines() if line.startswith("mkdir -p ")]
-    assert "(cd " in line and str(MODULE / "skills") in line
-    assert "for d in */; do zip -qr " in line
-    assert "~/Downloads/knowledge-mcp-skills/" in line
-    assert (
-        "Upload each ZIP in ~/Downloads/knowledge-mcp-skills through Customize → Skills in Claude."
-        in done.stderr
-    )
 
 
 def test_doctor_status_verbose_json_and_fault(tmp_path):

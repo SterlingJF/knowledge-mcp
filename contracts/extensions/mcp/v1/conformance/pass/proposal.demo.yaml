@@ -1,0 +1,63 @@
+---
+schema: knowledge-mcp/proposal/1
+summary: Focus proposal on retiring the evening build
+rows:
+  - current:
+      label: Title
+      text: Build schedule and cache rollout
+    proposed:
+      label: Title
+      text: Evening build retirement
+    mark: suggested
+    sources:
+      - file: meeting-notes.md
+        line_number: 15
+  - current:
+      label: Motivation
+      text: evening build never finishes
+    proposed:
+      label: Motivation
+      text: 7 of 9 evening runs hit the 6-hour limit
+    mark: supported
+    sources:
+      - file: build-timings.xlsx
+        place: Evening!A2:D10
+  - proposed:
+      label: Status
+      text: Proposed. Approval is disputed.
+    mark: conflicting
+    sources:
+      - file: cache-rollout-review.pptx
+        place: slide 7
+      - file: meeting-notes.md
+        line_number: 11
+      - file: meeting-notes.md
+        line_number: 19
+  - current:
+      label: Open question
+      text: what baseline would show build times doubled?
+    proposed:
+      label: Still open
+      text: no timings from before the cache
+    mark: partly
+    sources:
+      - file: build-timings.xlsx
+        place: Evening!A2
+      - file: meeting-notes.md
+        line_number: 21
+left_out:
+  - file: vendor-quote.xlsx
+    reason: answers none of this proposal's questions
+card: |
+  `PROPOSED CHANGES` · `Nothing saved`
+
+  **Focus proposal on retiring the evening build**
+
+  | ID | Current | Proposed | Source |
+  | --- | --- | --- | --- |
+  | C1 | **Title:** Build schedule and cache rollout | ◆ Suggested · **Title:** Evening build retirement | `meeting-notes.md:15` |
+  | C2 | **Motivation:** evening build never finishes | ● Supported · **Motivation:** 7 of 9 evening runs hit the 6-hour limit | `build-timings.xlsx › Evening!A2:D10` |
+  | C3 | — | ✕ Conflicting · **Status:** Proposed. Approval is disputed. | `cache-rollout-review.pptx › slide 7` · `meeting-notes.md:11` · `meeting-notes.md:19` |
+  | C4 | **Open question:** what baseline would show build times doubled? | ◐ Partly answered · **Still open:** no timings from before the cache | `build-timings.xlsx › Evening!A2` · `meeting-notes.md:21` |
+
+  ⊘ `vendor-quote.xlsx` left out: answers none of this proposal's questions

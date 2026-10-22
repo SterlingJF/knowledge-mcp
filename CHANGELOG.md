@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.4.0
+
+### Added
+
+- Before an edit, the agent shows the proposed changes as a card: each change numbered C1, C2 and so on, with its sources and how well they back it. A source can be your own words. Chat apps show a table and terminals a list. `kb_prepare_proposal` returns the card in `card`.
+- After an edit, the agent shows what was saved. When you return to a document, it shows the latest recorded edit. `kb_record_edit` and `kb_list_edits` return these cards in `card`.
+- `kbp_card` accepts `format: "json"` and returns the knowledge-bus card as JSON in `stdout`. Without `format`, or with null, it still returns Markdown.
+- The `kbp_*` tools publish `outputSchema` and return validated `structuredContent`. Unknown argument names are rejected before kbp runs.
+- User guides on the [docs site](https://knowledge-mcp.pdflowlabs.io/docs): introduction, quick start, working with documents, reviewing incoming material, organizing files, and history and help.
+- Homebrew installs shell completions for zsh, Bash and Fish.
+
+### Changed
+
+- `kb setup claude-desktop` registers the MCP server and no longer prints steps for uploading skills.
+- `kb setup claude-code` edits the Claude Code settings file directly instead of running the `claude` CLI, so unrelated settings and line endings stay as they were.
+- The CLI starts faster, and `kbp_*` tool calls start fewer subprocesses.
+- The Homebrew formula depends on OpenSSL 4.
+- Maintainer docs: the release runbook moves to `RELEASING.md`, and the MCP tools reference to `docs/mcp-tools.mdx`.
+
+### Fixed
+
+- An edited `*.kbp.yaml` file is no longer mistaken for the bundled copy with the same id and version.
+- MCP tools keep document and conventions text exactly as sent, whatever its line endings, and accept null conventions text.
+- Setup keeps comments, Unicode and line endings in JSONC settings files, rejects malformed settings, and keeps unrelated comments when removing an entry it has no record of.
+- `kb setup --remove` keeps a shared skill link that now points somewhere else, and removes dangling links it created once the last harness is removed.
+- `kb kbp` JSON output and errors match the MCP tools. Help after mode arguments never runs kbp, and a broken install reports a reinstall command in JSON output too.
+
 ## 0.3.0
 
 ### Added

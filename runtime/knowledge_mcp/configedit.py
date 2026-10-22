@@ -6,7 +6,10 @@ import json
 import re
 import tomllib
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from json5.model import Node as ModelNode
 
 
 class ConfigError(ValueError):
@@ -28,126 +31,61 @@ class Node:
     members: list[tuple[str, int, Node]] = field(default_factory=list)
 
 
-class _Parser:
-    def __init__(self, text: str) -> None:
-        self.text = text
-        self.at = 0
+def _position(model: ModelNode, lines: list[int], *, end: bool = False) -> int:
+    line = model.end_lineno if end else model.lineno
+    column = model.end_col_offset if end else model.col_offset
+    assert line is not None and column is not None
+    return lines[line - 1] + column
 
-    def fail(self, message: str) -> ConfigError:
-        line = self.text.count("\n", 0, self.at) + 1
-        return ConfigError(message, line)
 
-    def blank(self) -> None:
-        text = self.text
-        while self.at < len(text):
-            char = text[self.at]
-            if char in " \t\r\n﻿":
-                self.at += 1
-            elif text.startswith("//", self.at):
-                end = text.find("\n", self.at)
-                self.at = len(text) if end < 0 else end
-            elif text.startswith("/*", self.at):
-                end = text.find("*/", self.at + 2)
-                if end < 0:
-                    message = "unclosed comment"
-                    raise self.fail(message)
-                self.at = end + 2
-            else:
-                return
+def _source_node(model: ModelNode, text: str, lines: list[int]) -> Node:
+    """Adapt json-five's source positions; keep edits on the original text."""
+    from json5.model import (  # noqa: PLC0415 - defer JSONC startup.
+        JSONArray,
+        JSONObject,
+    )
 
-    def value(self) -> Node:
-        self.blank()
-        if self.at >= len(self.text):
-            message = "value expected"
-            raise self.fail(message)
-        char = self.text[self.at]
-        if char == "{":
-            return self.object()
-        if char == "[":
-            return self.array()
-        if char == '"':
-            start = self.at
-            text = self.string()
-            return Node(start, self.at, text)
-        match = re.compile(r"-?\d+(\.\d+)?([eE][+-]?\d+)?|true|false|null").match(
-            self.text, self.at
-        )
-        if match is None:
-            message = "value expected"
-            raise self.fail(message)
-        self.at = match.end()
-        return Node(match.start(), match.end(), json.loads(match.group()))
-
-    def string(self) -> str:
-        match = re.compile(r'"(?:[^"\\\n]|\\.)*"').match(self.text, self.at)
-        if match is None:
-            message = "unterminated string"
-            raise self.fail(message)
-        self.at = match.end()
-        value = json.loads(match.group())
-        assert isinstance(value, str)
-        return value
-
-    def object(self) -> Node:
-        node = Node(self.at, self.at, {})
-        self.at += 1
-        while True:
-            self.blank()
-            if self.text.startswith("}", self.at):
-                self.at += 1
-                node.end = self.at
-                return node
-            if not self.text.startswith('"', self.at):
+    start = _position(model, lines)
+    end = _position(model, lines, end=True)
+    node = Node(start, end)
+    if isinstance(model, JSONObject):
+        node.value = {}
+        for key, value in model.key_value_pairs:
+            begin = _position(key, lines)
+            finish = _position(key, lines, end=True)
+            name = json.loads(text[begin:finish])
+            if not isinstance(name, str):
                 message = "quoted object key expected"
-                raise self.fail(message)
-            begin = self.at
-            key = self.string()
-            self.blank()
-            if not self.text.startswith(":", self.at):
-                message = "':' expected"
-                raise self.fail(message)
-            self.at += 1
-            child = self.value()
-            node.members.append((key, begin, child))
-            node.value[key] = child.value
-            self.blank()
-            if self.text.startswith(",", self.at):
-                self.at += 1
-            elif not self.text.startswith("}", self.at):
-                message = "',' or '}' expected"
-                raise self.fail(message)
+                raise ConfigError(message, key.lineno)
+            child = _source_node(value, text, lines)
+            node.members.append((name, begin, child))
+            node.value[name] = child.value
+    elif isinstance(model, JSONArray):
+        node.value = [_source_node(value, text, lines).value for value in model.values]
+    else:
+        # JSONC has JSON literals, not JSON5's additional string/number forms.
+        def reject_constant(_constant: str) -> Any:
+            message = "JSON number expected"
+            raise ConfigError(message, model.lineno)
 
-    def array(self) -> Node:
-        node = Node(self.at, self.at, [])
-        self.at += 1
-        while True:
-            self.blank()
-            if self.text.startswith("]", self.at):
-                self.at += 1
-                node.end = self.at
-                return node
-            child = self.value()
-            node.value.append(child.value)
-            self.blank()
-            if self.text.startswith(",", self.at):
-                self.at += 1
-            elif not self.text.startswith("]", self.at):
-                message = "',' or ']' expected"
-                raise self.fail(message)
+        node.value = json.loads(text[start:end], parse_constant=reject_constant)
+    return node
 
 
 def parse_json(text: str) -> Node:
-    """Parse empty text as `{}`. Raise `ConfigError` for structural errors or a non-object root.
-    Malformed strings or numbers can raise `json.JSONDecodeError`.
-    """
+    """Parse JSONC with json-five, preserving source positions for local edits."""
     if not text.strip():
         return Node(0, 0, {})
-    parser = _Parser(text)
-    node = parser.value()
-    parser.blank()
-    if parser.at != len(text):
-        message = "unexpected text after the top JSON value"
-        raise parser.fail(message)
+    from json5.loader import ModelLoader, loads  # noqa: PLC0415 - defer JSONC startup.
+    from json5.utils import JSON5DecodeError  # noqa: PLC0415 - defer JSONC startup.
+
+    try:
+        model = loads(text, loader=ModelLoader())
+    except JSON5DecodeError as error:
+        line = error.token.lineno if error.token else text.count("\n") + 1
+        raise ConfigError(str(error), line) from None
+    lines = [0, *(match.end() for match in re.finditer("\n", text))]
+    node = _source_node(model.value, text, lines)
     if not isinstance(node.value, dict):
         message = "expected a JSON object at the top of the file"
         raise ConfigError(message)
@@ -274,16 +212,32 @@ def json_remove(text: str, path: tuple[str, ...], name: str, piece: str | None) 
         node = _child(node, key) if node is not None else None
     if node is None or not isinstance(node.value, dict) or name not in node.value:
         return text
+    from json5.tokenizer import tokenize  # noqa: PLC0415 - defer JSONC startup.
+
     members = node.members
     index = next(i for i, (key, _begin, _child) in enumerate(members) if key == name)
     _key, begin, child = members[index]
-    if index + 1 < len(members):
-        start, end = begin, members[index + 1][1]
+    # Remove only this member and one separator. Comments and whitespace between
+    # members belong to the user's file, including comments in an otherwise empty object.
+    limit = members[index + 1][1] if index + 1 < len(members) else node.end - 1
+    commas = [
+        child.end + token.index
+        for token in tokenize(text[child.end : limit])
+        if token.type == "COMMA"
+    ]
+    spans = [(begin, child.end)]
+    if commas:
+        spans.append((commas[0], commas[0] + 1))
     elif index > 0:
-        start, end = members[index - 1][2].end, child.end
-    else:
-        start, end = node.start + 1, node.end - 1
-    new = text[:start] + text[end:]
+        previous = members[index - 1][2].end
+        spans.extend(
+            (previous + token.index, previous + token.end)
+            for token in tokenize(text[previous:begin])
+            if token.type == "COMMA"
+        )
+    new = text
+    for start, end in sorted(spans, reverse=True):
+        new = new[:start] + new[end:]
     json_value(new)
     return new
 

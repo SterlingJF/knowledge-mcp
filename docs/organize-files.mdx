@@ -1,0 +1,31 @@
+---
+title: "Organize files"
+description: "Choose naming and filing rules for a folder, then review proposed moves, renames and link repairs before your assistant changes any files."
+---
+
+## Choose names and folders
+
+Ask your assistant how files in this folder are named and filed, and where those rules came from. Compare what it suggests with the folders you already use.
+
+For notes, you can use ACE, PARA, Johnny.Decimal or a system of your own. Codebase documents stay in the folders the codebase already uses. File names can include dates, titles and projects, and your assistant asks you for anything it's missing.
+
+Saving a naming or filing rule doesn't move any files. If existing files need to move, your assistant proposes the moves separately for you to review. Files whose document type hasn't been confirmed stay where they are.
+
+<Card
+  title="Naming and filing conventions"
+  icon="folder-tree"
+  href="/naming-and-filing"
+  horizontal
+/>
+
+## Move and rename files
+
+To tidy up a folder, ask:
+
+> Help me tidy project-notes and its subfolders. Show me where you’d move files and what you’d rename before changing anything.
+
+Check the new paths and the link changes. Leave out any moves you don't want and approve the rest. Your assistant looks for links across the whole knowledge base, including notes outside the folder you're tidying.
+
+knowledge-mcp works out how to repair Markdown links and Obsidian wikilinks. If something's wrong, the move waits until it's sorted out. That could be a link search that didn't finish, an unclear target, a destination that's already taken, a document type that doesn't belong there, or an internal link it can't repair.
+
+After you approve, your assistant checks the files again, moves them, checks the links and records all the edits together. A change across several files can stop partway through. If that happens, read [Recovery](/history-and-help#recovery) before you carry on.

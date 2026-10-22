@@ -10,7 +10,7 @@
     {
       "name": "knowledge-mcp",
       "description": "Plain, structured thinking while you work. It's free, open, and local-first.",
-      "source": "./runtime"
+      "source": "./"
     }
   ]
 }

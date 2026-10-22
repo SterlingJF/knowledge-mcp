@@ -1,0 +1,13 @@
+---
+# A source names a line or a place, not both.
+schema: knowledge-mcp/proposal/1
+summary: Focus proposal on retiring the evening build
+card: "`PROPOSED CHANGES`"
+rows:
+  - proposed:
+      label: Title
+      text: Evening build retirement
+    sources:
+      - file: build-timings.xlsx
+        line_number: 2
+        place: Evening!A2:D10

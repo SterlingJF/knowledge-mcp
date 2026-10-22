@@ -1,0 +1,29 @@
+---
+schema: knowledge-mcp/proposal/1
+summary: Rollout as background, build lead decides
+rows:
+  - current:
+      text: Cache sequence as an open question
+    proposed:
+      label: Background
+      text: read cache in 0.4, write cache in 0.5. Not proposed or approved.
+    sources:
+      - file: meeting-notes.md
+        line_number: 15
+  - current:
+      label: Open question
+      text: who can settle the conflicting accounts?
+    proposed:
+      label: Approval
+      text: build lead decides at Thursday's review
+    sources:
+      - said: The build lead decides at Thursday's review.
+card: |
+  `PROPOSED CHANGES` · `Nothing saved`
+
+  **Rollout as background, build lead decides**
+
+  | ID | Current | Proposed | Source |
+  | --- | --- | --- | --- |
+  | C1 | Cache sequence as an open question | **Background:** read cache in 0.4, write cache in 0.5. Not proposed or approved. | `meeting-notes.md:15` |
+  | C2 | **Open question:** who can settle the conflicting accounts? | **Approval:** build lead decides at Thursday's review | you, today |

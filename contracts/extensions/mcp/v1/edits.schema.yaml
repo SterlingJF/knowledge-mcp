@@ -28,6 +28,10 @@ $defs:
         type: array
         items:
           $ref: "#/$defs/edit"
+      card:
+        description: The latest edit as markdown. Absent when no edit is recorded. Show it in your reply unchanged.
+        type: string
+        minLength: 1
   edit:
     title: Edit
     description:

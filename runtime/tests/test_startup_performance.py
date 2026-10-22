@@ -85,7 +85,7 @@ def test_generated_schema_loader_parity(fallback, monkeypatch):
     if fallback:
         monkeypatch.delattr(yaml, "CSafeLoader", raising=False)
     paths = sorted(SCHEMAS.glob("*.schema.yaml"))
-    assert len(paths) == 14
+    assert len(paths) == 16
     schemas.bundle.cache_clear()
     try:
         for path in paths:

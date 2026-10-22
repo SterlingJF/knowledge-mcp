@@ -1,0 +1,84 @@
+---
+title: "Quick start"
+description: "Install knowledge-mcp and connect it to the AI app you already use. Once it's connected, open a knowledge base and start on your first document."
+---
+
+## Connect AI apps on macOS
+
+<Tabs>
+  <Tab title="Homebrew">
+
+    You need Homebrew and at least one of the AI apps below.
+
+    <Steps>
+      <Step title="Install knowledge-mcp">
+
+        ```sh
+        brew install sterlingjf/tap/knowledge-mcp
+        ```
+
+      </Step>
+      <Step title="Connect your app">
+
+        Run the command for each app you use:
+
+        | App | Command |
+        | --- | --- |
+        | Claude Code | `kb setup claude-code` |
+        | Codex | `kb setup codex` |
+        | Claude Desktop | `kb setup claude-desktop` |
+        | Pi | `kb setup pi` |
+        | OpenCode | `kb setup opencode` |
+
+      </Step>
+    </Steps>
+
+  </Tab>
+  <Tab title="Plugin">
+
+    Claude Code and Codex can also install knowledge-mcp as a plugin. Plugins need [uv](https://docs.astral.sh/uv/), which downloads Python 3.14 if you don't have it. Use either the plugin or Homebrew for each app, not both.
+
+    <CodeGroup>
+      ```text Claude Code
+      /plugin marketplace add SterlingJF/knowledge-mcp
+      /plugin install knowledge-mcp@knowledge-mcp
+      ```
+
+      ```sh Codex
+      codex plugin marketplace add SterlingJF/knowledge-mcp
+      codex plugin add knowledge-mcp@knowledge-mcp
+      ```
+    </CodeGroup>
+
+    That's it. There's nothing else to set up.
+
+  </Tab>
+</Tabs>
+
+## Limits on shared chats
+
+<Warning>
+
+If two chats run at the same time, they can overwrite each other's saved document types and readers, even when they're working on different documents in different folders. When chats share the [document types file](/history-and-help#saved-work), let only one of them save document settings at a time.
+
+</Warning>
+
+## Start or resume work
+
+1. Open your assistant in your knowledge base folder.
+2. Ask: “Read this area’s guidance and documents. Explain what people do and produce, and suggest where to begin.”
+3. If you've saved notes before, ask it to read them and tell you where to pick up.
+4. Decide on the next task together and ask your assistant to walk you through it. Look over any changes it proposes before it edits your files.
+
+## Improve your first document
+
+Pick a proposal or a codebase document you want to improve, and ask:
+
+> Help me finish this proposal using these notes. Show me a draft before changing the file.
+
+1. Answer your assistant's questions.
+2. Read the proposed changes. Check each one's sources, and name it by its ID, such as C2.
+3. Approve the text. Your assistant saves it, checks it and records the edit.
+4. Ask your assistant to show you the edit history.
+
+Next: [Revise a document](/work-with-documents#revise-a-document).

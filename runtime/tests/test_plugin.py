@@ -13,9 +13,11 @@ from mcp.client.stdio import StdioServerParameters
 
 from tests.harness import MODULE, server_parameters, session, texts
 
-CLAUDE = json.loads((MODULE / ".claude-plugin" / "plugin.json").read_text())
-CODEX = json.loads((MODULE / ".codex-plugin" / "plugin.json").read_text())
-CODEX_SERVERS = json.loads((MODULE / "codex-mcp.json").read_text())
+ROOT = MODULE.parent
+
+CLAUDE = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text())
+CODEX = json.loads((ROOT / ".codex-plugin" / "plugin.json").read_text())
+CODEX_SERVERS = json.loads((ROOT / "codex-mcp.json").read_text())
 PROJECT = tomllib.loads((MODULE / "pyproject.toml").read_text())["project"]
 
 CODEX_KEEPS = ("HOME", "PATH", "USER", "TMPDIR")
@@ -37,15 +39,24 @@ def uv_locations() -> dict[str, str]:
 def copy_plugin(tmp_path: Path) -> Path:
     target = tmp_path / "installed" / "knowledge-mcp"
     shutil.copytree(
-        MODULE,
+        ROOT,
         target,
-        ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache", ".venv"),
+        ignore=shutil.ignore_patterns(
+            "__pycache__",
+            ".pytest_cache",
+            ".venv",
+            "node_modules",
+            ".git",
+            ".mypy_cache",
+            ".ruff_cache",
+        ),
     )
     return target
 
 
 def version_answer(parameters: StdioServerParameters) -> str:
     async def steps(client):
+        assert (await client.list_tools()).tools
         result = await client.call_tool("kbp_version", {})
         assert not result.is_error, texts(result)
         return texts(result)[0]
@@ -74,7 +85,17 @@ def test_codex_starts_the_server_from_a_copy_of_the_folder(tmp_path):
 
     assert answer.startswith("Knowledge Bus ")
     assert (home / ".local" / "state" / "knowledge-mcp" / "log.jsonl").is_file()
-    assert list((home / ".cache" / "knowledge-mcp" / "environments").iterdir())
+    python = plugin / ".venv/bin/python"
+    before = python.stat().st_mtime_ns
+    assert version_answer(
+        StdioServerParameters(
+            command=server["command"],
+            args=server["args"],
+            cwd=plugin,
+            env=env,
+        )
+    ).startswith("Knowledge Bus ")
+    assert python.stat().st_mtime_ns == before
 
 
 def test_codex_manifest_lists_state_directory_env_vars():
@@ -107,18 +128,17 @@ def test_claude_manifest_starts_copied_plugin_from_other_cwd(tmp_path):
 
 def test_corrupt_lock_hashes_fail_startup(tmp_path):
     plugin = copy_plugin(tmp_path)
-    lock = plugin / "requirements.lock"
+    lock = plugin / "uv.lock"
     text = lock.read_text()
-    first = text.index("--hash=sha256:") + len("--hash=sha256:")
-    lock.write_text(text[:first] + "0" * 64 + text[first + 64 :])
-    second = lock.read_text().index("--hash=sha256:", first) + len("--hash=sha256:")
-    text = lock.read_text()
-    lock.write_text(text[:second] + "1" * 64 + text[second + 64 :])
+    # The direct production archive must be checked before starting the server.
+    text = re.sub(r'(hash = "sha256:)[0-9a-f]{64}', r"\g<1>" + "0" * 64, text)
+    lock.write_text(text)
     server = CODEX_SERVERS["mcpServers"]["knowledge-mcp"]
     env = {
         **{name: os.environ[name] for name in CODEX_KEEPS if name in os.environ},
         "XDG_CACHE_HOME": str(tmp_path / "cache"),
         **uv_locations(),
+        "UV_NO_CACHE": "1",
     }
 
     done = subprocess.run(
@@ -135,9 +155,6 @@ def test_corrupt_lock_hashes_fail_startup(tmp_path):
     assert done.returncode != 0
     assert "hash" in done.stderr.lower()
     assert done.stdout == ""
-    assert not any(
-        (tmp_path / "cache" / "knowledge-mcp" / "environments").glob("[!.]*")
-    )
 
 
 def test_development_server_returns_knowledge_bus_version(tmp_path):
@@ -148,9 +165,9 @@ def test_both_manifests_name_the_same_plugin_and_skills():
     for manifest in (CLAUDE, CODEX):
         assert manifest["name"] == "knowledge-mcp"
         assert manifest["version"] == PROJECT["version"]
-        assert manifest["skills"] == "./skills/"
+        assert manifest["skills"] == "./runtime/skills/"
     assert CODEX["mcpServers"] == "./codex-mcp.json"
-    assert not (MODULE / ".mcp.json").exists()
+    assert not (ROOT / ".mcp.json").exists()
 
 
 def test_every_description_copy_is_the_package_description():
@@ -176,9 +193,13 @@ def test_every_description_copy_is_the_package_description():
 def test_both_manifests_expose_the_import_skill(tmp_path):
     plugin = copy_plugin(tmp_path)
     for manifest in (CLAUDE, CODEX):
-        for folder in (MODULE, plugin):
-            skill = folder / manifest["skills"] / "kb-import-document"
-            assert skill_name(skill) == "kb-import-document"
+        for folder in (ROOT, plugin):
+            skills = sorted((MODULE / "skills").glob("*/SKILL.md"))
+            assert len(skills) == 9
+            for original in skills:
+                skill = folder / manifest["skills"] / original.parent.name
+                assert skill_name(skill) == original.parent.name
+                assert (skill / "SKILL.md").read_bytes() == original.read_bytes()
 
 
 def test_plugin_skill_names_are_unique_and_match_upstream():
@@ -206,7 +227,7 @@ def skill_name(folder: Path) -> str:
 def test_own_skills_are_preserved_in_copied_plugin(tmp_path):
     skills = MODULE / "skills"
     for manifest in (CLAUDE, CODEX):
-        assert (MODULE / manifest["skills"]).resolve() == skills
+        assert (ROOT / manifest["skills"]).resolve() == skills
     own = sorted(path.name for path in skills.iterdir() if path.name in OWN_SKILLS)
     assert own == sorted(OWN_SKILLS)
 
@@ -228,6 +249,7 @@ def test_own_skills_are_preserved_in_copied_plugin(tmp_path):
                 "kb_list_audiences",
                 "kb_record_edit",
                 "kb_list_edits",
+                "kb_prepare_proposal",
             },
         ),
         (
@@ -270,9 +292,9 @@ def test_marketplaces_reference_local_plugin_directory():
     assert claude_entry == {
         **claude_entry,
         "name": "knowledge-mcp",
-        "source": "./runtime",
+        "source": "./",
     }
     assert codex_entry["name"] == "knowledge-mcp"
-    assert codex_entry["source"] == {"source": "local", "path": "./runtime"}
+    assert codex_entry["source"] == {"source": "local", "path": "./"}
     assert {"policy", "category"} <= codex_entry.keys()
-    assert (repo / claude_entry["source"]).resolve() == MODULE
+    assert (repo / claude_entry["source"]).resolve() == ROOT

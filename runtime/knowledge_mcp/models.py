@@ -42,7 +42,7 @@ class SpecFile(BaseModel):
     digest: str | None = Field(
         default=None,
         description=(
-            "The file's digest, as listed in `received` by an earlier tool result this session."
+            "File SHA-256 (`sha256:…`); send exact text if unknown. kbp_validate requires previously sent text."
         ),
     )
 

@@ -27,6 +27,7 @@ from tests.harness import (
     texts,
     validator,
 )
+from tests.test_approved_names_end_to_end import old_record
 
 README = "README.md"
 RFC = "docs/rfcs/0042-cache.md"
@@ -691,3 +692,101 @@ def test_a_nested_folder_keeps_its_own_scope_below_a_record_only_top_folder(
         for spec in later["scopes"][waiting["scope"]]["universe_specs"]
     ] == [(PRODUCT, False)]
     assert entries(bare)[NESTED_RFC]["universe_spec"] == PRODUCT
+
+
+def test_physical_shared_record_serialized_writers_preserve_complete_metadata(tmp_path):
+    """Two clients share a physical record; test code serializes saves, not a server lock."""
+    base = KnowledgeBase(tmp_path / "base")
+    base.add_universe_specs("", [CODEBASE, PRODUCT])
+    base.write(PRICING, "# Pricing\r\n")
+    base.write(RFC, "# Cache\r\n")
+    base.write("review.md", "# Saved next steps\r\n\r\nQuestion still open.\r\n")
+    authority = {
+        "basis": "request",
+        "text": "Pricing is a design doc for the product lead.",
+    }
+    original = {
+        "universe_spec": PRODUCT,
+        "version": "0.9",
+        "document_type": "design-doc",
+        "set_by": "person",
+        "allowed_by": authority,
+        "time": "2026-10-10T09:16:40.003Z",
+        "audience": {"value": "the product lead", "status": "confirmed"},
+    }
+    # Carry a canonical legacy fixture entry through a physical migration save.
+    legacy = yaml.safe_load(old_record())
+    legacy["files"] = {PRICING: legacy["files"][PRICING]}
+    legacy_text = yaml.safe_dump(legacy).replace("\n", "\r\n")
+    old_path = ".knowledge-bus/plugins/knowledge-mcp/record.yaml"
+    base.write(old_path, legacy_text)
+    migration_harness = Harness(base)
+    state = tmp_path / "state"
+    migrated = session(
+        server_parameters(state),
+        lambda client: migration_harness.update_on(client, legacy_text),
+    )
+    assert not (base.root / RECORD).exists()
+    migration_harness.write_record(migrated["record"])
+    assert yaml.safe_load(base.read(RECORD))["files"] == {PRICING: original}
+    assert (base.root / old_path).read_bytes() == legacy_text.encode()
+    left, right = Harness(base), Harness(KnowledgeBase(base.root))
+    assert left.base.root / RECORD == right.base.root / RECORD
+    old = left.record()
+    before_note = (base.root / "review.md").read_bytes()
+    left_changes = {
+        "entries": [
+            {
+                "path": RFC,
+                "set_by": "agent",
+                "universe_spec": CODEBASE,
+                "document_type": "design-proposal",
+            }
+        ]
+    }
+    right_changes = {
+        "entries": [{"path": QUOTE, "set_by": "agent", "no_document_type": True}]
+    }
+
+    async def prepare(client):
+        return await left.update_on(client, old, **left_changes)
+
+    first = session(server_parameters(state), prepare)
+    first_rfc = yaml.safe_load(first["record"])["files"][RFC]
+    # Preparation itself must never write the shared settings or notes.
+    assert left.record() == old
+    stale = session(
+        server_parameters(state),
+        lambda client: right.update_on(client, old, **right_changes),
+    )
+    assert first["based_on"] == fingerprint(old) == stale["based_on"]
+    left.write_record(first["record"])
+    assert fingerprint(right.record()) != stale["based_on"]
+    # Reread/reprepare from another process before its serialized save.
+    second = session(
+        server_parameters(state), lambda client: right.save(client, **right_changes)
+    )
+    assert second["based_on"] == fingerprint(first["record"])
+    actual = yaml.safe_load((base.root / RECORD).read_bytes())
+    assert actual["schema"] == "knowledge-mcp/document-types/1"
+    assert set(actual["files"]) == {PRICING, RFC, QUOTE}
+    assert actual["files"][PRICING] == original
+    assert actual["files"][RFC] == first_rfc
+    for path, kind in ((RFC, "design-proposal"), (QUOTE, None)):
+        item = actual["files"][path]
+        expected = {
+            "set_by": "agent",
+            "allowed_by": {
+                "basis": "instruction",
+                "text": LINE,
+                "location": "AGENTS.md",
+            },
+            "time": item["time"],
+        }
+        if kind:
+            expected.update(universe_spec=CODEBASE, version="0.1", document_type=kind)
+        else:
+            expected["no_document_type"] = True
+        assert item == expected
+    assert (base.root / "review.md").read_bytes() == before_note
+    assert (base.root / PRICING).read_bytes() == b"# Pricing\r\n"

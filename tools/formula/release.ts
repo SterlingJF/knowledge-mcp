@@ -192,7 +192,21 @@ export async function source(
   const { validateMetadata, releaseNotes } =
     await import("./release-metadata.ts");
   validateMetadata(checkout, options.release.version);
-  run("just", ["check_knowledge_mcp_lock", checkout], { cwd: options.root });
+  const requirements = run("uv", [
+    "export",
+    "--color",
+    "never",
+    "--project",
+    checkout,
+    "--locked",
+    "--package",
+    "knowledge-mcp",
+    "--no-dev",
+    "--no-emit-workspace",
+    "--no-header",
+    "--format",
+    "requirements-txt",
+  ]);
   const dist = join(options.root, "dist");
   mkdirSync(dist, { recursive: true });
   let assets: Set<string>;
@@ -250,10 +264,8 @@ export async function source(
     sdist: readFileSync(archive),
     url: `${options.release.rootUrl}/${name}`,
     lock: readFileSync(join(checkout, "uv.lock"), "utf8"),
-    requirements: readFileSync(
-      join(checkout, "runtime/requirements.lock"),
-      "utf8",
-    ),
+    lockDirectory: checkout,
+    requirements,
     pyproject: manifest,
   });
   if (newSource) {

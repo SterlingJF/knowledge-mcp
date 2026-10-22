@@ -10,12 +10,3 @@ repos:
     hooks:
       - id: renovate-config-validator
         args: ["--strict"]
-  - repo: local
-    hooks:
-      # The plugin start script and the Homebrew formula install from runtime/requirements.lock.
-      - id: requirements-lock
-        name: Export uv.lock to runtime/requirements.lock
-        entry: just generate_knowledge_mcp_lock
-        language: system
-        files: ^uv\.lock$
-        pass_filenames: false

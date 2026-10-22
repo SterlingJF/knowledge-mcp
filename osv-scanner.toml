@@ -4,3 +4,53 @@
 id = "GHSA-vfj7-8cjw-p6xm"
 ignoreUntil = 2027-01-08
 reason = "braces 3.0.3 has no patched release. Only markdownlint-cli2 uses braces. braces expands only glob patterns from this repo and markdownlint-cli2."
+
+[[IgnoredVulns]]
+id = "GHSA-43mp-35q3-x3fq"
+ignoreUntil = 2026-10-31
+reason = "virtualenv 21.14.9 fixes this, but the 7-day minimum release age blocks it until 2026-10-24. Only dev tools use virtualenv; the Homebrew install doesn't include it."
+
+[[IgnoredVulns]]
+id = "GHSA-5vjq-rrrf-7h2q"
+ignoreUntil = 2026-10-31
+reason = "virtualenv 21.14.9 fixes this, but the 7-day minimum release age blocks it until 2026-10-24. Only dev tools use virtualenv; the Homebrew install doesn't include it."
+
+[[IgnoredVulns]]
+id = "GHSA-8rjx-v5ww-45pp"
+ignoreUntil = 2026-10-31
+reason = "virtualenv 21.14.9 fixes this, but the 7-day minimum release age blocks it until 2026-10-24. Only dev tools use virtualenv; the Homebrew install doesn't include it."
+
+[[IgnoredVulns]]
+id = "GHSA-c947-3pg5-gm8q"
+ignoreUntil = 2026-10-31
+reason = "virtualenv 21.14.9 fixes this, but the 7-day minimum release age blocks it until 2026-10-24. Only dev tools use virtualenv; the Homebrew install doesn't include it."
+
+[[IgnoredVulns]]
+id = "GHSA-c978-59m8-c77v"
+ignoreUntil = 2026-10-31
+reason = "virtualenv 21.14.9 fixes this, but the 7-day minimum release age blocks it until 2026-10-24. Only dev tools use virtualenv; the Homebrew install doesn't include it."
+
+[[IgnoredVulns]]
+id = "GHSA-cw65-gx24-rc82"
+ignoreUntil = 2026-10-31
+reason = "virtualenv 21.14.9 fixes this, but the 7-day minimum release age blocks it until 2026-10-24. Only dev tools use virtualenv; the Homebrew install doesn't include it."
+
+[[IgnoredVulns]]
+id = "GHSA-vxj4-q4g9-crj7"
+ignoreUntil = 2026-10-31
+reason = "virtualenv 21.14.9 fixes this, but the 7-day minimum release age blocks it until 2026-10-24. Only dev tools use virtualenv; the Homebrew install doesn't include it."
+
+[[IgnoredVulns]]
+id = "GHSA-gfr2-rv44-r23c"
+ignoreUntil = 2026-10-31
+reason = "markdown-it 15.0.3 fixes this, but the 7-day minimum release age blocks it until 2026-10-23. Only markdownlint-cli2 and markdownlint-rule-relative-links use markdown-it, on this repo's Markdown."
+
+[[IgnoredVulns]]
+id = "GHSA-r7fv-28h4-cvq7"
+ignoreUntil = 2026-10-31
+reason = "markdown-it 15.0.3 fixes this, but the 7-day minimum release age blocks it until 2026-10-23. Only markdownlint-cli2 and markdownlint-rule-relative-links use markdown-it, on this repo's Markdown."
+
+[[IgnoredVulns]]
+id = "GHSA-vfgh-jcmw-g37q"
+ignoreUntil = 2026-10-31
+reason = "markdown-it 15.0.3 fixes this, but the 7-day minimum release age blocks it until 2026-10-23. Only markdownlint-cli2 and markdownlint-rule-relative-links use markdown-it, on this repo's Markdown."

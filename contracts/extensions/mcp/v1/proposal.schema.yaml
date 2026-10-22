@@ -1,0 +1,146 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: proposal.schema.yaml
+title: kb_prepare_proposal result
+description:
+  The structuredContent of a kb_prepare_proposal result, or problem details
+  when isError is true.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Proposal
+    description: Proposed changes to a document.
+    type: object
+    additionalProperties: false
+    required:
+      - schema
+      - summary
+      - rows
+      - card
+    properties:
+      schema:
+        const: knowledge-mcp/proposal/1
+      summary:
+        description: What the proposal changes, in one line.
+        type: string
+        minLength: 1
+      rows:
+        description: One row per change, in display order. The card names row n change Cn.
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/row"
+      left_out:
+        description: Files you read but didn't cite.
+        type: array
+        items:
+          $ref: "#/$defs/left_out_file"
+      card:
+        description: The proposal as markdown. Show it in your reply unchanged.
+        type: string
+        minLength: 1
+  row:
+    title: Proposal row
+    type: object
+    additionalProperties: false
+    required:
+      - proposed
+      - sources
+    properties:
+      current:
+        $ref: "#/$defs/cell"
+        description: The document's text now. Omit it for an addition.
+      proposed:
+        $ref: "#/$defs/cell"
+      mark:
+        $ref: "#/$defs/mark"
+      sources:
+        type: array
+        minItems: 1
+        items:
+          oneOf:
+            - $ref: "#/$defs/line_source"
+            - $ref: "#/$defs/place_source"
+            - $ref: "#/$defs/person_source"
+  cell:
+    title: Proposal cell
+    type: object
+    additionalProperties: false
+    required:
+      - text
+    properties:
+      label:
+        description: The field or section, such as `Title`.
+        type: string
+        minLength: 1
+      text:
+        description: Plain words, without markdown syntax.
+        type: string
+        minLength: 1
+  mark:
+    title: Evidence mark
+    description: How well the sources back the proposed text. `suggested` marks your own wording.
+    enum:
+      - supported
+      - partly
+      - conflicting
+      - suggested
+  line_source:
+    title: Line source
+    description: A line in a text file.
+    type: object
+    additionalProperties: false
+    required:
+      - file
+      - line_number
+    properties:
+      file:
+        type: string
+        minLength: 1
+      line_number:
+        type: integer
+        minimum: 1
+  place_source:
+    title: Place source
+    description: A place in a sheet or deck.
+    type: object
+    additionalProperties: false
+    required:
+      - file
+      - place
+    properties:
+      file:
+        type: string
+        minLength: 1
+      place:
+        description: Such as `Evening!A2:D10` or `slide 7`.
+        type: string
+        minLength: 1
+  person_source:
+    title: Person source
+    description: The person's words in this conversation.
+    type: object
+    additionalProperties: false
+    required:
+      - said
+    properties:
+      said:
+        type: string
+        minLength: 1
+  left_out_file:
+    title: Left-out file
+    type: object
+    additionalProperties: false
+    required:
+      - file
+      - reason
+    properties:
+      file:
+        type: string
+        minLength: 1
+      reason:
+        type: string
+        minLength: 1

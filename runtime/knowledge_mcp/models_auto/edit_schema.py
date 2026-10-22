@@ -26,6 +26,13 @@ class EditReceipt(BaseModel):
     before_digest: Digest
     after_digest: Digest
     operation: EditOperation | None = None
+    card: Annotated[
+        str,
+        Field(
+            description="The saved edit as markdown. Show it in your reply unchanged.",
+            min_length=1,
+        ),
+    ]
 
 
 type KbRecordEditResult = Annotated[
