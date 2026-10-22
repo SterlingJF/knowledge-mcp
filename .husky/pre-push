@@ -1,2 +1,4 @@
-just check
+# Git's hook variables would point the tests' temporary repositories at this one.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_PREFIX
 just scan_dependencies_or_warn
+just check

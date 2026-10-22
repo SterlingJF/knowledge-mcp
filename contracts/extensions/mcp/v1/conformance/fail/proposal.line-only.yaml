@@ -1,0 +1,11 @@
+---
+# A source names its file.
+schema: knowledge-mcp/proposal/1
+summary: Focus proposal on retiring the evening build
+card: "`PROPOSED CHANGES`"
+rows:
+  - proposed:
+      label: Title
+      text: Evening build retirement
+    sources:
+      - line_number: 15

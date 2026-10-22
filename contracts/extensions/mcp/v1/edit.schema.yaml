@@ -23,6 +23,7 @@ $defs:
       - allowed_by
       - before_digest
       - after_digest
+      - card
     properties:
       schema:
         const: knowledge-mcp/edit/2
@@ -43,6 +44,10 @@ $defs:
         $ref: common.schema.yaml#/$defs/digest
       operation:
         $ref: common.schema.yaml#/$defs/edit_operation
+      card:
+        description: The saved edit as markdown. Show it in your reply unchanged.
+        type: string
+        minLength: 1
     if:
       type: object
       required:

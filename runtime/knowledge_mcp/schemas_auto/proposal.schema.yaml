@@ -1,0 +1,220 @@
+---
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: proposal.schema.yaml
+title: kb_prepare_proposal result
+description: The structuredContent of a kb_prepare_proposal result, or problem details
+  when isError is true.
+type: object
+oneOf:
+  - $ref: "#/$defs/answer"
+  - $ref: problem.schema.yaml
+$defs:
+  answer:
+    title: Proposal
+    description: Proposed changes to a document.
+    type: object
+    required:
+      - schema
+      - summary
+      - rows
+      - card
+    properties:
+      schema:
+        const: knowledge-mcp/proposal/1
+      summary:
+        description: What the proposal changes, in one line.
+        type: string
+        minLength: 1
+      rows:
+        description: One row per change, in display order. The card names row n change Cn.
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/row"
+      left_out:
+        description: Files you read but didn't cite.
+        type: array
+        items:
+          $ref: "#/$defs/left_out_file"
+      card:
+        description: The proposal as markdown. Show it in your reply unchanged.
+        type: string
+        minLength: 1
+    additionalProperties: false
+  row:
+    title: Proposal row
+    type: object
+    required:
+      - proposed
+      - sources
+    properties:
+      current:
+        description: The document's text now. Omit it for an addition.
+        $ref: "#/$defs/cell"
+      proposed:
+        $ref: "#/$defs/cell"
+      mark:
+        $ref: "#/$defs/mark"
+      sources:
+        type: array
+        minItems: 1
+        items:
+          oneOf:
+            - $ref: "#/$defs/line_source"
+            - $ref: "#/$defs/place_source"
+            - $ref: "#/$defs/person_source"
+    additionalProperties: false
+  cell:
+    title: Proposal cell
+    type: object
+    required:
+      - text
+    properties:
+      label:
+        description: The field or section, such as `Title`.
+        type: string
+        minLength: 1
+      text:
+        description: Plain words, without markdown syntax.
+        type: string
+        minLength: 1
+    additionalProperties: false
+  mark:
+    title: Evidence mark
+    description: How well the sources back the proposed text. `suggested` marks your own wording.
+    enum:
+      - supported
+      - partly
+      - conflicting
+      - suggested
+  line_source:
+    title: Line source
+    description: A line in a text file.
+    type: object
+    required:
+      - file
+      - line_number
+    properties:
+      file:
+        type: string
+        minLength: 1
+      line_number:
+        type: integer
+        minimum: 1
+    additionalProperties: false
+  place_source:
+    title: Place source
+    description: A place in a sheet or deck.
+    type: object
+    required:
+      - file
+      - place
+    properties:
+      file:
+        type: string
+        minLength: 1
+      place:
+        description: Such as `Evening!A2:D10` or `slide 7`.
+        type: string
+        minLength: 1
+    additionalProperties: false
+  person_source:
+    title: Person source
+    description: The person's words in this conversation.
+    type: object
+    required:
+      - said
+    properties:
+      said:
+        type: string
+        minLength: 1
+    additionalProperties: false
+  left_out_file:
+    title: Left-out file
+    type: object
+    required:
+      - file
+      - reason
+    properties:
+      file:
+        type: string
+        minLength: 1
+      reason:
+        type: string
+        minLength: 1
+    additionalProperties: false
+  problem.schema.yaml:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    $id: problem.schema.yaml
+    title: Problem details
+    description: An error from a knowledge-mcp tool, as RFC 9457 problem details. On failure, `kb type --json` and `kb doctor --json` print a problem object as the last stderr line. Branch on `type`.
+    type: object
+    required:
+      - type
+      - title
+      - detail
+    properties:
+      type:
+        oneOf:
+          - title: Invalid arguments
+            description: An argument is unknown, missing or fails the tool's input schema, or two arguments conflict.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/argument-invalid
+          - title: Invalid folders
+            description: The call sent invalid folders or file names, or omitted universe spec text that knowledge-mcp could not retrieve.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/scope-invalid
+          - title: Unknown digest
+            description: The call sent a digest that matches no text received in this session.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/digest-unknown
+          - title: Invalid document-types file
+            description: The document-types file text sent is not valid YAML or fails document-types.schema.yaml.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/record-invalid
+          - title: Unknown document type
+            description: The requested document type is absent from the selected universe spec or universe specs.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/document-type-unknown
+          - title: kbp failed
+            description: kbp exited with an error or is missing from the install.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/kbp-failed
+          - title: Unreadable kbp output
+            description: kbp printed no JSON object, or an object with an unsupported `schema` value.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/kbp-version-skew
+          - title: knowledge-mcp failed
+            description: Any other failure inside knowledge-mcp.
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/internal-error
+          - title: Invalid document move
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/move-invalid
+          - title: Incomplete move input
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/move-input-incomplete
+          - title: Incomplete conventions context
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-context-incomplete
+          - title: Invalid conventions
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-invalid
+          - title: Unsupported conventions
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/conventions-unsupported
+          - title: Invalid filing values
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/filing-values-invalid
+          - title: Document move limit exceeded
+            const: https://github.com/SterlingJF/knowledge-mcp/problems/move-limit-exceeded
+      title:
+        type: string
+      detail:
+        description: Error detail; raw-stream MCP wrappers may omit it from text.
+        type: string
+        minLength: 1
+      errors:
+        type: array
+        minItems: 1
+        items:
+          title: Argument error
+          type: object
+          required:
+            - detail
+            - pointer
+          properties:
+            detail:
+              type: string
+            pointer:
+              description: JSON Pointer into the arguments as sent, such as "#/entries/0/document_type".
+              type: string
+              pattern: ^#(/([^~/]|~[01])*)*$
+          additionalProperties: false
+    additionalProperties: false

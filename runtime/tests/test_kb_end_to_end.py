@@ -217,12 +217,13 @@ class TestSetup:
         assert entry(home, harness) == EXPECTED[harness]
         assert done.stdout == ""
         lines = done.stderr.splitlines()
-        assert lines[0].startswith("Registered knowledge-mcp with ")
-        assert str(home) in lines[0]
+        [registered] = [
+            line for line in lines if line.startswith("Registered knowledge-mcp with ")
+        ]
+        assert str(home) in registered
         [backup] = (home / ".local/state/knowledge-mcp/setup/backups").iterdir()
-        assert f"backup at {backup}." in lines[0]
+        assert f"backup at {backup}." in registered
         assert "\x1b[" not in done.stderr
-        steps = lines[1:]
         if harness in SKILL_FOLDER:
             folder = home / SKILL_FOLDER[harness]
             for name in SKILLS:
@@ -236,18 +237,6 @@ class TestSetup:
             state_file = home / ".local/state/knowledge-mcp/setup/state.json"
             record = json.loads(state_file.read_text())["hosts"][harness]
             assert record["links"] == []
-
-            skills_path = str(MODULE / "skills")
-            [guidance] = [
-                line for line in done.stderr.splitlines() if skills_path in line
-            ]
-            assert "Claude desktop app" in done.stderr
-            assert any(line.startswith("mkdir -p ") for line in steps)
-            [upload] = [line for line in steps if line.strip().startswith("Upload ")]
-            assert "ZIP" in upload
-            assert "Customize → Skills" in upload
-            assert "(cd " in guidance
-            assert not guidance.startswith(("warning: ", "problem: "))
 
         assert not any(
             line.startswith(("warning: ", "problem: "))
@@ -278,6 +267,56 @@ class TestSetup:
             kb(home, "setup", "--remove", harness)
             assert (home / ".agents/skills/kb-check").is_symlink()
         kb(home, "setup", "--remove", "codex")
+
+        assert snapshot(home) == before
+
+    @pytest.mark.parametrize("target_exists", [True, False])
+    def test_remove_preserves_retargeted_same_name_shared_skill(
+        self, tmp_path, target_exists
+    ):
+        home = fixture_home(tmp_path)
+        folder = home / ".agents/skills"
+        folder.mkdir(parents=True)
+        before = snapshot(home)
+        target = tmp_path / "user-skills/kb-check"
+        if target_exists:
+            write(target, "SKILL.md", "User skill\n")
+        for harness in ["codex", "pi"]:
+            kb(home, "setup", harness)
+        link = folder / "kb-check"
+        link.unlink()
+        link.symlink_to(target, target_is_directory=True)
+
+        kb(home, "setup", "--remove", "codex")
+
+        assert all((folder / name).is_symlink() for name in SKILLS)
+        assert os.readlink(link) == str(target)
+
+        kb(home, "setup", "--remove", "pi")
+
+        assert snapshot(home) == before | {
+            ".agents/skills/kb-check": ("link", str(target))
+        }
+        if target_exists:
+            assert (target / "SKILL.md").read_text() == "User skill\n"
+
+    def test_remove_dangling_owned_shared_skills_after_last_harness(self, tmp_path):
+        home = fixture_home(tmp_path)
+        before = snapshot(home)
+        data = tmp_path / "data"
+        data.symlink_to(bundled.DATA, target_is_directory=True)
+        env = {"KNOWLEDGE_MCP_DATA": str(data)}
+        for harness in ["codex", "pi"]:
+            kb(home, "setup", harness, **env)
+        data.unlink()
+        links = [home / ".agents/skills" / name for name in SKILLS]
+        assert all(link.is_symlink() and not link.exists() for link in links)
+
+        kb(home, "setup", "--remove", "codex", **env)
+
+        assert all(link.is_symlink() for link in links)
+
+        kb(home, "setup", "--remove", "pi", **env)
 
         assert snapshot(home) == before
 
@@ -414,7 +453,7 @@ class TestSetup:
         assert "already has a knowledge-mcp entry" in done.stderr
         assert snapshot(home) == before
 
-    def test_setup_uses_harness_clis_except_for_codex_config(self, tmp_path):
+    def test_setup_uses_pi_cli_and_preserves_claude_and_codex_config(self, tmp_path):
         home = fixture_home(tmp_path)
         bin_folder, log = harness_clis(tmp_path)
         before = snapshot(home)
@@ -433,9 +472,7 @@ class TestSetup:
             )
 
         assert log.read_text().splitlines() == [
-            f"claude mcp add --scope user knowledge-mcp -- {KB} mcp",
             f"pi mcp add knowledge-mcp -- {KB} mcp",
-            "claude mcp remove --scope user knowledge-mcp",
             "pi mcp remove knowledge-mcp",
         ]
         assert snapshot(home) == before
@@ -446,6 +483,14 @@ class TestSetup:
         bin_folder, log = harness_clis(tmp_path)
         before = snapshot(home)
         kb(home, "setup", harness, path=str(bin_folder), STUB_LOG=str(log))
+        if harness == "claude-code":
+            state_file = home / ".local/state/knowledge-mcp/setup/state.json"
+            state = json.loads(state_file.read_text())
+            record = state["hosts"][harness]
+            Path(f"{log}.{harness}").write_text(record["piece"])
+            record.update(method="cli", cli="claude")
+            state_file.write_text(json.dumps(state))
+            log.write_text("legacy claude registration\n")
         cli_remove(home, harness, log)
 
         done = kb(
@@ -989,6 +1034,28 @@ def test_sdist_wheel_install_links_skills_via_opt_path(
     subprocess.run(
         [uv, "venv", "--quiet", "--python", sys.executable, str(venv)], check=True
     )
+    requirements = tmp_path / "requirements.txt"
+    exported = subprocess.run(
+        [
+            uv,
+            "export",
+            "--color",
+            "never",
+            "--project",
+            str(MODULE.parent),
+            "--locked",
+            "--package",
+            "knowledge-mcp",
+            "--no-dev",
+            "--no-emit-workspace",
+            "--no-header",
+            "--format",
+            "requirements-txt",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    requirements.write_bytes(exported.stdout)
     subprocess.run(
         [
             uv,
@@ -998,7 +1065,7 @@ def test_sdist_wheel_install_links_skills_via_opt_path(
             "--python",
             str(venv / "bin/python"),
             "-r",
-            str(MODULE / "requirements.lock"),
+            str(requirements),
             str(wheel),
         ],
         check=True,
@@ -1068,3 +1135,82 @@ def test_sdist_wheel_install_links_skills_via_opt_path(
         capture_output=True,
     )
     assert sorted(path.name for path in home.iterdir()) == []
+
+
+@pytest.mark.parametrize("harness", HARNESSES)
+def test_setup_remove_preserves_raw_crlf_settings(tmp_path, harness):
+    home = fixture_home(tmp_path)
+    spec = HARNESS_SPECS[harness]
+    config = spec.config(Env(home, {"HOME": str(home)}))
+    original = config.read_bytes().replace(b"\n", b"\r\n")
+    config.write_bytes(original)
+    before = snapshot(home)
+
+    kb(home, "setup", harness)
+
+    state_file = home / ".local/state/knowledge-mcp/setup/state.json"
+    record = json.loads(state_file.read_text())["hosts"][harness]
+    registered = config.read_bytes()
+    piece = record["piece"].encode("utf-8")
+    assert registered.count(piece) == 1
+    assert registered.replace(piece, b"", 1) == original
+    assert entry(home, harness) == EXPECTED[harness]
+    assert Path(record["backups"][0]).read_bytes() == original
+
+    kb(home, "setup", "--remove", harness)
+
+    assert config.read_bytes() == original
+    assert snapshot(home) == before
+
+
+def test_unregister_created_jsonc_keeps_comment_when_receipt_invalid(tmp_path):
+    home = tmp_path / "home"
+    (home / "Library/Application Support/Claude").mkdir(parents=True)
+    config = home / DESKTOP
+    kb(home, "setup", "claude-desktop")
+    state_file = home / ".local/state/knowledge-mcp/setup/state.json"
+    record = json.loads(state_file.read_text())["hosts"]["claude-desktop"]
+    assert record["created_file"] is True
+    comment = b"/* user comment added after setup */"
+    changed = config.read_bytes().replace(
+        b'"mcpServers": {', b'"mcpServers": { ' + comment
+    )
+    assert record["piece"].encode() not in changed
+    config.write_bytes(changed)
+
+    kb(home, "setup", "--remove", "claude-desktop")
+
+    assert config.is_file()
+    assert comment in config.read_bytes()
+    assert entry(home, "claude-desktop") is None
+    assert not state_file.exists()
+    # The retained file is usable for another complete setup/removal cycle.
+    retained = config.read_bytes()
+    kb(home, "setup", "claude-desktop")
+    kb(home, "setup", "--remove", "claude-desktop")
+    assert config.read_bytes() == retained
+
+
+def test_claude_installed_cli_is_not_needed_to_preserve_whole_settings(tmp_path):
+    home = fixture_home(tmp_path)
+    before = snapshot(home)
+    bin_folder, log = harness_clis(tmp_path)
+    config = home / ".claude.json"
+    original = config.read_bytes().replace(b"\n", b"\r\n")
+    config.write_bytes(original)
+    before = snapshot(home)
+    kb(home, "setup", "claude-code", path=str(bin_folder), STUB_LOG=str(log))
+    assert not log.exists()
+    assert entry(home, "claude-code") == EXPECTED["claude-code"]
+    [backup] = (home / ".local/state/knowledge-mcp/setup/backups").iterdir()
+    assert backup.read_bytes() == original
+    kb(
+        home,
+        "setup",
+        "--remove",
+        "claude-code",
+        path=str(bin_folder),
+        STUB_LOG=str(log),
+    )
+    assert not log.exists()
+    assert snapshot(home) == before

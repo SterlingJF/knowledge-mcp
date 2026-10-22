@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from shutil import copytree
+from typing import Any
 from urllib.parse import quote
 
 import anyio
 import pytest
+from mcp.client import Client
+from mcp.client.stdio import StdioServerParameters
 
 from knowledge_mcp import document_types as records
 from knowledge_mcp.main import build_server
@@ -476,3 +480,287 @@ def test_external_html_is_unchanged():
     assert (
         apply(docs, prepare(docs))["Other/Reference.md"] == docs["Other/Reference.md"]
     )
+
+
+PEER_MOVE_PERMISSION = {
+    "basis": "request",
+    "text": (
+        "Fictional QA approval: move Inbox/Note.md to decisions/note.md, update "
+        "outside-folder references in References/Index.md, and move its classification "
+        "entry while preserving its type, reader and provenance."
+    ),
+}
+
+
+@pytest.fixture
+def peer_move(
+    tmp_path: Path,
+) -> tuple[Path, dict[str, str], list[dict[str, Any]], StdioServerParameters]:
+    root = tmp_path / "vault"
+    copytree(FIXTURE, root)
+    original = vault()
+    record = records.dump(
+        {
+            p: typed(
+                audience={"value": "future reader", "status": "confirmed"},
+                fingerprint=records.digest(original[p]),
+            )
+            for p in (
+                "Inbox/Note.md",
+                "decisions/cache-policy.md",
+                "decisions/queue-policy.md",
+            )
+        }
+    )
+    config = root / records.PLACE
+    config.parent.mkdir(parents=True)
+    config.write_text(record)
+    original[records.PLACE] = record
+    listing = [{"path": p} for p in vault()]
+    common = dict(location=str(root), knowledge_bus_folders=[], record=record)
+    parameters = server_parameters(tmp_path)
+
+    async def preview(client: Client) -> dict[str, Any]:
+        result = await client.call_tool(
+            "kb_get_document_type",
+            dict(
+                **common,
+                name="Note.md",
+                folders=["Inbox"],
+                listing=listing,
+                conventions_files=[{"folder": "", "text": ""}],
+            ),
+        )
+        assert not result.is_error
+        proposal = result.structured_content["filing"][0]["proposal"]
+        assert proposal["path"] == "decisions/note.md"
+        assert proposal["evidence"] == [
+            "decisions/cache-policy.md",
+            "decisions/queue-policy.md",
+        ]
+        args = dict(
+            **common,
+            old_path="Inbox/Note.md",
+            path=proposal["path"],
+            listing=listing,
+            documents=[{"path": "Inbox/Note.md", "text": original["Inbox/Note.md"]}],
+            case_mode="sensitive",
+            allowed_by=PEER_MOVE_PERMISSION,
+        )
+        first = await client.call_tool("kb_prepare_document_move", args)
+        assert not first.is_error
+        assert first.structured_content["status"] == "texts_needed"
+        assert first.structured_content["writes"] == []
+        search = first.structured_content["search"]
+        documents = []
+        searched = []
+        for path in sorted(root.rglob("*.md")):
+            relative = path.relative_to(root).as_posix()
+            text = path.read_text()
+            searched.append(relative)
+            if relative == "Inbox/Note.md" or any(
+                term.casefold() in text.casefold() for term in search
+            ):
+                documents.append({"path": relative, "text": text})
+        assert searched == sorted(p for p in vault() if p.endswith(".md"))
+        assert "References/Index.md" in [d["path"] for d in documents]
+        second = await client.call_tool(
+            "kb_prepare_document_move",
+            dict(**args, searched=True, search=search) | {"documents": documents},
+        )
+        assert not second.is_error
+        return second.structured_content
+
+    plan = session(parameters, preview)
+    assert plan["status"] == "ready", plan["issues"]
+    writes = [
+        *plan["writes"],
+        dict(
+            old_path=records.PLACE,
+            path=records.PLACE,
+            text=plan["record"],
+            before_digest=records.digest(record),
+            after_digest=records.digest(plan["record"]),
+        ),
+    ]
+    assert {w["old_path"] for w in writes} == {
+        "Inbox/Note.md",
+        "References/Index.md",
+        records.PLACE,
+    }
+    return root, original, writes, parameters
+
+
+def apply_peer_move(
+    root: Path,
+    original: dict[str, str],
+    writes: list[dict[str, Any]],
+    parameters: StdioServerParameters,
+    interrupted: bool,
+) -> None:
+
+    async def apply_and_record(client: Client) -> None:
+        for index, w in enumerate(writes, 1):
+            source, target = root / w["old_path"], root / w["path"]
+            assert records.digest(source.read_text()) == w["before_digest"]
+            if source != target:
+                assert not target.exists()
+                with target.open("x") as stream:
+                    stream.write(w["text"])
+                source.unlink()
+            else:
+                target.write_text(w["text"])
+            result = await client.call_tool(
+                "kb_record_edit",
+                dict(
+                    location=str(root),
+                    allowed_by=PEER_MOVE_PERMISSION,
+                    before=original[w["old_path"]],
+                    after=target.read_text(),
+                    whole_file=True,
+                    operation=dict(
+                        id="peer-move",
+                        index=index,
+                        count=len(writes),
+                        old_path=w["old_path"],
+                        path=w["path"],
+                    ),
+                ),
+            )
+            assert not result.is_error
+            if interrupted and index == 2:
+                with pytest.raises(OSError, match="simulated write failure"):
+                    fail_write()
+                return
+
+    session(parameters, apply_and_record)
+
+
+def reload_peer_move(
+    root: Path,
+    original: dict[str, str],
+    parameters: StdioServerParameters,
+    interrupted: bool,
+) -> list[dict[str, Any]]:
+    async def reopen(client: Client) -> list[dict[str, Any]]:
+        result = await client.call_tool("kb_list_edits", {"location": str(root)})
+        assert not result.is_error
+        entries = result.structured_content["edits"]
+        assert len(entries) == (2 if interrupted else 3)
+        assert {e["operation"]["index"] for e in entries} == set(
+            range(1, len(entries) + 1)
+        )
+        assert all(e["operation"]["count"] == 3 for e in entries)
+        assert all(e["operation"]["id"] == "peer-move" for e in entries)
+        for e in entries:
+            assert e["whole_file"] is True
+            assert e["allowed_by"] == PEER_MOVE_PERMISSION
+            assert e["before"] == original[e["operation"]["old_path"]]
+            assert e["after_digest"] == records.digest(
+                (root / e["operation"]["path"]).read_text()
+            )
+        if not interrupted:
+            result = await client.call_tool(
+                "kb_get_document_type",
+                dict(location=str(root), knowledge_bus_folders=[])
+                | dict(
+                    name="note.md",
+                    folders=["decisions"],
+                    record=(root / records.PLACE).read_text(),
+                    listing=[
+                        {"path": p.relative_to(root).as_posix()}
+                        for p in root.rglob("*")
+                        if p.is_file()
+                    ],
+                ),
+            )
+            assert not result.is_error
+            kept = result.structured_content["recorded"]["entry"]
+            expected = records.parse(original[records.PLACE])["Inbox/Note.md"]
+            assert kept == records.plain(expected)
+            assert kept["fingerprint"] == records.digest(
+                (root / "decisions/note.md").read_text()
+            )
+        return entries
+
+    return session(parameters, reopen)
+
+
+@pytest.mark.parametrize("interrupted", [False, True])
+def test_peer_move_on_disk_history_reload_and_guarded_recovery(
+    tmp_path: Path,
+    peer_move: tuple[Path, dict[str, str], list[dict[str, Any]], StdioServerParameters],
+    interrupted: bool,
+) -> None:
+    root, original, writes, parameters = peer_move
+    stage = tmp_path / "originals"
+    copytree(root, stage)
+    apply_peer_move(root, original, writes, parameters, interrupted)
+    entries = reload_peer_move(root, original, parameters, interrupted)
+    for entry in entries:
+        assert entry["before"] == (stage / entry["operation"]["old_path"]).read_text()
+        assert entry["before_digest"] == records.digest(entry["before"])
+    if interrupted:
+        changed = root / "References/Index.md"
+        later = changed.read_text() + "\nLater reader edit.\n"
+        changed.write_text(later)
+
+        async def fresh_history(client: Client) -> list[dict[str, Any]]:
+            result = await client.call_tool("kb_list_edits", {"location": str(root)})
+            assert not result.is_error
+            return result.structured_content["edits"]
+
+        persisted = session(parameters, fresh_history)
+        assert {e["operation"]["index"] for e in persisted} == {1, 2}
+        assert all(e["operation"]["count"] == 3 for e in persisted)
+        current = {
+            p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()
+        }
+        conflicts = []
+        for entry in sorted(
+            persisted, key=lambda e: e["operation"]["index"], reverse=True
+        ):
+            operation = entry["operation"]
+            target = root / operation["path"]
+            source = root / operation["old_path"]
+            if records.digest(target.read_text()) != entry["after_digest"] or (
+                source != target and source.exists()
+            ):
+                conflicts.append(operation["path"])
+        recovery_status = "blocked" if conflicts else "ready"
+        # Check the whole group's guard before any inverse file write.
+        assert recovery_status == "blocked"
+        assert conflicts == ["References/Index.md"]
+        assert {
+            p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()
+        } == current
+        assert changed.read_text() == later
+        assert not (root / "Inbox/Note.md").exists()
+        assert (root / "decisions/note.md").read_text() == original["Inbox/Note.md"]
+        assert (root / records.PLACE).read_text() == original[records.PLACE]
+        assert session(parameters, fresh_history) == persisted == entries
+        for p, text in original.items():
+            assert (stage / p).read_text() == text
+            if p not in {"Inbox/Note.md", "References/Index.md", records.PLACE}:
+                assert (root / p).read_text() == text
+    else:
+        assert not (root / "Inbox/Note.md").exists()
+        assert (root / "decisions/note.md").read_text() == original["Inbox/Note.md"]
+        expected = original["References/Index.md"].replace(
+            "Inbox/Note", "decisions/note"
+        )
+        expected = expected.replace("[[Note", "[[note")
+        expected = expected.replace("`[[note]]`", "`[[Note]]`")
+        expected = expected.replace("~~~markdown\n[[note]]", "~~~markdown\n[[Note]]")
+        assert (root / "References/Index.md").read_text() == expected
+        saved = records.parse((root / records.PLACE).read_text())
+        assert "Inbox/Note.md" not in saved
+        assert records.plain(saved["decisions/note.md"]) == records.plain(
+            records.parse(original[records.PLACE])["Inbox/Note.md"]
+        )
+        assert saved["decisions/note.md"].fingerprint == records.digest(
+            (root / "decisions/note.md").read_text()
+        )
+        for p, text in original.items():
+            if p not in {"Inbox/Note.md", "References/Index.md", records.PLACE}:
+                assert (root / p).read_text() == text

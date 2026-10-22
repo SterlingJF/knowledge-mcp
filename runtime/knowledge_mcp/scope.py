@@ -169,13 +169,38 @@ class Workspace:
             text = self._texts.get(spec.digest)
             if text is not None:
                 rebuilt.sources[spec.id] = SENT
-            return text
-        copy = None if sent_only else bundled.index().get((spec.id, spec.version))
+                return text
+        try:
+            copy = None if sent_only else bundled.index().get((spec.id, spec.version))
+        except OSError, UnicodeError:
+            if spec.digest is None:
+                raise
+            return None
         if copy is None:
+            return None
+        text = (
+            _verified_text(copy.path, spec)
+            if spec.digest is not None
+            else _read(copy.path)
+        )
+        if text is None:
             return None
         rebuilt.bundled.append(spec.name)
         rebuilt.sources[spec.id] = bundled.label()
-        return _read(copy.path)
+        return text
+
+
+def _verified_text(path: Path, spec: SpecFile) -> str | None:
+    try:
+        data = path.read_bytes()
+        if "sha256:" + hashlib.sha256(data).hexdigest() != spec.digest:
+            return None
+        text = data.decode("utf-8")
+    except OSError, UnicodeError:
+        return None
+    if bundled.header(text.removeprefix("\ufeff")) != (spec.id, spec.version):
+        return None
+    return text
 
 
 def _digest(text: str) -> str:

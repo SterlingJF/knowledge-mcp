@@ -8,7 +8,7 @@
       "name": "knowledge-mcp",
       "source": {
         "source": "local",
-        "path": "./runtime"
+        "path": "./"
       },
       "policy": {
         "installation": "AVAILABLE",

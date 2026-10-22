@@ -257,7 +257,7 @@ test("source builds reuse the shared root source recipe and generator", () => {
   ]);
   assert.ok(
     generated.includes(
-      "node tools/formula/generate-formula.ts --sdist 'source archive.tar.gz' --out 'formula output.rb' --lock 'tagged source/uv.lock' --requirements 'tagged source/runtime/requirements.lock' --pyproject 'tagged source/runtime/pyproject.toml'",
+      "node tools/formula/generate-formula.ts --sdist 'source archive.tar.gz' --out 'formula output.rb' --lock 'tagged source/uv.lock' --requirements \"$requirements\" --pyproject 'tagged source/runtime/pyproject.toml'",
     ),
   );
   assert.equal(

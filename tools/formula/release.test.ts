@@ -63,10 +63,9 @@ function releasedSource(context: TestContext) {
     "uv.lock",
     "pyproject.toml",
     "runtime/pyproject.toml",
-    "runtime/requirements.lock",
     "package.json",
-    "runtime/.claude-plugin/plugin.json",
-    "runtime/.codex-plugin/plugin.json",
+    ".claude-plugin/plugin.json",
+    ".codex-plugin/plugin.json",
   ]) {
     const destination = join(checkout, file);
     mkdirSync(dirname(destination), { recursive: true });
@@ -170,7 +169,8 @@ test("source reuses the immutable asset and generates from the released lockfile
   const events: Array<string> = [];
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
-    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "uv" && args[0] === "export")
+      return execFileSync("uv", args, { encoding: "utf8" });
     if (command === "git") {
       // Isolate existing-archive compatibility from SOURCE provenance validation.
       if (args[0] === "status") return "";
@@ -220,7 +220,8 @@ test("source builds through the existing root recipe and refuses the wrong check
   const events: Array<string> = [];
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
-    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "uv" && args[0] === "export")
+      return execFileSync("uv", args, { encoding: "utf8" });
     if (command === "git") return git(fixture.checkout, args);
     if (command === "tar") return "Name: knowledge-mcp\nVersion: 0.2.0\n";
     if (command === "just") {
@@ -264,7 +265,8 @@ test("source builds through the existing root recipe and refuses the wrong check
 test("a reused source archive with the wrong package identity cannot produce a formula", async (context) => {
   const fixture = releasedSource(context);
   const run: Runner = (command, args) => {
-    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "uv" && args[0] === "export")
+      return execFileSync("uv", args, { encoding: "utf8" });
     if (command === "git") return git(fixture.checkout, args);
     if (command === "tar") return "Name: other-package\nVersion: 0.2.0\n";
     assert.equal(command, "gh");
@@ -408,7 +410,8 @@ test("tap refuses changed same-version source before copying or committing", (co
   const trusted = new Set<string>();
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
-    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "uv" && args[0] === "export")
+      return execFileSync("uv", args, { encoding: "utf8" });
     if (command === "brew" && args[0] === "tap-new") {
       mkdirSync(
         join(
@@ -638,7 +641,8 @@ test("a structured 404 creates the release, while authentication and transport f
   let status: number | undefined = 404;
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
-    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "uv" && args[0] === "export")
+      return execFileSync("uv", args, { encoding: "utf8" });
     if (command === "git") return git(fixture.checkout, args);
     if (command === "tar") return "Name: knowledge-mcp\nVersion: 0.2.0\n";
     if (command === "just") {
@@ -740,7 +744,8 @@ test("native build tests the installed app before staging original Homebrew meta
   let metadata = "";
   const run: Runner = (command, args, options) => {
     events.push(`${command} ${args.join(" ")}`);
-    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "uv" && args[0] === "export")
+      return execFileSync("uv", args, { encoding: "utf8" });
     if (command === "uname") return "x86_64";
     if (command === "sw_vers") return "15.7";
     if (command === "gh") {
@@ -872,7 +877,8 @@ test("merge passes both original JSON files to Homebrew after native-pair public
   let trusted = false;
   const run: Runner = (command, args) => {
     events.push(`${command} ${args.join(" ")}`);
-    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "uv" && args[0] === "export")
+      return execFileSync("uv", args, { encoding: "utf8" });
     if (command === "gh") {
       if (args[1] === "view") return JSON.stringify({ assets: [] });
       if (args[1] === "upload") {
@@ -1046,8 +1052,7 @@ for (const releaseExists of [false, true]) {
     );
     const mutations: Array<string> = [];
     const run: Runner = (command, args) => {
-      if (command === "just" && args[0] === "check_knowledge_mcp_lock")
-        return "";
+      if (command === "uv" && args[0] === "export") return "";
       if (command === "git") {
         // Isolate content validation; SOURCE cleanliness has separate real-Git cases.
         if (args[0] === "status") return "";
@@ -1092,7 +1097,8 @@ test("new release uses completed tagged notes and validates locks before release
   const events: Array<string> = [];
   const run: Runner = (command, args) => {
     events.push([command, ...args].join(" "));
-    if (command === "just" && args[0] === "check_knowledge_mcp_lock") return "";
+    if (command === "uv" && args[0] === "export")
+      return execFileSync("uv", args, { encoding: "utf8" });
     if (command === "git") {
       // Isolate content validation; SOURCE cleanliness has separate real-Git cases.
       if (args[0] === "status") return "";
@@ -1127,10 +1133,7 @@ test("new release uses completed tagged notes and validates locks before release
     run,
   );
   assert.ok(events.some((event) => event.startsWith("gh release create")));
-  writeFileSync(
-    join(fixture.checkout, "runtime/requirements.lock"),
-    "invalid requirement\n",
-  );
+  writeFileSync(join(fixture.checkout, "uv.lock"), "invalid lock\n");
   events.length = 0;
   await assert.rejects(
     source(
@@ -1141,7 +1144,7 @@ test("new release uses completed tagged notes and validates locks before release
       },
       run,
     ),
-    /requirements/i,
+    /lock|TOML/i,
   );
   assert.ok(
     events.every(
@@ -1159,26 +1162,7 @@ for (const publication of [
 ]) {
   test(`stale tagged dependency locks stop ${publication} before GitHub commands`, async (context) => {
     const fixture = releasedSource(context);
-    const check = (args: Array<string>) =>
-      execFileSync(
-        "just",
-        ["--justfile", join(projectRoot, "justfile"), ...args],
-        {
-          cwd: fixture.root,
-          encoding: "utf8",
-          stdio: ["ignore", "pipe", "pipe"],
-          env: {
-            ...process.env,
-            FORCE_COLOR: "1",
-            CLICOLOR_FORCE: "1",
-            UV_COLOR: "always",
-            NO_COLOR: "",
-            UV_OFFLINE: "1",
-            UV_PYTHON_DOWNLOADS: "never",
-          },
-        },
-      );
-    check(["check_knowledge_mcp_lock", fixture.checkout]);
+    execFileSync("uv", ["lock", "--check", "--project", fixture.checkout]);
     const path = join(fixture.checkout, "runtime/pyproject.toml");
     const original = readFileSync(path, "utf8");
     const changed = original.replace(/(["'])mcp==([^"']+)\1/, "$1mcp>=$2$1");
@@ -1189,17 +1173,14 @@ for (const publication of [
     );
     writeFileSync(path, changed);
     const external: Array<string> = [];
-    const run: Runner = (command, args, options) => {
+    const run: Runner = (command, args) => {
       if (command === "git") {
         // Isolate content validation; SOURCE cleanliness has separate real-Git cases.
         if (args[0] === "status") return "";
         return git(fixture.checkout, args);
       }
-      if (command === "just") {
-        assert.deepEqual(args, ["check_knowledge_mcp_lock", fixture.checkout]);
-        assert.equal(options?.cwd, fixture.root);
-        return check(args);
-      }
+      if (command === "uv")
+        return execFileSync("uv", args, { encoding: "utf8" });
       if (command === "tar") return "Name: knowledge-mcp\nVersion: 0.2.0\n";
       assert.equal(command, "gh");
       external.push(args.join(" "));

@@ -8,3 +8,7 @@ allowed_by:
   text: Add an Overview section to DESIGN.md.
 before_digest: sha256:3713f20ffca57278ca48c668c8d3b9a0ac0f754b180ecf840ee526e15991c651
 after_digest: sha256:c20e71fb57a21d8d5987facb7aee1f77174be26dd46ab58cc0066bae0d3c5df7
+card: |
+  `Saved` · **Edit saved**
+
+  The edit to `DESIGN.md` is recorded.

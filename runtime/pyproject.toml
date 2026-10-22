@@ -1,6 +1,6 @@
 [project]
 name = "knowledge-mcp"
-version = "0.3.0"
+version = "0.4.0"
 description = "Plain, structured thinking while you work. It's free, open, and local-first."
 readme = "README.md"
 license = "MIT"
@@ -12,6 +12,7 @@ dependencies = [
   # Click rejects abbreviated options by default.
   "click==8.5.0",
   "jsonschema==4.26.0",
+  "json-five==1.1.2",
   # Provides kbp. After changing this pin, run uv lock, then `just refresh_knowledge_model <tag>`.
   "knowledge-bus @ https://github.com/SterlingJF/knowledge-bus/releases/download/v0.10.0/knowledge_bus-0.10.0.tar.gz",
   "mcp==2.2.0",

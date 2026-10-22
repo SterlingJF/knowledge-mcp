@@ -17,8 +17,8 @@ export type Run = (
 ) => string;
 const jsonFiles = [
   "package.json",
-  "runtime/.claude-plugin/plugin.json",
-  "runtime/.codex-plugin/plugin.json",
+  ".claude-plugin/plugin.json",
+  ".codex-plugin/plugin.json",
 ];
 function object(value: unknown, label: string): Record<string, unknown> {
   if (value === null || typeof value !== "object" || Array.isArray(value))
@@ -158,7 +158,6 @@ export async function prepare(
     ...jsonFiles,
     "CHANGELOG.md",
     "uv.lock",
-    "runtime/requirements.lock",
     "pnpm-lock.yaml",
   ];
   const original = new Map(
@@ -221,7 +220,6 @@ export async function prepare(
       throw new Error(
         "Release preparation changed unrelated dependency pins in uv.lock.",
       );
-    run("just", ["generate_knowledge_mcp_lock"], { cwd: root });
     validateMetadata(root, version);
     if (
       !readFileSync(join(root, "pnpm-lock.yaml")).equals(

@@ -1,0 +1,57 @@
+---
+title: "Work with documents"
+description: "Revise a document for its reader, write or adapt drafting instructions, and get answers from existing documents with sources you can check."
+---
+
+## Revise a document
+
+Ask your assistant to revise a document. If it asks who the document is for, tell it. Then check the draft against its sources and the questions the document should answer.
+
+knowledge-mcp comes with instructions for product development and codebase documentation. Before your assistant starts drafting, ask which of them apply in this folder.
+
+If your assistant asks about requirements, answer them. If the answer to a question is already in another document, have the draft link to it.
+
+## Custom instructions
+
+{/* TODO WBP Example */}
+
+To create instructions for a new kind of document, ask:
+
+> Create instructions for drafting release guides for new maintainers.
+
+Check that the instructions suit release guides for new maintainers. If they don't, ask your assistant to adapt them. Your release guide keeps its name and folder.
+
+To approve new instructions:
+
+<Steps>
+  <Step title="Review the proposed changes">
+
+    Look at each change and where it came from, and check that it covers the questions new maintainers will ask.
+
+  </Step>
+  <Step title="Check where they apply">
+
+    See which documents the instructions will apply to.
+
+  </Step>
+  <Step title="Approve the instructions">
+
+    Approve instruction changes separately from document edits.
+
+  </Step>
+  <Step title="Let your assistant try them out">
+
+    Your assistant saves and validates the instructions, reloads them and tests them on another document.
+
+  </Step>
+</Steps>
+
+You don't edit instruction files yourself. Tell your assistant what you want changed and it edits them. Validation only checks their structure and references, not whether the instructions are any good.
+
+## Ask about existing documents
+
+To get answers from documents you already have, point your assistant at them:
+
+> Read the onboarding guide and setup notes. What do I need to get started? Show your sources.
+
+Check the passages it cites. Your assistant does the searching, and knowledge-mcp tells it which questions each document is meant to answer.

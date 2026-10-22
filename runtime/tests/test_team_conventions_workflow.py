@@ -23,8 +23,8 @@ WRITE_SKILL = ROOT / "runtime/skills/kb-write-document/SKILL.md"
 
 def test_local_definition_workflow_preserves_bundled_id_and_version():
     skill = WRITE_SKILL.read_text()
-    assert "Send complete local `*.kbp.yaml` text on first use" in skill
-    assert "including files with bundled ids and versions" in skill
+    assert 'First try the actual file SHA-256 as `digest: "sha256:…"`' in skill
+    assert "if unknown, send exact full `text`" in skill
     assert "while the text is unchanged" in skill
     assert "Include `text` when those values match no file bundled" not in skill
     for name in ("kb-track-document-types", "kb-import-document"):

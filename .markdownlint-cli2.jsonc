@@ -14,6 +14,7 @@
         "Homebrew",
         "knowledge-bus",
         "knowledge-mcp",
+        "Knowledge-MCP",
         "OpenCode",
       ],
     },
@@ -24,6 +25,7 @@
   "globs": ["**/*.md"],
   "ignores": [
     "node_modules/**",
+    ".agents/**",
     ".claude/**",
     ".venv/**",
     "runtime/skills/kb-check/**",

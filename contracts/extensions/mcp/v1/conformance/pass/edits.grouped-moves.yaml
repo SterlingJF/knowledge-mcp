@@ -147,3 +147,5 @@ edits:
       count: 4
       old_path: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
       path: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+card: |
+  `EDIT` · `batch-vault`

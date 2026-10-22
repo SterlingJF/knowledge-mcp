@@ -245,7 +245,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
         name="kbp_card",
         title="Read a card",
         description=(
-            "Read the card for a document type before you draft or edit a document of that type. Returns kbp's Markdown card with purpose, writing advice and section questions, plus the exit code. Appends the result to `log.jsonl`."
+            "Read the card for a document type before you draft or edit a document of that type. Returns kbp's card with purpose, writing advice and section questions as Markdown by default or native JSON, plus the exit code. Appends the result to `log.jsonl`."
         ),
         annotations=READS,
     )
@@ -257,6 +257,10 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             str, Field(description="The document type id, such as `design-doc`.")
         ],
         universe: Universe = None,
+        format: Annotated[
+            Literal["json", "markdown"] | None,
+            Field(description="Defaults to `markdown`."),
+        ] = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             folders=folders,
@@ -264,12 +268,13 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             location=location,
             kind=kind,
             universe=universe,
+            format=format,
         )
         argv = [
             "--card",
             kind,
             *(["--universe", universe] if universe else []),
             "--format",
-            "markdown",
+            format or "markdown",
         ]
         return scoped("kbp_card", location, arguments, argv)

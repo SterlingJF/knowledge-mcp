@@ -137,13 +137,16 @@ def test_mint_matches_kbp_code_shape(tmp_path, argv):
     ]
 
 
-def test_validate_crash_matches_kbp(tmp_path):
+def test_validate_crash_preserves_report_without_traceback(tmp_path):
     root = sample(tmp_path, "unparsable")
     through = run_kb(tmp_path, "kbp", "validate", cwd=root)
     direct = run_kbp(tmp_path, "--validate", cwd=root)
     assert through.returncode == direct.returncode == 1
     assert through.stdout == direct.stdout
-    assert through.stderr.splitlines()[-5:] == direct.stderr.splitlines()[-5:]
+    assert "Traceback" not in through.stderr
+    assert through.stderr.count("Error:") == 1
+    assert "Run kb doctor --verbose" in through.stderr
+    assert "Traceback" in direct.stderr
 
 
 @pytest.mark.parametrize("mode", [flag[2:] for flag in MODES])
@@ -221,7 +224,11 @@ def test_root_help_works_with_the_package_missing(tmp_path):
     assert "kbp" in listed_commands(done.stdout)
 
 
-def test_upstream_modes_and_arguments_are_read_without_starting_a_child(tmp_path):
+@pytest.mark.parametrize("code", [0, 1, 7])
+@pytest.mark.parametrize("as_json", [False, True])
+def test_upstream_modes_and_arguments_are_read_without_starting_a_child(
+    tmp_path, code, as_json
+):
     shadow = tmp_path / "shadow"
     write(shadow, "kbp_conform/__init__.py")
     write(
@@ -233,8 +240,8 @@ FORMATS = ("probe-format",)
 CODED = ("probe-kind",)
 def main(argv):
     print(json.dumps({"argv": argv, "pid": os.getpid(), "parent": os.getppid()}))
-    return 7
-""",
+    return RETURN_CODE
+""".replace("RETURN_CODE", str(code)),
     )
     done = run_kb(tmp_path, "kbp", "--help", PYTHONPATH=str(shadow))
     assert listed_commands(done.stdout) == {"probe"}
@@ -242,6 +249,7 @@ def main(argv):
         tmp_path,
         "kbp",
         "probe",
+        *(["--json"] if as_json else []),
         "--output=a",
         "--",
         "-odd",
@@ -249,8 +257,23 @@ def main(argv):
         "x",
         PYTHONPATH=str(shadow),
     )
-    assert done.returncode == 7, done.stderr
-    data = json.loads(done.stdout)
+    assert done.returncode == code, done.stderr
+    if as_json:
+        receipt = json.loads(done.stdout)
+        assert receipt["_meta"]["exit_code"] == done.returncode
+        assert receipt["isError"] is (code != 0)
+        assert "Traceback" not in done.stderr
+        if code:
+            assert done.stderr.count("Error:") == 1
+            assert (
+                json.loads(done.stderr.splitlines()[-1]) == receipt["structuredContent"]
+            )
+        else:
+            assert done.stderr == ""
+        data = json.loads(receipt["content"][0]["text"])
+    else:
+        assert done.stderr == ""
+        data = json.loads(done.stdout)
     assert data["argv"] == ["--probe", "--output=a", "--", "-odd", "x", "x"]
     assert data["parent"] == os.getpid()
 

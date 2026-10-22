@@ -6,15 +6,16 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DOC = ROOT / "docs/mcp-tools.md"
+DOC = ROOT / "docs/mcp-tools.mdx"
 GENERATOR = ROOT / "runtime/scripts/generate_tools_doc.py"
 CONTRACTS = ROOT / "contracts/extensions/mcp/v1"
+REPO = "https://github.com/SterlingJF/knowledge-mcp/blob/main"
 
 
 def test_the_tools_doc_lists_every_tool_argument_and_result_schema():
     text = DOC.read_text()
     tools = json.loads((CONTRACTS / "tools.json").read_text())["tools"]
-    assert "<!-- BEGIN AUTO-GENERATED arguments -->" in text
+    assert "{/* BEGIN AUTO-GENERATED arguments */}" in text
     for tool in tools:
         assert f"| `{tool['name']}`" in text
         section = text.split(f"### `{tool['name']}`\n", 1)[1].split("\n###", 1)[0]
@@ -29,11 +30,11 @@ def test_the_tools_doc_lists_every_tool_argument_and_result_schema():
         if output:
             schema = output["$id"]
             assert (CONTRACTS / schema).is_file()
-            assert f"](../contracts/extensions/mcp/v1/{schema})" in text
+            assert f"]({REPO}/contracts/extensions/mcp/v1/{schema})" in text
 
 
 def test_a_stale_tools_doc_fails_the_check_and_names_the_recipe(tmp_path):
-    path = tmp_path / "tools.md"
+    path = tmp_path / "tools.mdx"
     text = DOC.read_text().replace("`kb_get_document_type`", "`kb_obsolete_tool`", 1)
     path.write_text(text)
     done = subprocess.run(

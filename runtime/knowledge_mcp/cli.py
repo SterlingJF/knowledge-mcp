@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import contextlib
 import difflib
+import io
 import json
 import os
 import re
 import shlex
 import sys
-import traceback
 from collections.abc import Sequence
 from importlib import metadata
 from pathlib import Path
@@ -180,16 +180,16 @@ class Group(click.Group):
 
 
 class KbpMode(Command):
-    """Parse only a lone --help or -h. Pass every other argument to kbp unparsed."""
+    """Let Click consume kb flags, preserving kbp's literal argument boundary."""
 
     def parse_args(self, ctx: click.Context, args: list[str]) -> list[str]:
-        if args in (["--help"], ["-h"]):
-            return super().parse_args(ctx, args)
-        ctx.args = args
-        return args
+        boundary = args.index("--") if "--" in args else len(args)
+        super().parse_args(ctx, args[:boundary])
+        ctx.args.extend(args[boundary:])
+        return ctx.args
 
-    def collect_usage_pieces(self, _ctx: click.Context) -> list[str]:
-        return ["[<args>]..."]
+    def collect_usage_pieces(self, ctx: click.Context) -> list[str]:
+        return ["[<args>]...", *super().collect_usage_pieces(ctx)]
 
 
 class KbpGroup(Group):
@@ -258,9 +258,10 @@ class KbpGroup(Group):
             raise click.NoSuchCommand(name, message, ctx=ctx) from None
 
 
-def _show(error: KbError) -> None:
+def _show(error: KbError, fallback: str = REPORT) -> None:
     click.echo(f"Error: {error.message.rstrip(chr(46))}.", err=True)
-    click.echo(error.fix or REPORT, err=True)
+    if fix := error.fix or fallback:
+        click.echo(fix, err=True)
 
 
 def _json(value: Any) -> None:
@@ -500,10 +501,9 @@ def mcp() -> None:
 @kb.command(
     short_help="Register knowledge-mcp with a harness",
     help=(
-        "Register knowledge-mcp with a harness. kb adds kb mcp to the harness MCP settings. "
-        "It links the bundled skills into the harness skills folder. For claude-desktop, kb "
-        "prints the steps to upload the skills instead.\n\nkb backs up existing settings "
-        "files in setup/backups under the state folder before editing those files directly."
+        "Register knowledge-mcp with a harness.\n\n"
+        "Adds kb mcp to the harness's MCP settings and links bundled skills into any "
+        "skills folder. Backs up settings files before editing."
     ),
     examples=[
         ("Register knowledge-mcp with Codex", ("kb setup codex",)),
@@ -538,7 +538,7 @@ def setup(harness: str, remove: bool) -> None:
     except OSError as error:
         raise KbError(f"{error}.", fix) from error
     for problem in report.problems:
-        _show(problem)
+        _show(problem, fallback="")
     if report.text():
         click.echo(report.text(), err=True)
     for warning in report.warnings:
@@ -743,21 +743,39 @@ def doctor(verbose: bool, as_json: bool) -> None:
         click.get_current_context().exit(1)
 
 
-def _run_kbp(argv: list[str]) -> NoReturn:
+def _run_kbp(argv: list[str], *, as_json: bool = False) -> NoReturn:
+    from knowledge_mcp.tools import respond
+
+    stdout, stderr = io.StringIO(), io.StringIO()
+    failure = None
     try:
-        code = kbp.call(argv)
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = kbp.call(argv)
     except kbp.KbpMissing as error:
         raise InstallFault(str(error)) from error
-    # For a kbp crash, kb prints the traceback so the bug report shows the failing kbp code.
-    except Exception:  # noqa: BLE001
-        traceback.print_exc()
+    except Exception as error:  # noqa: BLE001
         code = 1
+        message = f"kbp failed: {error}."
+        failure = KbError(message, REPORT)
+    if as_json:
+        mode = argv[0].removeprefix("--").replace("-", "_")
+        answer = respond.printed(
+            f"kbp_{mode}",
+            str(Path.cwd()),
+            {"argv": argv},
+            kbp.Printed(stdout.getvalue(), stderr.getvalue(), code),
+        )
+        _json(answer.model_dump(mode="json", by_alias=True, exclude_none=True))
+        if answer.is_error:
+            fault = ToolFault(cast("dict[str, Any]", answer.structured_content), REPORT)
+            fault.exit_code = code
+            raise fault
+    else:
+        click.echo(stdout.getvalue(), nl=False)
+        click.echo(stderr.getvalue(), nl=False, err=True)
+        if failure is not None:
+            raise failure
     click.get_current_context().exit(code)
-
-
-def _kbp_version(ctx: click.Context, _param: click.Parameter, value: bool) -> None:
-    if value and not ctx.resilient_parsing:
-        _run_kbp(["--version"])
 
 
 @kb.group(
@@ -787,13 +805,13 @@ def _kbp_version(ctx: click.Context, _param: click.Parameter, value: bool) -> No
 @click.option(
     "--version",
     is_flag=True,
-    is_eager=True,
-    expose_value=False,
-    callback=_kbp_version,
     help="Show the knowledge-bus version and the bundled protocol version and exit",
 )
+@click.option("--json", "as_json", is_flag=True, help="Print the result as JSON")
 @click.pass_context
-def kbp_group(ctx: click.Context) -> None:
+def kbp_group(ctx: click.Context, version: bool, as_json: bool) -> None:
+    if version:
+        _run_kbp(["--version"], as_json=as_json)
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 
@@ -813,7 +831,7 @@ def _mode_command(flag: str, upstream: ModuleType) -> click.Command:
     name = flag[2:]
     summary = MODE_HELP.get(name, f"Run the kbp {flag} mode")
     pointer = (
-        f"kb handles a lone --help or -h after kb kbp {name}. "
+        f"kb handles --help, -h and --json after kb kbp {name}. "
         f"kb passes other flags and arguments to kbp {flag}."
     )
     if name == "mint":
@@ -822,16 +840,28 @@ def _mode_command(flag: str, upstream: ModuleType) -> click.Command:
         pointer += " Output formats for --format: " + ", ".join(upstream.FORMATS) + "."
 
     @click.pass_context
-    def invoke(ctx: click.Context) -> NoReturn:
-        _run_kbp([flag, *ctx.args])
+    def invoke(ctx: click.Context, as_json: bool) -> NoReturn:
+        _run_kbp(
+            [flag, *ctx.args],
+            as_json=as_json or bool(ctx.parent and ctx.parent.params.get("as_json")),
+        )
 
     return KbpMode(
         name=name,
+        params=[
+            click.Option(
+                ["--json", "as_json"], is_flag=True, help="Print the result as JSON"
+            )
+        ],
         callback=invoke,
         short_help=summary,
         help=f"{summary}. {pointer}",
         epilog=KBP_EXIT_CODES,
-        context_settings={"help_option_names": ["-h", "--help"]},
+        context_settings={
+            "help_option_names": ["-h", "--help"],
+            "ignore_unknown_options": True,
+            "allow_extra_args": True,
+        },
     )
 
 

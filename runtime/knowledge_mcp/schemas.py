@@ -10,8 +10,16 @@ import yaml
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import best_match
 
-# kbp_* tools return kbp's output with no output schema.
+# Every registered tool has a canonical result schema.
 RESULTS = {
+    "kbp_validate": "kbp-output",
+    "kbp_self_check": "kbp-output",
+    "kbp_version": "kbp-output",
+    "kbp_mint": "kbp-output",
+    "kbp_inspect": "kbp-output",
+    "kbp_explore": "kbp-output",
+    "kbp_kinds": "kbp-output",
+    "kbp_card": "kbp-output",
     "kb_list_convention_templates": "convention-templates",
     "kb_list_conventions": "folder-conventions",
     "kb_prepare_conventions": "conventions-update",
@@ -23,6 +31,7 @@ RESULTS = {
     "kb_prepare_document_types": "document-types-update",
     "kb_record_edit": "edit",
     "kb_list_edits": "edits",
+    "kb_prepare_proposal": "proposal",
 }
 
 

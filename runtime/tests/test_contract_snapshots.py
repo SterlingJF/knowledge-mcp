@@ -18,6 +18,8 @@ from tests.harness import BUNDLED, CODEBASE, MODULE, PRODUCT, header
 from tests.test_document_moves_end_to_end import apply, arguments
 from tests.test_folder_filing_end_to_end import six_notes
 from tests.test_import_end_to_end import THREAD
+from tests.test_proposal_end_to_end import DEMO as PROPOSAL
+from tests.test_proposal_end_to_end import REVISED
 from tests.test_session_start_filing_end_to_end import (
     configuration,
     five_events,
@@ -329,25 +331,9 @@ def story(client: Client) -> Any:
             },
         )
         await ask("edits.one-edit", "kb_list_edits", {"location": f"{NOTES}/{DESIGN}"})
-        await ask(
-            "problem.argument-invalid",
-            "kb_get_document_type",
-            {**document(RFC), "name": Path(RFC).name, "digest": "sha256:" + "1" * 64},
-        )
-        await ask(
-            "problem.document-type-unknown",
-            "kb_list_audiences",
-            {**document(RFC), "document_type": "no-such-type"},
-        )
-        await ask(
-            "problem.digest-unknown",
-            "kb_get_document_type",
-            {
-                **document(RFC),
-                "name": Path(RFC).name,
-                "record_digest": "sha256:" + "2" * 64,
-            },
-        )
+        await ask("proposal.demo", "kb_prepare_proposal", PROPOSAL)
+        await ask("proposal.revised", "kb_prepare_proposal", REVISED)
+        await problem_stories(ask)
         template_catalog = await ask(
             "convention-templates.catalog",
             "kb_list_convention_templates",
@@ -401,6 +387,28 @@ def story(client: Client) -> Any:
         return answers
 
     return steps()
+
+
+async def problem_stories(ask):
+    await ask(
+        "problem.argument-invalid",
+        "kb_get_document_type",
+        {**document(RFC), "name": Path(RFC).name, "digest": "sha256:" + "1" * 64},
+    )
+    await ask(
+        "problem.document-type-unknown",
+        "kb_list_audiences",
+        {**document(RFC), "document_type": "no-such-type"},
+    )
+    await ask(
+        "problem.digest-unknown",
+        "kb_get_document_type",
+        {
+            **document(RFC),
+            "name": Path(RFC).name,
+            "record_digest": "sha256:" + "2" * 64,
+        },
+    )
 
 
 async def session_start_stories(ask):

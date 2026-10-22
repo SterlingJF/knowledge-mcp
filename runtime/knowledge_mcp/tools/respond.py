@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+from collections.abc import Callable
 from typing import Any
 
 from mcp.types import CallToolResult, TextContent
@@ -11,6 +12,7 @@ from pydantic import BaseModel
 
 from knowledge_mcp import log, problems
 from knowledge_mcp.kbp import Printed
+from knowledge_mcp.models_auto.kbp_output_schema import KbpOutputAnswer
 
 
 def sent(**arguments: Any) -> dict[str, Any]:
@@ -41,16 +43,28 @@ def answer(
     arguments: dict[str, Any],
     model: type[BaseModel],
     data: dict[str, Any],
+    view: Callable[[dict[str, Any]], str | None] | None = None,
 ) -> CallToolResult:
     """Validate `data` against `model`, log the result, and return the validated data as
-    structured content and as one JSON text block."""
+    structured content and as one JSON text block.
+
+    With `view`, its markdown goes in the `card` field and in a text block before the JSON block,
+    since some hosts give the model only structured content and others only text.
+    A view that returns None adds no card.
+    """
+    card = view(data) if view is not None else None
+    if card is not None:
+        data = data | {"card": card}
     structured = model.model_validate(data).model_dump(
         mode="json", by_alias=True, exclude_unset=True
     )
-    text = compact(structured)
-    log.record(tool, location, arguments, [text])
+    texts = [compact(structured)]
+    if card is not None:
+        texts.insert(0, card)
+    log.record(tool, location, arguments, texts)
     return CallToolResult(
-        content=[TextContent(type="text", text=text)], structured_content=structured
+        content=[TextContent(type="text", text=text) for text in texts],
+        structured_content=structured,
     )
 
 
@@ -97,6 +111,8 @@ def printed(
 
     Append `note` as a JSON text block with `meta.stream` set to `knowledge-mcp`.
 
+    Structured content is a validated stream receipt on success, or the existing
+    coded problem on failure. Raw text blocks and exit metadata stay unchanged.
     `is_error` is true when kbp exits with a nonzero code.
     """
     blocks = _streams(output)
@@ -106,7 +122,24 @@ def printed(
                 type="text", text=compact(note), meta={"stream": "knowledge-mcp"}
             )
         )
+    if output.code != 0:
+        structured = problems.KbpFailed(output, tool.removeprefix("kbp_")).details()
+    else:
+        data: dict[str, Any] = {
+            "schema": "knowledge-mcp/kbp-output/1",
+            "stdout": output.stdout,
+            "stderr": output.stderr,
+            "exit_code": output.code,
+        }
+        if note:
+            data["note"] = note
+        structured = KbpOutputAnswer.model_validate(data).model_dump(
+            mode="json", by_alias=True, exclude_unset=True
+        )
     log.record(tool, location, arguments, [block.text for block in blocks])
     return CallToolResult(
-        content=list(blocks), is_error=output.code != 0, meta={"exit_code": output.code}
+        content=list(blocks),
+        structured_content=structured,
+        is_error=output.code != 0,
+        meta={"exit_code": output.code},
     )

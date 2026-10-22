@@ -4,31 +4,19 @@ Plain, structured thinking while you work. It's free, open, and local-first.
 
 ## Example
 
-You ask your agent: "Draft a proposal to move our team to a new tool. We need approval. Moving back will be costly."
+You ask your agent: "Is this ready for review?"
 
-![Before drafting, the agent identifies the reviewer, asks about imposed limits and work order, and consults problem and risk notes. Approval and costly reversal make those questions required.](docs/assets/knowledge-mcp-flow.svg)
+![An AI chat reviews a design proposal with knowledge-mcp, records the approved edit, then picks it up in a new conversation](.github/assets/knowledge-mcp-demo.gif)
 
-## Features
+## Key features
 
-- **Document context.** Give your agent each file's document type, reader and questions, in any folder, drive or page your agent can reach.
-- **Proposed names and folders.** Get a proposed name and folder for each file with a document type, and accept one file or a whole folder at a time.
-- **Naming and filing conventions.** Set naming and filing conventions per document type, from your current folders, a template such as ACE or PARA, or from scratch.
-- **Structure by folder.** Define document types and their questions in universe specs for your whole knowledge base or a single folder.
-- **Team folders.** Keep each team's terms, document types and conventions in the team's folder, and see which conventions each folder uses.
-- **Guided writing.** See each section's questions as you write, and leave each condition open until you confirm its value.
-- **Writing for the reader.** Get drafts written for each document type's reader, once you confirm your role.
-- **Knowledge import.** Turn notes and conversations into proposed updates to your documents.
-- **Conflicting answers.** Keep both versions side by side when new material contradicts a note, and choose which version stays.
-- **Folder review.** Find stale items, open questions and contradictions in any folder you import, without changing your originals.
-- **Document memory.** Keep each file's document type, reader and your corrections across sessions and chats.
-- **File changes.** Review new, moved and deleted files with your agent at session start, plus files that still need a document type.
-- **Edit history.** Compare original and revised text, and undo recorded edits.
-- **Starters.** Start with ready-made document types for product development or codebase recordkeeping in any folder without a universe spec.
-- **Custom document types.** Add or change document types with the included knowledge-bus skills, and see the evidence behind each proposed change.
-- **Decision records.** Record each decision with the condition for revisiting the decision.
-- **Universe spec explorer.** Browse the sections and questions of any document type, and validate your universe specs.
-- **Local-first.** Run knowledge-mcp on your machine with no network calls. Your agent makes every change to your files.
-- **Answer log.** Review every answer knowledge-mcp gives in a log kept outside your knowledge base.
+- **Document context.** Always keep track of a document's type, dependencies, and target audience. Your agent understands the questions each section should address, from ready-made document types to your own.
+- **Suggested edits.** See the evidence behind each proposed change. Suggestions are numbered and list their sources, with how strongly those sources support the change.
+- **Knowledge maintenance.** Bring in meeting notes or chat threads and see what they confirm, add to or contradict in your documents. Conflicting answers stay visible and traced for you to easily resolve.
+- **File organization.** Set custom rules and patterns for naming and organizing documents. Use an existing folder system like ACE or PARA, or define your own.
+- **Persistent memory.** Each document's type, reader and your corrections carry over between chats.
+- **Edit history.** See exactly what changed in each recorded edit, and roll back what you don't want.
+- **Local-first.** knowledge-mcp runs entirely on-device and can connect to Claude Code, Claude Desktop, Codex, Pi, and OpenCode. No network calls and no account needed.
 
 ## Get started
 
@@ -48,7 +36,7 @@ Then register knowledge-mcp with each harness you use:
 | Pi                | `kb setup pi`             |
 | OpenCode          | `kb setup opencode`       |
 
-Start a new session afterward. For the Claude desktop app, also run the ZIP command that `kb setup claude-desktop` prints and upload each ZIP through Customize → Skills in Claude. Then ask your agent for a document, as in the example above.
+Then ask your agent about a document, as in the example above.
 
 ### Plugin alternatives
 
@@ -68,9 +56,9 @@ codex plugin marketplace add SterlingJF/knowledge-mcp
 codex plugin add knowledge-mcp@knowledge-mcp
 ```
 
-Start a new session after installation.
-
 ### Shell completion
+
+Homebrew installs completions for zsh, Bash and Fish. If you installed `kb` another way, add them yourself.
 
 For zsh, add to `~/.zshrc`:
 
@@ -88,10 +76,11 @@ For Fish, add `env _KB_COMPLETE=fish_source kb | source` to your shell configura
 
 ## Guides and reference
 
-- [Naming and filing conventions](docs/naming-and-filing.md).
-- [MCP tools](docs/mcp-tools.md).
+- [Introduction](https://knowledge-mcp.pdflowlabs.io/docs).
+- [Naming and filing conventions](https://knowledge-mcp.pdflowlabs.io/docs/naming-and-filing).
+- [MCP tools](https://knowledge-mcp.pdflowlabs.io/docs/mcp-tools).
 - [Access and data handling](SECURITY.md).
-- [Release checks for maintainers](docs/release-check.md).
+- [Release checks for maintainers](RELEASING.md).
 - [Contributing](CONTRIBUTING.md).
 
 ## License

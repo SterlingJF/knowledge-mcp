@@ -9,7 +9,7 @@ dev = [
   "actionlint-py==1.7.12.25",
   "datamodel-code-generator[ruff]==0.83.0",
   "mypy==2.4.0",
-  "pre-commit==4.6.2",
+  "pre-commit==4.7.0",
   "ruff==0.16.9",
   "shellcheck-py==0.11.0.1",
   "tombi==1.8.0",

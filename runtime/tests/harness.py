@@ -138,7 +138,7 @@ def fit(result: Any) -> dict[str, Any]:
 
 def checked(result: Any, contract: str) -> dict[str, Any]:
     assert not result.is_error, texts(result)
-    [text] = texts(result)
+    *_, text = texts(result)
     answer = json.loads(text)
     assert result.structured_content == answer
     validator(contract).validate(answer)

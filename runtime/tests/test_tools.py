@@ -19,6 +19,7 @@ TOOLS = {
     "kb_prepare_conventions",
     "kb_prepare_document_move",
     "kb_prepare_document_moves",
+    "kb_prepare_proposal",
     "kbp_validate",
     "kbp_self_check",
     "kbp_version",

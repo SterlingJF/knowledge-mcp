@@ -1,0 +1,107 @@
+---
+title: "History and help"
+description: "Find where knowledge-mcp saves settings and edit history, recover from an unwanted edit, remove knowledge-mcp, fix common problems and read the FAQ."
+---
+
+## Saved work
+
+| What                                    | Where                                                                                         | Saved by              |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------- |
+| Documents and review notes              | Anywhere in your knowledge base                                                               | You or your assistant |
+| Document types, readers and permissions | `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` at the root of your knowledge base | Your assistant        |
+| Filing rules                            | `conventions.yaml`, next to `document-types.yaml` or in a team folder                         | Your assistant        |
+| Tool answers and edit history           | `log.jsonl` and `edits.jsonl` in the state folder                                             | knowledge-mcp         |
+
+By default, the state folder is `~/.local/state/knowledge-mcp`.
+
+To pick up later, start a new chat in the same folder. Ask your assistant to reload your document settings, reopen your review note and check which files changed since last time. That only works if a file list was saved in an earlier session. Nothing watches your files in the background.
+
+## Recovery
+
+1. If an edit goes wrong or gets interrupted, stop making changes.
+2. Ask your assistant: “Compare my files with the saved history.”
+3. Then ask: “What changed, and what can you restore?”
+4. Review its proposal before you approve the restore. Make sure it keeps any edits made after the one you're undoing.
+
+## Data and removal
+
+The knowledge-mcp server doesn't make network calls or open a network port. Text that knowledge-mcp gives your assistant is handled by your AI app and model under their own policies. Saved answers and edit history can contain sensitive text, and the logs aren't cleared automatically.
+
+To remove knowledge-mcp:
+
+<Steps>
+  <Step title="Quit your AI apps">
+
+    Close Claude Code, Codex or any other app you set up with knowledge-mcp.
+
+  </Step>
+  <Step title="Disconnect knowledge-mcp from each app">
+
+    Run the [setup command](/quick-start#connect-ai-apps-on-macos) you used again with `--remove`:
+
+    ```bash
+    kb setup --remove codex
+    ```
+
+    The command tells you if anything in that app's settings is left for you to remove.
+
+  </Step>
+  <Step title="Uninstall knowledge-mcp">
+
+    ```bash
+    brew uninstall knowledge-mcp
+    ```
+
+  </Step>
+</Steps>
+
+<Note>
+
+Uninstalling leaves your documents, document settings and history in place. If you plan to delete them, copy your edit history first.
+
+</Note>
+
+## Troubleshooting
+
+| Problem                   | What to do                                                                                         |
+| ------------------------- | -------------------------------------------------------------------------------------------------- |
+| Tools are missing         | Run `kb doctor` and do what it suggests.                                                           |
+| Instructions are missing  | Run `kb doctor` and do what it suggests.                                                           |
+| A document won't open     | Paste the text in, or pick a document your assistant can open.                                     |
+| The saved reader is wrong | Ask your assistant to change the reader before it drafts.                                          |
+| A move is blocked         | Ask your assistant why, and what it suggests doing next.                                           |
+| Your assistant stopped    | Check your app's usage limits. Check that saved files match your edit history before you continue. |
+
+If you can reproduce a problem, report it on [GitHub Issues](https://github.com/SterlingJF/knowledge-mcp/issues). Include your knowledge-mcp version, the AI app you use, the `kb doctor` result and the steps to reproduce it. Leave out document text and sensitive logs.
+
+Report security issues through a [private security advisory](https://github.com/SterlingJF/knowledge-mcp/security/advisories/new), with the affected version, the steps to reproduce and the impact. Only the latest release gets security fixes.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What carries over between chats?">
+
+    Your document settings, filing rules, tool answers and recorded edits carry over. Your assistant shows a document's latest edit when you return to it. Save anything unfinished in a note.
+
+  </Accordion>
+  <Accordion title="Which drives and bases are supported?">
+
+    Knowledge-MCP supports any drive, network storage, or knowledge base that can hold a `.knowledge-bus` folder for your knowledge specs, file management rules, and settings. The only prerequisite is that your agent or harness can access that configuration folder.
+
+  </Accordion>
+  <Accordion title="Which apps can I connect?">
+
+    You can connect Claude Code, Codex, Claude Desktop, Pi and OpenCode with `kb setup`. Claude Code and Codex can also use the plugin.
+
+  </Accordion>
+  <Accordion title="Does knowledge-mcp block unapproved edits?">
+
+    No. It's up to your assistant to ask before it edits.
+
+  </Accordion>
+  <Accordion title="Can two chats share a folder?">
+
+    Yes, but only one of them should save settings. If both save at the same time, one can overwrite the other.
+
+  </Accordion>
+</AccordionGroup>

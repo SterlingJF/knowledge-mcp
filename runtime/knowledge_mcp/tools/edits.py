@@ -14,13 +14,14 @@ from knowledge_mcp.models_auto.edits_schema import EditsAnswer
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
 from knowledge_mcp.tools.kbp import READS, Location
+from knowledge_mcp.views import markdown
 
 RECORD = """\
-Record an edit right after you make it, so the person can check or undo the change. Returns the edit's id and the digests of `before` and `after`. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.
+Record an edit right after you make it, so the person can check or undo the change. Returns the edit's id, the digests of `before` and `after`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.
 """
 
 LIST = """\
-List the edits recorded for `location`, oldest first, to check or undo an edit. The `kb-write-document` skill gives the undo steps. Reads `edits.jsonl`, appends the answer to `log.jsonl`, and opens no knowledge-base file.
+List the edits recorded for `location`, oldest first, to check or undo an edit or to pick up earlier work. Returns the latest edit, if any, as markdown in `card`. The `kb-write-document` skill gives the undo steps. Reads `edits.jsonl`, appends the answer to `log.jsonl`, and opens no knowledge-base file.
 """
 
 
@@ -89,7 +90,12 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
         )
         entry = edits.record(location, allowed_by, texts, operation)
         return respond.answer(
-            "kb_record_edit", location, arguments, EditReceipt, edits.receipt(entry)
+            "kb_record_edit",
+            location,
+            arguments,
+            EditReceipt,
+            edits.receipt(entry),
+            view=markdown.saved,
         )
 
     @mcp.tool(
@@ -101,5 +107,10 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
     def kb_list_edits(location: Location) -> CallToolResult:
         arguments = respond.sent(location=location)
         return respond.answer(
-            "kb_list_edits", location, arguments, EditsAnswer, edits.listing(location)
+            "kb_list_edits",
+            location,
+            arguments,
+            EditsAnswer,
+            edits.listing(location),
+            view=markdown.pickup,
         )

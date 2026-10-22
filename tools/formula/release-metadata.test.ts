@@ -15,7 +15,7 @@ import { test } from "node:test";
 import type { TestContext } from "node:test";
 
 import { check, resolveConfig } from "prettier";
-import { stringify } from "smol-toml";
+import { parse, stringify } from "smol-toml";
 
 import { prepare, releaseNotes, validateMetadata } from "./release-metadata.ts";
 import type { Run } from "./release-metadata.ts";
@@ -24,10 +24,9 @@ const projectRoot = resolve(import.meta.dirname, "../..");
 const files = [
   "runtime/pyproject.toml",
   "package.json",
-  "runtime/.claude-plugin/plugin.json",
-  "runtime/.codex-plugin/plugin.json",
+  ".claude-plugin/plugin.json",
+  ".codex-plugin/plugin.json",
   "uv.lock",
-  "runtime/requirements.lock",
   "pnpm-lock.yaml",
   "CHANGELOG.md",
 ];
@@ -85,17 +84,12 @@ function successfulRun(root: string, calls: Array<string>): Run {
       );
       return "";
     }
-    assert.deepEqual(
-      [command, ...args],
-      ["just", "generate_knowledge_mcp_lock"],
-    );
-    return "";
+    throw new Error(`Unexpected command: ${command} ${args.join(" ")}`);
   };
 }
 
 test("prepare promotes the matching draft, synchronizes shipped versions and preserves unrelated work and pins", async (context) => {
   const root = fixture(context);
-  const requirements = readFileSync(join(root, "runtime/requirements.lock"));
   const readme = readFileSync(join(root, "README.md"));
   const pnpmLock = readFileSync(join(root, "pnpm-lock.yaml"));
   const calls: Array<string> = [];
@@ -108,14 +102,11 @@ test("prepare promotes the matching draft, synchronizes shipped versions and pre
       "0.2.1",
     );
   assert.deepEqual(readFileSync(join(root, "README.md")), readme);
-  assert.deepEqual(
-    readFileSync(join(root, "runtime/requirements.lock")),
-    requirements,
-  );
+  assert.equal(existsSync(join(root, "runtime/requirements.lock")), false);
   assert.deepEqual(readFileSync(join(root, "pnpm-lock.yaml")), pnpmLock);
   assert.ok(calls.includes("uv lock"));
   assert.equal(calls.includes("uv lock --offline"), false);
-  assert.ok(calls.includes("just generate_knowledge_mcp_lock"));
+  assert.equal(calls.includes("just generate_knowledge_mcp_lock"), false);
   assert.ok(
     calls.every(
       (call) =>
@@ -230,8 +221,8 @@ for (const notes of [
 
 for (const path of [
   "package.json",
-  "runtime/.claude-plugin/plugin.json",
-  "runtime/.codex-plugin/plugin.json",
+  ".claude-plugin/plugin.json",
+  ".codex-plugin/plugin.json",
   "uv.lock",
 ])
   test(`metadata rejects mismatched ${path}`, (context) => {
@@ -250,10 +241,6 @@ test("failed lock refresh restores metadata, notes, and partly written lock byte
   const run: Run = (command) => {
     if (command === "git") return "";
     writeFileSync(join(root, "uv.lock"), "partial lock\n");
-    writeFileSync(
-      join(root, "runtime/requirements.lock"),
-      "partial requirements\n",
-    );
     throw new Error("lock refresh failed");
   };
   await assert.rejects(prepare(root, "0.2.1", run), /lock refresh failed/);
@@ -269,13 +256,21 @@ test("unrelated dependency changes abort and roll back the whole preparation", a
       const result = good(command, args, options);
       if (command === "uv") {
         const lock = join(root, "uv.lock");
-        writeFileSync(
-          lock,
-          readFileSync(lock, "utf8").replace(
-            'name = "knowledge-bus"\nversion = "0.10.0"',
-            'name = "knowledge-bus"\nversion = "0.11.0"',
-          ),
+        const original = readFileSync(lock, "utf8");
+        const packages = (
+          parse(original) as {
+            package: Array<{ name: string; version: string }>;
+          }
+        ).package;
+        const dependency = packages.find(
+          (entry) => entry.name === "knowledge-bus",
+        )!;
+        const mutated = original.replace(
+          `name = "${dependency.name}"\nversion = "${dependency.version}"`,
+          `name = "${dependency.name}"\nversion = "${dependency.version}.1"`,
         );
+        assert.notEqual(mutated, original);
+        writeFileSync(lock, mutated);
       }
       return result;
     }),
@@ -301,7 +296,7 @@ test("root release recipes share preparation and the native lock-check authority
     encoding: "utf8",
   });
   assert.equal(checked.status, 0, checked.stderr);
-  assert.match(checked.stdout + checked.stderr, /uv export .*--locked/);
+  assert.match(checked.stdout + checked.stderr, /uv lock --check/);
   assert.match(checked.stdout + checked.stderr, /release-metadata\.ts check/);
 });
 
@@ -310,103 +305,59 @@ for (const forced of [
   { CLICOLOR_FORCE: "1" },
   { FORCE_COLOR: "1", CLICOLOR_FORCE: "1", UV_COLOR: "always" },
 ]) {
-  test(`requirements generation and checking stay plain under ${Object.keys(forced).join(" + ")}`, (context) => {
-    const root = fixture(context);
-    copyFileSync(
-      join(projectRoot, "pyproject.toml"),
-      join(root, "pyproject.toml"),
-    );
-    const path = join(root, "runtime/requirements.lock");
-    const baseline = readFileSync(path);
-    const env = {
-      ...process.env,
-      ...forced,
-      NO_COLOR: "",
-      UV_CACHE_DIR: join(root, "uv-cache"),
-      UV_OFFLINE: "1",
-      UV_PYTHON_DOWNLOADS: "never",
-    };
-    const run = (recipe: string, args: Array<string> = []) =>
-      execFileSync(
-        "just",
-        [
-          "--justfile",
-          join(projectRoot, "justfile"),
-          "--working-directory",
-          root,
-          recipe,
-          ...args,
-        ],
-        { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] },
-      );
-    run("generate_knowledge_mcp_lock");
-    const generated = readFileSync(path);
+  test(`native formula export stays plain under ${Object.keys(forced).join(" + ")}`, () => {
+    const args = [
+      "export",
+      "--color",
+      "never",
+      "--project",
+      projectRoot,
+      "--locked",
+      "--package",
+      "knowledge-mcp",
+      "--no-dev",
+      "--no-emit-workspace",
+      "--no-header",
+      "--format",
+      "requirements-txt",
+    ];
+    const baseline = execFileSync("uv", args);
+    const exported = execFileSync("uv", args, {
+      env: { ...process.env, ...forced },
+    });
+    assert.deepEqual(exported, baseline);
+    assert.equal(exported.includes(0x1b), false);
     assert.equal(
-      generated.includes(0x1b),
+      existsSync(join(projectRoot, "runtime/requirements.lock")),
       false,
-      "requirements must contain no terminal escapes",
-    );
-    assert.deepEqual(generated, baseline);
-    run("check_knowledge_mcp_lock", [root]);
-    writeFileSync(
-      path,
-      Buffer.concat([baseline, Buffer.from("# stale lock fixture\n")]),
-    );
-    assert.throws(
-      () => run("check_knowledge_mcp_lock", [root]),
-      /requirements.lock is stale/,
     );
   });
 }
 
-test("preparation delegates to a plain native requirements export under forced color", async (context) => {
+test("native preparation preserves dependency pins under forced color", async (context) => {
   const root = fixture(context);
   copyFileSync(
     join(projectRoot, "pyproject.toml"),
     join(root, "pyproject.toml"),
   );
-  const baseline = readFileSync(join(root, "runtime/requirements.lock"));
   const env = {
     ...process.env,
     FORCE_COLOR: "1",
     CLICOLOR_FORCE: "1",
     UV_COLOR: "always",
-    NO_COLOR: "",
-    UV_CACHE_DIR: join(root, "uv-cache"),
-    UV_OFFLINE: "1",
     UV_PYTHON_DOWNLOADS: "never",
   };
-  const refresh = successfulRun(root, []);
   const run: Run = (command, args, options) => {
-    if (command === "git" || command === "uv")
-      return refresh(command, args, options);
-    assert.deepEqual(
-      [command, ...args],
-      ["just", "generate_knowledge_mcp_lock"],
-    );
-    const nativeArgs =
-      command === "just"
-        ? [
-            "--justfile",
-            join(projectRoot, "justfile"),
-            "--working-directory",
-            root,
-            ...args,
-          ]
-        : args;
-    return execFileSync(command, nativeArgs, {
+    if (command === "git") return "";
+    return execFileSync(command, args, {
       cwd: options?.cwd,
       env,
       encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
     });
   };
   await prepare(root, "0.2.1", run);
-  assert.deepEqual(
-    readFileSync(join(root, "runtime/requirements.lock")),
-    baseline,
-  );
   assert.equal(validateMetadata(root), "0.2.1");
+  assert.equal(existsSync(join(root, "runtime/requirements.lock")), false);
 });
 
 test("native preparation works in a dependency-free workspace with an empty cache", async (context) => {
@@ -436,6 +387,9 @@ test("native preparation works in a dependency-free workspace with an empty cach
   const cache = join(root, "uv-cache");
   const env = {
     ...process.env,
+    FORCE_COLOR: "1",
+    CLICOLOR_FORCE: "1",
+    UV_COLOR: "always",
     UV_CACHE_DIR: cache,
     UV_OFFLINE: "1",
     UV_PYTHON_DOWNLOADS: "never",
@@ -447,7 +401,6 @@ test("native preparation works in a dependency-free workspace with an empty cach
     stdio: ["ignore", "pipe", "pipe"],
   });
   rmSync(cache, { recursive: true, force: true });
-  writeFileSync(join(root, "runtime/requirements.lock"), "");
   const workspace = readFileSync(join(root, "pyproject.toml"));
   const calls: Array<Array<string>> = [];
   const run: Run = (command, args, options) => {
@@ -479,14 +432,8 @@ test("native preparation works in a dependency-free workspace with an empty cach
     });
   };
   await prepare(root, "0.2.1", run);
-  assert.deepEqual(calls, [
-    ["uv", "lock"],
-    ["just", "generate_knowledge_mcp_lock"],
-  ]);
+  assert.deepEqual(calls, [["uv", "lock"]]);
   assert.equal(validateMetadata(root), "0.2.1");
   assert.deepEqual(readFileSync(join(root, "pyproject.toml")), workspace);
-  assert.equal(
-    readFileSync(join(root, "runtime/requirements.lock"), "utf8"),
-    "",
-  );
+  assert.equal(existsSync(join(root, "runtime/requirements.lock")), false);
 });

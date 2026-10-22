@@ -1,9 +1,11 @@
 ---
 name: kb-write-document
-description: Use before writing or editing a knowledge-base document, locally or through a connector.
+description: Use before proposing changes to, writing or editing a document, locally or through a connector.
 ---
 
 # Write a Document
+
+To propose changes to a document, follow Proposals.
 
 1. Read knowledge-base files with your own tools.
    Establish the root and the requested folder. Discover `.knowledge-bus/` folders along every relevant ancestor path.
@@ -14,7 +16,7 @@ description: Use before writing or editing a knowledge-base document, locally or
    - `location`: the file's path or URL, as text.
    - `name`: the filename, including its extension.
    - `folders`: the folder names on the path from the root folder to the file.
-   - `knowledge_bus_folders`: every folder containing `.knowledge-bus/`, including folders holding peer documents. Set `folder` to its root-relative path. In `files`, list each `*.kbp.yaml` file directly inside the `.knowledge-bus/` directory by `name`. Include the `id` and `version` from the `universe:` or `guidance:` block. Send complete local `*.kbp.yaml` text on first use, including files with bundled ids and versions. When `.knowledge-bus/workspace.yaml` exists, send its text as `workspace_yaml` on every call.
+   - `knowledge_bus_folders`: every folder containing `.knowledge-bus/`, including folders holding peer documents. Set `folder` to its root-relative path. In `files`, list each `*.kbp.yaml` file directly inside `.knowledge-bus/` by `name`. Include `id` and `version` from the `universe:` or `guidance:` block. First try the actual file SHA-256 as `digest: "sha256:…"`; if unknown, send exact full `text`. When `.knowledge-bus/workspace.yaml` exists, send its text as `workspace_yaml` on every call.
    - `role`: the reader's role, such as maintainer or product lead, when you can tell.
    - `listing`: every current document and attachment path relative to the root.
    - `record`: the current document-types file text. Follow `kb-track-document-types` for reading and migration.
@@ -36,14 +38,26 @@ description: Use before writing or editing a knowledge-base document, locally or
    Ask the person for unknown values. Never invent dates, properties or numbering.
 
 7. **Review filing.** Show the assessment for the chosen document type and confirm the path before writing. Follow Names, folders and moves for an accepted move.
-8. **Read the card.** Call `kbp_card` with `kind` set to the document type and the same `location` and `folders`, with ancestor `knowledge_bus_folders`. Set `universe` to the `universe_spec` of the chosen candidate or saved entry. Quote the card instead of restating its rules in your own words.
-9. **Guess the conditions.** Read each condition after "Depends on:" on the card. State the expected value with "(guess)" and a reason. Keep the condition open until the person confirms or corrects the value. Write a conditional section only after the person confirms the values for that section. Show which sections depend on each open condition.
-10. **Check whether a document is needed.** Read the card's "No document needed" line. Compare your guesses with any conditions. Treat "in every situation" as unconditional. If the line applies, say "no document needed (guess)" and name any assumed values. Ask whether to write the document anyway.
+8. **Read the card.** Call `kbp_card` with `format: "json"` and `kind` set to the document type and the same `location` and `folders`, with ancestor `knowledge_bus_folders`. Set `universe` to the `universe_spec` of the chosen candidate or saved entry. Read the JSON in `stdout`. Cite its `kind` and `sections[].element` IDs; never derive IDs from headings. Quote the card instead of restating its rules in your own words.
+   The card has no source filenames or digests. Use the response note's `received` name/digest pairs or `bundled` filenames and `source` declaration.
+   Forward reader results as typed values into tool arguments; retain the complete card and provenance when passing context.
+9. **Guess the conditions.** Read `conditions` and `presentation[].conditions`, including predicates in `disabled_when`, `no_artifact`, section `when`/`gate` and guidance `when`. State the expected value with "(guess)" and a reason. Keep the condition open until the person confirms or corrects the value. Write a conditional section only after the person confirms the values for that section. Show which sections depend on each open condition.
+10. **Check whether a document is needed.** Read the card's `no_artifact` predicate. Compare your guesses with its conditions. An empty predicate means "in every situation". If the predicate applies, say "no document needed (guess)" and name any assumed values. Ask whether to write the document anyway.
 11. **Choose the reader.** Call `kb_list_audiences` with `document_type` and the same `location` and `folders`, with ancestor `knowledge_bus_folders`. Set `universe_spec` to the chosen universe spec id. When you can't tell the reader, ask the person and offer only the answer's `choices`. When `choices` is empty, write for the answer's `actor` and offer no choices of your own.
 12. **Write.** Write the card's sections in order, follow the card's instructions, and use the confirmed values.
+13. **Propose before editing.** Follow Proposals.
 
 For card and reader calls, include only configuration folders from the root down to the subject folder.
 Keep the complete peer-folder inventory for document-type lookup, tracking and move preparation.
+
+## Proposals
+
+Don't stop to ask about the document type or reader first.
+
+1. Call `kb_prepare_proposal` with one row per change, its sources and evidence mark, and each file you read but didn't cite. Send plain words, without markdown syntax, in `text`. Send `layout: "list"` when you run in a terminal.
+2. Show `card` from the result in your reply unchanged, then add your own lines. Mark a guessed document type or reader with "(guess)" and ask about it there. Name each change by its ID, such as C2, never by its position.
+3. When the person changes or decides something, prepare the card again with the rows that still apply. Cite their words in a `said` source.
+4. Nothing is saved until the person approves. Then follow Edits.
 
 ## Folder conventions
 
@@ -113,7 +127,7 @@ To file documents under `Finance/Contracts`, save a reviewed local convention in
 2. Get permission for each addition, replacement or removal.
    Call `kb_prepare_conventions` with `location` set to the root, current `conventions` text, proposed `changes` and `allowed_by`.
    Set `folder` to the selected folder and supply ancestor `conventions_files`, excluding the target file.
-   Include current applicable definitions in `knowledge_bus_folders`, with complete local universe spec text or an unchanged session digest.
+   Include applicable definitions in `knowledge_bus_folders` with actual file SHA-256 digests; if unknown, send exact full text.
    Send `from_parent` to replace the complete parent selection; omission preserves the current selection.
    Preview every resulting convention before creating a team boundary or changing parent selections.
    Keep template proposals local to the selected folder. Choose parent selections explicitly.
@@ -173,10 +187,12 @@ A content edit authorizes a move only when the permission also covers the move.
 2. **Record each edit.** Immediately call `kb_record_edit` with `location`, `allowed_by`, `before` and `after`.
    Quote the person's words in `allowed_by.text` and select `allowed_by.basis`.
    For `instruction`, put the instruction file's path in `allowed_by.location`.
-3. **Check or undo an edit.** Call `kb_list_edits` with `location`.
+   Show `card` from the result in your reply unchanged, then add your own lines.
+3. **Pick up earlier work.** When the person returns to a document, call `kb_list_edits` with its `location`. Show `card` from the result in your reply unchanged, then write "Still open:" and what the document leaves open.
+4. **Check or undo an edit.** Call `kb_list_edits` with `location`.
    Restore `before` only where the document still contains `after`.
    If the edit record omits `after`, restore the whole file from `before` only when the current file's digest equals `after_digest`.
-4. **Update document types.** After creating, moving or deleting a file, follow `kb-track-document-types`.
+5. **Update document types.** After creating, moving or deleting a file, follow `kb-track-document-types`.
 
 During this work, commit nothing, push nothing, open no issue or pull request, and post no comment.
 

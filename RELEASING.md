@@ -1,12 +1,12 @@
 # Release checks
 
-See the [Release workflow](../.github/workflows/release.yml).
+See the [Release workflow](.github/workflows/release.yml).
 The `HOMEBREW_TAP_TOKEN` secret is a fine-grained token with read and write access to the tap repository's contents alone.
 
 ## Publish a release
 
 1. Record user-visible changes under `## Unreleased` in `CHANGELOG.md`, grouped under Added, Changed, Removed and Fixed. Include upgrade steps for breaking changes.
-2. Run `just release_prepare X.Y.Z` to update package versions, plugin versions, `uv.lock` and `runtime/requirements.lock`.
+2. Run `just release_prepare X.Y.Z` to update package versions, plugin versions, `uv.lock`.
    The recipe renames `## Unreleased` to `## X.Y.Z` and stages nothing.
 3. Run `just release_check`, then `just check`.
 4. Commit, then push the tag `vX.Y.Z`. The tag version must match `runtime/pyproject.toml`.
@@ -85,13 +85,13 @@ Check `brew info` for `poured_from_bottle: true` after a bottle install or `fals
 
 ### Harnesses
 
-1. Register knowledge-mcp with the [setup command](../README.md#get-started) for each harness under test, then start a new session.
-2. Run `kb doctor`. Check the MCP server list in Claude Code, Codex, the Claude desktop app, Pi or OpenCode.
+1. Run each harness’s [setup command](README.md#get-started). Record its exit code and output; setup ends here.
+2. For release diagnostics, run `kb doctor`. Inspect servers in Claude Code, Codex, Claude Desktop, Pi or OpenCode.
    Check that the knowledge-mcp entry runs `kb mcp` from the Homebrew path.
 3. In a test codebase, pick an existing file and run `kb type <path>`.
    Ask the agent for the document type of the same file. Check that the agent calls `kb_get_document_type`.
-4. In a harness with a skills folder, check that each `kb-*` skill appears once.
-   The Claude desktop app takes skill uploads instead.
+4. Check each `kb-*` skill appears once.
+   Claude Desktop has no skills folder, so skip this check there.
 
 ### Upgrade
 
@@ -115,4 +115,4 @@ Check that skill links still use Homebrew's `opt/knowledge-mcp` path.
 3. If you installed the package for this check, run `kb doctor --verbose` to find the state folder.
    Then run `brew uninstall knowledge-mcp`.
 
-Uninstalling keeps the state folder. See [SECURITY.md](../SECURITY.md#known-limitations).
+Uninstalling keeps the state folder. See [SECURITY.md](SECURITY.md#known-limitations).

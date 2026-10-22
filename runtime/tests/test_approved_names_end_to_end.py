@@ -79,8 +79,8 @@ APPROVED_HELP: dict[tuple[str, ...], tuple[set[str], set[str], set[str]]] = {
         set(),
     ),
     ("doctor",): (set(), {"--help", "--verbose", "--json"}, set()),
-    ("kbp",): (set(KBP_MODES), {"--help", "--version"}, set()),
-    **{("kbp", mode): (set(), {"--help"}, set()) for mode in KBP_MODE_FLAGS},
+    ("kbp",): (set(KBP_MODES), {"--help", "--version", "--json"}, set()),
+    **{("kbp", mode): (set(), {"--help", "--json"}, set()) for mode in KBP_MODE_FLAGS},
 }
 
 
@@ -318,6 +318,7 @@ APPROVED_TOOLS = {
     "kb_list_edits",
     "kb_record_edit",
     "kb_prepare_document_types",
+    "kb_prepare_proposal",
     "kbp_validate",
     "kbp_self_check",
     "kbp_version",
@@ -339,6 +340,7 @@ NAMED_VERBS = {
     "kb_list_edits": "List",
     "kb_record_edit": "Record",
     "kb_prepare_document_types": "Prepare",
+    "kb_prepare_proposal": "Prepare",
     "kbp_validate": "Validate",
 }
 VERBS = {
@@ -923,7 +925,7 @@ def user_facing(
                         )
                     )
     for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json"):
-        data = json.loads((MODULE / manifest).read_text(encoding="utf-8"))
+        data = json.loads((MODULE.parent / manifest).read_text(encoding="utf-8"))
         shown = [data.get("description"), *(data.get("interface") or {}).values()]
         found += [(manifest, text) for text in shown if isinstance(text, str)]
     docs = [
@@ -935,15 +937,26 @@ def user_facing(
     ]
     docs += [
         str(path.relative_to(MODULE.parent))
-        for path in (MODULE.parent / "docs").glob("*.md")
+        for path in sorted((MODULE.parent / "docs").glob("*.md*"))
     ]
-    docs.append("docs/assets/knowledge-mcp-flow.svg")
+    docs.append(".github/assets/knowledge-mcp-flow.svg")
     for name in docs:
         found.append((name, (MODULE.parent / name).read_text(encoding="utf-8")))
     written = migration["first"].get("record") or ""
     comments = [line for line in written.splitlines() if line.startswith("#")]
     found.append(("document-types comments", "\n".join(comments)))
     return [(source, plain(text, places(tmp_path))) for source, text in found]
+
+
+# Card 22: user-approved docs-draft.md (SHA-256 dd4e70c330b362a13dc84a8949fb525c1f7fd9246f7fdb24d4c301bac2530fff), line 201.
+# This FAQ display case does not rename API/package identifiers.
+APPROVED_STORAGE_ANSWER = (
+    "Knowledge-MCP supports any drive, network storage, or knowledge base that can hold a "
+    "`.knowledge-bus` folder for your knowledge specs, file management rules, and settings. "
+    "The only prerequisite is that your agent or harness can access that configuration folder."
+)
+
+APPROVED_QUICK_START_CTA = "[Try Knowledge-MCP](quick-start.md#quick-start)"
 
 
 PATH_TOKEN = re.compile(r"\S*/\S*|\S*\.(?:ya?ml|md|jsonl?|toml)\b\S*")
@@ -966,6 +979,30 @@ def hits(
                     else checked
                 )
                 for match in re.finditer(pattern, scan):
+                    if (
+                        source == "docs/history-and-help.mdx"
+                        and line.strip() == APPROVED_STORAGE_ANSWER
+                        and [ln.strip() for ln in text.splitlines()].count(
+                            APPROVED_STORAGE_ANSWER
+                        )
+                        == 1
+                        and rule == '"Knowledge-MCP" for knowledge-mcp'
+                        and match.start() == len(line) - len(line.lstrip())
+                        and match.end() == match.start() + len("Knowledge-MCP")
+                    ):
+                        continue
+                    if (
+                        source == "docs/index.mdx"
+                        and rule == '"Knowledge-MCP" for knowledge-mcp'
+                        and text.count(APPROVED_QUICK_START_CTA) == 1
+                        and any(
+                            match.start() == cta.start() + len("[Try ")
+                            for cta in re.finditer(
+                                re.escape(APPROVED_QUICK_START_CTA), scan
+                            )
+                        )
+                    ):
+                        continue
                     report.append(f"{source}:{number}: {rule}: {match.group(0)!r}")
     return report
 
@@ -977,9 +1014,111 @@ def test_user_facing_text_holds_no_banned_wording(tmp_path, server, migration):
 
 
 def test_user_facing_text_holds_no_retired_name(tmp_path, server, migration):
-    found = hits(user_facing(tmp_path, server, migration), RETIRED, strip_paths=False)
+    shown = user_facing(tmp_path, server, migration)
+    [faq] = [text for source, text in shown if source == "docs/history-and-help.mdx"]
+    assert [ln.strip() for ln in faq.splitlines()].count(APPROVED_STORAGE_ANSWER) == 1
+    found = hits(shown, RETIRED, strip_paths=False)
 
     assert found == [], "\n".join(found)
+
+
+@pytest.mark.parametrize(
+    ("source", "line", "number"),
+    [
+        ("docs/history-and-help.mdx", APPROVED_STORAGE_ANSWER, 53),
+        ("docs/history-and-help.mdx", APPROVED_STORAGE_ANSWER, 54),
+        ("README.md", APPROVED_STORAGE_ANSWER, 53),
+        ("kb --help", APPROVED_STORAGE_ANSWER, 53),
+        ("docs/history-and-help.mdx", APPROVED_STORAGE_ANSWER + " Knowledge-MCP", 53),
+        (
+            "docs/history-and-help.mdx",
+            APPROVED_STORAGE_ANSWER.replace("drive,", "disk,"),
+            53,
+        ),
+        (
+            "docs/history-and-help.mdx",
+            APPROVED_STORAGE_ANSWER.replace("Knowledge-MCP", "Knowledge MCP"),
+            53,
+        ),
+        ("docs/history-and-help.mdx", "Knowledge-MCP", 53),
+        *[
+            ("docs/history-and-help.mdx", term, 53)
+            for term in (
+                "host",
+                "agent app",
+                "refusal",
+                "hat",
+                "--hat",
+                "--top",
+                "km-write",
+                "kb_fit",
+                "no_fit",
+                "`made`",
+                "standing line",
+                "change row",
+                "ground",
+                "`line`",
+                "change_row",
+                "file the edit",
+            )
+        ],
+    ],
+)
+def test_retired_name_exception_is_only_the_approved_faq_line(source, line, number):
+    found = hits([(source, "\n" * (number - 1) + line)], RETIRED, strip_paths=False)
+
+    approved = (
+        source == "docs/history-and-help.mdx"
+        and line.strip() == APPROVED_STORAGE_ANSWER
+    )
+    assert bool(found) is not approved
+
+
+@pytest.mark.parametrize(
+    ("source", "line", "number", "expected"),
+    [
+        ("docs/index.mdx", APPROVED_QUICK_START_CTA, 19, 0),
+        ("docs/index.mdx", APPROVED_QUICK_START_CTA, 20, 0),
+        ("README.md", APPROVED_QUICK_START_CTA, 19, 1),
+        ("kb --help", APPROVED_QUICK_START_CTA, 19, 1),
+        ("docs/index.mdx", "Try Knowledge-MCP", 19, 1),
+        (
+            "docs/index.mdx",
+            APPROVED_QUICK_START_CTA.replace("Try ", ""),
+            19,
+            1,
+        ),
+        (
+            "docs/index.mdx",
+            APPROVED_QUICK_START_CTA.replace("Knowledge-MCP", "Knowledge MCP"),
+            19,
+            1,
+        ),
+        (
+            "docs/index.mdx",
+            APPROVED_QUICK_START_CTA.replace("#quick-start", ""),
+            19,
+            1,
+        ),
+        (
+            "docs/index.mdx",
+            APPROVED_QUICK_START_CTA.replace("quick-start.md", "history-and-help.md"),
+            19,
+            1,
+        ),
+        ("docs/index.mdx", "Knowledge-MCP " + APPROVED_QUICK_START_CTA, 19, 1),
+        ("docs/index.mdx", APPROVED_QUICK_START_CTA + " Knowledge-MCP", 19, 1),
+        ("docs/index.mdx", APPROVED_QUICK_START_CTA + "\nKnowledge-MCP", 19, 1),
+        ("docs/index.mdx", APPROVED_QUICK_START_CTA + " --hat", 19, 1),
+        ("docs/index.mdx", "\n".join([APPROVED_QUICK_START_CTA] * 2), 19, 2),
+    ],
+)
+def test_retired_name_exception_is_only_the_approved_cta_link(
+    source, line, number, expected
+):
+    found = hits([(source, "\n" * (number - 1) + line)], RETIRED, strip_paths=False)
+
+    assert len(found) == expected, "\n".join(found)
 
 
 def test_help_outside_kbp_doctor_and_readme_use_no_knowledge_bus_terms(tmp_path):
@@ -1007,3 +1146,11 @@ def test_help_outside_kbp_doctor_and_readme_use_no_knowledge_bus_terms(tmp_path)
     found += hits(readme, README_TERMS, strip_paths=True)
 
     assert found == [], "\n".join(found)
+
+
+def test_retired_name_exception_rejects_duplicate_approved_passages():
+    text = "\n".join([APPROVED_STORAGE_ANSWER, APPROVED_STORAGE_ANSWER])
+    assert (
+        len(hits([("docs/history-and-help.mdx", text)], RETIRED, strip_paths=False))
+        == 2
+    )

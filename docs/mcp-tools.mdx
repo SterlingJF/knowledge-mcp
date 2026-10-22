@@ -1,46 +1,49 @@
-# MCP tools
+---
+title: "MCP tools"
+---
 
-<!-- BEGIN AUTO-GENERATED intro -->
+{/* BEGIN AUTO-GENERATED intro */}
 
 The server serves MCP over stdio and opens no network port. Harnesses with a knowledge-mcp plugin start the server through the plugin. Other harnesses run `kb mcp`.
 
-<!-- END AUTO-GENERATED intro -->
+{/* END AUTO-GENERATED intro */}
 
-> Generated regions come from [tools.json](../contracts/extensions/mcp/v1/tools.json), the `tools/list` response. After a tool change, run `just generate_contract_snapshots`, then `just generate_mcp_tools_doc`.
+> Generated regions come from [tools.json](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/tools.json), the `tools/list` response. After a tool change, run `just generate_contract_snapshots`, then `just generate_mcp_tools_doc`.
 
 ## File access and side effects
 
-The agent supplies document text, inventories and configuration, then applies prepared file changes with its own tools. Preparation tools return text for the agent to save; tool calls also append answers to the state log. `kb_record_edit` stores edit history there, and `kbp_explore` writes offline viewers. See [data handling and retention](../SECURITY.md#trust-model).
+The agent supplies document text, inventories and configuration, then applies prepared file changes with its own tools. Preparation tools return text for the agent to save; tool calls also append answers to the state log. `kb_record_edit` stores edit history there, and `kbp_explore` writes offline viewers. See [data handling and retention](https://github.com/SterlingJF/knowledge-mcp/blob/main/SECURITY.md#trust-model).
 
-The included [writing skill](../runtime/skills/kb-write-document/SKILL.md) and [tracking skill](../runtime/skills/kb-track-document-types/SKILL.md) cover approval, link searches, configuration checks, applying changes and guarded undo. The [naming and filing guide](naming-and-filing.md) explains the workflow for readers.
+The included [writing skill](https://github.com/SterlingJF/knowledge-mcp/blob/main/runtime/skills/kb-write-document/SKILL.md) and [tracking skill](https://github.com/SterlingJF/knowledge-mcp/blob/main/runtime/skills/kb-track-document-types/SKILL.md) cover approval, link searches, configuration checks, applying changes and guarded undo. The [naming and filing guide](/naming-and-filing) explains the workflow for readers.
 
 ## Tools
 
-<!-- BEGIN AUTO-GENERATED tools -->
+{/* BEGIN AUTO-GENERATED tools */}
 
-| Tool                           | Purpose                                                                                                                                                       | Result                                                                                                |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `kb_get_document_type`         | Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing.                                             | [document-type.schema.yaml](../contracts/extensions/mcp/v1/document-type.schema.yaml)                 |
-| `kb_list_audiences`            | List the readers you can choose for a document type.                                                                                                          | [audiences.schema.yaml](../contracts/extensions/mcp/v1/audiences.schema.yaml)                         |
-| `kb_list_convention_templates` | List bundled ACE, PARA and Johnny.Decimal definitions for notes, with folder purposes, naming suggestions and sources.                                        | [convention-templates.schema.yaml](../contracts/extensions/mcp/v1/convention-templates.schema.yaml)   |
-| `kb_list_conventions`          | List naming and filing conventions that apply in a folder, with their source folders and parent marks.                                                        | [folder-conventions.schema.yaml](../contracts/extensions/mcp/v1/folder-conventions.schema.yaml)       |
-| `kb_list_edits`                | List the edits recorded for `location`, oldest first, to check or undo an edit.                                                                               | [edits.schema.yaml](../contracts/extensions/mcp/v1/edits.schema.yaml)                                 |
-| `kb_prepare_conventions`       | Prepare conventions text from supplied configuration and proposed changes.                                                                                    | [conventions-update.schema.yaml](../contracts/extensions/mcp/v1/conventions-update.schema.yaml)       |
-| `kb_prepare_document_move`     | Prepare a document move from supplied text, a complete listing and permission.                                                                                | [document-move.schema.yaml](../contracts/extensions/mcp/v1/document-move.schema.yaml)                 |
-| `kb_prepare_document_moves`    | Prepare moves together from supplied text and a complete listing.                                                                                             | [document-moves.schema.yaml](../contracts/extensions/mcp/v1/document-moves.schema.yaml)               |
-| `kb_prepare_document_types`    | Prepare document-types text by comparing a complete listing with saved entries.                                                                               | [document-types-update.schema.yaml](../contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
-| `kb_prepare_import`            | Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`.                                    | [import.schema.yaml](../contracts/extensions/mcp/v1/import.schema.yaml)                               |
-| `kb_record_edit`               | Record an edit right after you make it, so the person can check or undo the change.                                                                           | [edit.schema.yaml](../contracts/extensions/mcp/v1/edit.schema.yaml)                                   |
-| `kbp_card`                     | Read the card for a document type before you draft or edit a document of that type.                                                                           | kbp's output, as is                                                                                   |
-| `kbp_explore`                  | Write an offline HTML viewer for a universe spec under `explorer/` beside `log.jsonl`.                                                                        | kbp's output, as is                                                                                   |
-| `kbp_inspect`                  | Get a universe spec and its type guidance as kbp's JSON model.                                                                                                | kbp's output, as is                                                                                   |
-| `kbp_kinds`                    | List the document types of the universe specs that apply.                                                                                                     | kbp's output, as is                                                                                   |
-| `kbp_mint`                     | Mint new `code` values of one `kind` for universe spec entries.                                                                                               | kbp's output, as is                                                                                   |
-| `kbp_self_check`               | Validate kbp's bundled protocol definition with `kbp --self-check`.                                                                                           | kbp's output, as is                                                                                   |
-| `kbp_validate`                 | Validate files in the nearest supplied `.knowledge-bus/` folder and parent files named in its `workspace.yaml`, using file text or digests from this session. | kbp's output, as is                                                                                   |
-| `kbp_version`                  | Get the installed knowledge-bus release and protocol version from `kbp --version`.                                                                            | kbp's output, as is                                                                                   |
+| Tool                           | Purpose                                                                                                                                                       | Result                                                                                                                                                   |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `kb_get_document_type`         | Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing.                                             | [document-type.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-type.schema.yaml)                 |
+| `kb_list_audiences`            | List the readers you can choose for a document type.                                                                                                          | [audiences.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/audiences.schema.yaml)                         |
+| `kb_list_convention_templates` | List bundled ACE, PARA and Johnny.Decimal definitions for notes, with folder purposes, naming suggestions and sources.                                        | [convention-templates.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/convention-templates.schema.yaml)   |
+| `kb_list_conventions`          | List naming and filing conventions that apply in a folder, with their source folders and parent marks.                                                        | [folder-conventions.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/folder-conventions.schema.yaml)       |
+| `kb_list_edits`                | List the edits recorded for `location`, oldest first, to check or undo an edit or to pick up earlier work.                                                    | [edits.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/edits.schema.yaml)                                 |
+| `kb_prepare_conventions`       | Prepare conventions text from supplied configuration and proposed changes.                                                                                    | [conventions-update.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/conventions-update.schema.yaml)       |
+| `kb_prepare_document_move`     | Prepare a document move from supplied text, a complete listing and permission.                                                                                | [document-move.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-move.schema.yaml)                 |
+| `kb_prepare_document_moves`    | Prepare moves together from supplied text and a complete listing.                                                                                             | [document-moves.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-moves.schema.yaml)               |
+| `kb_prepare_document_types`    | Prepare document-types text by comparing a complete listing with saved entries.                                                                               | [document-types-update.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
+| `kb_prepare_import`            | Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`.                                    | [import.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/import.schema.yaml)                               |
+| `kb_prepare_proposal`          | Prepare the proposed-changes card whenever you propose changes to a document, before any edit.                                                                | [proposal.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/proposal.schema.yaml)                           |
+| `kb_record_edit`               | Record an edit right after you make it, so the person can check or undo the change.                                                                           | [edit.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/edit.schema.yaml)                                   |
+| `kbp_card`                     | Read the card for a document type before you draft or edit a document of that type.                                                                           | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
+| `kbp_explore`                  | Write an offline HTML viewer for a universe spec under `explorer/` beside `log.jsonl`.                                                                        | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
+| `kbp_inspect`                  | Get a universe spec and its type guidance as kbp's JSON model.                                                                                                | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
+| `kbp_kinds`                    | List the document types of the universe specs that apply.                                                                                                     | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
+| `kbp_mint`                     | Mint new `code` values of one `kind` for universe spec entries.                                                                                               | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
+| `kbp_self_check`               | Validate kbp's bundled protocol definition with `kbp --self-check`.                                                                                           | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
+| `kbp_validate`                 | Validate files in the nearest supplied `.knowledge-bus/` folder and parent files named in its `workspace.yaml`, using file text or digests from this session. | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
+| `kbp_version`                  | Get the installed knowledge-bus release and protocol version from `kbp --version`.                                                                            | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
 
-<!-- END AUTO-GENERATED tools -->
+{/* END AUTO-GENERATED tools */}
 
 When kbp runs, the result contains one text block per non-empty stream, with stdout before stderr.
 Each block identifies the stream in `_meta.stream`.
@@ -48,12 +51,14 @@ Tools with a `folders` argument can append a JSON text block with `_meta.stream`
 That block lists bundled or received universe specs and, after a successful `kbp_explore` call, the `explorer` folder.
 The result contains the kbp exit code in `_meta.exit_code` and sets `isError` for a non-zero exit code.
 
+`kb_prepare_proposal`, `kb_record_edit` and `kb_list_edits` also return a Markdown card in `card`, repeated as the first text block, for harnesses that pass only one of the two to the model.
+
 Failures in `kb_*` tools and errors before kbp runs return a problem object in `structuredContent`.
-[problem.schema.yaml](../contracts/extensions/mcp/v1/problem.schema.yaml) lists the problem types.
+[problem.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/problem.schema.yaml) lists the problem types.
 
 ## Arguments
 
-<!-- BEGIN AUTO-GENERATED arguments -->
+{/* BEGIN AUTO-GENERATED arguments */}
 
 ### `kb_get_document_type`
 
@@ -181,6 +186,16 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 | `folders`               | list of string                                    | yes      | Folder names from the knowledge base root folder down to the destination folder. Empty for the root folder or when the person named no folder.                                                                                                                                                                 |
 | `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
 
+### `kb_prepare_proposal`
+
+| Argument   | Type                                        | Required | Meaning                                                                                                         |
+| ---------- | ------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `location` | string                                      | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
+| `summary`  | string                                      | yes      | What the proposal changes, in one line.                                                                         |
+| `rows`     | list of [ProposalRow](#proposalrow)         | yes      | One row per change, in display order. The card names row n change Cn.                                           |
+| `left_out` | list of [LeftOutFile](#leftoutfile) or null | no       | Files you read but didn't cite.                                                                                 |
+| `layout`   | [Layout](#layout)                           | no       | `list` in a terminal, which can't scroll a wide table sideways.                                                 |
+
 ### `kb_record_edit`
 
 | Argument       | Type                                    | Required | Meaning                                                                                                                           |
@@ -202,6 +217,7 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 | `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
 | `kind`                  | string                                            | yes      | The document type id, such as `design-doc`.                                                                                                                                                                                                                                                                    |
 | `universe`              | string or null                                    | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
+| `format`                | `json` or `markdown` or null                      | no       | Defaults to `markdown`.                                                                                                                                                                                                                                                                                        |
 
 ### `kbp_explore`
 
@@ -257,11 +273,11 @@ No arguments.
 
 No arguments.
 
-<!-- END AUTO-GENERATED arguments -->
+{/* END AUTO-GENERATED arguments */}
 
 ## Shapes
 
-<!-- BEGIN AUTO-GENERATED shapes -->
+{/* BEGIN AUTO-GENERATED shapes */}
 
 ### AllowedBy
 
@@ -404,6 +420,12 @@ Type: string, pattern `^sha256:[0-9a-f]{64}$`.
 | `no_document_type` | boolean                       | no       |                                                                                                                                                                       |
 | `audience`         | [Audience](#audience) or null | no       | The document's reader. `value` is one of the `choices` or the `actor` from `kb_list_audiences`. Set `status` to `confirmed` only after the person confirms the value. |
 
+### EvidenceMark
+
+How well the sources back the proposed text. `suggested` marks your own wording.
+
+Type: `supported`, `partly`, `conflicting` or `suggested`.
+
 ### FileChange
 
 Type: [FileCreated](#filecreated) or [FileDeleted](#filedeleted) or [FileMoved](#filemoved) or [FileEdited](#fileedited).
@@ -471,6 +493,26 @@ Type: string.
 | `files`          | list of [SpecFile](#specfile) | no       | Every `*.kbp.yaml` file directly inside the `.knowledge-bus/` folder.               |
 | `workspace_yaml` | string or null                | no       | The text of `.knowledge-bus/workspace.yaml`.                                        |
 
+### Layout
+
+Type: `list` or `table`.
+
+### LeftOutFile
+
+| Field    | Type   | Required | Meaning |
+| -------- | ------ | -------- | ------- |
+| `file`   | string | yes      |         |
+| `reason` | string | yes      |         |
+
+### LineSource
+
+A line in a text file.
+
+| Field         | Type    | Required | Meaning |
+| ------------- | ------- | -------- | ------- |
+| `file`        | string  | yes      |         |
+| `line_number` | integer | yes      |         |
+
 ### LinkBinding
 
 An independently verified original target for a complete internal link token.
@@ -512,6 +554,39 @@ Path from the knowledge base's root folder, with `/` between folders, such as `d
 
 Type: string.
 
+### PersonSource
+
+The person's words in this conversation.
+
+| Field  | Type   | Required | Meaning |
+| ------ | ------ | -------- | ------- |
+| `said` | string | yes      |         |
+
+### PlaceSource
+
+A place in a sheet or deck.
+
+| Field   | Type   | Required | Meaning                                |
+| ------- | ------ | -------- | -------------------------------------- |
+| `file`  | string | yes      |                                        |
+| `place` | string | yes      | Such as `Evening!A2:D10` or `slide 7`. |
+
+### ProposalCell
+
+| Field   | Type           | Required | Meaning                                |
+| ------- | -------------- | -------- | -------------------------------------- |
+| `label` | string or null | no       | The field or section, such as `Title`. |
+| `text`  | string         | yes      | Plain words, without markdown syntax.  |
+
+### ProposalRow
+
+| Field      | Type                                                                                              | Required | Meaning                                           |
+| ---------- | ------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------- |
+| `current`  | [ProposalCell](#proposalcell) or null                                                             | no       | The document's text now. Omit it for an addition. |
+| `proposed` | [ProposalCell](#proposalcell)                                                                     | yes      |                                                   |
+| `mark`     | [EvidenceMark](#evidencemark) or null                                                             | no       |                                                   |
+| `sources`  | list of [LineSource](#linesource) or [PlaceSource](#placesource) or [PersonSource](#personsource) | yes      |                                                   |
+
 ### RemoveConvention
 
 | Field           | Type     | Required | Meaning |
@@ -534,7 +609,7 @@ Type: `agent` or `person`.
 | `id`      | string         | yes      | The `id` value in the file's `universe:` or `guidance:` block.                                                                                                                                   |
 | `version` | string         | yes      | The `version` value in the file's `universe:` or `guidance:` block, as written.                                                                                                                  |
 | `text`    | string or null | no       | The full file text. Send fresh text whenever the file changes. Reuse `digest` while the text stays unchanged. Leave it out when `id` and `version` match a bundled file, except in kbp_validate. |
-| `digest`  | string or null | no       | The file's digest, as listed in `received` by an earlier tool result this session.                                                                                                               |
+| `digest`  | string or null | no       | File SHA-256 (`sha256:…`); send exact text if unknown. kbp_validate requires previously sent text.                                                                                               |
 
 ### UpsertConvention
 
@@ -548,7 +623,7 @@ Type: `agent` or `person`.
 | `content`       | [ConventionContent](#conventioncontent) or null                  | no       |         |
 | `set_by`        | [SetBy](#setby)                                                  | yes      |         |
 
-<!-- END AUTO-GENERATED shapes -->
+{/* END AUTO-GENERATED shapes */}
 
 ## Terms
 

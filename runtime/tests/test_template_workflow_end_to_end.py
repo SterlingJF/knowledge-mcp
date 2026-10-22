@@ -1,19 +1,32 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from functools import cache
+from functools import cache, partial
+from hashlib import sha256
 from pathlib import Path
+from shutil import copytree
+from urllib.parse import quote
 
 import anyio
 import pytest
 import yaml
+from mcp.client import Client
 
 from knowledge_mcp import document_types as records
 from knowledge_mcp.main import build_server
-from tests.harness import BUNDLED, CODEBASE, knowledge_base, scope_arguments
+from tests.harness import (
+    BUNDLED,
+    CODEBASE,
+    PRODUCT,
+    knowledge_base,
+    scope_arguments,
+    server_parameters,
+    session,
+)
 from tests.test_convention_templates_end_to_end import catalog, variant
 from tests.test_conventions_end_to_end import PERMISSION, PLACE
 from tests.test_document_move_end_to_end import (
+    FIXTURE,
     apply,
     arguments,
     fail_write,
@@ -597,7 +610,7 @@ def test_t07_invalid_johnny_decimal_relationships_remain_pending(supplied, quest
 
 
 def test_naming_guide_links_every_template_source():
-    text = (Path(__file__).parents[2] / "docs/naming-and-filing.md").read_text()
+    text = (Path(__file__).parents[2] / "docs/naming-and-filing.mdx").read_text()
     for template in catalog()["templates"]:
         assert all(source["url"] in text for source in template["sources"])
 
@@ -613,3 +626,483 @@ def test_template_instructions_name_the_conventions_format(relative_path, format
     text = (Path(__file__).parents[2] / relative_path).read_text()
     assert "B2" not in text
     assert format_name in text
+
+
+def workflow_rules(pattern):
+    if pattern == "custom":
+        change = proposal(
+            name="atlas-title", kind="decision-record", folder=["Decisions"]
+        )
+        change["universe_spec"] = PRODUCT
+        change["name"] = {
+            "case": "lower",
+            "separator": "-",
+            "parts": [
+                {"part": "literal", "value": "qa"},
+                {"part": "document_type"},
+                {"part": "date", "property": "decision_date", "format": "YYYY-MM-DD"},
+                {"part": "property", "property": "project"},
+                {"part": "content"},
+            ],
+        }
+        chosen = [change]
+    elif pattern == "ace":
+        change = proposal()
+        chosen = [change, proposal(name="calendar-note", kind="meeting-note")]
+        chosen[1]["folder"] = ["Calendar", "Meetings"]
+    elif pattern == "custom-ace":
+        change = proposal(
+            name="atlas-title", kind="knowledge-note", folder=["Atlas (general notes)"]
+        )
+        chosen = [
+            change,
+            proposal(
+                name="atlas-title", kind="resource-note", folder=["Atlas (ai-owned)"]
+            ),
+        ]
+    elif pattern == "para":
+        change = proposal("para", "projects-title", "project-note")
+        change["folder"].append({"part": "property", "property": "project"})
+        chosen = [
+            change,
+            proposal("para", "archives-title", "archived-note", ["04 Archives"]),
+            proposal("para", "areas-title", "area-note", ["02 Areas"]),
+        ]
+    else:
+        numbered = ["10-19 Work", "12 Meetings", "12.03 Product reviews"]
+        assert variant("johnny-decimal", "id-date-title")["folder"] is None
+        change = proposal("johnny-decimal", "id-date-title", "meeting-note", numbered)
+        accepted = proposal(
+            "johnny-decimal", "id-date-title", "knowledge-note", numbered
+        )
+        change["name"]["parts"][0]["property"] = "meeting_date"
+        chosen = [accepted, change]
+
+    return chosen
+
+
+def save_reviewed_rules(root, parameters, chosen):
+    config = root / PLACE
+    scope = scope_arguments(root, "Inbox/Note.md", send_text=True)[
+        "knowledge_bus_folders"
+    ]
+    original = disk_snapshot(root)
+    directories = {p.relative_to(root) for p in root.rglob("*") if p.is_dir()}
+
+    async def save_reviewed(client: Client):
+        args = dict(
+            location=str(root),
+            conventions=config.read_bytes().decode("utf-8"),
+            knowledge_bus_folders=scope,
+            changes=chosen,
+        )
+        refused = await client.call_tool("kb_prepare_conventions", args)
+        assert not refused.is_error
+        assert refused.structured_content["status"] == "permission_needed"
+        assert refused.structured_content["record"] is None
+        result = await client.call_tool(
+            "kb_prepare_conventions", dict(**args, allowed_by=PERMISSION)
+        )
+        assert not result.is_error
+        assert result.structured_content["status"] == "ready"
+        assert disk_snapshot(root) == original
+        config.write_text(result.structured_content["record"])
+        receipt = await client.call_tool(
+            "kb_record_edit",
+            dict(
+                location=str(root),
+                allowed_by=PERMISSION,
+                before="",
+                after=config.read_bytes().decode("utf-8"),
+                whole_file=True,
+            ),
+        )
+        assert not receipt.is_error
+
+    session(parameters, save_reviewed)
+    saved = disk_snapshot(root)
+    assert saved == original | {PLACE: config.read_bytes()}
+    assert {p.relative_to(root) for p in root.rglob("*") if p.is_dir()} == directories
+    rows = yaml.safe_load(config.read_bytes().decode("utf-8"))["conventions"]
+    assert {r["document_type"] for r in rows} == {c["document_type"] for c in chosen}
+    for c in chosen:
+        row = next(r for r in rows if r["document_type"] == c["document_type"])
+        assert row["folder"] == c["folder"]
+        assert row["name"]["parts"] == c["name"]["parts"]
+        assert row["allowed_by"] == PERMISSION
+
+    return saved
+
+
+async def convention_move_preview(client: Client, root, values, target):
+    source = "Inbox/Note.md"
+    config, tracking = root / PLACE, root / records.PLACE
+    subject = root / source
+    saved = disk_snapshot(root)
+    scope = scope_arguments(root, source, send_text=True)["knowledge_bus_folders"]
+    listing = [{"path": p} for p in disk_snapshot(root)]
+    args = dict(
+        location=str(root),
+        name="Note.md",
+        folders=["Inbox"],
+        knowledge_bus_folders=scope,
+        record=tracking.read_bytes().decode("utf-8"),
+        listing=listing,
+        conventions_files=[{"folder": "", "text": config.read_bytes().decode("utf-8")}],
+    )
+    missing = await client.call_tool(
+        "kb_get_document_type",
+        dict(
+            **args,
+            filing_values=[
+                {k: v for k, v in dict(values, properties={}).items() if k != "content"}
+            ],
+        ),
+    )
+    assert not missing.is_error
+    item = missing.structured_content["filing"][0]
+    assert item["status"] == "values_needed" and item["needed"]
+    assert item["proposal"] is None
+    result = await client.call_tool(
+        "kb_get_document_type", dict(**args, filing_values=[values])
+    )
+    assert not result.is_error
+    assert result.structured_content["filing"][0]["proposal"]["path"] == target
+    move = dict(
+        location=str(root),
+        old_path=source,
+        path=target,
+        knowledge_bus_folders=scope,
+        record=tracking.read_bytes().decode("utf-8"),
+        listing=listing,
+        documents=[{"path": source, "text": subject.read_bytes().decode("utf-8")}],
+        case_mode="sensitive",
+    )
+    declined = await client.call_tool("kb_prepare_document_move", move)
+    assert declined.is_error
+    assert any(
+        e["pointer"] == "#/allowed_by" for e in declined.structured_content["errors"]
+    )
+    assert disk_snapshot(root) == saved
+    permission = {
+        "basis": "accepted_change",
+        "text": f"Move {source} to {target}, repair references and move its classification.",
+    }
+    first = await client.call_tool(
+        "kb_prepare_document_move", dict(**move, allowed_by=permission)
+    )
+    assert not first.is_error
+    assert first.structured_content["status"] == "texts_needed"
+    assert first.structured_content["writes"] == []
+    result = await client.call_tool(
+        "kb_prepare_document_move",
+        dict(
+            **move,
+            allowed_by=permission,
+            searched=True,
+            search=first.structured_content["search"],
+        )
+        | {
+            "documents": [
+                {"path": p, "text": (root / p).read_bytes().decode("utf-8")}
+                for p in disk_snapshot(root)
+                if p.endswith(".md")
+            ]
+        },
+    )
+    assert not result.is_error
+    plan = result.structured_content
+    assert plan["status"] == "ready", plan["issues"]
+    for path, targets in {
+        source: ["References/assets/diagram.png", "Other/Reference.md", source],
+        "References/Index.md": [source] * 14 + ["Inbox/Space Name.md"],
+    }.items():
+        links = [link for link in plan["links"] if link["source_path"] == path]
+        assert [link["target_before"] for link in links] == targets
+        assert [link["target_after"] for link in links] == [
+            target if p == source else p for p in targets
+        ]
+    assert disk_snapshot(root) == saved
+    return plan, permission
+
+
+async def place_convention_move(client: Client, root, writes, permission):
+    for w in writes:
+        actual = "sha256:" + sha256((root / w["old_path"]).read_bytes()).hexdigest()
+        assert actual == w["before_digest"], w["old_path"]
+    for index, w in enumerate(writes, 1):
+        old, new = root / w["old_path"], root / w["path"]
+        before = old.read_bytes().decode("utf-8")
+        new.parent.mkdir(parents=True, exist_ok=True)
+        if old != new:
+            with new.open("xb") as stream:
+                stream.write(w["text"].encode("utf-8"))
+            old.unlink()
+        else:
+            new.write_bytes(w["text"].encode("utf-8"))
+        assert "sha256:" + sha256(new.read_bytes()).hexdigest() == w["after_digest"]
+        result = await client.call_tool(
+            "kb_record_edit",
+            dict(
+                location=str(root),
+                allowed_by=permission,
+                before=before,
+                after=new.read_bytes().decode("utf-8"),
+                whole_file=True,
+                operation=dict(
+                    id="convention-placement",
+                    index=index,
+                    count=3,
+                    old_path=w["old_path"],
+                    path=w["path"],
+                ),
+            ),
+        )
+        assert not result.is_error
+
+
+async def refuse_stale_convention_move(client: Client, root, writes, permission):
+    for w in writes:
+        path = root / w["old_path"]
+        original = path.read_bytes()
+        changed = original.replace(b"\n", b"\r\n")
+        assert changed != original
+        path.write_bytes(changed)
+        stale = disk_snapshot(root)
+        with pytest.raises(AssertionError, match=w["old_path"]):
+            await place_convention_move(client, root, writes, permission)
+        assert disk_snapshot(root) == stale
+        path.write_bytes(original)
+
+
+async def reopen_convention_move(client: Client, root, writes, permission, saved):
+    target = writes[0]["path"]
+    config, tracking = root / PLACE, root / records.PLACE
+    result = await client.call_tool(
+        "kb_get_document_type",
+        dict(
+            location=str(root),
+            name=Path(target).name,
+            **scope_arguments(root, target, send_text=True),
+            record=tracking.read_bytes().decode("utf-8"),
+            listing=[{"path": p} for p in disk_snapshot(root)],
+            conventions_files=[
+                {"folder": "", "text": config.read_bytes().decode("utf-8")}
+            ],
+        ),
+    )
+    assert not result.is_error
+    recorded = result.structured_content["recorded"]["entry"]
+    history = await client.call_tool("kb_list_edits", {"location": str(root)})
+    assert not history.is_error
+    entries = history.structured_content["edits"]
+    assert len(entries) == 4
+    assert entries[0]["allowed_by"] == PERMISSION
+    assert entries[0]["before"] == ""
+    assert (
+        entries[0]["after_digest"]
+        == "sha256:" + sha256(config.read_bytes()).hexdigest()
+    )
+    for index, (e, w) in enumerate(zip(entries[1:], writes, strict=True), 1):
+        assert e["allowed_by"] == permission
+        assert e["operation"] == dict(
+            id="convention-placement",
+            index=index,
+            count=3,
+            old_path=w["old_path"],
+            path=w["path"],
+        )
+        assert e["whole_file"] is True
+        assert e["before"] == saved[w["old_path"]].decode()
+        assert e["before_digest"] == w["before_digest"]
+        assert (
+            e["after_digest"]
+            == "sha256:" + sha256((root / w["path"]).read_bytes()).hexdigest()
+        )
+    return recorded
+
+
+def disk_snapshot(root):
+    return {
+        p.relative_to(root).as_posix(): p.read_bytes()
+        for p in root.rglob("*")
+        if p.is_file()
+    }
+
+
+@pytest.mark.parametrize(
+    ("pattern", "properties", "content", "target"),
+    [
+        (
+            "custom",
+            {"decision_date": "2026-10-18", "project": "Atlas"},
+            "Use a Shared Cache",
+            "Decisions/qa-decision-record-2026-10-18-atlas-use-a-shared-cache.md",
+        ),
+        ("ace", {"date": "2026-10-18"}, None, "Calendar/2026-10-18.md"),
+        (
+            "custom-ace",
+            {},
+            "Working memory",
+            "Atlas (general notes)/Working memory.md",
+        ),
+        (
+            "para",
+            {"project": "Garden redesign"},
+            "Supplier shortlist",
+            "Projects/Garden redesign/Supplier shortlist.md",
+        ),
+        (
+            "johnny-decimal",
+            {"meeting_date": "2026-10-18"},
+            "Launch discussion",
+            "10-19 Work/12 Meetings/12.03 Product reviews/2026-10-18 Launch discussion.md",
+        ),
+    ],
+)
+def test_reviewed_conventions_on_disk_move_links_and_fresh_history(
+    tmp_path, pattern, properties, content, target
+):
+    root = tmp_path / "vault"
+    copytree(FIXTURE, root)
+    knowledge_base(root, {"": [CODEBASE, PRODUCT]})
+    (root / ".knowledge-bus/personal-notes.kbp.yaml").write_text(note_spec())
+    if pattern == "custom":
+        (root / "decisions").rename(root / "Decisions")
+    chosen = workflow_rules(pattern)
+    change = chosen[1] if pattern == "johnny-decimal" else chosen[0]
+    kind = change["document_type"]
+    source = "Inbox/Note.md"
+    subject = root / source
+    if content is not None:
+        subject.write_text(
+            subject.read_bytes()
+            .decode("utf-8")
+            .replace("# Note\n", f"# {content}\n", 1)
+        )
+    entry = records.entry(
+        **(
+            records.plain(typed(kind))
+            | {
+                "universe_spec": change["universe_spec"],
+                "audience": {"value": "note author", "status": "confirmed"},
+                "fingerprint": "sha256:" + sha256(subject.read_bytes()).hexdigest(),
+            }
+        )
+    )
+    config, tracking = root / PLACE, root / records.PLACE
+    config.parent.mkdir(parents=True)
+    config.write_text("")
+    tracking.write_text(records.dump({source: entry}))
+    parameters = server_parameters(tmp_path / "state")
+
+    saved = save_reviewed_rules(root, parameters, chosen)
+    values = dict(
+        path=source,
+        universe_spec=change["universe_spec"],
+        document_type=kind,
+        properties=properties,
+        **({"content": content} if content is not None else {}),
+    )
+
+    async def preview(client: Client):
+        return await convention_move_preview(client, root, values, target)
+
+    # Independent fixture syntax and the chosen destination, never planner output.
+    expected_note = saved[source].replace(
+        b"[Diagram](../References/assets/diagram.png)",
+        f"[Diagram]({'../' * target.count('/')}References/assets/diagram.png)".encode(),
+    )
+    stem = Path(target).stem
+    encoded = quote(target, safe="/")
+    expected_index = f"""\
+[[{stem}]]
+[[{stem}|text]]
+[[{stem}#Heading]]
+[[{stem}#^id]]
+![[{stem}]]
+![[{stem}#Heading]]
+![[{stem}#^id]]
+[[{target.removesuffix(".md")}]]
+[[{target}]]
+[plain](../{encoded})
+[encoded](../{encoded}#Heading)
+[with title](../{encoded} "Read the note")
+![image](../{encoded} "Preview")
+[reference][note]
+
+[note]: ../{encoded}
+
+[encoded space](../Inbox/Space%20Name.md)
+
+`[[Note]]`
+
+~~~markdown
+[[Note]]
+~~~
+""".encode()
+    expected = records.plain(entry) | (
+        {"fingerprint": "sha256:" + sha256(expected_note).hexdigest()}
+        if saved[source] != expected_note
+        else {}
+    )
+
+    plan, permission = session(parameters, preview)
+    writes = [
+        *plan["writes"],
+        dict(
+            old_path=records.PLACE,
+            path=records.PLACE,
+            text=plan["record"],
+            before_digest="sha256:" + sha256(tracking.read_bytes()).hexdigest(),
+            after_digest=records.digest(plan["record"]),
+        ),
+    ]
+    assert {w["old_path"] for w in writes} == {
+        source,
+        "References/Index.md",
+        records.PLACE,
+    }
+    for w in writes:
+        assert (
+            "sha256:" + sha256((root / w["old_path"]).read_bytes()).hexdigest()
+            == w["before_digest"]
+        )
+        if w["old_path"] != w["path"]:
+            assert not (root / w["path"]).exists()
+
+    async def place(client: Client):
+        await place_convention_move(client, root, writes, permission)
+
+    session(
+        parameters,
+        partial(
+            refuse_stale_convention_move,
+            root=root,
+            writes=writes,
+            permission=permission,
+        ),
+    )
+    assert disk_snapshot(root) == saved
+    session(parameters, place)
+    assert not subject.exists()
+    current = disk_snapshot(root)
+    assert set(current) == (set(saved) - {source}) | {target}
+    for path, data in saved.items():
+        if path not in {source, "References/Index.md", records.PLACE}:
+            assert current[path] == data
+    assert current[target] == expected_note
+    assert current["References/Index.md"] == expected_index
+    assert {
+        p: records.plain(e)
+        for p, e in records.parse(tracking.read_bytes().decode("utf-8")).items()
+    } == {target: expected}
+
+    async def reopen(client: Client):
+        assert (
+            await reopen_convention_move(client, root, writes, permission, saved)
+            == expected
+        )
+
+    session(parameters, reopen)
+    assert disk_snapshot(root) == current

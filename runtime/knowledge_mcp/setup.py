@@ -120,7 +120,7 @@ def load_state(env: Env) -> dict[str, Any]:
     path = _state_path(env)
     if not path.is_file():
         return {"version": STATE_VERSION, "hosts": {}, "created": []}
-    data = json.loads(path.read_text(encoding="utf-8"))
+    data = json.loads(path.read_text(encoding="utf-8", newline=""))
     if not isinstance(data, dict):
         raise TypeError(data)
     return data
@@ -192,7 +192,7 @@ def _edit_add(
 ) -> None:
     path = harness.config(env)
     created = not path.exists()
-    text = "" if created else path.read_text(encoding="utf-8")
+    text = "" if created else path.read_text(encoding="utf-8", newline="")
     entry = harness.entry(command)
     if harness.format == "toml":
         new, piece = configedit.toml_insert(text, harness.path[0], NAME, entry)
@@ -215,15 +215,19 @@ def _edit_remove(harness: Harness, _env: Env, record: dict[str, Any]) -> None:
     path = Path(record["config"])
     if not path.is_file():
         return
-    text = path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8", newline="")
     if harness.format == "toml":
         new = configedit.toml_remove(text, harness.path[0], NAME, record.get("piece"))
     else:
         new = configedit.json_remove(text, harness.path, NAME, record.get("piece"))
-    empty = not new.strip() or (
-        harness.format == "json" and configedit.empty_chain(new, harness.path)
-    )
-    if record.get("created_file") and empty:
+    # Only a complete insertion receipt can prove this created file has no user text.
+    piece = record.get("piece")
+    if (
+        record.get("created_file")
+        and piece
+        and text.count(piece) == 1
+        and not new.strip()
+    ):
         path.unlink()
     elif new != text:
         _write(path, new)
@@ -246,11 +250,6 @@ def _cli(harness: Harness, env: Env) -> str | None:
 def _ours(link: Path) -> bool:
     """True when `link` is a symlink to the bundled skill with the same name in this install."""
     return link.is_symlink() and Path(os.readlink(link)) == bundled.SKILLS / link.name
-
-
-def _links_to_same_name(link: Path) -> bool:
-    """Return True when `link` is a symlink whose stored target has the same basename."""
-    return link.is_symlink() and Path(os.readlink(link)).name == link.name
 
 
 def _skill_duplicates(
@@ -285,14 +284,6 @@ def _link_skills(
 ) -> None:
     if harness.skills is None:
         report.detail("Skills", "Source", str(bundled.SKILLS))
-        report.steps.extend(
-            [
-                "mkdir -p ~/Downloads/knowledge-mcp-skills && (cd "
-                + shlex.quote(str(bundled.SKILLS))
-                + ' && for d in */; do zip -qr ~/Downloads/knowledge-mcp-skills/"${d%/}.zip" "$d"; done)',
-                "Upload each ZIP in ~/Downloads/knowledge-mcp-skills through Customize → Skills in Claude.",
-            ]
-        )
         return
     folder = harness.skills(env)
     record["created"] += _make_folder(folder)
@@ -365,7 +356,13 @@ def _register(
         record.update(method="present", config=str(harness.config(env)))
     else:
         cli = _cli(harness, env)
-        if cli is not None and harness.cli_add is not None:
+        # Claude Code CLI rewrites unrelated settings, including CRLF and migration fields.
+        # Its documented user config uses the same MCP entry; preserve those bytes via A6.
+        if (
+            harness.id != "claude-code"
+            and cli is not None
+            and harness.cli_add is not None
+        ):
             _run(cli, harness.cli_add(command), env)
             record.update(
                 method="cli", config=str(harness.config(env)), cli=harness.cli
@@ -447,7 +444,6 @@ def _setup(name: str, harness: Harness, env: Env) -> Report:
         report.warn(
             f"{reason}. Install {harness.title} to use the knowledge-mcp entry in {path}."
         )
-    report.steps.append(f"{_restart(harness)} to load knowledge-mcp.")
     return report
 
 
@@ -506,7 +502,7 @@ def remove(name: str, env: Env | None = None) -> Report:
     removed = 0
     for link in record["links"]:
         path = Path(link)
-        if link not in others and _links_to_same_name(path):
+        if link not in others and _ours(path):
             path.unlink()
             removed += 1
     _removal_feedback(harness, record, state, removed, report)
