@@ -16,7 +16,7 @@ dependencies = [
   # Provides kbp. After changing this pin, run uv lock, then `just refresh_knowledge_model <tag>`.
   "knowledge-bus @ https://github.com/SterlingJF/knowledge-bus/releases/download/v0.10.0/knowledge_bus-0.10.0.tar.gz",
   "mcp==2.2.0",
-  "pydantic==2.13.4",
+  "pydantic==2.14.1",
   "pyyaml==6.0.3",
 ]
 
