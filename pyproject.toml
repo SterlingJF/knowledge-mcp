@@ -1,18 +1,18 @@
 [project]
 name = "workspace"
 version = "0.1.0"
-requires-python = ">=3.14,<3.15"
+requires-python = ">=3.15,<3.16"
 dependencies = []
 
 [dependency-groups]
 dev = [
   "actionlint-py==1.7.12.25",
-  "datamodel-code-generator[ruff]==0.83.0",
+  "datamodel-code-generator[ruff]==0.85.0",
   "mypy==2.4.0",
   "pre-commit==4.7.0",
-  "ruff==0.16.9",
+  "ruff==0.17.1",
   "shellcheck-py==0.11.0.1",
-  "tombi==1.8.0",
+  "tombi==1.8.6",
   "types-jsonschema==4.26.0.20261006",
   "types-pyyaml==6.0.12.20260906",
   "vulture==2.16",
