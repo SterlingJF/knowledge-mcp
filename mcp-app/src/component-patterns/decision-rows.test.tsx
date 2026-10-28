@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 
+import { badge } from "@/copy/en";
+
 import { countAccepted, DecisionRows } from "./decision-rows";
 
 const rows = [
@@ -13,7 +15,7 @@ const rows = [
     id: "b",
     name: "Design proposal",
     cells: ["Design proposal", "Proposals/"],
-    decided: { tone: "neutral" as const, label: "Not saved" },
+    decided: { tone: "neutral" as const, label: badge.neutral.dropped },
   },
 ];
 
@@ -28,7 +30,7 @@ test("undecided rows offer a choice; decided rows show a badge instead", () => {
     />,
   );
   expect(screen.getAllByRole("button", { name: "Accept" })).toHaveLength(1);
-  expect(screen.getByText("Not saved")).toBeTruthy();
+  expect(screen.getByText("Dropped")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Accept" }));
   expect(onChoiceChange).toHaveBeenCalledWith("a", "accept");
 });

@@ -1,4 +1,5 @@
 // P02 Change table: one row per Cn — what is there now, what is proposed with its evidence mark, and the exact sources.
+import { Fragment } from "react";
 import type { ReactNode } from "react";
 
 import { ChangeNumber, SelectAll } from "@/component-elements/change-number";
@@ -6,7 +7,7 @@ import { SourceChip } from "@/component-elements/chips";
 import { EvidenceMark } from "@/component-elements/evidence-mark";
 import { CurrentText } from "@/component-elements/text-lines";
 import type { ProposalCell, ProposalRow, Source } from "@/contracts/proposal";
-import { label as labels, line } from "@/copy/en";
+import { label as labels, line, source as sourceCopy } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 const xs =
@@ -49,13 +50,19 @@ function sameFileAsPrevious(sources: Source[], i: number): boolean {
 function Sources({ sources }: { sources: Source[] }) {
   return (
     <span className="flex flex-wrap items-center gap-(--km-space-2)">
-      {sources.map((source, i) => (
-        <SourceChip
-          key={i}
-          source={source}
-          continuation={sameFileAsPrevious(sources, i)}
-        />
-      ))}
+      {sources.map((source, i) => {
+        const short = sameFileAsPrevious(sources, i);
+        return (
+          <Fragment key={i}>
+            {short && (
+              <span className="text-(--color-text-tertiary)">
+                {sourceCopy.versus}
+              </span>
+            )}
+            <SourceChip source={source} continuation={short} />
+          </Fragment>
+        );
+      })}
     </span>
   );
 }

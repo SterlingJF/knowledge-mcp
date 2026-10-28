@@ -63,7 +63,10 @@ export default {
         headers={headers}
         rows={base.map((r) => ({
           ...r,
-          decided: { tone: "neutral" as const, label: badge.neutral.notSaved },
+          decided:
+            r.id === "dp"
+              ? { tone: "neutral" as const, label: badge.neutral.dropped }
+              : { tone: "done" as const, label: badge.done.accepted },
         }))}
         choices={{}}
         onChoiceChange={noop}

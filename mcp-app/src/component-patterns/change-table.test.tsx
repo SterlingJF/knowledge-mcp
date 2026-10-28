@@ -37,6 +37,7 @@ test("a second line in the same file shows as a short chip", () => {
   render(<ChangeTable rows={rows} />);
   expect(screen.getByText("notes.md:12")).toBeTruthy();
   expect(screen.getByText(":19")).toBeTruthy();
+  expect(screen.getByText("vs")).toBeTruthy();
 });
 
 test("a left-out row stays, marked out", () => {

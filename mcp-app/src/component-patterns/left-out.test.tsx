@@ -20,5 +20,6 @@ test("closed shows the count and names, then opens to each reason", () => {
 
 test("the count shows even at zero", () => {
   render(<LeftOut files={[]} />);
-  expect(screen.getByRole("note").textContent).toBe("0 files left out");
+  expect(screen.getByRole("note").textContent).toBe("Nothing left out");
+  expect(screen.queryByRole("button")).toBeNull();
 });
