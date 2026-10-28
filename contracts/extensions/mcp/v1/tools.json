@@ -17011,6 +17011,11 @@
       "annotations": {
         "readOnlyHint": true,
         "openWorldHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://knowledge-mcp/app.html"
+        }
       }
     },
     {
@@ -25911,6 +25916,11 @@
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://knowledge-mcp/app.html"
+        }
       }
     },
     {

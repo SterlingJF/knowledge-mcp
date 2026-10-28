@@ -39,7 +39,7 @@ def test_server_reads_the_packaged_app_html(tmp_path):
     assert content.text.lstrip().lower().startswith("<!doctype html>")
 
 
-def test_only_the_proposal_tool_points_at_the_app(tmp_path):
+def test_only_the_card_tools_point_at_the_app(tmp_path):
     async def steps(client):
         return (await client.list_tools()).tools
 
@@ -48,7 +48,11 @@ def test_only_the_proposal_tool_points_at_the_app(tmp_path):
         for tool in session(server_parameters(tmp_path), steps)
         if (tool.meta or {}).get("ui")
     }
-    assert bound == {"kb_prepare_proposal": {"resourceUri": URI}}
+    assert bound == {
+        "kb_prepare_proposal": {"resourceUri": URI},
+        "kb_record_edit": {"resourceUri": URI},
+        "kb_prepare_document_moves": {"resourceUri": URI},
+    }
 
 
 def test_proposal_result_keeps_the_text_card_first(tmp_path):

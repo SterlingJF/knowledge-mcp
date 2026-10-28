@@ -13,7 +13,7 @@ from mcp.server.apps import EXTENSION_ID, Apps, ResourceCsp
 
 URI = "ui://knowledge-mcp/app.html"
 HTML = Path(__file__).parent / "ui" / "app.html"
-TOOLS = ("kb_prepare_proposal",)
+TOOLS = ("kb_prepare_proposal", "kb_record_edit", "kb_prepare_document_moves")
 # Claude serves the host fonts from this origin.
 CSP = ResourceCsp(resource_domains=["https://assets.claude.ai"])
 
