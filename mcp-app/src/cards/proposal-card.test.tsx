@@ -192,3 +192,37 @@ test("CardView picks the proposal card by schema", () => {
   );
   expect(screen.getByText(e02.summary)).toBeTruthy();
 });
+
+test("a younger instance starts over with every change kept", () => {
+  const { host, view } = renderCard(e02, "fullscreen");
+  fireEvent.click(rowCheckbox(1));
+  expect(
+    screen.getByRole("button", { name: action.save("C2–C4") }),
+  ).toBeTruthy();
+  const younger = { ...e02, instance: { ...e02.instance, seq: 9 } };
+  view.rerender(
+    <StaticCardHost host={{ ...host, result: asResult(younger) }}>
+      <ProposalCard result={asResult(younger)} />
+    </StaticCardHost>,
+  );
+  expect(
+    screen.getByRole("button", { name: action.save("C1–C4") }),
+  ).toBeTruthy();
+});
+
+test("the full view of a minimal proposal with nothing left out has no LeftOut", () => {
+  renderCard(
+    {
+      schema: "knowledge-mcp/proposal/1",
+      summary: "Fix a typo",
+      rows: [
+        { current: { text: "teh" }, proposed: { text: "the" }, sources: [] },
+      ],
+      left_out: [],
+      card: "",
+    },
+    "fullscreen",
+  );
+  expect(screen.getByText("Fix a typo")).toBeTruthy();
+  expect(screen.queryByText(line.leftOut(0))).toBeNull();
+});

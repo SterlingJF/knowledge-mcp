@@ -158,6 +158,8 @@ export type ProposalViewProps = {
   onKeptChange: (kept: Set<number>) => void;
   lifecycle: CardLifecycle;
   pressed?: Pressed;
+  /** Told which action was pressed, before the lifecycle freezes the card. */
+  onPressed?: (pressed: Pressed) => void;
 };
 
 /** The drawn card, given its state; the gallery renders it with fixed lifecycles. */
@@ -168,6 +170,7 @@ export function ProposalView({
   onKeptChange,
   lifecycle,
   pressed,
+  onPressed,
 }: ProposalViewProps) {
   const isNew = isNewDocument(p);
   const live = lifecycle.state === "live";
@@ -187,15 +190,16 @@ export function ProposalView({
           ? { tone: "neutral" as const, label: badge.neutral.notSaved }
           : { tone: "waiting" as const, label: badge.waiting.nothingSaved },
     why: isNew ? undefined : line.waitsBecause(fileName(p)),
-    lifecycle,
   };
+  // A new document is created whole: every section goes.
+  const sending = isNew ? new Set(numbers(p)) : kept;
   const save: CardAction = {
     label: isNew ? action.createFile : action.save(change.list([...kept])),
-    message: saveMessage(p, kept),
+    message: saveMessage(p, sending),
     frozenLine: frozen.approved,
     variant: "primary",
-    disabled: kept.size === 0,
-    context: saveContext(p, kept),
+    disabled: sending.size === 0,
+    context: saveContext(p, sending),
   };
   const notNow: CardAction = {
     label: action.notNow,
@@ -203,11 +207,21 @@ export function ProposalView({
     frozenLine: frozen.notSaved,
   };
   const actions = [save, notNow];
+  const tracked: CardLifecycle = {
+    ...lifecycle,
+    press: (a) => {
+      if (lifecycle.state === "live" && !a.disabled)
+        onPressed?.(a === notNow ? "notNow" : "save");
+      lifecycle.press(a);
+    },
+  };
+  const card = { ...shell, lifecycle: tracked, actions };
 
   if (displayMode === "fullscreen")
     return (
-      <FullView {...shell} actions={actions}>
+      <FullView {...card}>
         <ChangeTable
+          draft={isNew}
           rows={p.rows}
           kept={kept}
           onKeptChange={live ? onKeptChange : undefined}
@@ -215,22 +229,14 @@ export function ProposalView({
         {p.left_out && p.left_out.length > 0 && <LeftOut files={p.left_out} />}
       </FullView>
     );
-  return <SummaryCard {...shell} rows={summaryRows(p)} actions={actions} />;
+  return <SummaryCard {...card} rows={summaryRows(p)} />;
 }
 
 function LiveProposal({ proposal }: { proposal: Proposal }) {
   const host = useCardHost();
   const [kept, setKept] = useState(() => new Set(numbers(proposal)));
   const [pressed, setPressed] = useState<Pressed>();
-  const inner = useCardLifecycle();
-  const lifecycle: CardLifecycle = {
-    ...inner,
-    press: (a) => {
-      if (inner.state !== "live" || a.disabled) return;
-      setPressed(a.message === message.notNow ? "notNow" : "save");
-      inner.press(a);
-    },
-  };
+  const lifecycle = useCardLifecycle();
   return (
     <ProposalView
       proposal={proposal}
@@ -239,6 +245,7 @@ function LiveProposal({ proposal }: { proposal: Proposal }) {
       onKeptChange={setKept}
       lifecycle={lifecycle}
       pressed={pressed}
+      onPressed={setPressed}
     />
   );
 }
