@@ -32,6 +32,21 @@ export type Edit = {
   after_digest: Digest;
   /** Present for one edit of a multi-file operation; whole_file is then true. */
   operation?: EditOperation;
+  /** Set when the whole-file edit started from empty text. */
+  created?: true;
+  /** The id of the edit this one undoes. */
+  undoes?: string;
+  changes?: EditChanges;
   /** The saved edit as markdown, for hosts without the app. */
   card: string;
+};
+
+export type ChangedLine = { change: "removed" | "added"; text: string };
+
+export type EditChanges = {
+  hunks: number;
+  /** In document order, at most 12. */
+  lines: Array<ChangedLine>;
+  /** Changed lines beyond `lines`. */
+  more: number;
 };

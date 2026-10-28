@@ -177,8 +177,15 @@ export const label = {
 
 // C-Result
 export const editResult = {
-  saved: "Saved",
-  created: "Created",
+  /** Eyebrow for a created file (D06); an edit uses `eyebrow.change`. */
+  document: "Document",
+  hideChange: "Hide the change",
+  /** After the shown lines of a long diff. */
+  moreLines: (n: number) =>
+    `… and ${n} more changed ${n === 1 ? "line" : "lines"}`,
+  /** Undo meta when the undone edit's time is known: `undoes the 09:41 edit`. */
+  undoes: (time: string) => `undoes the ${time} edit`,
+  undoesEarlier: "undoes an earlier edit",
   /** What Undo sends: `Undo the 09:41 edit to cache-proposal.md`. */
   undo: (time: string, file: string) => `Undo the ${time} edit to ${file}`,
   /** Meta when an instruction for agents allowed the edit, not the person in this session. */

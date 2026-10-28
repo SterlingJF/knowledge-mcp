@@ -2,10 +2,10 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 import { StaticCardHost, stubCardHost } from "@/bridge/static";
 import type { ToolResult } from "@/bridge/bridge";
-import { action, badge, editResult, frozen, meta } from "@/copy/en";
+import { action, badge, editResult, eyebrow, frozen, meta } from "@/copy/en";
 import { CardView } from "./registry";
 import { EditCard, undoMessage, when } from "./edit-card";
-import { d06, r01 } from "./edit-card.fixture";
+import { d06, long, r01, r03 } from "./edit-card.fixture";
 
 const asResult = (e: unknown) => e as ToolResult;
 
@@ -33,20 +33,76 @@ test("formats the recorded time terse", () => {
   );
 });
 
-test("R01 summary: saved, where, when, on whose OK, with Undo", () => {
+test("R01 summary: change, title with count, when and whose OK, with Undo", () => {
   renderCard(r01);
-  expect(screen.getAllByText(editResult.saved)).toHaveLength(2);
-  expect(screen.getAllByText(badge.done.saved).length).toBeGreaterThan(0);
-  expect(screen.getByText(r01.location)).toBeTruthy();
+  expect(screen.getByText(eyebrow.change)).toBeTruthy();
+  expect(screen.getByText(badge.done.saved)).toBeTruthy();
+  expect(screen.getByText("cache-proposal.md · 4 changes")).toBeTruthy();
   expect(
     screen.getByText(new RegExp(`${meta.approvedByYou}$`)).textContent,
-  ).toMatch(/^Recorded Oct 28, \d\d:\d\d · approved by you$/);
+  ).toMatch(
+    new RegExp(
+      `^Recorded Oct 28, \\d\\d:\\d\\d${meta.join}${meta.approvedByYou}$`,
+    ),
+  );
   expect(screen.getByRole("button", { name: action.undo })).toBeTruthy();
 });
 
-test("D06: an edit from empty text reads as created", () => {
+test("without changes the title is the file name alone", () => {
+  renderCard({ ...r01, changes: undefined });
+  expect(screen.getByText("cache-proposal.md")).toBeTruthy();
+});
+
+test("D06: a created file reads Document, Created", () => {
   renderCard(d06);
-  expect(screen.getAllByText(editResult.created)).toHaveLength(2);
+  expect(screen.getByText(editResult.document)).toBeTruthy();
+  expect(screen.getByText(badge.done.created)).toBeTruthy();
+  expect(screen.getByText("cache-rollout.md")).toBeTruthy();
+});
+
+test("an empty before digest alone is not created", () => {
+  renderCard({ ...d06, created: undefined });
+  expect(screen.getByText(badge.done.saved)).toBeTruthy();
+});
+
+test("R03: an undo reads Change, Undone, undoes an earlier edit", () => {
+  renderCard(r03);
+  expect(screen.getByText(eyebrow.change)).toBeTruthy();
+  expect(screen.getByText(badge.done.undone)).toBeTruthy();
+  expect(
+    screen.getByText(new RegExp(`${editResult.undoesEarlier}$`)).textContent,
+  ).toMatch(
+    new RegExp(
+      `^Recorded Oct 28, \\d\\d:\\d\\d${meta.join}${editResult.undoesEarlier}$`,
+    ),
+  );
+});
+
+test("R02: Show the change opens the diff without freezing, then hides it", () => {
+  const host = renderCard(r01);
+  expect(screen.queryByText("Title: Evening build retirement")).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: action.showChange }));
+  expect(screen.getByText("Title: Evening build retirement").tagName).toBe(
+    "INS",
+  );
+  expect(
+    screen.getByText("Title: Build schedule and cache rollout").tagName,
+  ).toBe("DEL");
+  expect(host.sent).toEqual([]);
+  expect(screen.getByRole("button", { name: action.undo })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: editResult.hideChange }));
+  expect(screen.queryByText("Title: Evening build retirement")).toBeNull();
+});
+
+test("a long diff counts the lines it leaves out", () => {
+  renderCard(long);
+  fireEvent.click(screen.getByRole("button", { name: action.showChange }));
+  expect(screen.getByText(editResult.moreLines(5))).toBeTruthy();
+});
+
+test("no changes, no disclosure", () => {
+  renderCard({ ...r01, changes: undefined });
+  expect(screen.queryByRole("button", { name: action.showChange })).toBeNull();
 });
 
 test("an instruction-allowed edit says so instead of approved by you", () => {
@@ -86,14 +142,15 @@ test.each([
   ["a bad digest", { ...r01, before_digest: "sha256:nope" }],
   ["no location", { ...r01, location: "" }],
   ["a bad time", { ...r01, time: "yesterday" }],
+  ["bad changes", { ...r01, changes: { hunks: 1, lines: "x", more: 0 } }],
   ["an unknown basis", { ...r01, allowed_by: { basis: "vibes", text: "" } }],
 ])("a malformed result (%s) renders nothing", (_, e) => {
   renderCard(e);
   expect(screen.queryByRole("button")).toBeNull();
-  expect(screen.queryByText(editResult.saved)).toBeNull();
+  expect(screen.queryByText(badge.done.saved)).toBeNull();
 });
 
 test("CardView draws the edit card for knowledge-mcp/edit/2", () => {
   renderCard(r01, true);
-  expect(screen.getAllByText(badge.done.saved).length).toBeGreaterThan(0);
+  expect(screen.getByText(badge.done.saved)).toBeTruthy();
 });

@@ -1,21 +1,37 @@
 // C-Result: the card for a kb_record_edit result (knowledge-mcp/edit/2).
-// It says what was saved or created, when and on whose OK, with Undo. Undo only sends a message:
+// It says what was saved, created or undone, when and on whose OK, with Undo. Undo only sends a message:
 // the assistant checks the edit log and restores the file, and the undo comes back as its own card.
+import { useState } from "react";
+
 import type { ToolResult } from "@/bridge/bridge";
+import { Diff } from "@/component-elements/diff";
 import { useCardLifecycle } from "@/component-patterns/card-lifecycle";
 import type { CardLifecycle } from "@/component-patterns/card-lifecycle";
 import { ResultCard } from "@/component-patterns/result-card";
-import type { Edit } from "@/contracts/edit";
-import { badge, editResult, meta } from "@/copy/en";
+import type { Edit, EditChanges } from "@/contracts/edit";
+import { action, badge, change, editResult, eyebrow, meta } from "@/copy/en";
 import { registerCard } from "./registry";
 import type { CardProps } from "./registry";
 
-/** The digest of empty text: an edit from it created the file. */
-export const EMPTY_DIGEST =
-  "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-
 const DIGEST = /^sha256:[0-9a-f]{64}$/;
 const BASES = ["request", "instruction", "accepted_change"];
+
+function isChanges(c: unknown): c is EditChanges {
+  if (typeof c !== "object" || c === null) return false;
+  const { hunks, lines, more } = c as Partial<EditChanges>;
+  return (
+    typeof hunks === "number" &&
+    typeof more === "number" &&
+    Array.isArray(lines) &&
+    lines.every(
+      (l) =>
+        typeof l === "object" &&
+        l !== null &&
+        (l.change === "removed" || l.change === "added") &&
+        typeof l.text === "string",
+    )
+  );
+}
 
 export function isEdit(result: ToolResult | null): result is ToolResult & Edit {
   if (!result || result.schema !== "knowledge-mcp/edit/2") return false;
@@ -32,11 +48,10 @@ export function isEdit(result: ToolResult | null): result is ToolResult & Edit {
     typeof e.before_digest === "string" &&
     DIGEST.test(e.before_digest) &&
     typeof e.after_digest === "string" &&
-    DIGEST.test(e.after_digest)
+    DIGEST.test(e.after_digest) &&
+    (e.changes === undefined || isChanges(e.changes))
   );
 }
-
-export const isCreated = (e: Edit) => e.before_digest === EMPTY_DIGEST;
 
 export const fileName = (e: Edit) => e.location.split("/").at(-1) || e.location;
 
@@ -57,6 +72,12 @@ export function when(iso: string, timeZone?: string) {
   return { full: `${day}, ${time}`, time };
 }
 
+/** `cache-proposal.md · 4 changes`, or the file name alone without changes. */
+export const editTitle = (e: Edit) =>
+  e.changes
+    ? fileName(e) + meta.join + change.count(e.changes.hunks)
+    : fileName(e);
+
 export const undoMessage = (e: Edit, timeZone?: string) =>
   editResult.undo(when(e.time, timeZone).time, fileName(e));
 
@@ -73,15 +94,60 @@ export function undoContext(e: Edit) {
   };
 }
 
+/** R02: Show the change opens the diff in place; it sends nothing and never freezes the card. */
+function ChangeDisclosure({
+  changes,
+  open,
+  onOpenChange,
+}: {
+  changes: EditChanges;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  return (
+    <>
+      {open && (
+        <Diff
+          lines={changes.lines.map((l) => ({ kind: l.change, text: l.text }))}
+        />
+      )}
+      {open && changes.more > 0 && (
+        <p className="mt-[var(--km-space-3)] text-[length:var(--font-text-xs-size)] text-[color:var(--color-text-secondary)]">
+          {editResult.moreLines(changes.more)}
+        </p>
+      )}
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => onOpenChange(!open)}
+        className="mt-[var(--km-space-4)] inline-flex min-h-[var(--km-target)] cursor-pointer items-center bg-transparent p-0 text-[length:var(--font-text-xs-size)] text-[color:var(--color-text-primary)] underline underline-offset-2 focus-visible:outline-[length:var(--border-width-regular)] focus-visible:outline-[color:var(--color-border-primary)]"
+      >
+        {open ? editResult.hideChange : action.showChange}
+      </button>
+    </>
+  );
+}
+
 export type EditViewProps = {
   edit: Edit;
   lifecycle: CardLifecycle;
   timeZone?: string;
+  /** The diff's open state; the gallery fixes it, the live card holds it. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 /** The drawn card, given its state; the gallery renders it with fixed lifecycles. */
-export function EditView({ edit, lifecycle, timeZone }: EditViewProps) {
-  const created = isCreated(edit);
+export function EditView({
+  edit,
+  lifecycle,
+  timeZone,
+  open: fixedOpen,
+  onOpenChange,
+}: EditViewProps) {
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = fixedOpen ?? ownOpen;
+  const setOpen = onOpenChange ?? setOwnOpen;
   const message = undoMessage(edit, timeZone);
   // ResultCard owns the Undo action; the context rides along on the press.
   const tracked: CardLifecycle = {
@@ -91,21 +157,37 @@ export function EditView({ edit, lifecycle, timeZone }: EditViewProps) {
         a.message === message ? { ...a, context: undoContext(edit) } : a,
       ),
   };
+  // The result names only the undone edit's id, not its time.
+  const who = edit.undoes
+    ? editResult.undoesEarlier
+    : edit.allowed_by.basis === "instruction"
+      ? editResult.allowedByInstruction
+      : meta.approvedByYou;
   return (
     <ResultCard
       kind="result"
-      eyebrow={created ? editResult.created : editResult.saved}
-      title={edit.location}
-      badgeLabel={created ? badge.done.created : badge.done.saved}
-      when={when(edit.time, timeZone).full}
-      who={
-        edit.allowed_by.basis === "instruction"
-          ? editResult.allowedByInstruction
-          : meta.approvedByYou
+      eyebrow={edit.created ? editResult.document : eyebrow.change}
+      title={editTitle(edit)}
+      badgeLabel={
+        edit.created
+          ? badge.done.created
+          : edit.undoes
+            ? badge.done.undone
+            : badge.done.saved
       }
+      when={when(edit.time, timeZone).full}
+      who={who}
       undoMessage={message}
       lifecycle={tracked}
-    />
+    >
+      {edit.changes && edit.changes.lines.length > 0 && (
+        <ChangeDisclosure
+          changes={edit.changes}
+          open={open}
+          onOpenChange={setOpen}
+        />
+      )}
+    </ResultCard>
   );
 }
 
