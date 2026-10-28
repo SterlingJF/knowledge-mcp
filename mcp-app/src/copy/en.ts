@@ -61,6 +61,14 @@ export const decision = {
   keepRefused: "Keep refused",
 } as const;
 
+/** Evidence marks as they read inside a summary count: `1 partly answered`. */
+export const evidenceCount = {
+  supported: "supported",
+  partly: "partly answered",
+  conflicting: "conflicting",
+  suggested: "suggested",
+} as const;
+
 export const evidence = {
   supported: "Supported",
   partly: "Partly answered",
@@ -76,6 +84,10 @@ export const line = {
       ? "Nothing left out"
       : `${count} ${count === 1 ? "file" : "files"} left out`,
   addition: "— addition",
+  /** Stands in for the file name when a result names no document. */
+  theDocument: "the document",
+  /** After the first item of a list cut short inline: `C3 Status · … · +1 more`. */
+  andMore: (count: number) => `+${count} more`,
   /** Every refusal says this after its reason (F07). */
   nothingChanged: "Nothing was changed.",
   summaryJoin: " · ",
@@ -100,6 +112,8 @@ export const change = {
   number: (n: number) => `C${n}`,
   range: (from: number, to: number) =>
     from === to ? `C${from}` : `C${from}–C${to}`,
+  /** More changes than a summary line can name: `6 changes`. */
+  count: (n: number) => `${n} ${n === 1 ? "change" : "changes"}`,
   /** Change numbers as runs: [1,2,3,4] → "C1–C4"; [1,3,4] → "C1, C3–C4". */
   list: (numbers: Array<number>) =>
     numbers
