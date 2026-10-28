@@ -66,7 +66,11 @@ window.KMT = {
       "Eyebrows, meta, captions, current text, column heads",
     ],
     ["--color-border-tertiary", "Row dividers, chips"],
-    ["--color-border-secondary", "Controls: unticked box, segmented choice"],
+    ["--color-border-secondary", "Segmented choice outline"],
+    [
+      "--color-text-tertiary",
+      "Also the unticked box edge: 3:1 as a control boundary",
+    ],
     ["--color-ring-primary", "Focus ring on every control"],
     ["warning", "Waiting on you: Needs your OK, Nothing saved, Your choice"],
     ["success", "Done and recorded: Saved, Approved, Created, Moved, Applied"],
