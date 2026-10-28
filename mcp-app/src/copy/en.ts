@@ -169,3 +169,13 @@ export const label = {
   proposed: "Proposed",
   source: "Source",
 } as const;
+
+// C-Result
+export const editResult = {
+  saved: "Saved",
+  created: "Created",
+  /** What Undo sends: `Undo the 09:41 edit to cache-proposal.md`. */
+  undo: (time: string, file: string) => `Undo the ${time} edit to ${file}`,
+  /** Meta when an instruction for agents allowed the edit, not the person in this session. */
+  allowedByInstruction: "allowed by your instruction",
+} as const;
