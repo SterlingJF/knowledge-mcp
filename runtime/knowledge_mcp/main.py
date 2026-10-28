@@ -47,7 +47,7 @@ from mcp_types import (
 from mcp_types.jsonrpc import INVALID_PARAMS
 from pydantic import ValidationError
 
-from knowledge_mcp import problems, schemas, version
+from knowledge_mcp import apps, problems, schemas, version
 from knowledge_mcp.kbp import KbpMissing
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import (
@@ -106,6 +106,7 @@ class Server(MCPServer):
         # Registration, schemas and invocation share the SDK's native metadata.
         self.tools = ToolManager()
         self.subscriptions = InMemorySubscriptionBus()
+        self.extensions: dict[str, dict[str, Any]] = {}
 
     def add_tool(  # noqa: PLR0913, PLR0917 - native SDK registration signature.
         self,
@@ -159,6 +160,7 @@ class Server(MCPServer):
             on_get_prompt=self.prompt_handler,
             on_subscriptions_listen=ListenHandler(self.subscriptions),
         )
+        server.extensions = self.extensions
         stdin = Stdin() if sys.platform != "win32" else None
         async with stdio_server(stdin=stdin) as (read_stream, write_stream):
             await server.run(
@@ -208,15 +210,10 @@ class Server(MCPServer):
 
     async def read_handler(
         self,
-        _ctx: ServerRequestContext[Any],
+        ctx: ServerRequestContext[Any],
         params: ReadResourceRequestParams,
     ) -> Any:
-        # This application registers no resources, matching the native empty registry.
-        raise MCPError(
-            code=INVALID_PARAMS,
-            message=f"Unknown resource: {params.uri}",
-            data={"uri": str(params.uri)},
-        )
+        return await self._handle_read_resource(ctx, params)
 
     async def prompts_handler(
         self,
@@ -349,6 +346,7 @@ def build_server(workspace: Workspace | None = None) -> MCPServer:
     importing.register(mcp, workspace)
     kbp.register(mcp, workspace)
     proposal.register(mcp, workspace)
+    mcp.extensions = apps.register(mcp)
     # App registration must stay in sync with the canonical contract registry.
     missing = {tool.name for tool in mcp.tools.list_tools()} - schemas.RESULTS.keys()
     if missing:
