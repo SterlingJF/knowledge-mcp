@@ -63,7 +63,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
 .ann{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#d6336c;color:#fff;font:600 10px/1 var(--font-mono);margin:0 4px;vertical-align:middle;flex:none}
 .legend li{margin:0 0 6px 0;list-style:none;display:flex;gap:8px;align-items:flex-start;font-size:12.5px}
 .rows.narrow tr{display:block;border-bottom:1px solid var(--color-border-tertiary);padding:8px 0}.rows.narrow tr:first-child{display:none}.rows.narrow td{display:block;border:0;padding:3px 0}
-.narrowbox{width:360px}
+.narrowbox{width:360px}.dn-row{padding:var(--km-gap-row) 0;border-bottom:var(--border-width-regular) solid var(--color-border-tertiary)}.dn-row:last-child{border-bottom:0}.dn-ex{color:var(--color-text-secondary);margin-top:var(--km-gap-tight);overflow-wrap:anywhere}.dn-pick{margin-top:var(--km-gap-row)}
 .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}.flow .st{flex:1;min-width:190px;border:1px solid var(--color-border-secondary);border-radius:12px;padding:12px 14px;background:var(--color-background-primary);font-size:12.5px}.flow .st b{display:block;margin-bottom:4px}.flow .arr{align-self:center;color:var(--color-text-tertiary);font-size:18px}
 .host-o{border:1px dashed var(--color-border-secondary);border-radius:12px;padding:12px 14px;position:relative}.host-o .lbl{position:absolute;top:-9px;left:12px;background:var(--color-background-tertiary);padding:0 6px;font-size:11px;color:var(--color-text-tertiary)}
 .dt{display:grid;grid-template-columns:1fr 1fr;gap:12px}.do,.dont{border-radius:10px;padding:10px 12px;font-size:12px}.do{background:var(--color-background-success)}.dont{background:var(--color-background-danger)}.do b{color:var(--color-text-success)}.dont b{color:var(--color-text-danger)}
@@ -967,7 +967,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       purpose:
         "A quiet block inside a card for something you should know before deciding. Three kinds, one icon each.",
       body: two(
-        `<div class="note">${ic.info}<span><b>No naming rule for Design proposals</b> (dropped in conventions), so it goes beside cache-proposal.md.</span></div><div class="note">${ic.left}<span><b>2 files left out:</b> vendor-quote.xlsx, release-calendar.md. <u>Show why</u></span></div><div class="note">${ic.warn}<span>Prepared again because the file changed. C2’s current text is new.</span></div>`,
+        `<div class="note">${ic.info}<span><b>Design proposal has no naming rule</b> (dropped in conventions), so it goes beside cache-proposal.md.</span></div><div class="note">${ic.left}<span><b>2 files left out:</b> vendor-quote.xlsx, release-calendar.md. <u>Show why</u></span></div><div class="note">${ic.warn}<span>Prepared again because the file changed. C2’s current text is new.</span></div>`,
       ),
       tokens: [
         "--color-background-secondary",
@@ -1200,6 +1200,26 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       ],
       "rows",
     );
+  // Narrow: each row is the type, then its example, then the choice. The folder is dropped; the example already shows it.
+  const decisionNarrow = () =>
+    `<div class="dn">${[
+      [
+        "Decision record",
+        "Decisions/2026-10-28 retire evening build.md",
+        pick(""),
+      ],
+      [
+        "Meeting notes",
+        "Calendar/Meetings/2026-10-27 build review.md",
+        pick("a"),
+      ],
+      ["Design proposal", "Proposals/timings-notes.md", pick("d")],
+    ]
+      .map(
+        ([type, example, choice]) =>
+          `<div class="dn-row"><div class="k">${type}</div><div class="mono dn-ex">${example}</div><div class="dn-pick">${choice}</div></div>`,
+      )
+      .join("")}</div>`;
   const P = [
     {
       id: "P01",
@@ -1274,14 +1294,17 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       h: 760,
       purpose:
         "When each row needs its own answer: conventions, guidance changes, move blockers. The card’s primary action waits until rows are answered.",
-      body: two(
-        `<div class="km" style="margin:0">${decision(0)}</div><div class="km">${decision(1)}</div>`,
-      ),
+      body:
+        two(
+          `<div class="km" style="margin:0">${decision(0)}</div><div class="km">${decision(1)}</div>`,
+        ) +
+        `<div class="mu" style="margin:14px 0 8px;font-size:12px">Narrow (under 560px): type, example, choice</div><div class="km narrowbox" style="margin:0">${decisionNarrow()}</div>`,
       tokens: ["K01, K02, K04"],
       rules: [
         "Each row: a segmented choice (K11), not buttons. Changing a row’s value happens in chat.",
         "Decided rows show a badge in place of the choice.",
         "The primary button counts what will be saved.",
+        "Narrow: the header row goes (kept for screen readers); each row reads type (semibold), example (secondary, mono), then the choice. The folder column is dropped because the example path names it.",
       ],
       uses: [/class="seg"/],
     },
@@ -1294,15 +1317,15 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
         "Every outcome is a new card. A result says what was saved, when and on whose OK, with Undo. A refusal says why and that nothing changed.",
       body: two(
         card({
-          eb: "Saved",
+          eb: "Change",
           title: "cache-proposal.md · 4 changes",
           meta: "Recorded Oct 28, 09:41 · approved by you",
           badge: badge("b-grn", "Saved", "check"),
           acts: `${btn("Undo", "", "undo")}${btn("Show the change", "g")}`,
         }) +
           card({
-            eb: "Undo",
-            title: "Undo: cache-proposal.md · 4 changes",
+            eb: "Change",
+            title: "cache-proposal.md · 4 changes",
             badge: badge("b-red", "Can’t undo safely", "warn"),
             body: `<div class="note">${ic.warn}<span>cache-proposal.md changed after this edit (2 later edits). Nothing was changed.</span></div>`,
             acts: btn("Show the later edits", "p"),

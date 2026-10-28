@@ -192,14 +192,18 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 
 ### `kb_prepare_proposal`
 
-| Argument          | Type                                        | Required | Meaning                                                                                                                                                                                                                                        |
-| ----------------- | ------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`        | string                                      | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                |
-| `summary`         | string                                      | yes      | What the proposal changes, in one line.                                                                                                                                                                                                        |
-| `rows`            | list of [ProposalRow](#proposalrow)         | yes      | One row per change, in display order. The card names row n change Cn.                                                                                                                                                                          |
-| `left_out`        | list of [LeftOutFile](#leftoutfile) or null | no       | Files you read but didn't cite.                                                                                                                                                                                                                |
-| `layout`          | [Layout](#layout)                           | no       | `list` in a terminal, which can't scroll a wide table sideways.                                                                                                                                                                                |
-| `document_digest` | [Digest](#digest) or null                   | no       | The SHA-256 of the document's current text as UTF-8, written `sha256:` plus 64 lowercase hex digits. Send it whenever you've read the document, so the card can refuse a save after the document changes. The answer returns it in `based_on`. |
+| Argument          | Type                                                  | Required | Meaning                                                                                                                                                                                                                                        |
+| ----------------- | ----------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`        | string                                                | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                |
+| `summary`         | string                                                | yes      | What the proposal changes, in one line.                                                                                                                                                                                                        |
+| `rows`            | list of [ProposalRow](#proposalrow)                   | yes      | One row per change, in display order. The card names row n change Cn.                                                                                                                                                                          |
+| `left_out`        | list of [LeftOutFile](#leftoutfile) or null           | no       | Files you read but didn't cite.                                                                                                                                                                                                                |
+| `document_type`   | [ProposalDocumentType](#proposaldocumenttype) or null | no       | The document's type, from kb_get_document_type.                                                                                                                                                                                                |
+| `reader`          | [ProposalReader](#proposalreader) or null             | no       | Who the document is for, from kb_list_audiences, and whether the person confirmed it.                                                                                                                                                          |
+| `filing`          | [FilingNote](#filingnote) or null                     | no       | For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document.                                                                                                                                |
+| `open_questions`  | list of [ProposalCell](#proposalcell) or null         | no       | Questions no source answers, apart from conflicting rows.                                                                                                                                                                                      |
+| `layout`          | [Layout](#layout)                                     | no       | `list` in a terminal, which can't scroll a wide table sideways.                                                                                                                                                                                |
+| `document_digest` | [Digest](#digest) or null                             | no       | The SHA-256 of the document's current text as UTF-8, written `sha256:` plus 64 lowercase hex digits. Send it whenever you've read the document, so the card can refuse a save after the document changes. The answer returns it in `based_on`. |
 
 ### `kb_record_edit`
 
@@ -212,6 +216,7 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 | `after_digest` | string or null                          | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
 | `whole_file`   | boolean or null                         | no       | True when `before` is the whole file.                                                                                             |
 | `operation`    | [EditOperation](#editoperation) or null | no       |                                                                                                                                   |
+| `undoes`       | [EditId](#editid) or null               | no       | The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits.                                       |
 
 ### `kbp_card`
 
@@ -404,6 +409,10 @@ Type: string, pattern `^sha256:[0-9a-f]{64}$`.
 | `old_path` | [MovePath](#movepath) | yes      |         |
 | `path`     | [MovePath](#movepath) | yes      |         |
 
+### EditId
+
+Type: string, pattern `^[0-9a-f]{32}$`.
+
 ### EditOperation
 
 | Field      | Type          | Required | Meaning                                                                                  |
@@ -466,6 +475,24 @@ Type: [FileCreated](#filecreated) or [FileDeleted](#filedeleted) or [FileMoved](
 | `path`        | [Path](#path)                       | yes      | The path after the move. |
 | `old_path`    | [Path](#path)                       | yes      |                          |
 | `fingerprint` | [Fingerprint](#fingerprint) or null | no       |                          |
+
+### FileSource
+
+A whole file, with no line or place, such as a sheet you read in full.
+
+| Field  | Type   | Required | Meaning |
+| ------ | ------ | -------- | ------- |
+| `file` | string | yes      |         |
+
+### FilingNote
+
+Where a new document will be saved and why. Omit it for an existing document.
+
+| Field         | Type           | Required | Meaning                                                         |
+| ------------- | -------------- | -------- | --------------------------------------------------------------- |
+| `path`        | [Path](#path)  | yes      |                                                                 |
+| `naming_rule` | string or null | yes      | The naming rule that named the file, or null when none applied. |
+| `reason`      | string or null | no       | Why you chose the path. Required when `naming_rule` is null.    |
 
 ### FilingReview
 
@@ -601,14 +628,33 @@ A place in a sheet or deck.
 | `label` | string or null | no       | The field or section, such as `Title`. |
 | `text`  | string         | yes      | Plain words, without markdown syntax.  |
 
+### ProposalDocumentType
+
+The document's type, from kb_get_document_type. Send it whenever you know it.
+
+| Field   | Type   | Required | Meaning                    |
+| ------- | ------ | -------- | -------------------------- |
+| `id`    | string | yes      | Such as `design-proposal`. |
+| `label` | string | yes      | Such as `Design proposal`. |
+
+### ProposalReader
+
+The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.
+
+| Field       | Type    | Required | Meaning                                                                |
+| ----------- | ------- | -------- | ---------------------------------------------------------------------- |
+| `id`        | string  | yes      |                                                                        |
+| `label`     | string  | yes      | Such as `maintainers deciding whether to accept it`.                   |
+| `confirmed` | boolean | yes      | True when the person confirmed the reader, false when it's your guess. |
+
 ### ProposalRow
 
-| Field      | Type                                                                                              | Required | Meaning                                           |
-| ---------- | ------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------- |
-| `current`  | [ProposalCell](#proposalcell) or null                                                             | no       | The document's text now. Omit it for an addition. |
-| `proposed` | [ProposalCell](#proposalcell)                                                                     | yes      |                                                   |
-| `mark`     | [EvidenceMark](#evidencemark) or null                                                             | no       |                                                   |
-| `sources`  | list of [LineSource](#linesource) or [PlaceSource](#placesource) or [PersonSource](#personsource) | yes      |                                                   |
+| Field      | Type                                                                                                                           | Required | Meaning                                           |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ | -------- | ------------------------------------------------- |
+| `current`  | [ProposalCell](#proposalcell) or null                                                                                          | no       | The document's text now. Omit it for an addition. |
+| `proposed` | [ProposalCell](#proposalcell)                                                                                                  | yes      |                                                   |
+| `mark`     | [EvidenceMark](#evidencemark) or null                                                                                          | no       |                                                   |
+| `sources`  | list of [LineSource](#linesource) or [PlaceSource](#placesource) or [PersonSource](#personsource) or [FileSource](#filesource) | yes      |                                                   |
 
 ### RemoveConvention
 

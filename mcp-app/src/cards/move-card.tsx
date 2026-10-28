@@ -12,8 +12,8 @@ import type { CardAction } from "@/component-patterns/card-shell";
 import { useCardLifecycle } from "@/component-patterns/card-lifecycle";
 import type { CardLifecycle } from "@/component-patterns/card-lifecycle";
 import { Note } from "@/component-elements/note";
-import { SegmentedChoice } from "@/component-elements/segmented-choice";
 import { Tabs } from "@/component-elements/tabs";
+import { DecisionRows } from "@/component-patterns/decision-rows";
 import { FullView } from "@/component-patterns/full-view";
 import { PlanLines, PlanTable } from "@/component-patterns/plan-table";
 import { SummaryCard } from "@/component-patterns/summary-card";
@@ -76,9 +76,8 @@ export const repairedLinks = (p: DocumentMoves) =>
 const linkNotes = (p: DocumentMoves) =>
   unique(repairedLinks(p).map((l) => l.source_path)).length;
 
-/** A blocker is answerable in the card only with two or three computed choices. */
-const answerable = (issue: MoveIssue) =>
-  (issue.choices?.length ?? 0) >= 2 && (issue.choices?.length ?? 0) <= 3;
+/** A blocker with no computed choice can only be answered in chat. */
+const answerable = (issue: MoveIssue) => (issue.choices?.length ?? 0) > 0;
 
 export const allAnswered = (p: DocumentMoves, answers: Answers) =>
   blockers(p).every(
@@ -165,7 +164,7 @@ export type MoveViewProps = {
   plan: DocumentMoves;
   displayMode: "inline" | "fullscreen";
   answers: Answers;
-  onAnswer: (id: string, value: string) => void;
+  onAnswer: (id: string, value: string | null) => void;
   lifecycle: CardLifecycle;
   pressed?: Pressed;
   onPressed?: (pressed: Pressed) => void;
@@ -241,28 +240,30 @@ export function MoveView({
     return (
       <FullView {...card}>
         {b.length > 0 ? (
-          <PlanTable
+          <DecisionRows
             headers={[moves.label.problem, moves.label.yourChoice]}
-            columns={[45, 55]}
+            align="start"
+            // No title: the bold file name in the cell carries the weight.
+            narrow={{ title: -1 }}
+            choices={answers}
+            onChoiceChange={(id, v) => live && onAnswer(id, v)}
             rows={b.map((issue, i) => ({
               id: issueId(i),
+              name: issue.detail,
               cells: [
                 <>
                   {issue.source_path && <b>{issue.source_path} </b>}
                   {issue.detail}
                 </>,
-                answerable(issue) ? (
-                  <SegmentedChoice
-                    aria-label={issue.detail}
-                    options={issue.choices!.map((c, n) => ({
-                      value: String(n),
-                      label: choiceLabel(c),
-                    }))}
-                    value={answers[issueId(i)] ?? null}
-                    onValueChange={(v) => live && onAnswer(issueId(i), v)}
-                  />
-                ) : null,
               ],
+              options: (issue.choices ?? []).map((c, n) => ({
+                value: String(n),
+                label: choiceLabel(c),
+              })),
+              // P04 draws no empty choice: with nothing to pick, the answer goes in chat.
+              decided: answerable(issue)
+                ? undefined
+                : { tone: "neutral" as const, label: badge.neutral.nothingYet },
             }))}
           />
         ) : (

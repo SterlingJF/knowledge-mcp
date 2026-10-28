@@ -45,10 +45,10 @@ const card = (
       {
         label: label.evidence,
         value: joined(
-          "1 supported",
-          "1 partly answered",
-          "1 conflicting",
-          "1 suggested",
+          line.counted(1, "supported"),
+          line.counted(1, "partly answered"),
+          line.counted(1, "conflicting"),
+          line.counted(1, "suggested"),
         ),
       },
       {

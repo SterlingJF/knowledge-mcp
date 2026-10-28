@@ -3,7 +3,7 @@ import { useState } from "react";
 import { badge } from "@/copy/en";
 
 import { countAccepted, DecisionRows } from "./decision-rows";
-import type { DecisionKind, DecisionValue } from "./decision-rows";
+import type { DecisionKind, DecisionRow } from "./decision-rows";
 
 const mono = (t: string) => (
   <span className="font-(family-name:--font-mono)">{t}</span>
@@ -45,12 +45,12 @@ function Live({
   initial,
 }: {
   kind?: DecisionKind;
-  initial: Record<string, DecisionValue>;
+  initial: Record<string, string>;
 }) {
   const [choices, setChoices] =
-    useState<Record<string, DecisionValue | null>>(initial);
+    useState<Record<string, string | null>>(initial);
   return (
-    <div>
+    <div className="@container">
       <DecisionRows
         headers={headers}
         rows={base}
@@ -65,10 +65,114 @@ function Live({
   );
 }
 
+// M05F: one Problem cell per blocker, then its choice.
+const blockers: DecisionRow[] = [
+  {
+    id: "exists",
+    name: "Name taken",
+    cells: [
+      <span>
+        <b className="font-(--font-weight-semibold)">
+          Decisions/2026-10-28 retire evening build.md
+        </b>{" "}
+        already exists
+      </span>,
+    ],
+    options: [{ value: "skip", label: "Skip this file" }],
+  },
+  {
+    id: "link",
+    name: "Ambiguous link",
+    cells: [
+      <span>{mono("[[proposal]]")} in weekly-2026-43.md matches 2 notes</span>,
+    ],
+    options: [
+      { value: "a", label: "Link to Proposals/cache-proposal" },
+      { value: "b", label: "Link to Proposals/timings-notes" },
+    ],
+  },
+  {
+    id: "long",
+    name: "Ambiguous link",
+    cells: [
+      <span>
+        {mono("[[build review]]")} in weekly-2026-43.md matches 3 notes
+      </span>,
+    ],
+    options: [
+      {
+        value: "a",
+        label: "Link to Decisions/2026-10-28 retire evening build",
+      },
+      {
+        value: "b",
+        label: "Link to Calendar/Meetings/2026-10-27 build review",
+      },
+      { value: "c", label: "Link to Proposals/timings-notes" },
+    ],
+  },
+];
+
+function Blockers() {
+  const [choices, setChoices] = useState<Record<string, string | null>>({});
+  return (
+    <div className="@container">
+      <DecisionRows
+        headers={["Problem", "Your choice"]}
+        rows={blockers}
+        narrow={{ title: 0 }}
+        align="start"
+        choices={choices}
+        onChoiceChange={(id, v) => setChoices({ ...choices, [id]: v })}
+      />
+    </div>
+  );
+}
+
 export default {
   id: "P04",
   name: "Decision rows",
   stories: {
+    "Move blockers at 727px": (
+      <div className="w-[727px] max-w-full">
+        <Blockers />
+      </div>
+    ),
+    "Move blockers at 816px": (
+      <div className="w-[816px] max-w-full">
+        <Blockers />
+      </div>
+    ),
+    "Move blockers at 320px": (
+      <div className="w-[320px] max-w-full">
+        <Blockers />
+      </div>
+    ),
+    "Conventions at 816px": (
+      <div className="w-[816px] max-w-full">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
+      </div>
+    ),
+    "Conventions at 727px": (
+      <div className="w-[727px] max-w-full">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
+      </div>
+    ),
+    "Conventions at 360px": (
+      <div className="w-[360px] max-w-full">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
+      </div>
+    ),
+    "Conventions at 320px": (
+      <div className="w-[320px] max-w-full">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
+      </div>
+    ),
+    "Move blockers at 360px": (
+      <div className="w-[360px] max-w-full">
+        <Blockers />
+      </div>
+    ),
     Undecided: <Live initial={{ mn: "accept", dp: "drop" }} />,
     "Apply or keep refused": (
       <Live kind="applyKeepRefused" initial={{ dr: "apply" }} />
@@ -86,6 +190,16 @@ export default {
         choices={{}}
         onChoiceChange={noop}
       />
+    ),
+    "Undecided at 360px": (
+      <div className="w-[360px]">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
+      </div>
+    ),
+    "Undecided at 320px": (
+      <div className="w-[320px]">
+        <Live initial={{ mn: "accept" }} />
+      </div>
     ),
   },
 };

@@ -5,7 +5,7 @@ import type { ToolResult } from "@/bridge/bridge";
 import { action, badge, frozen, label, line, message, moves } from "@/copy/en";
 import { CardView } from "./registry";
 import { MoveCard, summaryRows } from "./move-card";
-import { m01, m05, m05Link } from "./move-card.fixture";
+import { m01, m05, m05Link, m05None } from "./move-card.fixture";
 
 const asResult = (p: unknown) => p as ToolResult;
 
@@ -69,7 +69,9 @@ test("blocked summary shows Needs you in place of Stays", () => {
 
 test("full view: moves tab, stays note, links tab with +N more", () => {
   renderCard(m01, "fullscreen");
-  expect(screen.getByText(moves.as("2026-10-27 build review.md"))).toBeTruthy();
+  expect(
+    screen.getByRole("table").textContent?.replace(/\u2060|\u00ad/g, ""),
+  ).toContain(moves.as("2026-10-27 build review.md"));
   expect(screen.getByText(moves.staysFact(1))).toBeTruthy();
   fireEvent.click(
     screen.getByRole("tab", { name: label.withCount(moves.label.links, 5) }),
@@ -84,27 +86,45 @@ test("blocker choices come from the plan; Move waits for each answer", () => {
   expect(screen.getByText(badge.waiting.needsChoice)).toBeTruthy();
   expect(moveButton().disabled).toBe(true);
   fireEvent.click(
-    screen.getByRole("button", {
+    screen.getByRole("radio", {
       name: moves.linkTo("Proposals/timings-notes"),
     }),
   );
   expect(moveButton().disabled).toBe(false);
 });
 
-test("a blocker with one computed choice can't be answered in the card", () => {
-  renderCard(m05, "fullscreen");
+test("a single skip_move blocker is a tick box; answering both enables Move", () => {
+  const host = renderCard(m05, "fullscreen");
+  expect(moveButton().disabled).toBe(true);
+  fireEvent.click(screen.getByRole("checkbox", { name: moves.skipFile }));
+  expect(moveButton().disabled).toBe(true);
   fireEvent.click(
-    screen.getByRole("button", {
+    screen.getByRole("radio", {
       name: moves.linkTo("Proposals/cache-proposal"),
     }),
   );
+  expect(moveButton().disabled).toBe(false);
+  fireEvent.click(moveButton());
+  const ctx = host.contexts[0] as {
+    document_moves: { blockers: Array<{ answer: unknown }> };
+  };
+  expect(ctx.document_moves.blockers.map((b) => b.answer)).toEqual([
+    { action: "skip_move", path: "Inbox/retire-evening.md" },
+    { action: "bind_link", path: "Proposals/cache-proposal.md" },
+  ]);
+});
+
+test("a blocker with no choices keeps Move off and points to chat", () => {
+  renderCard(m05None, "fullscreen");
+  expect(screen.queryByRole("checkbox")).toBeNull();
+  expect(screen.getByText(moves.whyBlocked)).toBeTruthy();
   expect(moveButton().disabled).toBe(true);
 });
 
 test("Move sends the message with digests and the chosen binding, then freezes", () => {
   const host = renderCard(m05Link, "fullscreen");
   fireEvent.click(
-    screen.getByRole("button", {
+    screen.getByRole("radio", {
       name: moves.linkTo("Proposals/timings-notes"),
     }),
   );

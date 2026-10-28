@@ -75,6 +75,7 @@ table.rows{width:100%;border-collapse:collapse;margin-top:var(--km-gap-group)}
 .cn{display:inline-flex;gap:var(--km-space-4);align-items:center;font:var(--font-weight-semibold) var(--font-text-xs-size)/var(--font-text-xs-line-height) var(--font-mono);color:var(--color-text-tertiary);white-space:nowrap}.cn .cb{margin-top:0}
 .cb{width:var(--km-check);height:var(--km-check);border-radius:var(--border-radius-xs);display:inline-grid;place-items:center;background:var(--color-background-inverse);color:var(--color-text-inverse);margin-top:2px}.cb svg{width:var(--km-icon-sm);height:var(--km-icon-sm)}.cb.mixed::after{content:"";width:8px;height:2px;border-radius:1px;background:currentColor}
 .lo-n{align-items:flex-start}.lo{list-style:none;margin:var(--km-space-4) 0 0;padding:0;display:grid;grid-template-columns:max-content 1fr;gap:var(--km-space-4) var(--km-space-5);align-items:baseline}.lo li{display:contents}.lo .chip{justify-self:start}
+.tick{display:inline-flex;align-items:center;gap:var(--km-gap-inline);font-size:var(--font-text-xs-size);font-weight:var(--font-weight-semibold)}.tick .cb{margin-top:0}
 .cb.off{background:transparent;border:var(--km-check-border) solid var(--color-text-tertiary)}
 .pulse{width:var(--km-dot);height:var(--km-dot);border-radius:50%;background:currentColor;position:relative;flex:none;margin-right:1px}
 .pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:currentColor;animation:km-pulse var(--km-pulse)}

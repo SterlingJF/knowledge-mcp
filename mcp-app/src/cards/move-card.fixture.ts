@@ -113,5 +113,11 @@ export const m05: DocumentMoves = {
   ],
 };
 
+/** A blocker the server can compute no choice for. */
+export const m05None: DocumentMoves = {
+  ...m05,
+  issues: [{ ...m05.issues[0], choices: undefined }],
+};
+
 /** M05 with only the blocker the card can answer: an ambiguous link. */
 export const m05Link: DocumentMoves = { ...m05, issues: [m05.issues[1]] };

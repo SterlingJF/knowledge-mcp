@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
+import { NoBreakName } from "@/component-elements/chips";
 import { line } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
@@ -25,10 +26,20 @@ export function PlanLines({
 }) {
   return (
     <span className="flex min-w-0 flex-col">
-      <span className="wrap-anywhere">{primary}</span>
+      <span>
+        {typeof primary === "string" ? (
+          <NoBreakName>{primary}</NoBreakName>
+        ) : (
+          primary
+        )}
+      </span>
       {secondary != null && (
-        <span className={cn(xs, "wrap-anywhere text-(--color-text-tertiary)")}>
-          {secondary}
+        <span className={cn(xs, "text-(--color-text-tertiary)")}>
+          {typeof secondary === "string" ? (
+            <NoBreakName>{secondary}</NoBreakName>
+          ) : (
+            secondary
+          )}
         </span>
       )}
     </span>

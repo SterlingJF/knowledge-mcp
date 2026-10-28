@@ -107,3 +107,12 @@ test("columns sit a group gap apart, chips in a cell a tight gap", () => {
     "gap-(--km-gap-tight)",
   );
 });
+
+test("on touch, every row with a tick box is at least the target tall", () => {
+  render(
+    <ChangeTable rows={rows} kept={new Set([1])} onKeptChange={() => {}} />,
+  );
+  const [header, first] = screen.getAllByRole("row");
+  expect(header.className).toContain("pointer-coarse:min-h-(--km-target)");
+  expect(first.className).toContain("pointer-coarse:min-h-(--km-target)");
+});

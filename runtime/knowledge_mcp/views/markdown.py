@@ -47,6 +47,8 @@ def _source(source: dict[str, Any]) -> str:
     file = source["file"]
     if "place" in source:
         return code(file + PLACE + source["place"])
+    if "line_number" not in source:
+        return code(file)
     return code(f"{file}:{source['line_number']}")
 
 
@@ -92,17 +94,42 @@ def _list(rows: list[dict[str, Any]]) -> list[str]:
     return lines
 
 
+def _meta(answer: dict[str, Any]) -> list[str]:
+    parts = []
+    if "document_type" in answer:
+        parts.append(_line(answer["document_type"]["label"]))
+    if "reader" in answer:
+        reader = answer["reader"]
+        guess = "" if reader["confirmed"] else " (reader is a guess)"
+        parts.append(f"for {_line(reader['label'])}{guess}")
+    lines = ["", " · ".join(parts)] if parts else []
+    if "filing" in answer:
+        filing = answer["filing"]
+        rule = filing["naming_rule"]
+        note = f"named by {_line(rule)}" if rule else "no naming rule"
+        line = f"Saved as {code(filing['path'])} · {note}"
+        if "reason" in filing:
+            line += f": {_line(filing['reason'])}"
+        lines += ["", line]
+    return lines
+
+
 def proposal(answer: dict[str, Any], layout: Layout) -> str:
     """`list` is for terminals, which can't scroll a wide table sideways."""
     lines = [
         f"{code('PROPOSED CHANGES')} · {code('Nothing saved')}",
         "",
         f"**{_line(answer['summary'])}**",
+        *_meta(answer),
         "",
         *(_list if layout == "list" else _table)(answer["rows"]),
     ]
     for left in answer.get("left_out", []):
         lines += ["", f"⊘ {code(left['file'])} left out: {_line(left['reason'])}"]
+    for question in answer.get("open_questions", []):
+        label = question.get("label")
+        named = f"**{_line(label)}** · " if label else ""
+        lines += ["", f"? Needs you · {named}no source: {_line(question['text'])}"]
     return "\n".join(lines) + "\n"
 
 
@@ -116,11 +143,34 @@ def _title(entry: dict[str, Any]) -> str:
     return "Edit"
 
 
+def _changes(found: dict[str, Any]) -> list[str]:
+    hunks = found["hunks"]
+    lines = [f"{hunks} change" + ("" if hunks == 1 else "s"), ""]
+    for line in found["lines"]:
+        text = _line(line["text"])
+        if line["change"] == "removed":
+            lines.append(f"- ~~{text}~~" if text else "- (blank line removed)")
+        else:
+            lines.append(f"- {text}" if text else "- (blank line added)")
+    if found["more"]:
+        lines.append(f"- … and {found['more']} more changed lines")
+    return lines
+
+
 def saved(answer: dict[str, Any]) -> str:
-    return (
+    name = code(_name(answer))
+    verb = "creation of" if answer.get("created") else "edit to"
+    text = (
         f"{code('Saved')} · **{_title(answer)} saved**\n\n"
-        f"The edit to {code(_name(answer))} is recorded.\n"
+        f"The {verb} {name} is recorded.\n"
     )
+    if answer.get("undoes"):
+        text += f"\nIt undoes edit {code(answer['undoes'])}.\n"
+    found = answer.get("changes")
+    if found and found["hunks"]:
+        heading, *rest = _changes(found)
+        text += "\n" + "\n".join([f"{name} · {heading}", *rest]) + "\n"
+    return text
 
 
 def pickup(answer: dict[str, Any]) -> str | None:

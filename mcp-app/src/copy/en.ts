@@ -46,6 +46,7 @@ export const action = {
   showWhy: "Show why",
   createFile: "Create the file",
   showChange: "Show the change",
+  hideChange: "Hide the change",
   showLaterEdits: "Show the later edits",
   all: "All",
   save: (changes: string) => `Save ${changes}`,
@@ -175,6 +176,31 @@ export const label = {
   source: "Source",
 } as const;
 
+// C-Proposal
+export const proposal = {
+  /** Meta line, after the document type: `for maintainers`. */
+  forReader: (reader: string) => `for ${reader}`,
+  /** Badge after a guessed reader, inline. */
+  guess: "guess",
+  /** Badge after a guessed reader, in the full view. */
+  readerGuess: "reader is a guess",
+  noNamingRule: "no naming rule",
+  namedBy: (rule: string) => `named by ${rule}`,
+  /** Note fact before the filing reason: `Design proposal has no naming rule`. */
+  noRuleFor: (type?: string) =>
+    type ? `${type} has no naming rule` : "No naming rule",
+  /** An open question nothing answers: `Rollout owner · no source`. */
+  unsourced: (question: string) => `${question}${line.summaryJoin}no source`,
+  /** Open questions listed in a note: `Rollout owner · no source, Budget · no source.` */
+  openList: (items: Array<string>) => `${items.join(", ")}.`,
+  toAnswer: (count: number) =>
+    count === 1 ? "One thing to answer." : `${count} things to answer.`,
+  staysOpen: (count: number) =>
+    count === 1
+      ? "It stays an open question unless you say."
+      : "They stay open questions unless you say.",
+} as const;
+
 // C-Move
 export const moves = {
   eyebrow: "Proposed moves",
@@ -218,7 +244,7 @@ export const moves = {
       ? "Waits for you because it moves files. You can undo it afterwards."
       : `Waits for you because it moves files and edits links in ${notes} other ${notes === 1 ? "note" : "notes"}. You can undo it afterwards.`,
   whyBlocked:
-    "Move stays off until each blocker has a choice. To use a different name, say it in chat.",
+    "Move stays off until each blocker has a choice. To keep both under a new name, say the name in chat.",
   /** What Move sends. */
   message: (files: number, links: number) =>
     links === 0
