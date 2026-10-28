@@ -2,6 +2,7 @@ import {
   act,
   fireEvent,
   render,
+  renderHook,
   screen,
   waitFor,
 } from "@testing-library/react";
@@ -192,4 +193,44 @@ test("the channel is closed on unmount", () => {
   unmount();
   expect(close).toHaveBeenCalledOnce();
   close.mockRestore();
+});
+
+describe("press with context and disabled actions", () => {
+  it("sends an action's context with its message", async () => {
+    const host = stubCardHost();
+    const { result } = renderHook(() => useCardLifecycle(), {
+      wrapper: ({ children }) => (
+        <StaticCardHost host={host}>{children}</StaticCardHost>
+      ),
+    });
+    await act(async () => {
+      result.current.press({
+        label: "Save C1",
+        message: "Save C1 to a.md",
+        frozenLine: "You approved this.",
+        context: { proposal: { kept: [1] } },
+      });
+    });
+    expect(host.sent).toEqual(["Save C1 to a.md"]);
+    expect(host.contexts).toEqual([{ proposal: { kept: [1] } }]);
+  });
+
+  it("ignores a disabled action", async () => {
+    const host = stubCardHost();
+    const { result } = renderHook(() => useCardLifecycle(), {
+      wrapper: ({ children }) => (
+        <StaticCardHost host={host}>{children}</StaticCardHost>
+      ),
+    });
+    await act(async () => {
+      result.current.press({
+        label: "Save",
+        message: "Save",
+        frozenLine: "x",
+        disabled: true,
+      });
+    });
+    expect(host.sent).toEqual([]);
+    expect(result.current.state).toBe("live");
+  });
 });

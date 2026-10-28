@@ -71,10 +71,10 @@ export function useCardLifecycle(): CardLifecycle {
   const send = host.send;
   const press = useCallback(
     (action: CardAction) => {
-      if (pressed.current || replaced) return;
+      if (pressed.current || replaced || action.disabled) return;
       pressed.current = true;
       setFrozenLine(action.frozenLine);
-      void send(action.message);
+      void send(action.message, action.context);
     },
     [send, replaced],
   );
