@@ -65,6 +65,11 @@
   }
 }
 
+/* A themed container sets its own text colour, so nested text follows its theme, not the page's. */
+[data-theme] {
+  color: var(--color-text-primary);
+}
+
 /* Transparent theming: Claude's chat shows through the frame. */
 html,
 body {
