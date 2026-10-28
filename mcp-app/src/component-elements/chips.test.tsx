@@ -9,7 +9,10 @@ test("line source reads file:line", () => {
 
 test("continuation drops the file", () => {
   render(
-    <SourceChip continuation source={{ file: "meeting-notes.md", line_number: 19 }} />,
+    <SourceChip
+      continuation
+      source={{ file: "meeting-notes.md", line_number: 19 }}
+    />,
   );
   expect(screen.getByText(":19")).toBeTruthy();
 });
@@ -20,7 +23,7 @@ test("place source reads file › place", () => {
 });
 
 test("person source quotes the words", () => {
-  render(<SourceChip speaker="you" source={{ said: "on its own" }} />);
+  render(<SourceChip source={{ said: "on its own" }} />);
   expect(screen.getByText("you: “on its own”")).toBeTruthy();
 });
 

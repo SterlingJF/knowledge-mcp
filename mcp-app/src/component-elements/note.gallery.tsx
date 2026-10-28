@@ -17,14 +17,22 @@ export default {
       </Note>
     ),
     Warning: (
-      <Note kind="warning">Prepared again because the file changed. C2’s current text is new.</Note>
+      <Note kind="warning">
+        Prepared again because the file changed. C2’s current text is new.
+      </Note>
     ),
     "Left-out list": (
       <Note kind="leftOut" fact={`${line.leftOut(2)}:`}>
         <LeftOutList
           files={[
-            { file: "vendor-quote.xlsx", reason: "Pricing for another project." },
-            { file: "release-calendar.md", reason: "Dates only, nothing about caching." },
+            {
+              file: "vendor-quote.xlsx",
+              reason: "Pricing for another project.",
+            },
+            {
+              file: "release-calendar.md",
+              reason: "Dates only, nothing about caching.",
+            },
           ]}
         />
       </Note>

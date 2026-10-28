@@ -3,9 +3,15 @@ import { render, screen } from "@testing-library/react";
 import { LeftOutList, Note } from "./note";
 
 test("bolds the fact before the reason", () => {
-  render(<Note kind="info" fact="No naming rule">so it goes beside.</Note>);
+  render(
+    <Note kind="info" fact="No naming rule">
+      so it goes beside.
+    </Note>,
+  );
   expect(screen.getByText("No naming rule").tagName).toBe("B");
-  expect(screen.getByRole("note").textContent).toBe("No naming rule so it goes beside.");
+  expect(screen.getByRole("note").textContent).toBe(
+    "No naming rule so it goes beside.",
+  );
 });
 
 test("a warning is announced", () => {

@@ -3,6 +3,7 @@ import { BookOpen, FileText, Folder, MessageSquare } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { source as sourceCopy } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 /** The contract's three source kinds (proposal.schema.yaml). */
@@ -27,7 +28,7 @@ function Chip({
 }) {
   return (
     <span className={cn(chipClass, className)}>
-      <Icon aria-hidden className="size-(--km-space-5) shrink-0" />
+      <Icon aria-hidden className="size-(--km-icon) shrink-0" />
       <span className={mono ? "font-(family-name:--font-mono)" : undefined}>
         {children}
       </span>
@@ -42,23 +43,20 @@ function placeIcon(place: string): LucideIcon {
 
 /**
  * One chip per source. `continuation` shows a line source as `:19` when the chip before it named the same file.
- * `speaker` labels a person source (the person in the conversation).
  */
 export function SourceChip({
   source,
   continuation = false,
-  speaker,
   className,
 }: {
   source: Source;
   continuation?: boolean;
-  speaker?: string;
   className?: string;
 }) {
   if ("said" in source)
     return (
       <Chip icon={MessageSquare} mono={false} className={className}>
-        {speaker ? `${speaker}: ` : ""}“{source.said}”
+        {sourceCopy.you}: “{source.said}”
       </Chip>
     );
   if ("place" in source)
@@ -85,7 +83,11 @@ export function PathChip({
   className?: string;
 }) {
   return (
-    <Chip icon={folder ? Folder : FileText} mono={!folder} className={className}>
+    <Chip
+      icon={folder ? Folder : FileText}
+      mono={!folder}
+      className={className}
+    >
       {path}
     </Chip>
   );

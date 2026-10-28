@@ -35,7 +35,10 @@ export function Note({
         className,
       )}
     >
-      <Icon aria-hidden className="mt-(--km-space-1) size-(--km-space-5) shrink-0" />
+      <Icon
+        aria-hidden
+        className="mt-(--km-space-1) size-(--km-icon) shrink-0"
+      />
       <div className="min-w-0">
         {fact != null && (
           <b className="font-(--font-weight-semibold)">{fact}</b>
