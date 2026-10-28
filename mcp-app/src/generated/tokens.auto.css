@@ -58,7 +58,7 @@
   --km-check: 15px;
   --km-check-border: 1.5px;
   --km-dot: 7px;
-  --km-label-col: 150px;
+  --km-label-col: max-content;
   --km-row: 28px;
   --km-underline: 2px;
   --km-focus-ring: 0 0 0 2px var(--color-background-primary), 0 0 0 4px var(--color-ring-primary);

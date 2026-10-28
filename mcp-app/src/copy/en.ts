@@ -91,7 +91,8 @@ export const line = {
   andMore: (count: number) => `+${count} more`,
   /** Every refusal says this after its reason (F07). */
   nothingChanged: "Nothing was changed.",
-  summaryJoin: " · ",
+  /** A no-break space after the dot: a breakdown wraps before a separator, never after it. */
+  summaryJoin: " ·\u00a0",
 } as const;
 
 export const source = {
@@ -138,7 +139,7 @@ export const meta = {
   /** Result-card meta: `Recorded Oct 28, 09:41 · approved by you`. */
   recorded: (when: string) => `Recorded ${when}`,
   approvedByYou: "approved by you",
-  join: " · ",
+  join: " ·\u00a0",
 } as const;
 
 export const eyebrow = {

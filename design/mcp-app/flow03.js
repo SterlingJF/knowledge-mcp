@@ -7,7 +7,7 @@
   );
   const trace = tool(
     "kb_get_document_type",
-    "Design proposal · read by maintainers deciding whether to accept it",
+    "Design proposal · read by maintainers",
   );
   const imports = tool(
     "kb_prepare_import",
@@ -17,7 +17,7 @@
   const head = {
     eb: "Proposed changes",
     title: "Focus the proposal on retiring the evening build",
-    meta: `${chip("file", '<span class="mono">cache-proposal.md</span>')} Design proposal · for maintainers deciding whether to accept it`,
+    meta: `${chip("file", '<span class="mono">cache-proposal.md</span>')} Design proposal · for maintainers`,
   };
   const R = [
     [
