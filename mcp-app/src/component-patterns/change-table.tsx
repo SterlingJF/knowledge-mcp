@@ -52,14 +52,14 @@ function Sources({ sources }: { sources: Source[] }) {
   return (
     <span
       data-testid="sources"
-      className="flex min-w-0 flex-col items-start gap-(--km-space-2)"
+      className="flex min-w-0 flex-col items-start gap-(--km-gap-tight)"
     >
       {sources.map((source, i) => {
         const short = sameFileAsPrevious(sources, i);
         return (
           <span
             key={i}
-            className="flex max-w-full min-w-0 items-center gap-(--km-space-2)"
+            className="flex max-w-full min-w-0 items-center gap-(--km-gap-inline)"
           >
             {short && (
               <span className="text-(--color-text-tertiary)">
@@ -98,7 +98,8 @@ export function ChangeTable({
   className,
 }: ChangeTableProps) {
   const frozen = draft || onKeptChange == null;
-  const rowClass = cn(tableRow, draft ? draftCols : editCols);
+  // One grid for the table; each row is a subgrid, so header and body columns line up.
+  const rowClass = cn(tableRow, "col-span-full grid-cols-subgrid");
   const keptSet = kept ?? new Set(rows.map((_, i) => i + 1));
   const isKept = (n: number) => frozen || keptSet.has(n);
 
@@ -125,11 +126,12 @@ export function ChangeTable({
     <div
       role="table"
       className={cn(
-        "@container text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary)",
+        "grid gap-x-(--km-gap-group) text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary) @max-[560px]:grid-cols-1",
+        draft ? draftCols : editCols,
         className,
       )}
     >
-      <div role="row" className={cn(rowClass, "py-(--km-space-3)")}>
+      <div role="row" className={cn(rowClass, "pt-0 pb-(--km-gap-row)")}>
         <span role="columnheader">{head}</span>
         <span role="columnheader" className={headClass}>
           {draft ? labels.section : labels.current}
@@ -177,7 +179,7 @@ export function ChangeTable({
             <span
               role="cell"
               className={cn(
-                "flex flex-col gap-(--km-space-2)",
+                "flex flex-col gap-(--km-gap-tight)",
                 out && tertiary,
                 out && "[&_[data-mark]]:text-(--color-text-tertiary)",
               )}

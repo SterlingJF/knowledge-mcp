@@ -98,3 +98,12 @@ test("draft mode: no boxes, no Current column, Section and Draft headers", () =>
   expect(screen.getByText("Suggested")).toBeTruthy();
   expect(document.querySelector("[data-left-out]")).toBeNull();
 });
+
+test("columns sit a group gap apart, chips in a cell a tight gap", () => {
+  render(<ChangeTable rows={rows} />);
+  const row = screen.getAllByTestId("sources")[1].closest("[role=row]");
+  expect(row?.className).toContain("gap-x-(--km-gap-group)");
+  expect(screen.getAllByTestId("sources")[1].className).toContain(
+    "gap-(--km-gap-tight)",
+  );
+});

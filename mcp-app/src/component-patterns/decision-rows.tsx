@@ -54,7 +54,7 @@ export function DecisionRows({
   onChoiceChange: (id: string, value: DecisionValue) => void;
   className?: string;
 }) {
-  const cell = "py-(--km-space-4) pr-(--km-space-5) align-top";
+  const cell = "py-(--km-gap-row) pr-(--km-gap-group) align-top";
   return (
     <table
       className={cn(
@@ -67,7 +67,7 @@ export function DecisionRows({
           {headers.map((h, i) => (
             <th
               key={i}
-              className={cn(cell, "py-(--km-space-3) font-[inherit]")}
+              className={cn(cell, "pt-0 pb-(--km-gap-row) font-[inherit]")}
             >
               {h}
             </th>

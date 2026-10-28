@@ -85,9 +85,17 @@ export default {
   id: "P08",
   name: "Plan table",
   stories: {
-    "Moves at 727px": <div className="w-[727px] max-w-full">{moves}</div>,
-    "Moves at 360px": <div className="w-[360px] max-w-full">{moves}</div>,
-    "Links at 727px": <div className="w-[727px] max-w-full">{links}</div>,
-    "Links at 360px": <div className="w-[360px] max-w-full">{links}</div>,
+    "Moves at 727px": (
+      <div className="@container w-[727px] max-w-full">{moves}</div>
+    ),
+    "Moves at 360px": (
+      <div className="@container w-[360px] max-w-full">{moves}</div>
+    ),
+    "Links at 727px": (
+      <div className="@container w-[727px] max-w-full">{links}</div>
+    ),
+    "Links at 360px": (
+      <div className="@container w-[360px] max-w-full">{links}</div>
+    ),
   },
 };
