@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { ReactNode } from "react";
 
 import { badge } from "@/copy/en";
 
@@ -124,6 +125,67 @@ const blockers: DecisionRow[] = [
   },
 ];
 
+const problem = (file: string, rest: string) => (
+  <span>
+    <b className="font-(--font-weight-semibold)">{file}</b> {rest}
+  </span>
+);
+const onlyInChat: DecisionRow[] = [
+  {
+    id: "a",
+    name: "No type",
+    cells: [problem("scan-0412.md", "has no document type")],
+    options: [],
+  },
+  {
+    id: "b",
+    name: "No type",
+    cells: [problem("whiteboard.png", "has no document type")],
+    options: [],
+  },
+];
+const mixed: DecisionRow[] = [
+  {
+    id: "c",
+    name: "Name taken",
+    cells: [
+      problem("Decisions/2026-10-28 retire evening build.md", "already exists"),
+    ],
+    options: [{ value: "skip", label: "Skip this file" }],
+  },
+  onlyInChat[0],
+];
+
+function Answers({ rows }: { rows: DecisionRow[] }) {
+  return (
+    <div className="@container">
+      <DecisionRows
+        headers={["Problem", "Your choice"]}
+        rows={rows}
+        narrow={{}}
+        align="start"
+        onChoiceChange={() => {}}
+      />
+    </div>
+  );
+}
+
+const widths = ["816", "727", "360", "320"] as const;
+const sized = (w: (typeof widths)[number], node: ReactNode) => (
+  <div style={{ width: `${w}px` }} className="max-w-full">
+    {node}
+  </div>
+);
+const answerStories = Object.fromEntries(
+  widths.flatMap((w) => [
+    [`Only answer in chat at ${w}px`, sized(w, <Answers rows={onlyInChat} />)],
+    [
+      `Tick box and answer in chat at ${w}px`,
+      sized(w, <Answers rows={mixed} />),
+    ],
+  ]),
+);
+
 function Blockers() {
   const [choices, setChoices] = useState<Record<string, string | null>>({});
   return (
@@ -144,6 +206,7 @@ export default {
   id: "P04",
   name: "Decision rows",
   stories: {
+    ...answerStories,
     "Move blockers at 727px": (
       <div className="w-[727px] max-w-full">
         <Blockers />

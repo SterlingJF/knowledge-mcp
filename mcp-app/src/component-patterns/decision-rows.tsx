@@ -81,7 +81,7 @@ function Choice({
   // No answer the card can offer: it is answered in chat, and the row stays unanswered.
   if (options.length === 0)
     return (
-      <span className="text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-secondary)">
+      <span className="whitespace-nowrap text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-secondary)">
         {decision.answerInChat}
       </span>
     );
@@ -162,7 +162,8 @@ export function DecisionRows({
           <th
             className={cn(
               cell,
-              "pt-0 pr-0 pb-(--km-gap-row) font-[inherit]",
+              // The choice header never wraps; the column grows to it.
+              "pt-0 pr-0 pb-(--km-gap-row) font-[inherit] whitespace-nowrap",
               align === "end" && "text-right",
             )}
           >
