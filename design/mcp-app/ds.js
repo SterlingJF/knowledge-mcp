@@ -967,7 +967,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       purpose:
         "A quiet block inside a card for something you should know before deciding. Three kinds, one icon each.",
       body: two(
-        `<div class="note">${ic.info}<span><b>No naming rule for Design proposals</b> (dropped in conventions), so it goes beside cache-proposal.md.</span></div><div class="note">${ic.left}<span><b>2 files left out:</b> vendor-quote.xlsx, release-calendar.md. <u>Show why</u></span></div><div class="note">${ic.warn}<span>Prepared again because the file changed. C2’s current text is new.</span></div>`,
+        `<div class="note">${ic.info}<span><b>Design proposal has no naming rule</b> (dropped in conventions), so it goes beside cache-proposal.md.</span></div><div class="note">${ic.left}<span><b>2 files left out:</b> vendor-quote.xlsx, release-calendar.md. <u>Show why</u></span></div><div class="note">${ic.warn}<span>Prepared again because the file changed. C2’s current text is new.</span></div>`,
       ),
       tokens: [
         "--color-background-secondary",
