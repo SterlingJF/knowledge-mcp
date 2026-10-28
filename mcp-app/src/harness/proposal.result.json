@@ -1,0 +1,97 @@
+{
+  "schema": "knowledge-mcp/proposal/1",
+  "summary": "Focus proposal on retiring the evening build",
+  "rows": [
+    {
+      "current": {
+        "label": "Title",
+        "text": "Build schedule and cache rollout"
+      },
+      "proposed": {
+        "label": "Title",
+        "text": "Evening build retirement"
+      },
+      "mark": "suggested",
+      "sources": [
+        {
+          "file": "meeting-notes.md",
+          "line_number": 15
+        }
+      ]
+    },
+    {
+      "current": {
+        "label": "Motivation",
+        "text": "evening build never finishes"
+      },
+      "proposed": {
+        "label": "Motivation",
+        "text": "7 of 9 evening runs hit the 6-hour limit"
+      },
+      "mark": "supported",
+      "sources": [
+        {
+          "file": "build-timings.xlsx",
+          "place": "Evening!A2:D10"
+        }
+      ]
+    },
+    {
+      "proposed": {
+        "label": "Status",
+        "text": "Proposed. Approval is disputed."
+      },
+      "mark": "conflicting",
+      "sources": [
+        {
+          "file": "cache-rollout-review.pptx",
+          "place": "slide 7"
+        },
+        {
+          "file": "meeting-notes.md",
+          "line_number": 11
+        },
+        {
+          "file": "meeting-notes.md",
+          "line_number": 19
+        }
+      ]
+    },
+    {
+      "current": {
+        "label": "Open question",
+        "text": "what baseline would show build times doubled?"
+      },
+      "proposed": {
+        "label": "Still open",
+        "text": "no timings from before the cache"
+      },
+      "mark": "partly",
+      "sources": [
+        {
+          "file": "build-timings.xlsx",
+          "place": "Evening!A2"
+        },
+        {
+          "file": "meeting-notes.md",
+          "line_number": 21
+        }
+      ]
+    }
+  ],
+  "left_out": [
+    {
+      "file": "vendor-quote.xlsx",
+      "reason": "answers none of this proposal's questions"
+    }
+  ],
+  "card": "`PROPOSED CHANGES` \u00b7 `Nothing saved`\n\n**Focus proposal on retiring the evening build**\n\n| ID | Current | Proposed | Source |\n| --- | --- | --- | --- |\n| C1 | **Title:** Build schedule and cache rollout | \u25c6 Suggested \u00b7 **Title:** Evening build retirement | `meeting-notes.md:15` |\n| C2 | **Motivation:** evening build never finishes | \u25cf Supported \u00b7 **Motivation:** 7 of 9 evening runs hit the 6-hour limit | `build-timings.xlsx \u203a Evening!A2:D10` |\n| C3 | \u2014 | \u2715 Conflicting \u00b7 **Status:** Proposed. Approval is disputed. | `cache-rollout-review.pptx \u203a slide 7` \u00b7 `meeting-notes.md:11` \u00b7 `meeting-notes.md:19` |\n| C4 | **Open question:** what baseline would show build times doubled? | \u25d0 Partly answered \u00b7 **Still open:** no timings from before the cache | `build-timings.xlsx \u203a Evening!A2` \u00b7 `meeting-notes.md:21` |\n\n\u2298 `vendor-quote.xlsx` left out: answers none of this proposal's questions\n",
+  "based_on": {
+    "document_digest": "sha256:f743c59f8ca25f6eb01596abbc68011ee2543bfabead5b25eac1899d67965684"
+  },
+  "instance": {
+    "subject": "~/notes/cache-policy.md",
+    "created_at": "2026-10-28T07:08:16.061Z",
+    "seq": 1
+  }
+}
