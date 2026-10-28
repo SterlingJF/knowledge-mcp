@@ -1321,7 +1321,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           title: "cache-proposal.md · 4 changes",
           meta: "Recorded Oct 28, 09:41 · approved by you",
           badge: badge("b-grn", "Saved", "check"),
-          acts: `${btn("Undo", "", "undo")}${btn("Show the change", "g")}`,
+          acts: `${btn("Undo", "", "undo")}<span class="disc">Show the change</span>`,
         }) +
           card({
             eb: "Change",

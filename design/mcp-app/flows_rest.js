@@ -413,7 +413,7 @@
         card({
           ...rHead,
           badge: badge("b-grn", "Saved", "check"),
-          acts: `${btn("Undo", "", "undo")}${btn("Show the change", "g")}`,
+          acts: `${btn("Undo", "", "undo")}<span class="disc">Show the change</span>`,
         }) +
         `<div class="say">Saved the four changes. The two questions are still open, so the status stays Proposed.</div>` +
         idle,
