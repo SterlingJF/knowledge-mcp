@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 
-import { decision, label } from "@/copy/en";
+import { label } from "@/copy/en";
 
 import { SegmentedChoice } from "./segmented-choice";
 
@@ -144,28 +144,18 @@ describe("SegmentedChoice", () => {
     vi.restoreAllMocks();
   });
 
-  it("one option is a tick box that sets and clears the value", () => {
-    const onValueChange = vi.fn<(...args: unknown[]) => void>();
-    const { rerender } = render(
-      <SegmentedChoice
-        aria-label="x"
-        options={[{ value: "skip", label: decision.skip }]}
-        value={null}
-        onValueChange={onValueChange}
-      />,
-    );
-    const box = screen.getByRole("checkbox", { name: decision.skip });
-    fireEvent.click(box);
-    expect(onValueChange).toHaveBeenLastCalledWith("skip");
-    rerender(
-      <SegmentedChoice
-        aria-label="x"
-        options={[{ value: "skip", label: decision.skip }]}
-        value="skip"
-        onValueChange={onValueChange}
-      />,
-    );
-    fireEvent.click(screen.getByRole("checkbox", { name: decision.skip }));
-    expect(onValueChange).toHaveBeenLastCalledWith(null);
+  it("refuses fewer than 2 options", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() =>
+      render(
+        <SegmentedChoice
+          aria-label="x"
+          options={[two[0]]}
+          value={null}
+          onValueChange={() => {}}
+        />,
+      ),
+    ).toThrow("2 or more options");
+    vi.restoreAllMocks();
   });
 });

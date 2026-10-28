@@ -94,3 +94,33 @@ test("a row brings its own options: one is a tick box, five stack", () => {
     screen.getByRole("radio", { name: "c" }).getAttribute("aria-checked"),
   ).toBe("true");
 });
+
+test("a one-option row is a tick box that sets and clears the value", () => {
+  const onChoiceChange = vi.fn<(id: string, v: string | null) => void>();
+  const row = (value: string | null) => ({
+    id: "s",
+    name: "scan",
+    cells: ["scan-0412.md"],
+    options: [{ value: "skip", label: "Skip this file" }],
+    value,
+  });
+  const { rerender } = render(
+    <DecisionRows
+      headers={["Blocker"]}
+      rows={[row(null)]}
+      onChoiceChange={onChoiceChange}
+    />,
+  );
+  expect(screen.queryByRole("radiogroup")).toBeNull();
+  fireEvent.click(screen.getByRole("checkbox", { name: "Skip this file" }));
+  expect(onChoiceChange).toHaveBeenLastCalledWith("s", "skip");
+  rerender(
+    <DecisionRows
+      headers={["Blocker"]}
+      rows={[row("skip")]}
+      onChoiceChange={onChoiceChange}
+    />,
+  );
+  fireEvent.click(screen.getByRole("checkbox", { name: "Skip this file" }));
+  expect(onChoiceChange).toHaveBeenLastCalledWith("s", null);
+});

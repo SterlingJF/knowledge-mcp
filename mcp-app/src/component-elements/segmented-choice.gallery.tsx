@@ -6,7 +6,6 @@ import { SegmentedChoice } from "./segmented-choice";
 import type { SegmentOption } from "./segmented-choice";
 
 const sets: Record<string, SegmentOption<string>[]> = {
-  one: [{ value: "skip", label: decision.skip }],
   two: [
     { value: "accept", label: decision.accept },
     { value: "drop", label: decision.drop },
@@ -49,8 +48,6 @@ export default {
   id: "K11",
   name: "Segmented choice",
   stories: {
-    "1 option at 727px": at("727", "one"),
-    "1 option at 360px": at("360", "one", "skip"),
     "2 options at 727px": at("727", "two"),
     "2 options at 360px": at("360", "two", "accept"),
     "3 options at 727px": at("727", "three", "supported"),

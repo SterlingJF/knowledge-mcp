@@ -2,6 +2,7 @@
 import type { ReactNode } from "react";
 
 import { Badge } from "@/component-elements/badge";
+import { TickBox } from "@/component-elements/change-number";
 import type { BadgeTone } from "@/component-elements/badge";
 import { SegmentedChoice } from "@/component-elements/segmented-choice";
 import type { SegmentOption } from "@/component-elements/segmented-choice";
@@ -31,7 +32,7 @@ export type DecisionRow = {
   /** Names the row for its choice's accessible label. */
   name: string;
   cells: ReactNode[];
-  /** This row's own answers (1 is a tick box, 4+ stack). Omit to use the table's `kind` preset. */
+  /** This row's own answers: 1 is a K05 tick box, 2+ a segmented choice (4+ stack). Omit to use the table's `kind` preset. */
   options?: readonly SegmentOption<string>[];
   /** This row's answer; overrides `choices[id]`. */
   value?: string | null;
@@ -45,6 +46,43 @@ export function countAccepted(
 ): number {
   return Object.values(choices).filter((v) => v === "accept" || v === "apply")
     .length;
+}
+
+function Choice({
+  row,
+  kind,
+  choices,
+  onChoiceChange,
+}: {
+  row: DecisionRow;
+  kind: DecisionKind;
+  choices: Record<string, string | null | undefined>;
+  onChoiceChange: (id: string, value: string | null) => void;
+}) {
+  if (row.decided)
+    return <Badge tone={row.decided.tone}>{row.decided.label}</Badge>;
+  const options = row.options ?? decisionOptions[kind];
+  const value = row.value !== undefined ? row.value : (choices[row.id] ?? null);
+  // One answer: a K05 tick box. Ticking sets it; clearing goes back to undecided.
+  if (options.length === 1) {
+    const only = options[0];
+    return (
+      <TickBox
+        label={only.label}
+        checked={value === only.value}
+        onCheckedChange={(on) => onChoiceChange(row.id, on ? only.value : null)}
+      />
+    );
+  }
+  return (
+    <SegmentedChoice<string>
+      aria-label={row.name}
+      className="[&>[role=radiogroup]]:ml-auto @max-[560px]:[&>[role=radiogroup]]:ml-0"
+      options={options}
+      value={value}
+      onValueChange={(v) => onChoiceChange(row.id, v)}
+    />
+  );
 }
 
 export function DecisionRows({
@@ -102,21 +140,12 @@ export function DecisionRows({
                 "w-2/5 pr-0 text-right @max-[560px]:mt-(--km-gap-row) @max-[560px]:w-auto @max-[560px]:text-left",
               )}
             >
-              {row.decided ? (
-                <Badge tone={row.decided.tone}>{row.decided.label}</Badge>
-              ) : (
-                <SegmentedChoice<string>
-                  aria-label={row.name}
-                  className="[&>[role=radiogroup]]:ml-auto @max-[560px]:[&>[role=radiogroup]]:ml-0"
-                  options={row.options ?? decisionOptions[kind]}
-                  value={
-                    row.value !== undefined
-                      ? row.value
-                      : (choices[row.id] ?? null)
-                  }
-                  onValueChange={(v) => onChoiceChange(row.id, v)}
-                />
-              )}
+              <Choice
+                row={row}
+                kind={kind}
+                choices={choices}
+                onChoiceChange={onChoiceChange}
+              />
             </td>
           </tr>
         ))}
