@@ -24,6 +24,8 @@ One card per slice. Each card lists the frames it builds, the files it owns, whe
 
 - [ ] **H1 Local host harness:** a dev page that hosts the built app the way Claude does (ext-apps AppBridge, sandboxed iframe, Claude's style variables, light and dark, inline and fullscreen), feeds it a real `kb_prepare_proposal` result, and records every ui/message and model context. Owns `mcp-app/harness.html`, `mcp-app/src/harness/*`. Blocked by batch 1.
 
+- [ ] **E5 Proposal document type and reader:** the E-frames show "Design proposal · for maintainers deciding whether to accept it" after the file chip, but `knowledge-mcp/proposal/1` has no field for it. Add optional `document_type` and `reader` (the assistant has both from `kb_get_document_type`), then the card shows them. Contract change.
+
 ## Batch 3: results and moves
 
 - [ ] **C-Result** R01–R04, D06 on `kb_record_edit`, `kb_list_edits`. Blocked by P-A, P-B.

@@ -55,7 +55,7 @@
         "Evidence",
         "1 supported · 1 partly answered · 1 conflicting · 1 suggested",
       ],
-      ["Needs you", "<b>C3 Status</b> · slide 7 approved, notes disputed"],
+      ["Needs you", "<b>C3 Status</b> · Proposed. Approval is disputed."],
       ["Left out", "vendor-quote.xlsx · release-calendar.md"],
     ]);
   const leftClosed = `<div class="note">${ic.left}<span><b>2 files left out:</b> vendor-quote.xlsx, release-calendar.md. <u>Show why</u></span></div>`;
@@ -225,7 +225,7 @@
       cap: [
         "Unticks C1 in the full view: keep the old title.",
         "C1 is struck through; the button names what will be saved. Back inline, the summary’s button reads the same.",
-        "The message sent is “Save C2–C4; keep the current title (C1)”. Only kept rows are written and recorded.",
+        "The message sent is “Save C2–C4 to cache-proposal.md; leave out C1”. Only kept rows are written and recorded.",
         "Per-row selection is in-app direct manipulation (Claude design guidelines); S2 accepted change.",
       ],
     },
@@ -276,10 +276,7 @@
           body: sum([
             ["Changes", "C1 Motivation · C2 Status · C3 Open question"],
             ["Unchanged", "Title · cache rollout section"],
-            [
-              "Needs you",
-              "<b>C2 Status</b> · slide 7 approved, notes disputed",
-            ],
+            ["Needs you", "<b>C2 Status</b> · Proposed. Approval is disputed."],
             ["Left out", "vendor-quote.xlsx · release-calendar.md"],
           ]),
           acts: acts("C1–C3"),
