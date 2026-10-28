@@ -20976,7 +20976,7 @@
             "description": "Who the document is for, from kb_list_audiences, and whether the person confirmed it.",
             "properties": {
               "id": {
-                "description": "The audience's id from kb_list_audiences, such as `maintainers`.",
+                "description": "The audience's id, as kb_list_audiences returned it.",
                 "minLength": 1,
                 "title": "Id",
                 "type": "string"
@@ -21364,7 +21364,7 @@
             ],
             "properties": {
               "id": {
-                "description": "The audience's id from kb_list_audiences, such as `maintainers`.",
+                "description": "The audience's id, as kb_list_audiences returned it.",
                 "type": "string",
                 "minLength": 1
               },

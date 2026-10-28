@@ -202,7 +202,7 @@ $defs:
       - confirmed
     properties:
       id:
-        description: The audience's id from kb_list_audiences, such as `maintainers`.
+        description: The audience's id, as kb_list_audiences returned it.
         type: string
         minLength: 1
       label:

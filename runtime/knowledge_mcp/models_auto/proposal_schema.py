@@ -136,7 +136,7 @@ class ProposalReader(BaseModel):
     id: Annotated[
         str,
         Field(
-            description="The audience's id from kb_list_audiences, such as `maintainers`.",
+            description="The audience's id, as kb_list_audiences returned it.",
             min_length=1,
         ),
     ]
