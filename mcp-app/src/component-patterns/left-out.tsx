@@ -29,7 +29,15 @@ export function LeftOut({
         onShowWhy={() => setOpen(true)}
         className={className}
       >
-        {`${files.map((f) => f.file).join(", ")}.`}
+        {files.map((f, i) => (
+          <span key={f.file}>
+            {i > 0 && ", "}
+            <span className="inline-block max-w-full wrap-anywhere">
+              {f.file}
+            </span>
+          </span>
+        ))}
+        .
       </Note>
     );
 

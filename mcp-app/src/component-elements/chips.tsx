@@ -13,7 +13,35 @@ export type PersonSource = { said: string };
 export type Source = LineSource | PlaceSource | PersonSource;
 
 const chipClass =
-  "inline-flex items-center whitespace-nowrap gap-(--km-space-2) rounded-(--border-radius-sm) border-(length:--border-width-regular) border-(--color-border-tertiary) bg-(--color-background-primary) px-(--km-space-3) py-(--km-space-1) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary)";
+  "inline-flex max-w-full items-center whitespace-nowrap gap-(--km-space-2) rounded-(--border-radius-sm) border-(length:--border-width-regular) border-(--color-border-tertiary) bg-(--color-background-primary) px-(--km-space-3) py-(--km-space-1) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary)";
+
+/**
+ * A name that may wrap only at a space or after "/": never at a hyphen or mid-name.
+ * Use it wherever a file name sits in text that can wrap.
+ */
+export function NoBreakName({ children }: { children: string }) {
+  // Words keep their spaces between them; a word with "/" may break after each "/".
+  return (
+    <>
+      {children.split(/(\s+)/).map((word, i) =>
+        /^\s*$/.test(word) ? (
+          word
+        ) : (
+          <span key={i}>
+            {word.split(/(?<=\/)/).map((piece, k) => (
+              <span key={k}>
+                {k > 0 && <wbr />}
+                <span className="inline-block max-w-full wrap-anywhere">
+                  {piece}
+                </span>
+              </span>
+            ))}
+          </span>
+        ),
+      )}
+    </>
+  );
+}
 
 function Chip({
   icon: Icon,
@@ -29,8 +57,17 @@ function Chip({
   return (
     <span className={cn(chipClass, className)}>
       <Icon aria-hidden className="size-(--km-icon) shrink-0" />
-      <span className={mono ? "font-(family-name:--font-mono)" : undefined}>
-        {children}
+      <span
+        className={cn(
+          "min-w-0 whitespace-normal",
+          mono && "font-(family-name:--font-mono)",
+        )}
+      >
+        {typeof children === "string" ? (
+          <NoBreakName>{children}</NoBreakName>
+        ) : (
+          children
+        )}
       </span>
     </span>
   );
