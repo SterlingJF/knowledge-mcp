@@ -379,15 +379,15 @@
         card({
           eb: "Document",
           title: "Proposals/cache-rollout.md",
-          meta: "Design proposal · recorded Oct 28, 10:12 · approved by you",
+          meta: "Recorded Oct 28, 10:12 · approved by you",
           badge: badge("b-grn", "Created", "check"),
-          acts: `${btn("Undo", "", "undo")}${btn("Show the file", "g")}`,
+          acts: btn("Undo", "", "undo"),
         }) +
         `<div class="say">Created beside cache-proposal.md. Ownership is still an open question in the file.</div>` +
         idle,
       cap: [
         "Pressed Create the file.",
-        "What was created, where, when and on whose OK; Undo.",
+        "What was created, where, when and on whose OK; Undo. The card cannot open a file, so there is no Show the file: say it in chat.",
         "The assistant writes the file, records it, then updates the document-types file.",
         "kb-write-document Edits and kb-track-document-types; TheDriveAI applied card (huFTiG_YBS).",
       ],
