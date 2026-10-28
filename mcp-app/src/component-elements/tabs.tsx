@@ -51,7 +51,7 @@ export function Tabs({
     >
       <TabsList
         variant="line"
-        className="h-auto w-full justify-start gap-(--km-space-5) rounded-none border-b-(length:--border-width-regular) border-(--color-border-tertiary) p-0"
+        className="h-auto w-full justify-start gap-(--km-gap-group) rounded-none border-b-(length:--border-width-regular) border-(--color-border-tertiary) p-0"
       >
         {tabs.map((tab) => (
           <TabsTrigger

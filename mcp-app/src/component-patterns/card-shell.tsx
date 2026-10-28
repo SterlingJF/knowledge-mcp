@@ -90,9 +90,9 @@ export function CardShell({
         className,
       )}
     >
-      {/* Narrow: badge and Full view drop below the title. Wide: they sit at its right. */}
-      <header className="flex flex-col items-start gap-[var(--km-gap-inline)] @sm:flex-row @sm:justify-between @sm:gap-[var(--km-gap-group)]">
-        <div className="min-w-0">
+      {/* Under 480px the title block takes the full width; badge and Full view follow it. */}
+      <header className="flex flex-row items-start justify-between gap-[var(--km-gap-group)] @max-[480px]:flex-col @max-[480px]:gap-[var(--km-gap-inline)]">
+        <div className="min-w-0 @max-[480px]:self-stretch">
           <Eyebrow>{eyebrow}</Eyebrow>
           <Title>{title}</Title>
           {meta != null && <Meta>{meta}</Meta>}
