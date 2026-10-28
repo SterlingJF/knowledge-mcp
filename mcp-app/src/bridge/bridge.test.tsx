@@ -2,7 +2,8 @@ import { render, screen } from "@testing-library/react";
 import type { App } from "@modelcontextprotocol/ext-apps/react";
 
 import { CardView, registerCard } from "@/cards/registry";
-import { cardHost } from "@/bridge/bridge";
+import { cardHost, useCardHost } from "@/bridge/bridge";
+import { StaticCardHost, stubCardHost } from "@/bridge/static";
 
 // A stand-in for the connected App: records what the card asked the host to do.
 function stubApp(modes: Array<string>) {
@@ -61,5 +62,23 @@ describe("CardView", () => {
       <CardView result={{ schema: "knowledge-mcp/other/1" }} />,
     );
     expect(container.innerHTML).toBe("");
+  });
+});
+
+describe("StaticCardHost", () => {
+  it("lets a card send through a recorded stand-in host", async () => {
+    const host = stubCardHost();
+    function Sender() {
+      const { send } = useCardHost();
+      return <button onClick={() => void send("Not now")}>Not now</button>;
+    }
+    render(
+      <StaticCardHost host={host}>
+        <Sender />
+      </StaticCardHost>,
+    );
+    screen.getByText("Not now").click();
+    await Promise.resolve();
+    expect(host.sent).toEqual(["Not now"]);
   });
 });
