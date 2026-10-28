@@ -18,6 +18,7 @@ from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
 from knowledge_mcp.tools.document_type import RecordDigest, RecordText
 from knowledge_mcp.tools.kbp import READS
+from knowledge_mcp.views import markdown
 
 DESCRIPTION = "Prepare moves together from supplied text and a complete listing. Return search strings, affected documents and link target checks; include `allowed_by` to receive replacement text after the confirmed search. Follow `kb-write-document` to apply the moves and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file."
 
@@ -82,4 +83,5 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             arguments,
             DocumentMovesAnswer,
             result,
+            view=markdown.moves,
         )

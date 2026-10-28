@@ -66,6 +66,13 @@ class ConventionsUpdateAnswer(BaseModel):
     record: str | None
     digest: Digest | None
     received: Received
+    card: Annotated[
+        str | None,
+        Field(
+            description="The proposed conventions as markdown. Show it in your reply unchanged.",
+            min_length=1,
+        ),
+    ] = None
 
 
 type KbPrepareConventionsResult = Annotated[

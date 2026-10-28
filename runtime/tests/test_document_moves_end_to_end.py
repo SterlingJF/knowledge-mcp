@@ -29,7 +29,7 @@ def arguments(docs, moves, **extra):
 def invoke(server, args):
     result = anyio.run(server.call_tool, "kb_prepare_document_moves", args)
     assert not result.is_error, result.structured_content
-    assert json.loads(result.content[0].text) == result.structured_content
+    assert json.loads(result.content[-1].text) == result.structured_content
     return result.structured_content
 
 

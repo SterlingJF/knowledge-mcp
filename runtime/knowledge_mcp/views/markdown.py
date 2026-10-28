@@ -128,3 +128,156 @@ def pickup(answer: dict[str, Any]) -> str | None:
         return None
     eyebrow = _title(answer["edits"][-1]).upper()
     return f"{code(eyebrow)} · {code(_name(answer))}\n"
+
+
+JOIN = " · "
+ARROW = " → "
+
+MOVE_BADGES = {
+    "permission_needed": "Needs your OK",
+    "blocked": "Needs your choice",
+    "ready": "Approved",
+    "texts_needed": "Nothing saved",
+    "unchanged": "Nothing saved",
+}
+
+
+def _count(n: int, one: str, many: str) -> str:
+    return f"{n} {one if n == 1 else many}"
+
+
+def _folder(path: str) -> str:
+    parent = str(PurePosixPath(path).parent)
+    return "/" if parent == "." else f"{parent}/"
+
+
+def _move(move: dict[str, Any]) -> str:
+    old, new = PurePosixPath(move["old_path"]), PurePosixPath(move["path"])
+    target = _folder(move["path"])
+    if old.name != new.name:
+        target += f" as {code(new.name)}"
+    return f"{code(move['old_path'])}{ARROW}{target}"
+
+
+def _link(link: dict[str, Any]) -> str:
+    before = code(link["target_before"])
+    after = code(link["replacement"])
+    return f"{code(link['source_path'])}{JOIN}{before}{ARROW}{after}"
+
+
+def _numbered(items: list[str]) -> list[str]:
+    return [f"{n}. {item}" for n, item in enumerate(items, start=1)]
+
+
+def moves(answer: dict[str, Any]) -> str:
+    """The move plan: moves, repaired links, blockers, then what the person can say next."""
+    status = answer["status"]
+    rows = answer["moves"]
+    repaired = [link for link in answer["links"] if link["replacement"] is not None]
+    notes = {link["source_path"] for link in repaired}
+    renames = sum(
+        PurePosixPath(m["old_path"]).name != PurePosixPath(m["path"]).name for m in rows
+    )
+    summary = [_count(len(rows), "move", "moves")]
+    if renames:
+        summary.append(_count(renames, "rename", "renames"))
+    summary.append(_count(len(repaired), "link repaired", "links repaired"))
+    if notes:
+        summary.append(_count(len(notes), "note", "notes"))
+    lines = [
+        f"{code('PROPOSED MOVES')} · {code(MOVE_BADGES[status])}",
+        "",
+        f"**{JOIN.join(summary)}**",
+    ]
+    if rows:
+        lines += [
+            "",
+            f"**Moves ({len(rows)})**",
+            "",
+            *_numbered([_move(m) for m in rows]),
+        ]
+    if repaired:
+        lines += [
+            "",
+            f"**Links ({len(repaired)})**",
+            "",
+            *_numbered([_link(link) for link in repaired]),
+        ]
+    if answer["issues"]:
+        lines += [
+            "",
+            f"**Blockers ({len(answer['issues'])})**",
+            "",
+            *_numbered([_line(issue["detail"]) for issue in answer["issues"]]),
+        ]
+    move = f"Move {_count(len(rows), 'file', 'files')}"
+    if status == "permission_needed":
+        lines += [
+            "",
+            f"Waits for you because it moves files and edits links in {_count(len(notes), 'note', 'notes')}. You can undo it afterwards.",
+            "",
+            f"Say “{move}” or “Not now”.",
+        ]
+    elif status == "blocked":
+        lines += [
+            "",
+            "Move stays off until each blocker has a choice.",
+            "",
+            "Say your choice for each blocker, or “Not now”.",
+        ]
+    return "\n".join(lines) + "\n"
+
+
+CONVENTION_BADGES = {
+    "permission_needed": "Nothing saved",
+    "ready": "Approved",
+    "unchanged": "Nothing saved",
+}
+
+
+def _part(part: dict[str, Any]) -> str:
+    kind = part["part"]
+    if kind == "content":
+        return "title"
+    if kind == "document_type":
+        return "type"
+    if kind == "literal":
+        return str(part["value"])
+    return str(part["property"]) if kind == "property" else "date"
+
+
+def _filing(change: dict[str, Any]) -> str:
+    folder = "".join(
+        f"{item}/" if isinstance(item, str) else f"{{{_part(item)}}}/"
+        for item in change["folder"]
+    )
+    name = JOIN.join(_part(part) for part in change["name"]["parts"])
+    return JOIN.join([code(folder or "/"), name])
+
+
+def _convention(change: dict[str, Any]) -> str:
+    kind = code(change["document_type"])
+    if change["change"] == "remove":
+        return f"{kind}{JOIN}removed"
+    return f"{kind}{JOIN}{_filing(change)}"
+
+
+def conventions(answer: dict[str, Any]) -> str:
+    """Proposed conventions: one numbered row per change, then what the person can say next."""
+    status = answer["status"]
+    changes = answer["changes"]
+    where = answer.get("folder") or _name(answer) or answer["location"]
+    lines = [
+        f"{code('PROPOSED CONVENTIONS')} · {code(CONVENTION_BADGES[status])}",
+        "",
+        f"**Naming and filing for {_line(where)}**",
+        "",
+    ]
+    if changes:
+        lines += _numbered([_convention(c) for c in changes])
+    else:
+        lines.append("No changes")
+    lines += ["", "Existing files unchanged until a move."]
+    if status == "permission_needed":
+        lines += ["", "Say “Save accepted”, which to drop, or “Not now”."]
+    return "\n".join(lines) + "\n"
