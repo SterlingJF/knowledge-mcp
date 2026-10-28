@@ -25,8 +25,7 @@ const rowBase =
 const editCols =
   "grid-cols-[auto_minmax(0,29fr)_minmax(0,42fr)_minmax(0,29fr)]";
 // Draft: Cn, Section, Draft, Source (D05F).
-const draftCols =
-  "grid-cols-[auto_minmax(0,20fr)_minmax(0,51fr)_minmax(0,29fr)]";
+const draftCols = "grid-cols-[auto_auto_minmax(0,55fr)_minmax(0,45fr)]";
 
 function Cell({
   label,
@@ -167,7 +166,7 @@ export function ChangeTable({
             </span>
             <span role="cell" className={cn(out && tertiary)}>
               {draft ? (
-                <span>{row.proposed.label}</span>
+                <span className="whitespace-nowrap">{row.proposed.label}</span>
               ) : row.current ? (
                 <CurrentText
                   label={row.current.label ?? labels.current}
