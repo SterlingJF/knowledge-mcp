@@ -17,9 +17,9 @@ One card per slice. Each card lists the frames it builds, the files it owns, whe
 
 ## Batch 2: patterns and the first card
 
-- [ ] **P-A Card frame:** P01 Card shell (live, frozen, replaced; flat inside the full view), P05 Result and refusal, P06 Card lifecycle (freeze on press, send the message, stand down when a newer card about the same file exists), P07 Summary and full view. Owns `component-patterns/{card-shell,result-card,card-lifecycle,summary-card,full-view}.*`. Blocked by batch 1.
-- [ ] **P-B Card bodies:** P02 Change table (Cn rows, tick boxes, select-all, frozen, stacked under 560px), P03 Left-out disclosure (closed and open), P04 Decision rows (segmented choice per row, decided badges). Owns `component-patterns/{change-table,left-out,decision-rows}.*`. Blocked by batch 1.
-- [ ] **E2+E3 Proposal contract:** a `based_on` digest of the document the proposal was prepared against, and a supersession key (`subject`, `created_at`, `seq`) in the `kb_prepare_proposal` result. Owns `contracts/extensions/mcp/v1/proposal.schema.yaml`, its samples, the generated models, `runtime/knowledge_mcp/tools/proposal.py` and its tests. The coordinator updates `mcp-app/src/contracts/proposal.ts`.
+- [x] **P-A Card frame:** P01 Card shell (live, frozen, replaced; flat inside the full view), P05 Result and refusal, P06 Card lifecycle (freeze on press, send the message, stand down when a newer card about the same file exists), P07 Summary and full view. Owns `component-patterns/{card-shell,result-card,card-lifecycle,summary-card,full-view}.*`. Blocked by batch 1.
+- [x] **P-B Card bodies:** P02 Change table (Cn rows, tick boxes, select-all, frozen, stacked under 560px), P03 Left-out disclosure (closed and open), P04 Decision rows (segmented choice per row, decided badges). Owns `component-patterns/{change-table,left-out,decision-rows}.*`. Blocked by batch 1.
+- [x] **E2+E3 Proposal contract:** a `based_on` digest of the document the proposal was prepared against, and a supersession key (`subject`, `created_at`, `seq`) in the `kb_prepare_proposal` result. Owns `contracts/extensions/mcp/v1/proposal.schema.yaml`, its samples, the generated models, `runtime/knowledge_mcp/tools/proposal.py` and its tests. The coordinator updates `mcp-app/src/contracts/proposal.ts`.
 - [ ] **C-Proposal** E01–E08, E02F, D05, D05F on `kb_prepare_proposal`. Blocked by P-A, P-B, E2+E3.
 
 ## Batch 3: results and moves

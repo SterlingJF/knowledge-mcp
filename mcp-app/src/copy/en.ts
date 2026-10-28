@@ -100,6 +100,19 @@ export const change = {
   number: (n: number) => `C${n}`,
   range: (from: number, to: number) =>
     from === to ? `C${from}` : `C${from}–C${to}`,
+  /** Change numbers as runs: [1,2,3,4] → "C1–C4"; [1,3,4] → "C1, C3–C4". */
+  list: (numbers: Array<number>) =>
+    numbers
+      .slice()
+      .sort((a, b) => a - b)
+      .reduce<Array<[number, number]>>((runs, n) => {
+        const last = runs.at(-1);
+        if (last && n === last[1] + 1) last[1] = n;
+        else runs.push([n, n]);
+        return runs;
+      }, [])
+      .map(([from, to]) => (from === to ? `C${from}` : `C${from}–C${to}`))
+      .join(", "),
 } as const;
 
 export const status = {
@@ -113,8 +126,23 @@ export const meta = {
   join: " · ",
 } as const;
 
+export const eyebrow = {
+  proposedChanges: "Proposed changes",
+  proposedDocument: "Proposed document",
+  change: "Change",
+} as const;
+
+/** What a card's button sends as the person's message. */
+export const message = {
+  save: (changes: string, file: string, leftOut?: string) =>
+    `Save ${changes} to ${file}${leftOut ? `; leave out ${leftOut}` : ""}`,
+  create: (file: string, changes: string) => `Create ${file} with ${changes}`,
+  notNow: "Not now",
+} as const;
+
 export const label = {
   changes: "Changes",
+  sections: "Sections",
   evidence: "Evidence",
   needsYou: "Needs you",
   leftOut: "Left out",

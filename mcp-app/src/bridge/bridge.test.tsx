@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import type { App } from "@modelcontextprotocol/ext-apps/react";
 
 import { CardView, registerCard } from "@/cards/registry";
+import { change } from "@/copy/en";
 import { cardHost, useCardHost } from "@/bridge/bridge";
 import { StaticCardHost, stubCardHost } from "@/bridge/static";
 
@@ -102,5 +103,13 @@ describe("StaticCardHost", () => {
     screen.getByText("Not now").click();
     await Promise.resolve();
     expect(host.sent).toEqual(["Not now"]);
+  });
+});
+
+describe("change.list", () => {
+  it("writes change numbers as runs", () => {
+    expect(change.list([4, 1, 2, 3])).toBe("C1–C4");
+    expect(change.list([1, 3, 4])).toBe("C1, C3–C4");
+    expect(change.list([2])).toBe("C2");
   });
 });

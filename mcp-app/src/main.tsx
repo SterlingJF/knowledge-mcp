@@ -6,6 +6,9 @@ import { CardHostProvider, useCardHost } from "./bridge/bridge";
 
 import "./styles.css";
 
+// Each cards/*-card.tsx registers itself on import, so a new card needs no edit here.
+import.meta.glob("./cards/*-card.tsx", { eager: true });
+
 function Card() {
   const { result } = useCardHost();
   return <CardView result={result} />;
