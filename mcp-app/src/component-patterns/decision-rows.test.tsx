@@ -169,7 +169,7 @@ test("move blockers: no title, nothing hidden, choice at the start", () => {
     />,
   );
   const cell = screen.getByText("a.md already exists");
-  expect(cell.className).toContain(
+  expect(cell.className).not.toContain(
     "@max-[560px]:font-(--font-weight-semibold)",
   );
   expect(cell.className).not.toContain("hidden");
