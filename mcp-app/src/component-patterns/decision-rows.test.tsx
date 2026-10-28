@@ -151,7 +151,7 @@ test("narrow layout marks the title, detail and hidden cells", () => {
   expect(screen.getByText("Choice").tagName).toBe("TH");
 });
 
-test("move blockers: problem is the title, nothing hidden, choice at the start", () => {
+test("move blockers: no title, nothing hidden, choice at the start", () => {
   render(
     <DecisionRows
       headers={["Problem", "Your choice"]}
@@ -163,7 +163,7 @@ test("move blockers: problem is the title, nothing hidden, choice at the start",
           options: [{ value: "s", label: "Skip" }],
         },
       ]}
-      narrow={{ title: 0 }}
+      narrow={{}}
       align="start"
       onChoiceChange={() => {}}
     />,

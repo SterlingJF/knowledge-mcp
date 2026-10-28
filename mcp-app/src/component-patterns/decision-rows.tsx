@@ -53,7 +53,8 @@ export function countAccepted(
 }
 
 /** Which cell plays which part when the table stacks under 560px. Column indexes. */
-export type NarrowLayout = { title: number; detail?: number; hide?: number[] };
+/** Leave `title` unset when the cell bolds its own part (M05F bolds only the file name). */
+export type NarrowLayout = { title?: number; detail?: number; hide?: number[] };
 /** The conventions layout: type as the title, example as the detail, folder hidden. */
 const conventionsNarrow: NarrowLayout = { title: 0, detail: 2, hide: [1] };
 
