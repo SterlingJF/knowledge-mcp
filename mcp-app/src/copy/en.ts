@@ -78,6 +78,8 @@ export const evidence = {
 } as const;
 
 export const line = {
+  /** A number and its noun never part across a line: `1 conflicting`. */
+  counted: (n: number, noun: string) => `${n}\u00a0${noun}`,
   waitsBecause: (file: string) =>
     `Waits for you because it changes ${file}. Every saved edit is recorded and can be undone.`,
   leftOut: (count: number) =>
@@ -115,7 +117,7 @@ export const change = {
   range: (from: number, to: number) =>
     from === to ? `C${from}` : `C${from}–C${to}`,
   /** More changes than a summary line can name: `6 changes`. */
-  count: (n: number) => `${n} ${n === 1 ? "change" : "changes"}`,
+  count: (n: number) => `${n}\u00a0${n === 1 ? "change" : "changes"}`,
   /** Change numbers as runs: [1,2,3,4] → "C1–C4"; [1,3,4] → "C1, C3–C4". */
   list: (numbers: Array<number>) =>
     numbers
