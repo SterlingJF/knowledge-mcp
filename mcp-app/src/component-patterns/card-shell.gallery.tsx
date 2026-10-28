@@ -1,5 +1,4 @@
 import { action, badge, frozen, line } from "@/copy/en";
-import { KeyValue } from "@/component-elements/key-value";
 import { CardShell } from "./card-shell";
 import type { CardAction, CardShellProps } from "./card-shell";
 
@@ -14,14 +13,12 @@ const actions: CardAction[] = [
 ];
 
 const base: CardShellProps = {
-  eyebrow: "Evidence review",
-  title: "cache-proposal.md",
-  meta: "4 changes · 3 sources",
-  badge: { tone: "waiting", label: badge.waiting.needsOk },
+  eyebrow: "Proposed changes",
+  title: "Focus the proposal on retiring the evening build",
+  meta: "cache-proposal.md · Design proposal · for maintainers deciding whether to accept it",
+  badge: { tone: "waiting", label: badge.waiting.nothingSaved },
   why: line.waitsBecause("cache-proposal.md"),
   actions,
-  onFullView: () => {},
-  children: <KeyValue rows={[{ label: "Changes", value: "C1–C4" }]} />,
 };
 
 export default {
@@ -29,8 +26,16 @@ export default {
   name: "Card shell",
   stories: {
     Live: <CardShell {...base} />,
-    Frozen: <CardShell {...base} state="frozen" frozenLine={frozen.approved} />,
-    Replaced: <CardShell {...base} state="replaced" />,
-    Flat: <CardShell {...base} onFullView={undefined} flat />,
+    Frozen: (
+      <CardShell
+        {...base}
+        eyebrow="Change"
+        badge={{ tone: "done", label: badge.done.approved }}
+        state="frozen"
+        frozenLine={frozen.approved}
+      />
+    ),
+    Replaced: <CardShell {...base} eyebrow="Change" state="replaced" />,
+    Flat: <CardShell {...base} flat />,
   },
 };

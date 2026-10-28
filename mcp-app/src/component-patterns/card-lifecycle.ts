@@ -38,6 +38,7 @@ export type CardLifecycle = {
   press: (action: CardAction) => void;
 };
 
+/** Call it in the card, not in SummaryCard or FullView, so state survives the display-mode switch. */
 export function useCardLifecycle(): CardLifecycle {
   const host = useCardHost();
   const [frozenLine, setFrozenLine] = useState<string>();

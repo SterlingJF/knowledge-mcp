@@ -19,21 +19,13 @@ export type FullViewProps = {
   lifecycle: CardLifecycle;
 };
 
-export function FullView(props: FullViewProps) {
-  const host = useCardHost();
-  return (
-    <FullViewLayout {...props} onPressed={() => void host.requestInline()} />
-  );
-}
-
-/** The full view without the bridge: the gallery and tests draw it directly. */
-export function FullViewLayout({
+export function FullView({
   children,
   actions,
   lifecycle,
-  onPressed,
   ...shell
-}: FullViewProps & { onPressed?: () => void }) {
+}: FullViewProps) {
+  const host = useCardHost();
   return (
     <CardShell
       {...shell}
@@ -43,7 +35,7 @@ export function FullViewLayout({
       actions={actions}
       onAction={(item) => {
         lifecycle.press(item);
-        onPressed?.();
+        void host.requestInline();
       }}
     >
       {children}

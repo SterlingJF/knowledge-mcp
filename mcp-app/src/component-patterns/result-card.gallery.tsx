@@ -1,4 +1,4 @@
-import { action, badge, frozen } from "@/copy/en";
+import { badge, frozen } from "@/copy/en";
 import type { CardLifecycle } from "./card-lifecycle";
 import { ResultCard } from "./result-card";
 
@@ -15,27 +15,33 @@ export default {
     Result: (
       <ResultCard
         kind="result"
-        eyebrow="Edit"
-        title="cache-proposal.md"
+        eyebrow="Saved"
+        title="cache-proposal.md · 4 changes"
         badgeLabel={badge.done.saved}
-        what="4 changes"
-        when="just now"
-        who="you"
+        what="Recorded"
+        when="Oct 28, 09:41"
+        who="approved by you"
         undoMessage=""
+        secondary={{
+          label: "Show the change",
+          message: "",
+          frozenLine: frozen.approved,
+        }}
         lifecycle={live}
       />
     ),
     Refusal: (
       <ResultCard
         kind="refusal"
-        eyebrow="Edit"
-        title="cache-proposal.md"
+        eyebrow="Undo"
+        title="Undo: cache-proposal.md · 4 changes"
         badgeLabel={badge.refused.cantUndo}
-        reason="The file changed after this edit, so undoing it would lose newer text. Nothing changed."
+        reason="cache-proposal.md changed after this edit (2 later edits)."
         nextStep={{
-          label: action.prepareAgain,
+          label: "Show the later edits",
           message: "",
           frozenLine: frozen.notSaved,
+          variant: "primary",
         }}
         lifecycle={live}
       />

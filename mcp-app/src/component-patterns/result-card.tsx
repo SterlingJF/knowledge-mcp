@@ -1,6 +1,7 @@
 // P05 Result and refusal. A result says what was done, when and by whom, with Undo and one other
 // step. A refusal says why and that nothing changed, with one next step.
 import type { ReactNode } from "react";
+import { Undo2 } from "lucide-react";
 
 import { Note } from "@/component-elements/note";
 import { action as actionCopy, frozen, line } from "@/copy/en";
@@ -31,7 +32,7 @@ export type ResultCardProps =
     })
   | (Common & {
       kind: "refusal";
-      /** Why it was refused, and that nothing changed. */
+      /** Why it was refused; the card adds that nothing was changed. */
       reason: ReactNode;
       nextStep: CardAction;
     });
@@ -44,6 +45,8 @@ export function ResultCard(props: ResultCardProps) {
         label: actionCopy.undo,
         message: props.undoMessage,
         frozenLine: frozen.undoRequested,
+        variant: "secondary",
+        icon: <Undo2 aria-hidden="true" />,
       },
     ];
     if (props.secondary) actions.push(props.secondary);
@@ -77,7 +80,7 @@ export function ResultCard(props: ResultCardProps) {
       flat={flat}
     >
       <Note kind="warning" className="mt-[var(--km-space-5)]">
-        {props.reason}
+        {props.reason} {line.nothingChanged}
       </Note>
       {children}
     </CardShell>

@@ -11,9 +11,7 @@ import { frozen } from "@/copy/en";
 import { CardShell } from "./card-shell";
 import type { CardAction } from "./card-shell";
 import { isYounger, useCardLifecycle } from "./card-lifecycle";
-import { StubHost, stubHost } from "./host-double";
-
-vi.mock("@/bridge/bridge", () => import("./host-double"));
+import { StaticCardHost, stubCardHost } from "@/bridge/static";
 
 const save: CardAction = {
   label: "Save C1",
@@ -36,11 +34,11 @@ function Card({ name }: { name: string }) {
 }
 
 test("a press freezes at once and sends the exact message, once", () => {
-  const host = stubHost();
+  const host = stubCardHost();
   render(
-    <StubHost host={host}>
+    <StaticCardHost host={host}>
       <Card name="a" />
-    </StubHost>,
+    </StaticCardHost>,
   );
   fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
   expect(screen.queryByRole("button")).toBeNull();
@@ -57,33 +55,30 @@ test("isYounger compares created_at, then seq", () => {
 
 test("the older card about the same subject stands down", async () => {
   const at = "2026-10-28T10:00:00Z";
-  const older = stubHost(
-    {},
-    { instance: { subject: "a.md", created_at: at, seq: 1 } },
-  );
-  const younger = stubHost(
-    {},
-    { instance: { subject: "a.md", created_at: at, seq: 2 } },
-  );
-  const other = stubHost(
-    {},
-    { instance: { subject: "b.md", created_at: at, seq: 0 } },
-  );
+  const older = stubCardHost({
+    result: { instance: { subject: "a.md", created_at: at, seq: 1 } },
+  });
+  const younger = stubCardHost({
+    result: { instance: { subject: "a.md", created_at: at, seq: 2 } },
+  });
+  const other = stubCardHost({
+    result: { instance: { subject: "b.md", created_at: at, seq: 0 } },
+  });
   render(
     <>
-      <StubHost host={older}>
+      <StaticCardHost host={older}>
         <Card name="older" />
-      </StubHost>
-      <StubHost host={other}>
+      </StaticCardHost>
+      <StaticCardHost host={other}>
         <Card name="other" />
-      </StubHost>
+      </StaticCardHost>
     </>,
   );
   await act(async () => {
     render(
-      <StubHost host={younger}>
+      <StaticCardHost host={younger}>
         <Card name="younger" />
-      </StubHost>,
+      </StaticCardHost>,
     );
   });
   await waitFor(() =>
@@ -98,24 +93,22 @@ test("the older card about the same subject stands down", async () => {
 
 test("an older card mounting late learns it is already replaced", async () => {
   const at = "2026-10-28T10:00:00Z";
-  const younger = stubHost(
-    {},
-    { instance: { subject: "a.md", created_at: at, seq: 2 } },
-  );
-  const older = stubHost(
-    {},
-    { instance: { subject: "a.md", created_at: at, seq: 1 } },
-  );
+  const younger = stubCardHost({
+    result: { instance: { subject: "a.md", created_at: at, seq: 2 } },
+  });
+  const older = stubCardHost({
+    result: { instance: { subject: "a.md", created_at: at, seq: 1 } },
+  });
   render(
-    <StubHost host={younger}>
+    <StaticCardHost host={younger}>
       <Card name="younger" />
-    </StubHost>,
+    </StaticCardHost>,
   );
   await act(async () => {
     render(
-      <StubHost host={older}>
+      <StaticCardHost host={older}>
         <Card name="older" />
-      </StubHost>,
+      </StaticCardHost>,
     );
   });
   await waitFor(() =>
@@ -128,9 +121,9 @@ test("an older card mounting late learns it is already replaced", async () => {
 test("without an instance key nothing is announced", () => {
   const post = vi.spyOn(BroadcastChannel.prototype, "postMessage");
   render(
-    <StubHost host={stubHost()}>
+    <StaticCardHost host={stubCardHost()}>
       <Card name="a" />
-    </StubHost>,
+    </StaticCardHost>,
   );
   expect(post).not.toHaveBeenCalled();
   post.mockRestore();

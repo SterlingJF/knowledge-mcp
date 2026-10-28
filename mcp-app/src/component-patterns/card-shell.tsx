@@ -28,7 +28,9 @@ export type CardAction = {
   message: string;
   /** The line from `frozen` in src/copy/en.ts shown once this action was pressed. */
   frozenLine: string;
+  /** Defaults to ghost, the decline look; the first action is usually primary. */
   variant?: ButtonVariant;
+  icon?: ReactNode;
 };
 
 export type CardShellProps = {
@@ -105,13 +107,14 @@ export function CardShell({
         )}
       </header>
       {children}
-      {why != null && <WhyLine>{why}</WhyLine>}
+      {live && why != null && <WhyLine>{why}</WhyLine>}
       {live && actions.length > 0 && (
         <div className="mt-[var(--km-space-5)] flex flex-wrap items-center gap-[var(--km-space-4)]">
           {actions.map((item) => (
             <Button
               key={item.label}
-              variant={item.variant ?? "secondary"}
+              variant={item.variant ?? "ghost"}
+              icon={item.icon}
               onClick={() => onAction?.(item)}
             >
               {item.label}

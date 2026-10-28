@@ -56,6 +56,7 @@ test("frozen: actions gone, frozen line added, body unchanged", () => {
   expect(screen.getByText(frozen.approved)).toBeTruthy();
   expect(screen.getByText("Body text")).toBeTruthy();
   expect(screen.getByText(badge.waiting.needsOk)).toBeTruthy();
+  expect(screen.queryByText("Waits for you.")).toBeNull();
 });
 
 test("replaced: neutral Replaced badge and its frozen line", () => {

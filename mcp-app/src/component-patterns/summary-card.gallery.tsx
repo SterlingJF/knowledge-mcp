@@ -1,8 +1,8 @@
+import { StaticCardHost, stubCardHost } from "@/bridge/static";
 import { action, badge, frozen, label, line } from "@/copy/en";
 import type { CardAction } from "./card-shell";
 import type { CardLifecycle } from "./card-lifecycle";
-import { FullViewLayout } from "./full-view";
-import { SummaryCardView } from "./summary-card";
+import { SummaryCard } from "./summary-card";
 
 const live: CardLifecycle = {
   state: "live",
@@ -18,34 +18,34 @@ const actions: CardAction[] = [
   },
   { label: action.notNow, message: "", frozenLine: frozen.notSaved },
 ];
-const head = {
-  eyebrow: "Evidence review",
-  title: "cache-proposal.md",
-  badge: { tone: "waiting" as const, label: badge.waiting.needsOk },
-  why: line.waitsBecause("cache-proposal.md"),
-  actions,
-  lifecycle: live,
-};
 
 export default {
   id: "P07",
-  name: "Summary and full view",
+  name: "Summary",
   stories: {
     Summary: (
-      <SummaryCardView
-        {...head}
-        onFullView={() => {}}
-        rows={[
-          { label: label.changes, value: "C1–C4 · 2 sections" },
-          { label: label.evidence, value: "3 supported · 1 partly answered" },
-          { label: label.leftOut, value: line.leftOut(2) },
-        ]}
-      />
-    ),
-    "Full view": (
-      <FullViewLayout {...head}>
-        <p>Every change, each with its sources.</p>
-      </FullViewLayout>
+      <StaticCardHost host={stubCardHost()}>
+        <SummaryCard
+          eyebrow="Proposed changes"
+          title="Focus the proposal on retiring the evening build"
+          badge={{ tone: "waiting", label: badge.waiting.nothingSaved }}
+          why={line.waitsBecause("cache-proposal.md")}
+          actions={actions}
+          lifecycle={live}
+          rows={[
+            {
+              label: label.changes,
+              value: "C1–C4: title, motivation, status, open question",
+            },
+            {
+              label: label.evidence,
+              value:
+                "1 supported · 1 partly answered · 1 conflicting · 1 suggested",
+            },
+            { label: label.leftOut, value: line.leftOut(2) },
+          ]}
+        />
+      </StaticCardHost>
     ),
   },
 };

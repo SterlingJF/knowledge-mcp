@@ -12,9 +12,9 @@ const actions: CardAction[] = [
   { label: action.notNow, message: "", frozenLine: frozen.notSaved },
 ];
 const shell = {
-  eyebrow: "Evidence review",
-  title: "cache-proposal.md",
-  badge: { tone: "waiting" as const, label: badge.waiting.needsOk },
+  eyebrow: "Proposed changes",
+  title: "Focus the proposal on retiring the evening build",
+  badge: { tone: "waiting" as const, label: badge.waiting.nothingSaved },
   actions,
 };
 
@@ -22,13 +22,24 @@ export default {
   id: "P06",
   name: "Card lifecycle",
   stories: {
-    Live: <CardShell {...shell} />,
-    "Frozen: approved": (
-      <CardShell {...shell} state="frozen" frozenLine={frozen.approved} />
+    "1 · Drawn live": <CardShell {...shell} />,
+    "2 · Pressed: approved": (
+      <CardShell
+        {...shell}
+        eyebrow="Change"
+        badge={{ tone: "done", label: badge.done.approved }}
+        state="frozen"
+        frozenLine={frozen.approved}
+      />
     ),
-    "Frozen: not now": (
-      <CardShell {...shell} state="frozen" frozenLine={frozen.notSaved} />
+    "2 · Pressed: not now": (
+      <CardShell
+        {...shell}
+        badge={{ tone: "neutral", label: badge.neutral.notSaved }}
+        state="frozen"
+        frozenLine={frozen.notSaved}
+      />
     ),
-    Replaced: <CardShell {...shell} state="replaced" />,
+    "5 · Replaced": <CardShell {...shell} eyebrow="Change" state="replaced" />,
   },
 };

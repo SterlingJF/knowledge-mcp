@@ -23,27 +23,14 @@ export type SummaryCardProps = {
   lifecycle: CardLifecycle;
 };
 
-export function SummaryCard(props: SummaryCardProps) {
-  const host = useCardHost();
-  return (
-    <SummaryCardView
-      {...props}
-      onFullView={
-        host.canFullView ? () => void host.requestFullView() : undefined
-      }
-    />
-  );
-}
-
-/** The summary without the bridge: the gallery and tests draw it directly. */
-export function SummaryCardView({
+export function SummaryCard({
   rows,
   children,
   actions,
   lifecycle,
-  onFullView,
   ...shell
-}: SummaryCardProps & { onFullView?: () => void }) {
+}: SummaryCardProps) {
+  const host = useCardHost();
   return (
     <CardShell
       {...shell}
@@ -51,7 +38,9 @@ export function SummaryCardView({
       frozenLine={lifecycle.frozenLine}
       actions={actions}
       onAction={lifecycle.press}
-      onFullView={onFullView}
+      onFullView={
+        host.canFullView ? () => void host.requestFullView() : undefined
+      }
     >
       <KeyValue rows={rows} />
       {children}

@@ -44,6 +44,8 @@ test("result: done badge, what · when · who, Undo first", () => {
     label: action.undo,
     message: "Undo edit 12",
     frozenLine: frozen.undoRequested,
+    variant: "secondary",
+    icon: expect.anything(),
   });
 });
 
@@ -54,7 +56,7 @@ test("refusal: refused badge, warning note, one next step", () => {
       eyebrow="Edit"
       title="cache-proposal.md"
       badgeLabel={badge.refused.cantUndo}
-      reason="The file changed after the edit. Nothing changed."
+      reason="The file changed after the edit."
       nextStep={{
         label: action.prepareAgain,
         message: "Prepare again",
@@ -66,6 +68,8 @@ test("refusal: refused badge, warning note, one next step", () => {
   expect(
     screen.getByText(badge.refused.cantUndo).closest("[data-tone]"),
   ).toHaveProperty("dataset.tone", "refused");
-  expect(screen.getByRole("alert").textContent).toContain("Nothing changed.");
+  expect(screen.getByRole("alert").textContent).toBe(
+    "The file changed after the edit. Nothing was changed.",
+  );
   expect(screen.getAllByRole("button")).toHaveLength(1);
 });
