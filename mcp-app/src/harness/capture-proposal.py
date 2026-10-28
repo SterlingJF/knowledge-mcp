@@ -25,7 +25,7 @@ FIRST = {**DEMO, "document_digest": DIGEST}
 # A younger proposal for the same document: the first card should stand down.
 YOUNGER = {
     **FIRST,
-    "summary": "Retire the evening build; cache rollout stays open",
+    "summary": "Retire the evening build",
     "rows": FIRST["rows"][:2],
 }
 

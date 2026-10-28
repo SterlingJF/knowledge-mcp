@@ -100,7 +100,11 @@ function Frame({
     bridgeRef.current?.setHostContext(context);
     onLog({
       kind: "host → context",
-      detail: { theme, width, displayMode: mode },
+      detail: {
+        theme,
+        displayMode: mode,
+        containerDimensions: context.containerDimensions,
+      },
       card,
       at: Date.now(),
     });
@@ -147,8 +151,9 @@ function Harness() {
     <div
       style={{
         display: "flex",
-        flexWrap: "wrap",
-        alignItems: "flex-start",
+        flexDirection: "column",
+        width: "max-content",
+        minWidth: "100%",
         gap: 16,
         padding: 16,
         minHeight: "100vh",
@@ -159,7 +164,7 @@ function Harness() {
         fontFamily: "system-ui, sans-serif",
       }}
     >
-      <main style={{ flex: "1 1 400px", minWidth: 0, overflowX: "auto" }}>
+      <main style={{ width: "max-content" }}>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
@@ -197,7 +202,7 @@ function Harness() {
       <aside
         aria-label="Host log"
         style={{
-          flex: "1 1 320px",
+          maxWidth: 760,
           fontSize: 12,
           overflow: "auto",
           maxHeight: "95vh",
