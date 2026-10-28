@@ -178,6 +178,21 @@ export const label = {
   source: "Source",
 } as const;
 
+// C-Result
+export const editResult = {
+  /** Eyebrow for a created file (D06); an edit uses `eyebrow.change`. */
+  document: "Document",
+  /** After the shown lines of a long diff. */
+  moreLines: (n: number) =>
+    `… and ${n} more changed ${n === 1 ? "line" : "lines"}`,
+  /** Undo meta: `undoes the 09:41 edit`. */
+  undoes: (time: string) => `undoes the ${time} edit`,
+  /** What Undo sends: `Undo the 09:41 edit to cache-proposal.md`. */
+  undo: (time: string, file: string) => `Undo the ${time} edit to ${file}`,
+  /** Meta when an instruction for agents allowed the edit, not the person in this session. */
+  allowedByInstruction: "allowed by your instruction",
+} as const;
+
 // C-Proposal
 export const proposal = {
   /** Meta line, after the document type: `for maintainers`. */

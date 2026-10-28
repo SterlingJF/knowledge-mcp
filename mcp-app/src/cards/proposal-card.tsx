@@ -33,6 +33,7 @@ import {
   message,
   proposal as proposalCopy,
 } from "@/copy/en";
+import { lastSegment } from "./file-name";
 import { registerCard } from "./registry";
 import type { CardProps } from "./registry";
 
@@ -73,7 +74,7 @@ export const isNewDocument = (p: Proposal) => p.rows.every((r) => !r.current);
 
 /** The last path segment of the subject, or "the document" without one. */
 export function fileName(p: Proposal): string {
-  return p.instance?.subject.split("/").at(-1) || line.theDocument;
+  return lastSegment(p.instance?.subject ?? "") || line.theDocument;
 }
 
 export function saveMessage(p: Proposal, kept: Set<number>): string {

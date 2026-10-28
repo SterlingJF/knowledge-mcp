@@ -31,6 +31,8 @@ export type ResultCardProps =
       /** The message Undo sends. Absent: no Undo (an undone change is redone through chat, R03). */
       undoMessage?: string;
       secondary?: CardAction;
+      /** A neutral badge once Undo froze the card, like the shell's Replaced: `badge.neutral.undoRequested`. */
+      frozenBadge?: ReactNode;
       /** "Show the change" beside Undo; the Diff it opens goes in children with id === controls. */
       disclosure?: CardDisclosure;
     })
@@ -63,7 +65,11 @@ export function ResultCard(props: ResultCardProps) {
           meta.join +
           (props.who ?? meta.approvedByYou)
         }
-        badge={{ tone: "done", label: badgeLabel }}
+        badge={
+          lifecycle.state === "frozen" && props.frozenBadge != null
+            ? { tone: "neutral", label: props.frozenBadge }
+            : { tone: "done", label: badgeLabel }
+        }
         why={why}
         actions={actions}
         disclosure={props.disclosure}

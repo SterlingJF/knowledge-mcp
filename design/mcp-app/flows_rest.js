@@ -530,10 +530,10 @@
       ["Moves", "3 · Inbox → Meetings/, Decisions/, Proposals/"],
       ["Renames", "2 · date + title"],
       ["Links", "5 repaired · 4 notes"],
-      ["Stays", "scan-0412.md · no document type"],
-      ...(blocked
-        ? [["Needs you", "<b>2 blockers</b> · name taken, ambiguous link"]]
-        : []),
+      // Four rows at most: a blocked plan shows Needs you in place of Stays.
+      blocked
+        ? ["Needs you", "<b>2 blockers</b> · name taken, ambiguous link"]
+        : ["Stays", "scan-0412.md · no document type"],
     ]);
   const mLeft = `<div class="note">${ic.left}<span><b>1 file stays where it is.</b> scan-0412.md has no document type.</span></div>`;
   const mWhy = `<span class="disc">${ic.link}Show the 5 links</span><div class="why">Waits for you because it moves files and edits links in 4 other notes. You can undo it afterwards.</div>`;
@@ -645,9 +645,10 @@
                 '<span class="mono">[[build-review-notes]]</span>',
                 '<span class="mono">[[2026-10-27 build review]]</span>',
               ],
-              ['<span class="mu">+ 2 more</span>', "", ""],
+              ['<span class="mu">+2 more</span>', "", ""],
             ],
-          ),
+          ) +
+          `<div class="why">Waits for you because it moves files and edits links in 4 other notes. You can undo it afterwards.</div>`,
         acts: `${btn("Move 3 files", "p")}${btn("Not now", "g")}`,
       }),
       composer: wait,
