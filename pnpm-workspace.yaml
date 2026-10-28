@@ -1,6 +1,7 @@
 ---
 packages:
   - contracts
+  - mcp-app
 
 # One week, in minutes.
 minimumReleaseAge: 10080

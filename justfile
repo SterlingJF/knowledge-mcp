@@ -21,7 +21,7 @@ install_unlock:
   pnpm install --no-frozen-lockfile
 
 # Run the CI checks without changing files.
-check: check_root check_contracts check_runtime
+check: check_root check_contracts check_runtime check_mcp_app
 
 # Check justfile formatting.
 check_justfile_format:
@@ -191,6 +191,10 @@ _contract_bundles MODE:
       exit 1
     fi
   done
+
+# Check mcp-app/: token staleness, lint, types, tests and the single-file build.
+check_mcp_app:
+  pnpm --filter mcp-app run check
 
 # Lint, type-check and test runtime/, and scan runtime/ for dead code. Check that models_auto and docs/mcp-tools.mdx are current.
 check_runtime: check_mcp_tools_doc (_contract_models '--check')

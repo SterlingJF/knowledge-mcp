@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./generated/tokens.auto.css";
+
+/* shadcn's names, pointed at the host style variables, so core components follow Claude's theme. */
+:root {
+  --background: transparent;
+  --foreground: var(--color-text-primary);
+  --primary: var(--color-background-inverse);
+  --primary-foreground: var(--color-text-inverse);
+  --secondary: var(--color-background-primary);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: var(--color-background-secondary);
+  --muted-foreground: var(--color-text-tertiary);
+  --accent: var(--color-background-secondary);
+  --accent-foreground: var(--color-text-primary);
+  --destructive: var(--color-text-danger);
+  --border: var(--color-border-tertiary);
+  --input: var(--color-border-secondary);
+  --ring: var(--color-ring-primary);
+  --radius: var(--border-radius-md);
+}
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: var(--border-radius-sm);
+  --radius-md: var(--border-radius-md);
+  --radius-lg: var(--border-radius-lg);
+  --radius-xl: var(--border-radius-xl);
+}
+
+/* Transparent theming: Claude's chat shows through the frame. */
+html,
+body {
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-text-sm-size);
+  line-height: var(--font-text-sm-line-height);
+  margin: 0;
+}

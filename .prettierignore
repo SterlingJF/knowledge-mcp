@@ -19,3 +19,7 @@ runtime/tests/fixtures/
 # The staleness checks compare these generated files with fresh unformatted output, so Prettier must leave them alone.
 runtime/knowledge_mcp/schemas_auto/
 contracts/extensions/mcp/v1/tools.json
+
+# shadcn vendor code stays as generated; the token CSS is compared byte for byte.
+mcp-app/src/component-core/
+mcp-app/src/generated/
