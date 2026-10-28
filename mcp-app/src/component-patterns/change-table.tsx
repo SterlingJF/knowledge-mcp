@@ -20,8 +20,13 @@ const tertiary = "text-(--color-text-tertiary)";
 // Only text spans are struck: a strike on the cell would reach the evidence mark.
 const struck = "line-through";
 // Wide: four columns. Narrow (container under 560px): each row stacks.
-const rowClass =
-  "grid grid-cols-[auto_minmax(0,29fr)_minmax(0,42fr)_minmax(0,29fr)] items-start gap-x-(--km-space-5) gap-y-(--km-space-3) border-b-(length:--border-width-regular) border-(--color-border-tertiary) py-(--km-space-4) @max-[560px]:grid-cols-1";
+const rowBase =
+  "grid items-start gap-x-(--km-space-5) gap-y-(--km-space-3) border-b-(length:--border-width-regular) border-(--color-border-tertiary) py-(--km-space-4) @max-[560px]:grid-cols-1";
+const editCols =
+  "grid-cols-[auto_minmax(0,29fr)_minmax(0,42fr)_minmax(0,29fr)]";
+// Draft: Cn, Section, Draft, Source (D05F).
+const draftCols =
+  "grid-cols-[auto_minmax(0,20fr)_minmax(0,51fr)_minmax(0,29fr)]";
 
 function Cell({
   label,
@@ -87,6 +92,8 @@ export type ChangeTableProps = {
   kept?: Set<number>;
   /** Omit for a frozen table: numbers stay, boxes go. */
   onKeptChange?: (kept: Set<number>) => void;
+  /** A proposed new document: no Current column, no boxes, every section kept. */
+  draft?: boolean;
   className?: string;
 };
 
@@ -94,9 +101,11 @@ export function ChangeTable({
   rows,
   kept,
   onKeptChange,
+  draft = false,
   className,
 }: ChangeTableProps) {
-  const frozen = onKeptChange == null;
+  const frozen = draft || onKeptChange == null;
+  const rowClass = cn(rowBase, draft ? draftCols : editCols);
   const keptSet = kept ?? new Set(rows.map((_, i) => i + 1));
   const isKept = (n: number) => frozen || keptSet.has(n);
 
@@ -108,7 +117,7 @@ export function ChangeTable({
   };
 
   let head: ReactNode = <span />;
-  if (!frozen)
+  if (!frozen && onKeptChange)
     head = (
       <SelectAll
         keptCount={rows.filter((_, i) => keptSet.has(i + 1)).length}
@@ -130,10 +139,10 @@ export function ChangeTable({
       <div role="row" className={cn(rowClass, "py-(--km-space-3)")}>
         <span role="columnheader">{head}</span>
         <span role="columnheader" className={headClass}>
-          {labels.current}
+          {draft ? labels.section : labels.current}
         </span>
         <span role="columnheader" className={headClass}>
-          {labels.proposed}
+          {draft ? labels.draft : labels.proposed}
         </span>
         <span role="columnheader" className={headClass}>
           {labels.source}
@@ -157,7 +166,9 @@ export function ChangeTable({
               />
             </span>
             <span role="cell" className={cn(out && tertiary)}>
-              {row.current ? (
+              {draft ? (
+                <span>{row.proposed.label}</span>
+              ) : row.current ? (
                 <CurrentText
                   label={row.current.label ?? labels.current}
                   className={cn(out && struck)}
@@ -179,7 +190,11 @@ export function ChangeTable({
               )}
             >
               {row.mark && <EvidenceMark mark={row.mark} />}
-              <Cell {...row.proposed} className={cn(out && struck)} />
+              {draft ? (
+                <span>{row.proposed.text}</span>
+              ) : (
+                <Cell {...row.proposed} className={cn(out && struck)} />
+              )}
             </span>
             <span
               role="cell"

@@ -86,3 +86,15 @@ test("the sources cell stacks its chips one per line", () => {
   expect(stacks[1].className).toContain("flex-col");
   expect(stacks[1].children).toHaveLength(2);
 });
+
+test("draft mode: no boxes, no Current column, Section and Draft headers", () => {
+  render(<ChangeTable rows={rows} draft onKeptChange={() => {}} />);
+  expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
+  expect(screen.queryByText("Current")).toBeNull();
+  expect(screen.queryByText("All")).toBeNull();
+  expect(screen.getByText("Section")).toBeTruthy();
+  expect(screen.getByText("Draft")).toBeTruthy();
+  expect(screen.getByText("Evening build retirement")).toBeTruthy();
+  expect(screen.getByText("Suggested")).toBeTruthy();
+  expect(document.querySelector("[data-left-out]")).toBeNull();
+});

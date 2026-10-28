@@ -158,6 +158,8 @@ export const message = {
 export const label = {
   changes: "Changes",
   sections: "Sections",
+  section: "Section",
+  draft: "Draft",
   savedAs: "Saved as",
   evidence: "Evidence",
   needsYou: "Needs you",

@@ -57,6 +57,11 @@ export default {
         <Live initial={[1, 2, 3]} />
       </div>
     ),
+    "Draft at 727px": (
+      <div className="w-[727px] max-w-full">
+        <ChangeTable rows={rows} draft />
+      </div>
+    ),
     "Narrow (under 560px)": (
       <div className="max-w-[24rem]">
         <Live initial={[1]} />
