@@ -1,0 +1,131 @@
+---
+schema: knowledge-mcp/document-moves/1
+location: unreachable://vault
+status: blocked
+allowed_by:
+  basis: instruction
+  text:
+    Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+    as you work.
+  location: AGENTS.md
+search:
+  - "%"
+  - "%2E%2E%2F%41"
+  - "%2E%2E%2F%41%2E%6D%64"
+  - "%2E%2E%2F%4D%6F%76%65%64%2F%41"
+  - "%2E%2E%2F%4D%6F%76%65%64%2F%41%2E%6D%64"
+  - "%2E%2E/%41"
+  - "%2E%2E/%41.md"
+  - "%2E%2E/%4D%6F%76%65%64/%41"
+  - "%2E%2E/%4D%6F%76%65%64/%41.md"
+  - "%2E%2F%2E%2E%2F%41"
+  - "%2E%2F%2E%2E%2F%41%2E%6D%64"
+  - "%2E%2F%2E%2E%2F%4D%6F%76%65%64%2F%41"
+  - "%2E%2F%2E%2E%2F%4D%6F%76%65%64%2F%41%2E%6D%64"
+  - "%2E%2F%41"
+  - "%2E%2F%41%2E%6D%64"
+  - "%2E%2F%4D%6F%76%65%64%2F%41"
+  - "%2E%2F%4D%6F%76%65%64%2F%41%2E%6D%64"
+  - "%2E/%2E%2E/%41"
+  - "%2E/%2E%2E/%41.md"
+  - "%2E/%2E%2E/%4D%6F%76%65%64/%41"
+  - "%2E/%2E%2E/%4D%6F%76%65%64/%41.md"
+  - "%2E/%41"
+  - "%2E/%41.md"
+  - "%2E/%4D%6F%76%65%64/%41"
+  - "%2E/%4D%6F%76%65%64/%41.md"
+  - "%41"
+  - "%41%2E%6D%64"
+  - "%41.md"
+  - "%4D%6F%76%65%64%2F%41"
+  - "%4D%6F%76%65%64%2F%41%2E%6D%64"
+  - "%4D%6F%76%65%64/%41"
+  - "%4D%6F%76%65%64/%41.md"
+  - ../%41
+  - ../%41.md
+  - ../A
+  - ../A.md
+  - ../Moved/%41
+  - ../Moved/%41.md
+  - ../Moved/A
+  - ../Moved/A.md
+  - ./%41
+  - ./%41.md
+  - ./../%41
+  - ./../%41.md
+  - ./../A
+  - ./../A.md
+  - ./../Moved/%41
+  - ./../Moved/%41.md
+  - ./../Moved/A
+  - ./../Moved/A.md
+  - ./A
+  - ./A.md
+  - ./Moved/%41
+  - ./Moved/%41.md
+  - ./Moved/A
+  - ./Moved/A.md
+  - A
+  - A.md
+  - Moved/%41
+  - Moved/%41.md
+  - Moved/A
+  - Moved/A.md
+based_on:
+  listing_digest: sha256:669975fdd795d62de233fc49e8163068c6706449bd5f6724a4979cf077a240f9
+  record_digest: sha256:8e43ba1bebde2d2015e1c67212f366b3df94b3f3ba9c4fe7be5f08cd0e53b964
+  documents:
+    - path: A.md
+      digest: sha256:78f50ef46072ccaf1757de66ca2ae35972b7afc7dafa322a07b388783621cafa
+    - path: x/Same.md
+      digest: sha256:6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+    - path: y/Same.md
+      digest: sha256:d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+  configuration: []
+writes: []
+record: null
+digest: null
+links: []
+issues:
+  - code: link-ambiguous
+    source_path: A.md
+    start: 0
+    end: 8
+    detail: Establish the original target with a verified binding.
+    choices:
+      - action: bind_link
+        path: x/Same.md
+      - action: bind_link
+        path: y/Same.md
+  - code: link-unpreserved
+    source_path: A.md
+    start: 0
+    end: 8
+    detail: Choose a destination that preserves the original link target.
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:8e43ba1bebde2d2015e1c67212f366b3df94b3f3ba9c4fe7be5f08cd0e53b964
+moves:
+  - old_path: A.md
+    path: Moved/A.md
+affected_documents: []
+record_changes: []
+card: |
+  `PROPOSED MOVES` · `Needs your choice`
+
+  **1 move · 0 links repaired**
+
+  **Moves (1)**
+
+  1. `A.md` → Moved/
+
+  **Blockers (2)**
+
+  1. Establish the original target with a verified binding.
+     - Link to `x/Same.md`
+     - Link to `y/Same.md`
+  2. Choose a destination that preserves the original link target.
+
+  Move stays off until each blocker has a choice.
+
+  Say your choice for each blocker, or “Not now”.

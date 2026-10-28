@@ -169,6 +169,27 @@ def _numbered(items: list[str]) -> list[str]:
     return [f"{n}. {item}" for n, item in enumerate(items, start=1)]
 
 
+def _choice(choice: dict[str, Any]) -> str:
+    if choice["action"] == "skip_move":
+        return f"Skip this file ({code(choice['path'])})"
+    return f"Link to {code(choice['path'])}"
+
+
+def _blocker(issue: dict[str, Any]) -> str:
+    choices = issue.get("choices", [])
+    return "".join([_line(issue["detail"]), *(f"\n   - {_choice(c)}" for c in choices)])
+
+
+def _heading(answer: dict[str, Any], files: int) -> list[str]:
+    lines = []
+    if "summary" in answer:
+        lines += [f"## {_line(answer['summary'])}", ""]
+    if "folder" in answer:
+        new = _count(files, "new file", "new files")
+        lines += [f"{code(answer['folder'])}{JOIN}{new}", ""]
+    return lines
+
+
 def moves(answer: dict[str, Any]) -> str:
     """The move plan: moves, repaired links, blockers, then what the person can say next."""
     status = answer["status"]
@@ -184,17 +205,36 @@ def moves(answer: dict[str, Any]) -> str:
     summary.append(_count(len(repaired), "link repaired", "links repaired"))
     if notes:
         summary.append(_count(len(notes), "note", "notes"))
-    lines = [
-        f"{code('PROPOSED MOVES')} · {code(MOVE_BADGES[status])}",
-        "",
-        f"**{JOIN.join(summary)}**",
-    ]
+    stays = answer.get("stays", [])
+    rules = {n["path"]: n["rule"] for n in answer.get("naming", [])}
+    lines = [f"{code('PROPOSED MOVES')} · {code(MOVE_BADGES[status])}", ""]
+    lines += _heading(answer, len(rows) + len(stays))
+    lines.append(f"**{JOIN.join(summary)}**")
     if rows:
         lines += [
             "",
             f"**Moves ({len(rows)})**",
             "",
-            *_numbered([_move(m) for m in rows]),
+            *_numbered(
+                [
+                    _move(m)
+                    + (f"{JOIN}{rules[m['path']]}" if m["path"] in rules else "")
+                    for m in rows
+                ]
+            ),
+        ]
+    if stays:
+        stay = "file stays" if len(stays) == 1 else "files stay"
+        lines += [
+            "",
+            f"**{len(stays)} {stay} where {'it is' if len(stays) == 1 else 'they are'}**",
+            "",
+            *_numbered(
+                [
+                    f"Stays{JOIN}{code(s['path'])}{JOIN}{_line(s['reason'])}"
+                    for s in stays
+                ]
+            ),
         ]
     if repaired:
         lines += [
@@ -208,7 +248,7 @@ def moves(answer: dict[str, Any]) -> str:
             "",
             f"**Blockers ({len(answer['issues'])})**",
             "",
-            *_numbered([_line(issue["detail"]) for issue in answer["issues"]]),
+            *_numbered([_blocker(issue) for issue in answer["issues"]]),
         ]
     move = f"Move {_count(len(rows), 'file', 'files')}"
     if status == "permission_needed":

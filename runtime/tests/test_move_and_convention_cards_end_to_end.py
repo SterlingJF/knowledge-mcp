@@ -133,3 +133,44 @@ def test_text_block_and_structured_card_are_identical():
 
     for result in (moves, conventions):
         assert result.content[0].text == result.structured_content["card"]
+
+
+def test_move_plan_card_shows_card_context():
+    docs = {**DOCS, "Inbox/scan-0412.md": ""}
+    server = build_server()
+    args = arguments(
+        docs,
+        MOVES,
+        summary="File the new files",
+        folder="Inbox",
+        stays=[dict(path="Inbox/scan-0412.md", reason="no document type")],
+        naming=[dict(path=MOVES[0][1], rule="date + title")],
+    )
+    first = anyio.run(server.call_tool, "kb_prepare_document_moves", args)
+    args.update(searched=True, search=first.structured_content["search"])
+    card = (
+        anyio.run(server.call_tool, "kb_prepare_document_moves", args).content[0].text
+    )
+    assert "## File the new files\n\n`Inbox` · 3 new files\n" in card
+    assert "build.md` · date + title\n" in card
+    assert (
+        "**1 file stays where it is**\n\n1. Stays · `Inbox/scan-0412.md` · no document type"
+        in card
+    )
+
+
+def test_blocked_move_plan_card_lists_choices():
+    card = plan([MOVES[0], ("Inbox/timings-notes.md", "Index.md")]).content[0].text
+    assert "\n   - Skip this file (`Inbox/timings-notes.md`)" in card
+
+
+def test_ambiguous_link_card_lists_targets():
+    docs = {"A.md": "[[Same]]", "x/Same.md": "1", "y/Same.md": "2"}
+    server = build_server()
+    args = arguments(docs, [("A.md", "Moved/A.md")])
+    first = anyio.run(server.call_tool, "kb_prepare_document_moves", args)
+    args.update(searched=True, search=first.structured_content["search"])
+    card = (
+        anyio.run(server.call_tool, "kb_prepare_document_moves", args).content[0].text
+    )
+    assert "   - Link to `x/Same.md`\n   - Link to `y/Same.md`" in card
