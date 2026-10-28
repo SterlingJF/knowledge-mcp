@@ -121,6 +121,13 @@ class DocumentMovesAnswer(BaseModel):
     moves: list[DocumentMove]
     affected_documents: list[DocumentMove]
     record_changes: list[DocumentMove]
+    card: Annotated[
+        str | None,
+        Field(
+            description="The move plan as markdown. Show it in your reply unchanged.",
+            min_length=1,
+        ),
+    ] = None
 
 
 type KbPrepareDocumentMovesResult = Annotated[

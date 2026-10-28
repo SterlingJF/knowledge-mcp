@@ -118,6 +118,10 @@ $defs:
         type: array
         items:
           $ref: common.schema.yaml#/$defs/document_move
+      card:
+        description: The move plan as markdown. Show it in your reply unchanged.
+        type: string
+        minLength: 1
     if:
       type: object
       required:
