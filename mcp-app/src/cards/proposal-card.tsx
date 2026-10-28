@@ -5,7 +5,9 @@ import { useState } from "react";
 
 import { useCardHost } from "@/bridge/bridge";
 import type { ToolResult } from "@/bridge/bridge";
-import { PathChip } from "@/component-elements/chips";
+import { Badge } from "@/component-elements/badge";
+import { NoBreakName, PathChip } from "@/component-elements/chips";
+import { Note } from "@/component-elements/note";
 import type { KeyValueRow } from "@/component-elements/key-value";
 import type { CardAction } from "@/component-patterns/card-shell";
 import { useCardLifecycle } from "@/component-patterns/card-lifecycle";
@@ -14,7 +16,11 @@ import { ChangeTable } from "@/component-patterns/change-table";
 import { FullView } from "@/component-patterns/full-view";
 import { LeftOut } from "@/component-patterns/left-out";
 import { SummaryCard } from "@/component-patterns/summary-card";
-import type { EvidenceMark, Proposal } from "@/contracts/proposal";
+import type {
+  EvidenceMark,
+  Proposal,
+  ProposalCell,
+} from "@/contracts/proposal";
 import {
   action,
   badge,
@@ -25,6 +31,7 @@ import {
   label,
   line,
   message,
+  proposal as proposalCopy,
 } from "@/copy/en";
 import { registerCard } from "./registry";
 import type { CardProps } from "./registry";
@@ -123,8 +130,19 @@ export function summaryRows(p: Proposal): KeyValueRow[] {
         .map(([mark, n]) => line.counted(n, evidenceCount[mark]))
         .join(line.summaryJoin),
     });
-  if (isNew && p.instance)
-    rows.push({ label: label.savedAs, value: p.instance.subject });
+  const savedAs = p.filing?.path ?? (isNew ? p.instance?.subject : undefined);
+  if (savedAs)
+    rows.push({
+      label: label.savedAs,
+      value: p.filing
+        ? [
+            savedAs,
+            p.filing.naming_rule === null
+              ? proposalCopy.noNamingRule
+              : proposalCopy.namedBy(p.filing.naming_rule),
+          ].join(line.summaryJoin)
+        : savedAs,
+    });
   const conflicts = p.rows.flatMap((r, i) =>
     r.mark === "conflicting" ? [i] : [],
   );
@@ -142,6 +160,11 @@ export function summaryRows(p: Proposal): KeyValueRow[] {
         </>
       ),
     });
+  } else if (p.open_questions && p.open_questions.length > 0) {
+    rows.push({
+      label: label.needsYou,
+      value: openQuestion(p.open_questions),
+    });
   }
   if (!isNew && p.left_out && p.left_out.length > 0)
     rows.push({
@@ -149,6 +172,42 @@ export function summaryRows(p: Proposal): KeyValueRow[] {
       value: p.left_out.map((f) => f.file).join(line.summaryJoin),
     });
   return rows.slice(0, MAX_ROWS);
+}
+
+/** An open question as `Rollout owner · no source`. */
+const unsourced = (q: ProposalCell) =>
+  proposalCopy.unsourced(q.label ?? q.text);
+
+/** The first open question, then `+n more`. */
+function openQuestion(questions: ProposalCell[]): string {
+  const [first] = questions;
+  return [
+    unsourced(first),
+    ...(questions.length > 1 ? [line.andMore(questions.length - 1)] : []),
+  ].join(line.summaryJoin);
+}
+
+const hasMeta = (p: Proposal) =>
+  Boolean(p.filing ?? p.instance ?? p.document_type ?? p.reader);
+
+/** File chip, document type, reader, and a badge when the reader is a guess. */
+function MetaLine({ p, full }: { p: Proposal; full: boolean }) {
+  const where = p.filing?.path ?? p.instance?.subject;
+  const words = [
+    p.document_type?.label,
+    p.reader && proposalCopy.forReader(p.reader.label),
+  ].filter((w): w is string => w != null);
+  return (
+    <>
+      {where && <PathChip path={where} />}
+      {words.length > 0 && <span>{words.join(line.summaryJoin)}</span>}
+      {p.reader && !p.reader.confirmed && (
+        <Badge tone="neutral">
+          {full ? proposalCopy.readerGuess : proposalCopy.guess}
+        </Badge>
+      )}
+    </>
+  );
 }
 
 export type ProposalViewProps = {
@@ -182,7 +241,9 @@ export function ProposalView({
         ? eyebrow.proposedDocument
         : eyebrow.proposedChanges,
     title: p.summary,
-    meta: p.instance ? <PathChip path={p.instance.subject} /> : undefined,
+    meta: hasMeta(p) ? (
+      <MetaLine p={p} full={displayMode === "fullscreen"} />
+    ) : undefined,
     badge:
       pressed === "save"
         ? { tone: "done" as const, label: badge.done.approved }
@@ -226,6 +287,23 @@ export function ProposalView({
           kept={kept}
           onKeptChange={live ? onKeptChange : undefined}
         />
+        {p.filing?.naming_rule === null && (
+          <Note
+            kind="info"
+            fact={proposalCopy.noRuleFor(p.document_type?.label)}
+          >
+            <NoBreakName>{p.filing.reason}</NoBreakName>
+          </Note>
+        )}
+        {p.open_questions && p.open_questions.length > 0 && (
+          <Note
+            kind="leftOut"
+            fact={proposalCopy.toAnswer(p.open_questions.length)}
+          >
+            {proposalCopy.openList(p.open_questions.map(unsourced))}{" "}
+            {proposalCopy.staysOpen(p.open_questions.length)}
+          </Note>
+        )}
         {p.left_out && p.left_out.length > 0 && <LeftOut files={p.left_out} />}
       </FullView>
     );

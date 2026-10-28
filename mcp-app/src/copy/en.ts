@@ -175,3 +175,28 @@ export const label = {
   proposed: "Proposed",
   source: "Source",
 } as const;
+
+// C-Proposal
+export const proposal = {
+  /** Meta line, after the document type: `for maintainers`. */
+  forReader: (reader: string) => `for ${reader}`,
+  /** Badge after a guessed reader, inline. */
+  guess: "guess",
+  /** Badge after a guessed reader, in the full view. */
+  readerGuess: "reader is a guess",
+  noNamingRule: "no naming rule",
+  namedBy: (rule: string) => `named by ${rule}`,
+  /** Note fact before the filing reason: `Design proposal has no naming rule`. */
+  noRuleFor: (type?: string) =>
+    type ? `${type} has no naming rule` : "No naming rule",
+  /** An open question nothing answers: `Rollout owner · no source`. */
+  unsourced: (question: string) => `${question}${line.summaryJoin}no source`,
+  /** Open questions listed in a note: `Rollout owner · no source, Budget · no source.` */
+  openList: (items: Array<string>) => `${items.join(", ")}.`,
+  toAnswer: (count: number) =>
+    count === 1 ? "One thing to answer." : `${count} things to answer.`,
+  staysOpen: (count: number) =>
+    count === 1
+      ? "It stays an open question unless you say."
+      : "They stay open questions unless you say.",
+} as const;
