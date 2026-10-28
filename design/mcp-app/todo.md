@@ -4,9 +4,9 @@ One card per slice. Each card lists the frames it builds, the files it owns, whe
 
 ## Batch 0: foundations (coordinator)
 
-- [ ] **0.1 Scaffold** `mcp-app/` package: Vite, React, Tailwind, shadcn core, Vitest, single-file build; module wiring (README layout, `check_mcp_app`, CI job, CONTRIBUTING map). Blocks everything.
-- [ ] **0.2 Tokens and copy:** `src/generated/tokens.auto.css` from `kmtokens.js` with a staleness check; `src/copy/en.ts` from F07. Blocks every element.
-- [ ] **0.3 Host bridge:** connect, host styles and fonts, transparent ground, display modes, size changes, `ui/message`; a card router on `structuredContent.schema`. Blocks every card.
+- [x] **0.1 Scaffold** `mcp-app/` package: Vite, React, Tailwind, shadcn core, Vitest, single-file build; module wiring (README layout, `check_mcp_app`, CI job, CONTRIBUTING map). Blocks everything.
+- [x] **0.2 Tokens and copy:** `src/generated/tokens.auto.css` from `kmtokens.js` with a staleness check; `src/copy/en.ts` from F07. Blocks every element.
+- [x] **0.3 Host bridge:** connect, host styles and fonts, transparent ground, display modes, size changes, `ui/message`; a card router on `structuredContent.schema`. Blocks every card.
 
 ## Batch 1: elements and engine (workers)
 
