@@ -120,7 +120,7 @@ function Blockers() {
       <DecisionRows
         headers={["Problem", "Your choice"]}
         rows={blockers}
-        narrow={{ title: 0 }}
+        narrow={{}}
         align="start"
         choices={choices}
         onChoiceChange={(id, v) => setChoices({ ...choices, [id]: v })}

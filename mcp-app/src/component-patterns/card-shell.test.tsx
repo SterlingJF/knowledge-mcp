@@ -112,3 +112,55 @@ test("actions sit one group gap below the body, the meta parts in a wrapping row
   expect(meta.className).toContain("flex-wrap");
   expect(meta.className).toContain("gap-y-[var(--km-gap-tight)]");
 });
+
+test("disclosure: in the action row, not an action, gone once frozen", () => {
+  const onToggle = vi.fn<() => void>();
+  const onAction = vi.fn<(a: CardAction) => void>();
+  const disclosure = {
+    label: action.showChange,
+    expanded: false,
+    onToggle,
+    controls: "diff-1",
+  };
+  const { rerender } = render(
+    <CardShell
+      eyebrow="Change"
+      title="t"
+      actions={[approve, notNow]}
+      onAction={onAction}
+      disclosure={disclosure}
+    />,
+  );
+  const toggle = screen.getByRole("button", { name: action.showChange });
+  expect(toggle.getAttribute("aria-expanded")).toBe("false");
+  expect(toggle.getAttribute("aria-controls")).toBe("diff-1");
+  fireEvent.click(toggle);
+  expect(onToggle).toHaveBeenCalledOnce();
+  expect(onAction).not.toHaveBeenCalled();
+  rerender(
+    <CardShell
+      eyebrow="Change"
+      title="t"
+      state="frozen"
+      frozenLine={frozen.approved}
+      disclosure={disclosure}
+    />,
+  );
+  expect(screen.queryByRole("button")).toBeNull();
+});
+
+test("disclosure alone still draws the row", () => {
+  render(
+    <CardShell
+      eyebrow="Change"
+      title="t"
+      disclosure={{
+        label: action.showChange,
+        expanded: false,
+        onToggle: () => {},
+        controls: "d",
+      }}
+    />,
+  );
+  expect(screen.getAllByRole("button")).toHaveLength(1);
+});
