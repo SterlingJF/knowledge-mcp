@@ -47,6 +47,8 @@ def _source(source: dict[str, Any]) -> str:
     file = source["file"]
     if "place" in source:
         return code(file + PLACE + source["place"])
+    if "line_number" not in source:
+        return code(file)
     return code(f"{file}:{source['line_number']}")
 
 
@@ -92,17 +94,42 @@ def _list(rows: list[dict[str, Any]]) -> list[str]:
     return lines
 
 
+def _meta(answer: dict[str, Any]) -> list[str]:
+    parts = []
+    if "document_type" in answer:
+        parts.append(_line(answer["document_type"]["label"]))
+    if "reader" in answer:
+        reader = answer["reader"]
+        guess = "" if reader["confirmed"] else " (reader is a guess)"
+        parts.append(f"for {_line(reader['label'])}{guess}")
+    lines = ["", " · ".join(parts)] if parts else []
+    if "filing" in answer:
+        filing = answer["filing"]
+        rule = filing["naming_rule"]
+        note = f"named by {_line(rule)}" if rule else "no naming rule"
+        line = f"Saved as {code(filing['path'])} · {note}"
+        if "reason" in filing:
+            line += f": {_line(filing['reason'])}"
+        lines += ["", line]
+    return lines
+
+
 def proposal(answer: dict[str, Any], layout: Layout) -> str:
     """`list` is for terminals, which can't scroll a wide table sideways."""
     lines = [
         f"{code('PROPOSED CHANGES')} · {code('Nothing saved')}",
         "",
         f"**{_line(answer['summary'])}**",
+        *_meta(answer),
         "",
         *(_list if layout == "list" else _table)(answer["rows"]),
     ]
     for left in answer.get("left_out", []):
         lines += ["", f"⊘ {code(left['file'])} left out: {_line(left['reason'])}"]
+    for question in answer.get("open_questions", []):
+        label = question.get("label")
+        named = f"**{_line(label)}** · " if label else ""
+        lines += ["", f"? Needs you · {named}no source: {_line(question['text'])}"]
     return "\n".join(lines) + "\n"
 
 
