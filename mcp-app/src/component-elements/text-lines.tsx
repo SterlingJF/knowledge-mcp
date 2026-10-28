@@ -27,7 +27,7 @@ export function Title({ className, ...props }: LineProps) {
   return (
     <div
       className={cn(
-        "mt-[var(--km-space-1)] font-[weight:var(--font-weight-semibold)] text-[length:var(--font-heading-md-size)] leading-[var(--font-heading-md-line-height)]",
+        "mt-[var(--km-gap-tight)] font-[weight:var(--font-weight-semibold)] text-[length:var(--font-heading-md-size)] leading-[var(--font-heading-md-line-height)]",
         className,
       )}
       {...props}
@@ -38,7 +38,12 @@ export function Title({ className, ...props }: LineProps) {
 export function Meta({ className, ...props }: LineProps) {
   return (
     <div
-      className={cn(xs, tertiary, "mt-[var(--km-space-1)]", className)}
+      className={cn(
+        xs,
+        tertiary,
+        "mt-[var(--km-gap-inline)] flex flex-wrap items-center gap-x-[var(--km-gap-inline)] gap-y-[var(--km-gap-tight)]",
+        className,
+      )}
       {...props}
     />
   );
@@ -47,7 +52,7 @@ export function Meta({ className, ...props }: LineProps) {
 export function WhyLine({ className, ...props }: LineProps) {
   return (
     <div
-      className={cn(xs, tertiary, "mt-[var(--km-space-5)]", className)}
+      className={cn(xs, tertiary, "mt-[var(--km-gap-group)]", className)}
       {...props}
     />
   );
@@ -56,7 +61,7 @@ export function WhyLine({ className, ...props }: LineProps) {
 export function FrozenLine({ className, ...props }: LineProps) {
   return (
     <div
-      className={cn(xs, tertiary, "mt-[var(--km-space-5)]", className)}
+      className={cn(xs, tertiary, "mt-[var(--km-gap-group)]", className)}
       {...props}
     />
   );

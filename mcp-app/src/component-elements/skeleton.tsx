@@ -24,7 +24,7 @@ export function SkeletonBlock({
     <CoreSkeleton
       aria-hidden
       className={cn(
-        "mt-[var(--km-space-4)] block rounded-[var(--border-radius-lg)] bg-[var(--color-background-secondary)] animate-[km-shimmer_var(--km-shimmer)] motion-reduce:animate-none",
+        "mt-[var(--km-gap-row)] block rounded-[var(--border-radius-lg)] bg-[var(--color-background-secondary)] animate-[km-shimmer_var(--km-shimmer)] motion-reduce:animate-none",
         shapes[shape],
         className,
       )}
@@ -56,7 +56,7 @@ export function CardSkeleton({
         <SkeletonBlock key={i} shape="row" />
       ))}
       {actions > 0 && (
-        <div className="flex gap-[var(--km-space-4)]">
+        <div className="flex gap-[var(--km-gap-inline)]">
           {Array.from({ length: actions }, (_, i) => (
             <SkeletonBlock key={i} shape="action" />
           ))}

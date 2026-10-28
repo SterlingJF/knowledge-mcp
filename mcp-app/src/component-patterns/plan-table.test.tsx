@@ -60,3 +60,12 @@ test("rows stack under 560px with each cell's header label", () => {
     ),
   ).toBe("minmax(0,40fr) minmax(0,60fr)");
 });
+
+test("columns sit a group gap apart, rows a row gap", () => {
+  render(
+    <PlanTable headers={["File", "Goes to"]} columns={[40, 60]} rows={rows} />,
+  );
+  const row = screen.getByText("a.md").closest("[role=row]");
+  expect(row?.className).toContain("gap-x-(--km-gap-group)");
+  expect(row?.className).toContain("py-(--km-gap-row)");
+});

@@ -68,7 +68,7 @@ export function PlanTable({
     >
       <div
         role="row"
-        className={cn(rowClass, "py-(--km-space-3) @max-[560px]:sr-only")}
+        className={cn(rowClass, "pt-0 pb-(--km-gap-row) @max-[560px]:sr-only")}
       >
         {headers.map((h) => (
           <span key={h} role="columnheader" className={label}>

@@ -52,14 +52,14 @@ function Sources({ sources }: { sources: Source[] }) {
   return (
     <span
       data-testid="sources"
-      className="flex min-w-0 flex-col items-start gap-(--km-space-2)"
+      className="flex min-w-0 flex-col items-start gap-(--km-gap-tight)"
     >
       {sources.map((source, i) => {
         const short = sameFileAsPrevious(sources, i);
         return (
           <span
             key={i}
-            className="flex max-w-full min-w-0 items-center gap-(--km-space-2)"
+            className="flex max-w-full min-w-0 items-center gap-(--km-gap-inline)"
           >
             {short && (
               <span className="text-(--color-text-tertiary)">
@@ -129,7 +129,7 @@ export function ChangeTable({
         className,
       )}
     >
-      <div role="row" className={cn(rowClass, "py-(--km-space-3)")}>
+      <div role="row" className={cn(rowClass, "pt-0 pb-(--km-gap-row)")}>
         <span role="columnheader">{head}</span>
         <span role="columnheader" className={headClass}>
           {draft ? labels.section : labels.current}
@@ -177,7 +177,7 @@ export function ChangeTable({
             <span
               role="cell"
               className={cn(
-                "flex flex-col gap-(--km-space-2)",
+                "flex flex-col gap-(--km-gap-tight)",
                 out && tertiary,
                 out && "[&_[data-mark]]:text-(--color-text-tertiary)",
               )}

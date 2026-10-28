@@ -14,7 +14,7 @@ export function HarnessFrame({ children }: { children: ReactNode }) {
 /** The example meta line from the frames: the file chip, then the type and reader. */
 export const exampleMeta = (
   <>
-    <PathChip path="cache-proposal.md" /> Design proposal · for maintainers
-    deciding whether to accept it
+    <PathChip path="cache-proposal.md" />
+    <span>Design proposal · for maintainers deciding whether to accept it</span>
   </>
 );

@@ -91,14 +91,14 @@ export function CardShell({
       )}
     >
       {/* Narrow: badge and Full view drop below the title. Wide: they sit at its right. */}
-      <header className="flex flex-col items-start gap-[var(--km-space-4)] @sm:flex-row @sm:justify-between @sm:gap-[var(--km-space-5)]">
+      <header className="flex flex-col items-start gap-[var(--km-gap-inline)] @sm:flex-row @sm:justify-between @sm:gap-[var(--km-gap-group)]">
         <div className="min-w-0">
           <Eyebrow>{eyebrow}</Eyebrow>
           <Title>{title}</Title>
           {meta != null && <Meta>{meta}</Meta>}
         </div>
         {(shownBadge || (onFullView && live)) && (
-          <span className="flex flex-none items-center gap-[var(--km-space-4)]">
+          <span className="flex flex-none items-center gap-[var(--km-gap-inline)]">
             {shownBadge && (
               <Badge tone={shownBadge.tone}>{shownBadge.label}</Badge>
             )}
@@ -111,7 +111,7 @@ export function CardShell({
       {children}
       {live && why != null && <WhyLine>{why}</WhyLine>}
       {live && actions.length > 0 && (
-        <div className="mt-[var(--km-space-5)] flex flex-wrap items-center gap-[var(--km-space-4)]">
+        <div className="mt-[var(--km-gap-group)] flex flex-wrap items-center gap-[var(--km-gap-inline)]">
           {actions.map((item) => (
             <Button
               key={item.label}
