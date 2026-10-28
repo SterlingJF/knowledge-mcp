@@ -159,6 +159,16 @@ window.KMT = {
     "--km-label-col": "150px",
     "--km-row": "28px",
   },
+  // One focus ring, one tracking, four opacities: each used by more than one part.
+  effect: {
+    "--km-focus-ring":
+      "0 0 0 2px var(--color-background-primary), 0 0 0 4px var(--color-ring-primary)",
+    "--km-eyebrow-tracking": "0.07em",
+    "--km-opacity-hover": "0.88",
+    "--km-opacity-dim": "0.55",
+    "--km-opacity-out": "0.45",
+    "--km-opacity-disabled": "0.4",
+  },
   layout: {
     min: "From 320px to fullscreen, by container queries, no fixed breakpoints",
     narrow: "Under 560px of container: table rows stack",
