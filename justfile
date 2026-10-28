@@ -38,8 +38,8 @@ format:
   pnpm run format
   pnpm run format:markdown
   just --fmt --indentation '  '
-  uv run --locked ruff check --fix --exit-zero --quiet runtime
-  uv run --locked ruff format runtime
+  uv run --locked ruff check --fix --exit-zero --quiet runtime mcp-app/src/harness
+  uv run --locked ruff format runtime mcp-app/src/harness
 
 # Run the pre-commit hooks on the staged files.
 check_staged:
@@ -204,8 +204,8 @@ generate_mcp_app_html:
 
 # Lint, type-check and test runtime/, and scan runtime/ for dead code. Check that models_auto and docs/mcp-tools.mdx are current.
 check_runtime: check_mcp_tools_doc (_contract_models '--check')
-  uv run --locked ruff check runtime
-  uv run --locked ruff format --check runtime
+  uv run --locked ruff check runtime mcp-app/src/harness
+  uv run --locked ruff format --check runtime mcp-app/src/harness
   uv run --locked mypy
   uv run --locked vulture
   cd runtime && uv run --locked pytest -n auto --maxprocesses 4 --dist loadfile

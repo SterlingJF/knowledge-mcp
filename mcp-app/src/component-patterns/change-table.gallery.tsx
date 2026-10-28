@@ -52,6 +52,11 @@ export default {
         <ChangeTable rows={rows} />
       </div>
     ),
+    "Full view at 727px": (
+      <div className="w-[727px] max-w-full">
+        <Live initial={[1, 2, 3]} />
+      </div>
+    ),
     "Narrow (under 560px)": (
       <div className="max-w-[24rem]">
         <Live initial={[1]} />
