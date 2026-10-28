@@ -6,7 +6,7 @@ import { Undo2 } from "lucide-react";
 import { Note } from "@/component-elements/note";
 import { action as actionCopy, frozen, line, meta } from "@/copy/en";
 import { CardShell } from "./card-shell";
-import type { CardAction } from "./card-shell";
+import type { CardAction, CardDisclosure } from "./card-shell";
 import { lifecycleProps } from "./card-lifecycle";
 import type { CardLifecycle } from "./card-lifecycle";
 
@@ -28,9 +28,11 @@ export type ResultCardProps =
       when: string;
       /** Whose OK; defaults to `meta.approvedByYou`. */
       who?: string;
-      /** The message Undo sends. */
-      undoMessage: string;
+      /** The message Undo sends. Absent: no Undo (an undone change is redone through chat, R03). */
+      undoMessage?: string;
       secondary?: CardAction;
+      /** "Show the change" beside Undo; the Diff it opens goes in children with id === controls. */
+      disclosure?: CardDisclosure;
     })
   | (Common & {
       kind: "refusal";
@@ -42,15 +44,15 @@ export type ResultCardProps =
 export function ResultCard(props: ResultCardProps) {
   const { eyebrow, title, badgeLabel, children, why, lifecycle, flat } = props;
   if (props.kind === "result") {
-    const actions: CardAction[] = [
-      {
+    const actions: CardAction[] = [];
+    if (props.undoMessage != null)
+      actions.push({
         label: actionCopy.undo,
         message: props.undoMessage,
         frozenLine: frozen.undoRequested,
         variant: "secondary",
         icon: <Undo2 aria-hidden="true" />,
-      },
-    ];
+      });
     if (props.secondary) actions.push(props.secondary);
     return (
       <CardShell
@@ -64,6 +66,7 @@ export function ResultCard(props: ResultCardProps) {
         badge={{ tone: "done", label: badgeLabel }}
         why={why}
         actions={actions}
+        disclosure={props.disclosure}
         {...lifecycleProps(lifecycle)}
         flat={flat}
       >

@@ -27,6 +27,8 @@ Every storyboard frame on canvas `MVdPWv1RzA`, as a PNG anyone on this machine c
 | 00 Components      | K11 · Segmented choice                                 | [VULR0vm521](http://localhost:4300/i/VULR0vm521.png) | —                                                    |
 | 00 Components      | K12 · Host-owned: never build                          | [sCD4RHPnV4](http://localhost:4300/i/sCD4RHPnV4.png) | —                                                    |
 | 00 Components      | K13 · Full view button                                 | [Hz9vWLSci0](http://localhost:4300/i/Hz9vWLSci0.png) | —                                                    |
+| 00 Components      | K14 · Tabs                                             | [UhAdisabu1](http://localhost:4300/i/UhAdisabu1.png) | —                                                    |
+| 00 Components      | K15 · Link button                                      | [6ldOaObz1t](http://localhost:4300/i/6ldOaObz1t.png) | —                                                    |
 | 00 Patterns        | P01 · Card shell                                       | [J5jdHpuyM1](http://localhost:4300/i/J5jdHpuyM1.png) | —                                                    |
 | 00 Patterns        | P02 · Change table                                     | [fuE3u44yse](http://localhost:4300/i/fuE3u44yse.png) | —                                                    |
 | 00 Patterns        | P03 · Left-out disclosure                              | [F4jvMHo9v4](http://localhost:4300/i/F4jvMHo9v4.png) | —                                                    |
@@ -34,6 +36,7 @@ Every storyboard frame on canvas `MVdPWv1RzA`, as a PNG anyone on this machine c
 | 00 Patterns        | P05 · Result and refusal                               | [kLBYJMLHcN](http://localhost:4300/i/kLBYJMLHcN.png) | —                                                    |
 | 00 Patterns        | P06 · Card lifecycle                                   | [mDVUNOEMlf](http://localhost:4300/i/mDVUNOEMlf.png) | —                                                    |
 | 00 Patterns        | P07 · Summary and full view                            | [PmQPaW_XnC](http://localhost:4300/i/PmQPaW_XnC.png) | —                                                    |
+| 00 Patterns        | P08 · Plan table                                       | [vuwlJ2-jje](http://localhost:4300/i/vuwlJ2-jje.png) | —                                                    |
 | 01 Orientation     | O01 · Getting oriented                                 | [LACr5JjM2d](http://localhost:4300/i/LACr5JjM2d.png) | [0Dgmw6yqan](http://localhost:4300/i/0Dgmw6yqan.png) |
 | 01 Orientation     | O02 · Oriented: what’s here and what changed           | [O78M5JOcuz](http://localhost:4300/i/O78M5JOcuz.png) | [WbD6BDusBl](http://localhost:4300/i/WbD6BDusBl.png) |
 | 01 Orientation     | O03 · If the folder has no guidance yet                | [9Le1iPFqz8](http://localhost:4300/i/9Le1iPFqz8.png) | [Jzkdlbdm1v](http://localhost:4300/i/Jzkdlbdm1v.png) |

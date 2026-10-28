@@ -1161,6 +1161,66 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       ],
       uses: [/class="xbtn"/],
     },
+    {
+      id: "K14",
+      name: "Tabs",
+      layer: "Element",
+      h: 520,
+      purpose:
+        "Switches between views of the same detail in the full view. Claude: “use collapsible sidebars, tabs, or pagination to disclose details”, never floating panels.",
+      body: two(
+        vr([
+          st(
+            "First tab",
+            `<div class="tabs" style="margin:0"><span class="on">Moves (3)</span><span>Links (5)</span></div>`,
+          ),
+          st(
+            "Second tab",
+            `<div class="tabs" style="margin:0"><span>Moves (3)</span><span class="on">Links (5)</span></div>`,
+          ),
+        ]),
+      ),
+      tokens: [
+        "--km-underline",
+        "--km-gap-group",
+        "--color-text-primary",
+        "--color-text-tertiary",
+        "--font-text-sm-*",
+      ],
+      rules: [
+        "Full view only; an inline card never has tabs.",
+        "Each label carries its count (label.withCount).",
+        "Arrow keys move between tabs; every tab is at least 44px tall on touch.",
+      ],
+      uses: [/class="tabs"/],
+    },
+    {
+      id: "K15",
+      name: "Link button",
+      layer: "Element",
+      h: 480,
+      purpose:
+        "Opens or closes detail inside the card: Show why, Show the change. It sends nothing and never freezes the card, so it is not one of the two actions.",
+      body: two(
+        vr([
+          st(
+            "In a note",
+            `<div class="note" style="margin:0">${ic.left}<span><b>1 file left out:</b> vendor-quote.xlsx. <span class="disc" style="margin:0">Show why</span></span></div>`,
+          ),
+          st(
+            "Beside an action",
+            `<div class="acts" style="margin:0">${btn("Undo", "", "undo")}<span class="disc">Show the change</span></div>`,
+          ),
+        ]),
+      ),
+      tokens: ["--color-text-primary", "--font-text-xs-*", "--km-target"],
+      rules: [
+        "Underlined, 12px; the label says what it opens and flips when open (Show the change / Hide the change).",
+        "aria-expanded and aria-controls name the content it opens; a 44px hit area on touch only.",
+        "Hidden once the card is frozen or replaced.",
+      ],
+      uses: [/class="disc"/],
+    },
   ];
 
   // ---------- Patterns ----------
@@ -1321,7 +1381,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           title: "cache-proposal.md · 4 changes",
           meta: "Recorded Oct 28, 09:41 · approved by you",
           badge: badge("b-grn", "Saved", "check"),
-          acts: `${btn("Undo", "", "undo")}${btn("Show the change", "g")}`,
+          acts: `${btn("Undo", "", "undo")}<span class="disc">Show the change</span>`,
         }) +
           card({
             eb: "Change",
@@ -1422,6 +1482,41 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
         "Selections and tabs live in the full view; text still goes in chat.",
       ],
       uses: [/class="xbtn"|class="km flat/],
+    },
+    {
+      id: "P08",
+      name: "Plan table",
+      layer: "Pattern",
+      h: 760,
+      purpose:
+        "A read-only table for a plan in the full view: each file and where it goes, each link before and after. No tick boxes; the plan is approved whole.",
+      body: two(
+        `<div class="km" style="margin:0">${tbl(
+          ["File", "Goes to"],
+          [
+            [
+              '<b>build-review-notes.md</b><div class="mu">Inbox</div>',
+              'Meetings/<div class="mu">as 2026-10-27 build review.md</div>',
+            ],
+            [
+              '<b>retire-evening.md</b><div class="mu">Inbox</div>',
+              'Decisions/<div class="mu">as 2026-10-28 retire evening build.md</div>',
+            ],
+            [
+              '<b>timings-notes.md</b><div class="mu">Inbox</div>',
+              "Proposals/",
+            ],
+          ],
+          "rows",
+        )}</div>`,
+      ),
+      tokens: ["K04, K14", "--km-gap-row", "--color-border-tertiary"],
+      rules: [
+        "Columns are given per table (Moves 40:60; Links 30:27:43); each cell is a primary line with an optional secondary line.",
+        "Long lists show the first rows and “+N more”, which opens the rest in place.",
+        "Under 560px each row stacks with its header labels; headers stay for screen readers.",
+      ],
+      uses: [/class="tabs"/],
     },
   ];
 

@@ -151,7 +151,7 @@ test("narrow layout marks the title, detail and hidden cells", () => {
   expect(screen.getByText("Choice").tagName).toBe("TH");
 });
 
-test("move blockers: problem is the title, nothing hidden, choice at the start", () => {
+test("move blockers: no title, nothing hidden, choice at the start", () => {
   render(
     <DecisionRows
       headers={["Problem", "Your choice"]}
@@ -163,15 +163,39 @@ test("move blockers: problem is the title, nothing hidden, choice at the start",
           options: [{ value: "s", label: "Skip" }],
         },
       ]}
-      narrow={{ title: 0 }}
+      narrow={{}}
       align="start"
       onChoiceChange={() => {}}
     />,
   );
   const cell = screen.getByText("a.md already exists");
-  expect(cell.className).toContain(
+  expect(cell.className).not.toContain(
     "@max-[560px]:font-(--font-weight-semibold)",
   );
   expect(cell.className).not.toContain("hidden");
   expect(screen.getByText("Your choice").className).not.toContain("text-right");
+});
+
+test("a row with no options asks for an answer in chat and stays unanswered", () => {
+  const onChoiceChange = vi.fn<(id: string, v: string | null) => void>();
+  render(
+    <DecisionRows
+      headers={["Problem", "Your choice"]}
+      rows={[
+        {
+          id: "x",
+          name: "x",
+          cells: ["scan-0412.md has no type"],
+          options: [],
+        },
+      ]}
+      align="start"
+      onChoiceChange={onChoiceChange}
+    />,
+  );
+  expect(screen.getByText("Answer in chat")).toBeTruthy();
+  expect(screen.queryByRole("button")).toBeNull();
+  expect(screen.queryByRole("checkbox")).toBeNull();
+  expect(document.querySelector("[data-tone]")).toBeNull();
+  expect(countAccepted({ x: null })).toBe(0);
 });
