@@ -15,6 +15,7 @@ export const badge = {
     moved: "Moved",
     applied: "Applied",
     undone: "Undone",
+    accepted: "Accepted",
   },
   refused: { cantUndo: "Can’t undo safely", checkerRefused: "Checker refused" },
   neutral: {
@@ -25,6 +26,7 @@ export const badge = {
     nothingYet: "Nothing yet",
     undoRequested: "Undo requested",
     replaced: "Replaced",
+    dropped: "Dropped",
   },
 } as const;
 
@@ -68,13 +70,17 @@ export const line = {
   waitsBecause: (file: string) =>
     `Waits for you because it changes ${file}. Every saved edit is recorded and can be undone.`,
   leftOut: (count: number) =>
-    `${count} ${count === 1 ? "file" : "files"} left out`,
+    count === 0
+      ? "Nothing left out"
+      : `${count} ${count === 1 ? "file" : "files"} left out`,
   addition: "— addition",
   summaryJoin: " · ",
 } as const;
 
 export const source = {
   you: "you",
+  /** Between two places in one file that disagree: `meeting-notes.md:11 vs :19`. */
+  versus: "vs",
   /** A line in a text file: `meeting-notes.md:15`. */
   line: (file: string, lineNumber: number) => `${file}:${lineNumber}`,
   /** Another line in the same file, after a chip that named it. */
