@@ -22,7 +22,8 @@ export type CardHost = {
   requestInline: () => Promise<void>;
 };
 
-const HostContext = createContext<CardHost | null>(null);
+/** Exported for StaticCardHost (bridge/static.tsx); cards read it through useCardHost. */
+export const HostContext = createContext<CardHost | null>(null);
 
 export function useCardHost(): CardHost {
   const host = useContext(HostContext);

@@ -44,6 +44,8 @@ export const action = {
   prepareAgain: "Prepare again",
   fullView: "Full view",
   showWhy: "Show why",
+  showChange: "Show the change",
+  showLaterEdits: "Show the later edits",
   all: "All",
   save: (changes: string) => `Save ${changes}`,
   move: (count: number) => `Move ${count} ${count === 1 ? "file" : "files"}`,
@@ -74,6 +76,8 @@ export const line = {
       ? "Nothing left out"
       : `${count} ${count === 1 ? "file" : "files"} left out`,
   addition: "— addition",
+  /** Every refusal says this after its reason (F07). */
+  nothingChanged: "Nothing was changed.",
   summaryJoin: " · ",
 } as const;
 
