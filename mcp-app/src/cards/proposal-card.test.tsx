@@ -16,6 +16,9 @@ import { CardView } from "./registry";
 import { ProposalCard, fileName, summaryRows } from "./proposal-card";
 import { e02, newDocument } from "./proposal-card.fixture";
 
+// Expected breakdowns are written with " · "; the card joins with line.summaryJoin.
+const joined = (text: string) => text.replaceAll(" · ", line.summaryJoin);
+
 const asResult = (p: unknown) => p as ToolResult;
 
 function renderCard(
@@ -51,12 +54,12 @@ test("summary data points come from the proposal, at most four", () => {
     label.leftOut,
   ]);
   expect(rows[0].value).toBe(
-    "C1 Title · C2 Motivation · C3 Status · C4 Open question",
+    joined("C1 Title · C2 Motivation · C3 Status · C4 Open question"),
   );
   expect(rows[1].value).toBe(
-    "1 supported · 1 partly answered · 1 conflicting · 1 suggested",
+    joined("1 supported · 1 partly answered · 1 conflicting · 1 suggested"),
   );
-  expect(rows[3].value).toBe("vendor-quote.xlsx · release-calendar.md");
+  expect(rows[3].value).toBe(joined("vendor-quote.xlsx · release-calendar.md"));
   renderCard(e02);
   expect(screen.getByText(eyebrow.proposedChanges)).toBeTruthy();
   expect(screen.getByText("cache-proposal.md")).toBeTruthy();
@@ -115,7 +118,9 @@ test("new document: sections, saved as, Create the file, no why line", () => {
     label.evidence,
     label.savedAs,
   ]);
-  expect(rows[0].value).toBe("C1 Motivation · C2 Alternatives · C3 Status");
+  expect(rows[0].value).toBe(
+    joined("C1 Motivation · C2 Alternatives · C3 Status"),
+  );
   const { host } = renderCard(newDocument);
   expect(screen.getByText(eyebrow.proposedDocument)).toBeTruthy();
   expect(screen.queryByText(/Waits for you/)).toBeNull();

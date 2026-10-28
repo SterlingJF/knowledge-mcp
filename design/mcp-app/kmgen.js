@@ -31,7 +31,11 @@ svg{width:var(--km-icon);height:var(--km-icon);flex:none}
 .note svg{margin-top:2px}
 /* The card paints no background (transparent theming); the border and padding stand for the host's bordered frame (prefersBorder: true). */
 .km{border:var(--border-width-regular) solid var(--color-border-primary);border-radius:var(--border-radius-xl);background:transparent;padding:var(--km-space-6);margin:10px 0}
+.km{container-type:inline-size}
 .kmh{display:flex;justify-content:space-between;gap:var(--km-gap-group);align-items:flex-start}
+/* Under 480px the title takes the full width; status and Full view follow it. Under 420px each label sits above its value. */
+@container (max-width:480px){.km .kmh{flex-direction:column;gap:var(--km-gap-inline)}}
+@container (max-width:420px){.km .grid2{grid-template-columns:1fr;row-gap:var(--km-gap-tight)}.km .grid2>.mu:not(:first-child){margin-top:var(--km-gap-tight)}}
 .eb{font-size:var(--font-text-xs-size);line-height:var(--font-text-xs-line-height);font-weight:var(--font-weight-semibold);letter-spacing:var(--km-eyebrow-tracking);text-transform:uppercase;color:var(--color-text-tertiary)}
 .tt{font-weight:var(--font-weight-semibold);font-size:var(--font-heading-md-size);line-height:var(--font-heading-md-line-height);margin-top:var(--km-gap-tight)}
 .meta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--km-gap-tight) var(--km-gap-inline);color:var(--color-text-tertiary);font-size:var(--font-text-xs-size);line-height:var(--font-text-xs-line-height);margin-top:var(--km-gap-inline)}
@@ -87,7 +91,7 @@ table.rows{width:100%;border-collapse:collapse;margin-top:var(--km-gap-group)}
 .km.flat{border:0;padding:0;margin:0}
 .fs{padding:0}.fsbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px dashed var(--color-border-secondary);font-weight:var(--font-weight-semibold)}.fsx{color:var(--color-text-tertiary)}
 .fsapp{padding:22px 40px 8px;max-width:1080px}.fs .comp{margin:12px 18px 16px}
-.tabs{display:flex;gap:var(--km-space-5);border-bottom:var(--border-width-regular) solid var(--color-border-tertiary);margin-top:var(--km-gap-group)}.tabs span{padding:6px 0;font-weight:var(--font-weight-semibold);color:var(--color-text-tertiary)}.tabs span.on{color:var(--color-text-primary);box-shadow:inset 0 calc(var(--km-underline) * -1) 0 var(--color-text-primary)}
+.tabs{display:flex;gap:var(--km-gap-group);border-bottom:var(--border-width-regular) solid var(--color-border-tertiary);margin-top:var(--km-gap-group)}.tabs span{padding:6px 0;font-weight:var(--font-weight-semibold);color:var(--color-text-tertiary)}.tabs span.on{color:var(--color-text-primary);box-shadow:inset 0 calc(var(--km-underline) * -1) 0 var(--color-text-primary)}
 `;
   const ic = {
     folder:
@@ -150,7 +154,8 @@ table.rows{width:100%;border-collapse:collapse;margin-top:var(--km-gap-group)}
   // At most five data points: Claude's limit for an inline card.
   const sum = (rows) => {
     if (rows.length > 5) throw new Error("inline card over 5 data points");
-    return `<div class="grid2">${rows.map(([a, b]) => `<div class="mu">${a}</div><div>${b}</div>`).join("")}</div>`;
+    // A breakdown wraps between items, never after a separator: the dot stays with the item it introduces.
+    return `<div class="grid2">${rows.map(([a, b]) => `<div class="mu">${a}</div><div>${b.replaceAll(" · ", " ·\u00a0")}</div>`).join("")}</div>`;
   };
   const fullFrame = (theme, s) =>
     `<!doctype html><html><head><meta charset="utf-8"><meta name="color-scheme" content="light dark"><style>${css}body{width:1280px}.stage{padding:28px 60px 18px}.cap{padding:10px 60px 22px}</style></head><body class="${theme}"><div style="position:relative"><span class="fid">${s.id}</span><div class="stage"><div class="host fs"><span class="tag">HOST FULL SCREEN · Claude draws the header bar, its close button and the composer; the app fills the rest</span><div class="fsbar"><span>knowledge-mcp</span><span class="fsx">${ic.x}</span></div><div class="fsapp">${s.content}</div>${s.composer || ""}</div></div><div class="cap"><div><b>User</b>${s.cap[0]}</div><div><b>Sees</b>${s.cap[1]}</div><div><b>System</b>${s.cap[2]}</div><div><b>Evidence</b>${s.cap[3]}</div></div></div></body></html>`;

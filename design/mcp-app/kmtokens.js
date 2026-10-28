@@ -182,7 +182,7 @@ window.KMT = {
     "--km-check": "15px",
     "--km-check-border": "1.5px",
     "--km-dot": "7px",
-    "--km-label-col": "150px",
+    "--km-label-col": "max-content",
     "--km-row": "28px",
     "--km-underline": "2px",
   },
@@ -197,6 +197,10 @@ window.KMT = {
   },
   layout: {
     min: "From 320px to fullscreen, by container queries, no fixed breakpoints",
+    header:
+      "Under 480px of container: the title takes the full width; status and Full view follow it",
+    summary:
+      "Under 420px of container: each summary label sits above its value",
     narrow: "Under 560px of container: table rows stack",
   },
 };
