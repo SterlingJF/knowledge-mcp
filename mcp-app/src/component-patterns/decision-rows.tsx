@@ -4,13 +4,18 @@ import type { ReactNode } from "react";
 import { Badge } from "@/component-elements/badge";
 import type { BadgeTone } from "@/component-elements/badge";
 import { SegmentedChoice } from "@/component-elements/segmented-choice";
+import type { SegmentOption } from "@/component-elements/segmented-choice";
 import { decision } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 export type DecisionKind = "acceptDrop" | "applyKeepRefused";
 export type DecisionValue = "accept" | "drop" | "apply" | "keepRefused";
 
-const optionsFor = {
+/** The two preset option sets; a row may bring its own instead. */
+export const decisionOptions: Record<
+  DecisionKind,
+  readonly SegmentOption<DecisionValue>[]
+> = {
   acceptDrop: [
     { value: "accept", label: decision.accept },
     { value: "drop", label: decision.drop },
@@ -19,20 +24,24 @@ const optionsFor = {
     { value: "apply", label: decision.apply },
     { value: "keepRefused", label: decision.keepRefused },
   ],
-} as const;
+};
 
 export type DecisionRow = {
   id: string;
   /** Names the row for its choice's accessible label. */
   name: string;
   cells: ReactNode[];
+  /** This row's own answers (1 is a tick box, 4+ stack). Omit to use the table's `kind` preset. */
+  options?: readonly SegmentOption<string>[];
+  /** This row's answer; overrides `choices[id]`. */
+  value?: string | null;
   /** Set once the decision is recorded: the badge replaces the choice. Label comes from copy. */
   decided?: { tone: BadgeTone; label: string };
 };
 
 /** How many rows will be saved: the count for the card's primary button. */
 export function countAccepted(
-  choices: Record<string, DecisionValue | null>,
+  choices: Record<string, string | null | undefined>,
 ): number {
   return Object.values(choices).filter((v) => v === "accept" || v === "apply")
     .length;
@@ -42,7 +51,7 @@ export function DecisionRows({
   headers,
   rows,
   kind = "acceptDrop",
-  choices,
+  choices = {},
   onChoiceChange,
   className,
 }: {
@@ -50,8 +59,9 @@ export function DecisionRows({
   rows: DecisionRow[];
   kind?: DecisionKind;
   /** Owned by the parent; null or absent means undecided. */
-  choices: Record<string, DecisionValue | null>;
-  onChoiceChange: (id: string, value: DecisionValue) => void;
+  choices?: Record<string, string | null | undefined>;
+  /** null only when a single-option row's tick box is cleared. */
+  onChoiceChange: (id: string, value: string | null) => void;
   className?: string;
 }) {
   const cell = "py-(--km-gap-row) pr-(--km-gap-group) align-top";
@@ -89,16 +99,21 @@ export function DecisionRows({
             <td
               className={cn(
                 cell,
-                "pr-0 text-right @max-[560px]:mt-(--km-gap-row) @max-[560px]:text-left",
+                "w-2/5 pr-0 text-right @max-[560px]:mt-(--km-gap-row) @max-[560px]:w-auto @max-[560px]:text-left",
               )}
             >
               {row.decided ? (
                 <Badge tone={row.decided.tone}>{row.decided.label}</Badge>
               ) : (
-                <SegmentedChoice<DecisionValue>
+                <SegmentedChoice<string>
                   aria-label={row.name}
-                  options={optionsFor[kind]}
-                  value={choices[row.id] ?? null}
+                  className="[&>[role=radiogroup]]:ml-auto @max-[560px]:[&>[role=radiogroup]]:ml-0"
+                  options={row.options ?? decisionOptions[kind]}
+                  value={
+                    row.value !== undefined
+                      ? row.value
+                      : (choices[row.id] ?? null)
+                  }
                   onValueChange={(v) => onChoiceChange(row.id, v)}
                 />
               )}
