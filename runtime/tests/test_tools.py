@@ -48,6 +48,17 @@ def test_server_registers_exact_expected_tool_names(tmp_path):
     assert {tool.name for tool in listed(tmp_path)} == TOOLS
 
 
+def titled(node, title):
+    if isinstance(node, dict):
+        if node.get("title") == title:
+            yield node
+        for value in node.values():
+            yield from titled(value, title)
+    elif isinstance(node, list):
+        for item in node:
+            yield from titled(item, title)
+
+
 def test_authorization_meanings_reach_the_listed_input_schemas(tmp_path):
     root = Path(__file__).resolve().parents[2]
     schema = yaml.safe_load(
@@ -62,11 +73,15 @@ def test_authorization_meanings_reach_the_listed_input_schemas(tmp_path):
             "kb_prepare_document_moves",
             "kb_prepare_conventions",
         }:
-            fields = tool.input_schema["$defs"]["AllowedBy"]["properties"]
-            for name in ("basis", "text", "location"):
-                assert fields[name].get("description") == source[name]["description"], (
-                    f"{tool.name}: {name} must preserve the shared authorization meaning"
-                )
+            found = list(titled(tool.input_schema, "AllowedBy"))
+            assert found, f"{tool.name}: no AllowedBy in the listed input schema"
+            for fields in (node["properties"] for node in found):
+                for name in ("basis", "text", "location"):
+                    assert (
+                        fields[name].get("description") == source[name]["description"]
+                    ), (
+                        f"{tool.name}: {name} must preserve the shared authorization meaning"
+                    )
 
 
 def test_tool_metadata_matches_local_operation_policy(

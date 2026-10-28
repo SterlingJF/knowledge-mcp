@@ -235,7 +235,9 @@ class Server(MCPServer):
                 name=info.name,
                 title=info.title,
                 description=info.description,
-                input_schema={**info.parameters, "additionalProperties": False},
+                input_schema=schemas.inlined(
+                    {**info.parameters, "additionalProperties": False}
+                ),
                 output_schema=(
                     schemas.listed(schemas.RESULTS[info.name])
                     if info.name in schemas.RESULTS
