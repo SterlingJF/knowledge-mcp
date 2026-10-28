@@ -66,6 +66,14 @@ export const line = {
   summaryJoin: " · ",
 } as const;
 
+export const source = {
+  you: "you",
+} as const;
+
+export const status = {
+  loading: "Loading",
+} as const;
+
 export const label = {
   changes: "Changes",
   evidence: "Evidence",
