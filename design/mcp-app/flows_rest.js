@@ -535,7 +535,7 @@
         ? [["Needs you", "<b>2 blockers</b> · name taken, ambiguous link"]]
         : []),
     ]);
-  const mLeft = `<div class="note">${ic.left}<span><b>1 file stays where it is.</b> scan-0412.md has no document type. <u>Show why</u></span></div>`;
+  const mLeft = `<div class="note">${ic.left}<span><b>1 file stays where it is.</b> scan-0412.md has no document type.</span></div>`;
   const mWhy = `<span class="disc">${ic.link}Show the 5 links</span><div class="why">Waits for you because it moves files and edits links in 4 other notes. You can undo it afterwards.</div>`;
   P["p05-move-plan"] = [
     {
@@ -700,22 +700,22 @@
             [
               [
                 `<b>Decisions/2026-10-28 retire evening build.md</b> already exists`,
-                `<span class="seg"><span>Skip this file</span><span>Keep both</span></span>`,
+                `<span class="tick"><span class="cb off"></span>Skip this file</span>`,
               ],
               [
                 `<span class="mono">[[proposal]]</span> in weekly-2026-43.md matches 2 notes`,
-                `<span class="seg"><span>Proposals/cache-proposal</span><span>Proposals/timings-notes</span></span>`,
+                `<span class="seg"><span>Link to Proposals/cache-proposal</span><span>Link to Proposals/timings-notes</span></span>`,
               ],
             ],
           ) +
-          `<div class="why">Move stays off until each blocker has a choice. To use a different name, say it in chat.</div>`,
+          `<div class="why">Move stays off until each blocker has a choice. To keep both under a new name, say the name in chat.</div>`,
         acts: `${btn("Move 3 files", "p dis")}${btn("Not now", "g")}`,
       }),
       composer: wait,
       cap: [
         "Pressed Full view to answer the blockers.",
         "Each blocker with a visible choice; Move stays off until all are answered.",
-        "Choices are selections in the card; a new name needs words, so it goes in chat.",
+        "Choices come from the plan (skip_move, bind_link): one choice is a tick, two or three a segmented choice. Keeping both needs a new name, which is words, so it goes in chat.",
         "Claude design guidelines: visible controls, text in chat.",
       ],
     },
