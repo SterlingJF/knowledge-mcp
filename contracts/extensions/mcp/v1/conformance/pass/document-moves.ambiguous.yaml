@@ -110,3 +110,22 @@ moves:
     path: Moved/A.md
 affected_documents: []
 record_changes: []
+card: |
+  `PROPOSED MOVES` · `Needs your choice`
+
+  **1 move · 0 links repaired**
+
+  **Moves (1)**
+
+  1. `A.md` → Moved/
+
+  **Blockers (2)**
+
+  1. Establish the original target with a verified binding.
+     - Link to `x/Same.md`
+     - Link to `y/Same.md`
+  2. Choose a destination that preserves the original link target.
+
+  Move stays off until each blocker has a choice.
+
+  Say your choice for each blocker, or “Not now”.

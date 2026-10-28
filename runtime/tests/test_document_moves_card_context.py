@@ -64,3 +64,10 @@ def test_ambiguous_link_offers_its_candidates():
         dict(action="bind_link", path="x/Same.md"),
         dict(action="bind_link", path="y/Same.md"),
     ]
+
+
+def test_stay_must_be_listed():
+    args = arguments(
+        {"A.md": "x"}, [("A.md", "B.md")], stays=[dict(path="Z.md", reason="r")]
+    )
+    assert "#/stays/0/path" in str(refused(args))

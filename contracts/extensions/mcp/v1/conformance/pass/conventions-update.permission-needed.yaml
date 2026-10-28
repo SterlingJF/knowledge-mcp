@@ -29,3 +29,13 @@ digest: null
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
     digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+card: |
+  `PROPOSED CONVENTIONS` · `Nothing saved`
+
+  **Naming and filing for notes**
+
+  1. `design-proposal` · `Proposals/` · title
+
+  Existing files unchanged until a move.
+
+  Say “Save accepted”, which to drop, or “Not now”.

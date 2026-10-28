@@ -130,12 +130,16 @@ $defs:
         description: Files left where they are, with reasons, echoed from the `stays` argument.
         type: array
         items:
-          $ref: common.schema.yaml#/$defs/move_stay
+          $ref: "#/$defs/move_stay"
       naming:
         description: The naming rule behind each named destination, echoed from the `naming` argument.
         type: array
         items:
-          $ref: common.schema.yaml#/$defs/move_naming
+          $ref: "#/$defs/move_naming"
+      card:
+        description: The move plan as markdown. Show it in your reply unchanged.
+        type: string
+        minLength: 1
     if:
       type: object
       required:
@@ -249,6 +253,37 @@ $defs:
         minItems: 1
         items:
           $ref: "#/$defs/choice"
+  move_stay:
+    title: Move stay
+    description: A file the assistant leaves where it is, with the reason the person sees.
+    type: object
+    additionalProperties: false
+    required:
+      - path
+      - reason
+    properties:
+      path:
+        $ref: common.schema.yaml#/$defs/move_path
+      reason:
+        description: Why the file stays, such as `no document type`.
+        type: string
+        minLength: 1
+  move_naming:
+    title: Move naming
+    description: The naming rule or convention that produced a move's destination name.
+    type: object
+    additionalProperties: false
+    required:
+      - path
+      - rule
+    properties:
+      path:
+        description: The destination `path` of one move in `moves`.
+        $ref: common.schema.yaml#/$defs/move_path
+      rule:
+        description: The rule in a few words, such as `date + title`.
+        type: string
+        minLength: 1
   choice:
     title: Move issue choice
     type: object

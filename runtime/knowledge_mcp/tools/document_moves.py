@@ -13,14 +13,17 @@ from knowledge_mcp.models_auto.common_schema import (
     DocumentMove,
     LinkBinding,
     MoveDocument,
+)
+from knowledge_mcp.models_auto.document_moves_schema import (
+    DocumentMovesAnswer,
     MoveNaming,
     MoveStay,
 )
-from knowledge_mcp.models_auto.document_moves_schema import DocumentMovesAnswer
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
 from knowledge_mcp.tools.document_type import RecordDigest, RecordText
 from knowledge_mcp.tools.kbp import READS
+from knowledge_mcp.views import markdown
 
 DESCRIPTION = "Prepare moves together from supplied text and a complete listing. Return search strings, affected documents and link target checks; include `allowed_by` to receive replacement text after the confirmed search. Follow `kb-write-document` to apply the moves and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file."
 
@@ -31,11 +34,19 @@ NAMING = "For a move's destination `path`, the naming rule or convention that pr
 
 
 def _check_context(
-    moves: list[DocumentMove], stays: list[MoveStay], naming: list[MoveNaming]
+    moves: list[DocumentMove],
+    listing: list[ListedFile],
+    stays: list[MoveStay],
+    naming: list[MoveNaming],
 ) -> None:
+    listed = {item.path for item in listing}
     moved = {m.old_path for m in moves}
     destinations = {m.path for m in moves}
     for index, stay in enumerate(stays):
+        if stay.path not in listed:
+            at = problems.pointer("stays", index, "path")
+            detail = f"{stay.path} is not in the listing."
+            raise problems.Error(detail, code="argument-invalid", pointer=at)
         if stay.path in moved:
             at = problems.pointer("stays", index, "path")
             detail = f"{stay.path} is moved, so it can't stay."
@@ -90,7 +101,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             stays=stays,
             naming=naming,
         )
-        _check_context(moves, stays or [], naming or [])
+        _check_context(moves, listing, stays or [], naming or [])
         text = records.received_text(record, record_digest, workspace.recall)
         sent = document_move.BatchRequest(
             location,
@@ -119,4 +130,5 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             arguments,
             DocumentMovesAnswer,
             result,
+            view=markdown.moves,
         )

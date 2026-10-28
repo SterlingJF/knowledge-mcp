@@ -1,16 +1,7 @@
 # Generated from contracts/extensions/mcp/v1 by just generate_contract_types. Edit the schemas, not this file.
 
 from pydantic import BaseModel, ConfigDict, Field
-from ._internal import (
-    AllowedBy,
-    Digest,
-    DocumentMove,
-    MoveNaming,
-    MovePath,
-    MoveStay,
-    Path,
-    Received,
-)
+from ._internal import AllowedBy, Digest, DocumentMove, MovePath, Path, Received
 from typing import Annotated, Literal
 from . import problem_schema
 
@@ -73,6 +64,42 @@ class MoveLink(BaseModel):
         str | None,
         Field(
             description="The complete replacement link token, or null when the original token needs no change."
+        ),
+    ]
+
+
+class MoveStay(BaseModel):
+    """
+    A file the assistant leaves where it is, with the reason the person sees.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: MovePath
+    reason: Annotated[
+        str,
+        Field(
+            description="Why the file stays, such as `no document type`.", min_length=1
+        ),
+    ]
+
+
+class MoveNaming(BaseModel):
+    """
+    The naming rule or convention that produced a move's destination name.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: Annotated[
+        MovePath, Field(description="The destination `path` of one move in `moves`.")
+    ]
+    rule: Annotated[
+        str,
+        Field(
+            description="The rule in a few words, such as `date + title`.", min_length=1
         ),
     ]
 
@@ -174,6 +201,13 @@ class DocumentMovesAnswer(BaseModel):
         list[MoveNaming] | None,
         Field(
             description="The naming rule behind each named destination, echoed from the `naming` argument."
+        ),
+    ] = None
+    card: Annotated[
+        str | None,
+        Field(
+            description="The move plan as markdown. Show it in your reply unchanged.",
+            min_length=1,
         ),
     ] = None
 

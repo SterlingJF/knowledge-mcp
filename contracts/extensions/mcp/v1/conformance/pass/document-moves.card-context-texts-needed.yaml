@@ -124,3 +124,19 @@ stays:
 naming:
   - path: Notes/2026-10-28 a.md
     rule: date + title
+card: |
+  `PROPOSED MOVES` · `Nothing saved`
+
+  ## File the new files
+
+  `Inbox` · 2 new files
+
+  **1 move · 1 rename · 0 links repaired**
+
+  **Moves (1)**
+
+  1. `Inbox/a.md` → Notes/ as `2026-10-28 a.md` · date + title
+
+  **1 file stays where it is**
+
+  1. Stays · `Inbox/scan-0412.md` · no document type

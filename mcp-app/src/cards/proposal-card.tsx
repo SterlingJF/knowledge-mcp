@@ -120,7 +120,7 @@ export function summaryRows(p: Proposal): KeyValueRow[] {
     rows.push({
       label: label.evidence,
       value: counts
-        .map(([mark, n]) => `${n} ${evidenceCount[mark]}`)
+        .map(([mark, n]) => line.counted(n, evidenceCount[mark]))
         .join(line.summaryJoin),
     });
   if (isNew && p.instance)
