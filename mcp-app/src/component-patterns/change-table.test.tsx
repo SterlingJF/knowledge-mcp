@@ -48,8 +48,14 @@ test("a left-out row stays, marked out", () => {
   expect(out?.getAttribute("data-left-out")).toBe("true");
   const cells = out?.querySelectorAll("[role=cell]") ?? [];
   expect(cells[0].className).not.toContain("line-through");
-  expect(cells[1].className).toContain("line-through");
-  expect(cells[2].className).toContain("line-through");
+  expect(cells[1].querySelector(".line-through")).toBeTruthy();
+  expect(cells[2].className).not.toContain("line-through");
+  expect(
+    cells[2].querySelector("[data-mark]")?.closest(".line-through"),
+  ).toBeNull();
+  expect(cells[2].querySelector(".line-through")?.textContent).toContain(
+    "7 of 9 runs",
+  );
   expect(cells[3].className).not.toContain("line-through");
   expect(out?.outerHTML).not.toContain("opacity-out");
 });

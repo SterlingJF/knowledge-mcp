@@ -17,7 +17,9 @@ const headClass = cn(
   "font-(--font-weight-semibold) text-(--color-text-secondary) @max-[560px]:sr-only",
 );
 // A left-out row: its text is struck and tertiary; the tick box stays at full strength.
-const struck = "text-(--color-text-tertiary) line-through";
+const tertiary = "text-(--color-text-tertiary)";
+// Only text spans are struck: a strike on the cell would reach the evidence mark.
+const struck = "line-through";
 // Wide: four columns. Narrow (container under 560px): each row stacks.
 const rowClass =
   "grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-x-(--km-space-5) gap-y-(--km-space-3) border-b-(length:--border-width-regular) border-(--color-border-tertiary) py-(--km-space-4) @max-[560px]:grid-cols-1";
@@ -145,13 +147,16 @@ export function ChangeTable({
                 onKeptChange={frozen ? undefined : (keep) => setOne(n, keep)}
               />
             </span>
-            <span role="cell" className={cn(out && struck)}>
+            <span role="cell" className={cn(out && tertiary)}>
               {row.current ? (
-                <CurrentText label={row.current.label ?? labels.current}>
+                <CurrentText
+                  label={row.current.label ?? labels.current}
+                  className={cn(out && struck)}
+                >
                   {row.current.text}
                 </CurrentText>
               ) : (
-                <span className="text-(--color-text-tertiary)">
+                <span className={cn(tertiary, out && struck)}>
                   {line.addition}
                 </span>
               )}
@@ -160,12 +165,12 @@ export function ChangeTable({
               role="cell"
               className={cn(
                 "flex flex-col gap-(--km-space-2)",
-                out && struck,
+                out && tertiary,
                 out && "[&_[data-mark]]:text-(--color-text-tertiary)",
               )}
             >
               {row.mark && <EvidenceMark mark={row.mark} />}
-              <Cell {...row.proposed} />
+              <Cell {...row.proposed} className={cn(out && struck)} />
             </span>
             <span
               role="cell"
