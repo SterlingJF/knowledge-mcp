@@ -1,13 +1,13 @@
 // K05 Change number and tick box: names each change Cn and lets you keep it or leave it out before saving.
 import { Checkbox } from "@/component-core/checkbox";
-import { action } from "@/copy/en";
+import { action, change } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 const rowClass =
-  "inline-flex items-center gap-(--km-space-4) whitespace-nowrap font-(family-name:--font-mono) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) font-(--font-weight-semibold) text-(--color-text-tertiary) pointer-coarse:min-h-(--km-target)";
+  "inline-flex items-center gap-(--km-space-4) whitespace-nowrap font-(family-name:--font-mono) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) font-(--font-weight-semibold) text-(--color-text-tertiary) pointer-coarse:min-h-(--km-target) pointer-coarse:min-w-(--km-target)";
 
 const boxClass =
-  "size-(--km-check) rounded-(--border-radius-xs) border-(length:--km-check-border) border-(--color-border-secondary) bg-transparent shadow-none after:hidden data-checked:border-transparent data-checked:bg-(--color-background-inverse) data-checked:text-(--color-text-inverse) data-indeterminate:border-transparent data-indeterminate:bg-(--color-background-inverse) data-indeterminate:text-(--color-text-inverse) data-indeterminate:[&_svg]:hidden data-indeterminate:before:h-(--km-space-1) data-indeterminate:before:w-(--km-space-4) data-indeterminate:before:rounded-(--km-space-1) data-indeterminate:before:bg-current data-indeterminate:before:content-[''] focus-visible:ring-(--color-ring-primary) [&_svg]:size-(--km-icon-sm)";
+  "size-(--km-check) rounded-(--border-radius-xs) border-(length:--km-check-border) border-(--color-border-secondary) bg-transparent shadow-none after:hidden data-checked:border-transparent data-checked:bg-(--color-background-inverse) data-checked:text-(--color-text-inverse) data-indeterminate:border-transparent data-indeterminate:bg-(--color-background-inverse) data-indeterminate:text-(--color-text-inverse) data-indeterminate:[&_svg]:hidden data-indeterminate:before:h-(--km-space-1) data-indeterminate:before:w-(--km-space-4) data-indeterminate:before:rounded-(--km-space-1) data-indeterminate:before:bg-current data-indeterminate:before:content-[''] focus-visible:border-transparent focus-visible:ring-0 focus-visible:shadow-(--km-focus-ring) [&_svg]:size-(--km-icon-sm)";
 
 /**
  * The Cn label. Without `onKeptChange` it is a frozen card's plain number.
@@ -24,7 +24,7 @@ export function ChangeNumber({
   onKeptChange?: (kept: boolean) => void;
   className?: string;
 }) {
-  const label = `C${n}`;
+  const label = change.number(n);
   if (!onKeptChange)
     return <span className={cn(rowClass, className)}>{label}</span>;
   return (

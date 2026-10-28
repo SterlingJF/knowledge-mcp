@@ -1,6 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
-import { LeftOutList, Note } from "./note";
+import { vi } from "vitest";
+
+import { Note } from "./note";
 
 test("bolds the fact before the reason", () => {
   render(
@@ -19,16 +21,13 @@ test("a warning is announced", () => {
   expect(screen.getByRole("alert")).toBeTruthy();
 });
 
-test("left-out list pairs each file with its reason", () => {
+test("Show why is a button that calls back", () => {
+  const onShowWhy = vi.fn<() => void>();
   render(
-    <LeftOutList
-      files={[
-        { file: "vendor-quote.xlsx", reason: "Pricing, not caching." },
-        { file: "release-calendar.md", reason: "Dates only." },
-      ]}
-    />,
+    <Note kind="leftOut" fact="2 files left out:" onShowWhy={onShowWhy}>
+      a, b.
+    </Note>,
   );
-  const items = screen.getAllByRole("listitem");
-  expect(items).toHaveLength(2);
-  expect(items[0].textContent).toBe("vendor-quote.xlsxPricing, not caching.");
+  fireEvent.click(screen.getByRole("button", { name: "Show why" }));
+  expect(onShowWhy).toHaveBeenCalledOnce();
 });

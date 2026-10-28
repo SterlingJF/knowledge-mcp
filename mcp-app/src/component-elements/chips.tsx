@@ -13,7 +13,7 @@ export type PersonSource = { said: string };
 export type Source = LineSource | PlaceSource | PersonSource;
 
 const chipClass =
-  "inline-flex max-w-full items-center gap-(--km-space-2) rounded-(--border-radius-sm) border-(length:--border-width-regular) border-(--color-border-tertiary) bg-(--color-background-primary) px-(--km-space-3) py-(--km-space-1) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary) [overflow-wrap:anywhere]";
+  "inline-flex items-center whitespace-nowrap gap-(--km-space-2) rounded-(--border-radius-sm) border-(length:--border-width-regular) border-(--color-border-tertiary) bg-(--color-background-primary) px-(--km-space-3) py-(--km-space-1) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary)";
 
 function Chip({
   icon: Icon,
@@ -56,18 +56,20 @@ export function SourceChip({
   if ("said" in source)
     return (
       <Chip icon={MessageSquare} mono={false} className={className}>
-        {sourceCopy.you}: “{source.said}”
+        {sourceCopy.said(source.said)}
       </Chip>
     );
   if ("place" in source)
     return (
       <Chip icon={placeIcon(source.place)} className={className}>
-        {source.file} › {source.place}
+        {sourceCopy.place(source.file, source.place)}
       </Chip>
     );
   return (
     <Chip icon={FileText} className={className}>
-      {continuation ? "" : source.file}:{source.line_number}
+      {continuation
+        ? sourceCopy.sameFile(source.line_number)
+        : sourceCopy.line(source.file, source.line_number)}
     </Chip>
   );
 }

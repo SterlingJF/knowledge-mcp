@@ -3,7 +3,7 @@ import { Ban, Info, TriangleAlert } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { PathChip } from "@/component-elements/chips";
+import { action } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 export type NoteKind = "info" | "leftOut" | "warning";
@@ -18,11 +18,14 @@ export function Note({
   kind,
   fact,
   children,
+  onShowWhy,
   className,
 }: {
   kind: NoteKind;
   fact?: ReactNode;
   children?: ReactNode;
+  /** Adds the "Show why" disclosure after the reason. */
+  onShowWhy?: () => void;
   className?: string;
 }) {
   const Icon = icons[kind];
@@ -45,34 +48,19 @@ export function Note({
         )}
         {fact != null && children != null && " "}
         {children}
+        {onShowWhy && (
+          <>
+            {" "}
+            <button
+              type="button"
+              onClick={onShowWhy}
+              className="inline-flex cursor-pointer items-center gap-(--km-space-2) rounded-(--border-radius-xs) border-0 bg-transparent p-0 text-(length:--font-text-xs-size) text-(--color-text-primary) underline underline-offset-2 outline-none focus-visible:shadow-(--km-focus-ring) pointer-coarse:min-h-(--km-target)"
+            >
+              {action.showWhy}
+            </button>
+          </>
+        )}
       </div>
     </div>
-  );
-}
-
-export type LeftOutFile = { file: string; reason: ReactNode };
-
-/** Left-out files: chip and reason in a shared two-column grid, so the reasons align. */
-export function LeftOutList({
-  files,
-  className,
-}: {
-  files: ReadonlyArray<LeftOutFile>;
-  className?: string;
-}) {
-  return (
-    <ul
-      className={cn(
-        "m-0 mt-(--km-space-4) grid list-none grid-cols-[max-content_1fr] items-baseline gap-x-(--km-space-5) gap-y-(--km-space-4) p-0",
-        className,
-      )}
-    >
-      {files.map(({ file, reason }) => (
-        <li key={file} className="contents">
-          <PathChip path={file} className="justify-self-start" />
-          <span>{reason}</span>
-        </li>
-      ))}
-    </ul>
   );
 }
