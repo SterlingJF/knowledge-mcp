@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import type { ProposalRow } from "@/contracts/proposal";
 
 import { ChangeTable } from "./change-table";
@@ -28,19 +30,31 @@ const rows: ProposalRow[] = [
   },
 ];
 
-const noop = () => {};
+function Live({ initial }: { initial: number[] }) {
+  const [kept, setKept] = useState(new Set(initial));
+  return <ChangeTable rows={rows} kept={kept} onKeptChange={setKept} />;
+}
+
+// Wide enough for the four-column layout.
+const wide = "w-[760px] max-w-full";
 
 export default {
   id: "P02",
   name: "Change table",
   stories: {
     "Some left out": (
-      <ChangeTable rows={rows} kept={new Set([1, 3])} onKeptChange={noop} />
+      <div className={wide}>
+        <Live initial={[1, 3]} />
+      </div>
     ),
-    Frozen: <ChangeTable rows={rows} />,
+    Frozen: (
+      <div className={wide}>
+        <ChangeTable rows={rows} />
+      </div>
+    ),
     "Narrow (under 560px)": (
       <div className="max-w-[24rem]">
-        <ChangeTable rows={rows} kept={new Set([1])} onKeptChange={noop} />
+        <Live initial={[1]} />
       </div>
     ),
   },

@@ -1,6 +1,9 @@
+import { useState } from "react";
+
 import { badge } from "@/copy/en";
 
-import { DecisionRows } from "./decision-rows";
+import { countAccepted, DecisionRows } from "./decision-rows";
+import type { DecisionKind, DecisionValue } from "./decision-rows";
 
 const mono = (t: string) => (
   <span className="font-(family-name:--font-mono)">{t}</span>
@@ -37,26 +40,38 @@ const base = [
 const headers = ["Document type", "Folder", "Example"];
 const noop = () => {};
 
+function Live({
+  kind,
+  initial,
+}: {
+  kind?: DecisionKind;
+  initial: Record<string, DecisionValue>;
+}) {
+  const [choices, setChoices] =
+    useState<Record<string, DecisionValue | null>>(initial);
+  return (
+    <div>
+      <DecisionRows
+        headers={headers}
+        rows={base}
+        kind={kind}
+        choices={choices}
+        onChoiceChange={(id, v) => setChoices({ ...choices, [id]: v })}
+      />
+      <p className="text-(length:--font-text-xs-size) text-(--color-text-tertiary)">
+        {countAccepted(choices)} / {base.length}
+      </p>
+    </div>
+  );
+}
+
 export default {
   id: "P04",
   name: "Decision rows",
   stories: {
-    Undecided: (
-      <DecisionRows
-        headers={headers}
-        rows={base}
-        choices={{ mn: "accept", dp: "drop" }}
-        onChoiceChange={noop}
-      />
-    ),
+    Undecided: <Live initial={{ mn: "accept", dp: "drop" }} />,
     "Apply or keep refused": (
-      <DecisionRows
-        headers={headers}
-        rows={base}
-        kind="applyKeepRefused"
-        choices={{ dr: "apply" }}
-        onChoiceChange={noop}
-      />
+      <Live kind="applyKeepRefused" initial={{ dr: "apply" }} />
     ),
     Decided: (
       <DecisionRows

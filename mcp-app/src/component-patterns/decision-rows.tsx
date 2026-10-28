@@ -65,7 +65,10 @@ export function DecisionRows({
       <thead>
         <tr className="border-b-(length:--border-width-regular) border-(--color-border-tertiary) text-left text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) font-(--font-weight-semibold) text-(--color-text-secondary)">
           {headers.map((h, i) => (
-            <th key={i} className={cn(cell, "py-(--km-space-3) font-inherit")}>
+            <th
+              key={i}
+              className={cn(cell, "py-(--km-space-3) font-[inherit]")}
+            >
               {h}
             </th>
           ))}

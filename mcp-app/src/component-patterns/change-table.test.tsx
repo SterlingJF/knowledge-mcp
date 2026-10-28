@@ -46,7 +46,12 @@ test("a left-out row stays, marked out", () => {
   );
   const out = screen.getByText("C2").closest("[role=row]");
   expect(out?.getAttribute("data-left-out")).toBe("true");
-  expect(out?.className).toContain("line-through");
+  const cells = out?.querySelectorAll("[role=cell]") ?? [];
+  expect(cells[0].className).not.toContain("line-through");
+  expect(cells[1].className).toContain("line-through");
+  expect(cells[2].className).toContain("line-through");
+  expect(cells[3].className).not.toContain("line-through");
+  expect(out?.outerHTML).not.toContain("opacity-out");
 });
 
 test("ticking and select-all report the kept set to the parent", () => {

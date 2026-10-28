@@ -16,6 +16,8 @@ const headClass = cn(
   xs,
   "font-(--font-weight-semibold) text-(--color-text-secondary) @max-[560px]:sr-only",
 );
+// A left-out row: its text is struck and tertiary; the tick box stays at full strength.
+const struck = "text-(--color-text-tertiary) line-through";
 // Wide: four columns. Narrow (container under 560px): each row stacks.
 const rowClass =
   "grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-x-(--km-space-5) gap-y-(--km-space-3) border-b-(length:--border-width-regular) border-(--color-border-tertiary) py-(--km-space-4) @max-[560px]:grid-cols-1";
@@ -134,10 +136,7 @@ export function ChangeTable({
             role="row"
             key={n}
             data-left-out={out || undefined}
-            className={cn(
-              rowClass,
-              out && "line-through opacity-(--km-opacity-out)",
-            )}
+            className={rowClass}
           >
             <span role="cell">
               <ChangeNumber
@@ -146,7 +145,7 @@ export function ChangeTable({
                 onKeptChange={frozen ? undefined : (keep) => setOne(n, keep)}
               />
             </span>
-            <span role="cell">
+            <span role="cell" className={cn(out && struck)}>
               {row.current ? (
                 <CurrentText label={row.current.label ?? labels.current}>
                   {row.current.text}
@@ -157,11 +156,24 @@ export function ChangeTable({
                 </span>
               )}
             </span>
-            <span role="cell" className="flex flex-col gap-(--km-space-2)">
+            <span
+              role="cell"
+              className={cn(
+                "flex flex-col gap-(--km-space-2)",
+                out && struck,
+                out && "[&_[data-mark]]:text-(--color-text-tertiary)",
+              )}
+            >
               {row.mark && <EvidenceMark mark={row.mark} />}
               <Cell {...row.proposed} />
             </span>
-            <span role="cell">
+            <span
+              role="cell"
+              className={cn(
+                out &&
+                  "text-(--color-text-tertiary) [&_*]:text-(--color-text-tertiary)",
+              )}
+            >
               <Sources sources={row.sources} />
             </span>
           </div>
