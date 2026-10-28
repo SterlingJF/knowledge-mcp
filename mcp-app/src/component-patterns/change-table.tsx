@@ -1,5 +1,4 @@
 // P02 Change table: one row per Cn — what is there now, what is proposed with its evidence mark, and the exact sources.
-import { Fragment } from "react";
 import type { ReactNode } from "react";
 
 import { ChangeNumber, SelectAll } from "@/component-elements/change-number";
@@ -22,7 +21,7 @@ const tertiary = "text-(--color-text-tertiary)";
 const struck = "line-through";
 // Wide: four columns. Narrow (container under 560px): each row stacks.
 const rowClass =
-  "grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-x-(--km-space-5) gap-y-(--km-space-3) border-b-(length:--border-width-regular) border-(--color-border-tertiary) py-(--km-space-4) @max-[560px]:grid-cols-1";
+  "grid grid-cols-[auto_minmax(0,29fr)_minmax(0,42fr)_minmax(0,29fr)] items-start gap-x-(--km-space-5) gap-y-(--km-space-3) border-b-(length:--border-width-regular) border-(--color-border-tertiary) py-(--km-space-4) @max-[560px]:grid-cols-1";
 
 function Cell({
   label,
@@ -53,18 +52,28 @@ function sameFileAsPrevious(sources: Source[], i: number): boolean {
 
 function Sources({ sources }: { sources: Source[] }) {
   return (
-    <span className="flex flex-wrap items-center gap-(--km-space-2)">
+    <span
+      data-testid="sources"
+      className="flex min-w-0 flex-col items-start gap-(--km-space-2)"
+    >
       {sources.map((source, i) => {
         const short = sameFileAsPrevious(sources, i);
         return (
-          <Fragment key={i}>
+          <span
+            key={i}
+            className="flex max-w-full min-w-0 items-center gap-(--km-space-2)"
+          >
             {short && (
               <span className="text-(--color-text-tertiary)">
                 {sourceCopy.versus}
               </span>
             )}
-            <SourceChip source={source} continuation={short} />
-          </Fragment>
+            <SourceChip
+              source={source}
+              continuation={short}
+              className="max-w-full min-w-0 whitespace-normal wrap-anywhere"
+            />
+          </span>
         );
       })}
     </span>

@@ -79,3 +79,10 @@ test("frozen drops the boxes and keeps the numbers", () => {
   expect(screen.getByText("C1")).toBeTruthy();
   expect(screen.queryByText("All")).toBeNull();
 });
+
+test("the sources cell stacks its chips one per line", () => {
+  render(<ChangeTable rows={rows} />);
+  const stacks = screen.getAllByTestId("sources");
+  expect(stacks[1].className).toContain("flex-col");
+  expect(stacks[1].children).toHaveLength(2);
+});
