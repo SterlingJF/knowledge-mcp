@@ -35,6 +35,7 @@ const flat = {
   ...tokens.space,
   ...tokens.motion,
   ...tokens.touch,
+  ...tokens.size,
 };
 const css = [
   "/* Generated from design/mcp-app/kmtokens.js by scripts/build-tokens.ts. Edit the tokens, not this file. */\n",
