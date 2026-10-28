@@ -29,4 +29,20 @@ export type Proposal = {
   left_out?: Array<LeftOutFile>;
   /** The Markdown text card, for hosts without the app. */
   card: string;
+  /** The document text the proposal was prepared against; present when the assistant sent its digest. */
+  based_on?: { document_digest: Digest };
+  /** Server-minted key: a card stands down when a younger one about the same subject appears. */
+  instance?: ProposalInstance;
+};
+
+/** `sha256:` plus 64 lowercase hex digits (common.schema.yaml digest). */
+export type Digest = `sha256:${string}`;
+
+export type ProposalInstance = {
+  /** The document's location as the assistant sent it. */
+  subject: string;
+  /** Server wall-clock time, ISO-8601 UTC to the millisecond. */
+  created_at: string;
+  /** Per-process counter; breaks ties in created_at. */
+  seq: number;
 };
