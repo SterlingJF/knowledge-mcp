@@ -106,6 +106,13 @@ export const status = {
   loading: "Loading",
 } as const;
 
+export const meta = {
+  /** Result-card meta: `Recorded Oct 28, 09:41 · approved by you`. */
+  recorded: (when: string) => `Recorded ${when}`,
+  approvedByYou: "approved by you",
+  join: " · ",
+} as const;
+
 export const label = {
   changes: "Changes",
   evidence: "Evidence",
