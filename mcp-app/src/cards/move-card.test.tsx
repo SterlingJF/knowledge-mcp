@@ -2,7 +2,16 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 import { StaticCardHost, stubCardHost } from "@/bridge/static";
 import type { ToolResult } from "@/bridge/bridge";
-import { action, badge, frozen, label, line, message, moves } from "@/copy/en";
+import {
+  action,
+  badge,
+  decision,
+  frozen,
+  label,
+  line,
+  message,
+  moves,
+} from "@/copy/en";
 import { CardView } from "./registry";
 import { MoveCard, summaryRows } from "./move-card";
 import { m01, m05, m05Link, m05None } from "./move-card.fixture";
@@ -117,6 +126,7 @@ test("a single skip_move blocker is a tick box; answering both enables Move", ()
 test("a blocker with no choices keeps Move off and points to chat", () => {
   renderCard(m05None, "fullscreen");
   expect(screen.queryByRole("checkbox")).toBeNull();
+  expect(screen.getByText(decision.answerInChat)).toBeTruthy();
   expect(screen.getByText(moves.whyBlocked)).toBeTruthy();
   expect(moveButton().disabled).toBe(true);
 });

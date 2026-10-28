@@ -5,7 +5,7 @@ import type { DocumentMoves } from "@/contracts/document-moves";
 import { frozen } from "@/copy/en";
 import { MoveView } from "./move-card";
 import type { Answers, Pressed } from "./move-card";
-import { m01, m05, m05Link } from "./move-card.fixture";
+import { m01, m05, m05Link, m05None } from "./move-card.fixture";
 
 const lifecycle = (
   state: CardLifecycle["state"],
@@ -59,6 +59,7 @@ export default {
     "M05F Answered (link only)": (
       <Story plan={m05Link} mode="fullscreen" answers={{ b1: "1" }} />
     ),
+    "M05F No computed choice": <Story plan={m05None} mode="fullscreen" />,
     "M06 Not now": (
       <Story life={lifecycle("frozen", frozen.notMoved)} pressed="notNow" />
     ),

@@ -244,7 +244,7 @@ export function MoveView({
             headers={[moves.label.problem, moves.label.yourChoice]}
             align="start"
             // No title: the bold file name in the cell carries the weight.
-            narrow={{ title: -1 }}
+            narrow={{}}
             choices={answers}
             onChoiceChange={(id, v) => live && onAnswer(id, v)}
             rows={b.map((issue, i) => ({
@@ -260,10 +260,6 @@ export function MoveView({
                 value: String(n),
                 label: choiceLabel(c),
               })),
-              // P04 draws no empty choice: with nothing to pick, the answer goes in chat.
-              decided: answerable(issue)
-                ? undefined
-                : { tone: "neutral" as const, label: badge.neutral.nothingYet },
             }))}
           />
         ) : (
