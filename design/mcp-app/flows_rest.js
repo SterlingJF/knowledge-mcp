@@ -329,7 +329,7 @@
         eb: "Proposed document",
         title: "Cache rollout",
         flat: true,
-        meta: `${chip("file", '<span class="mono">Proposals/cache-rollout.md</span>')} Design proposal · for maintainers deciding whether to accept it <span class="badge b-nt">reader is a guess</span>`,
+        meta: `${chip("file", '<span class="mono">Proposals/cache-rollout.md</span>')} Design proposal · for maintainers <span class="badge b-nt">reader is a guess</span>`,
         badge: badge("b-amb", "Nothing saved"),
         body:
           tbl(
@@ -377,7 +377,7 @@
         tool("kb_record_edit", "Proposals/cache-rollout.md created") +
         tool("kb_prepare_document_types", "document types updated") +
         card({
-          eb: "Created",
+          eb: "Document",
           title: "Proposals/cache-rollout.md",
           meta: "Design proposal · recorded Oct 28, 10:12 · approved by you",
           badge: badge("b-grn", "Created", "check"),
@@ -396,7 +396,7 @@
 
   // 04 Edit result
   const rHead = {
-    eb: "Saved",
+    eb: "Change",
     title: "cache-proposal.md · 4 changes",
     meta: "Recorded Oct 28, 09:41 · approved by you",
   };
@@ -460,9 +460,9 @@
         tool("kb_list_edits", "the file still holds what was written") +
         tool("kb_record_edit", "earlier text restored") +
         card({
-          eb: "Undo",
-          title: "Undo: cache-proposal.md · 4 changes",
-          meta: "Recorded Oct 28, 09:44",
+          eb: "Change",
+          title: "cache-proposal.md · 4 changes",
+          meta: "Recorded Oct 28, 09:44 · undoes the 09:41 edit",
           badge: badge("b-grn", "Undone", "check"),
         }) +
         `<div class="say">cache-proposal.md is back to how it was before 09:41.</div>` +
@@ -489,8 +489,8 @@
         sent("Undo the 09:41 edit to cache-proposal.md") +
         tool("kb_list_edits", "2 later edits") +
         card({
-          eb: "Undo",
-          title: "Undo: cache-proposal.md · 4 changes",
+          eb: "Change",
+          title: "cache-proposal.md · 4 changes",
           badge: badge("b-red", "Can’t undo safely", "warn"),
           body: `<div class="note">${ic.warn}<span>cache-proposal.md changed after this edit (2 later edits). Undoing would overwrite them. Nothing was changed.</span></div>`,
           acts: `${btn("Show the later edits", "p")}`,
@@ -535,7 +535,7 @@
         ? [["Needs you", "<b>2 blockers</b> · name taken, ambiguous link"]]
         : []),
     ]);
-  const mLeft = `<div class="note">${ic.left}<span><b>1 file stays where it is.</b> scan-0412.md has no document type. <u>Show why</u></span></div>`;
+  const mLeft = `<div class="note">${ic.left}<span><b>1 file stays where it is.</b> scan-0412.md has no document type.</span></div>`;
   const mWhy = `<span class="disc">${ic.link}Show the 5 links</span><div class="why">Waits for you because it moves files and edits links in 4 other notes. You can undo it afterwards.</div>`;
   P["p05-move-plan"] = [
     {
@@ -597,7 +597,7 @@
       content:
         tool("kb_record_edit", "8 of 8 writes recorded · every link checked") +
         card({
-          eb: "Moved",
+          eb: "Moves",
           title: "File the new files",
           meta: "3 files · 5 links repaired and checked",
           badge: badge("b-grn", "Moved", "check"),
@@ -700,22 +700,22 @@
             [
               [
                 `<b>Decisions/2026-10-28 retire evening build.md</b> already exists`,
-                `<span class="seg"><span>Skip this file</span><span>Keep both</span></span>`,
+                `<span class="tick"><span class="cb off"></span>Skip this file</span>`,
               ],
               [
                 `<span class="mono">[[proposal]]</span> in weekly-2026-43.md matches 2 notes`,
-                `<span class="seg"><span>Proposals/cache-proposal</span><span>Proposals/timings-notes</span></span>`,
+                `<span class="seg"><span>Link to Proposals/cache-proposal</span><span>Link to Proposals/timings-notes</span></span>`,
               ],
             ],
           ) +
-          `<div class="why">Move stays off until each blocker has a choice. To use a different name, say it in chat.</div>`,
+          `<div class="why">Move stays off until each blocker has a choice. To keep both under a new name, say the name in chat.</div>`,
         acts: `${btn("Move 3 files", "p dis")}${btn("Not now", "g")}`,
       }),
       composer: wait,
       cap: [
         "Pressed Full view to answer the blockers.",
         "Each blocker with a visible choice; Move stays off until all are answered.",
-        "Choices are selections in the card; a new name needs words, so it goes in chat.",
+        "Choices come from the plan (skip_move, bind_link): one choice is a tick, two or three a segmented choice. Keeping both needs a new name, which is words, so it goes in chat.",
         "Claude design guidelines: visible controls, text in chat.",
       ],
     },
@@ -880,7 +880,7 @@
         tool("kb_prepare_conventions", "prepared with your OK") +
         tool("kb_record_edit", "conventions.yaml recorded") +
         card({
-          eb: "Saved",
+          eb: "Conventions",
           title: `Naming and filing for ${S}`,
           meta: "2 conventions saved · 1 dropped",
           badge: badge("b-grn", "Saved", "check"),

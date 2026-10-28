@@ -485,9 +485,17 @@ class Plan:
         return self.sent.path if path == self.sent.old_path else path
 
     def issue(
-        self, code: str, source: str | None, token: Token | None, detail: str
+        self,
+        code: str,
+        source: str | None,
+        token: Token | None,
+        detail: str,
+        choices: list[dict[str, str]] | None = None,
     ) -> None:
-        self.result["issues"].append(_issue(code, source, token, detail))
+        found = _issue(code, source, token, detail)
+        if choices:
+            found["choices"] = choices
+        self.result["issues"].append(found)
 
     def target(self, token: Token, source: str) -> str | None:
         target, problem = self.resolve(token, source, self.paths)
@@ -515,7 +523,11 @@ class Plan:
                 if problem == "link-ambiguous"
                 else "The existing link has no listed target."
             )
-            self.issue(problem, source, token, detail)
+            choices = None
+            if problem == "link-ambiguous" and isinstance(self.sent, BatchRequest):
+                candidates, _ = _candidates(token, source, self.paths)
+                choices = [dict(action="bind_link", path=p) for p in candidates]
+            self.issue(problem, source, token, detail, choices)
         return target
 
     def replacement(self, token: Token, source: str, target: str) -> str | None:
@@ -789,6 +801,11 @@ def _batch_destinations(
                 None,
                 f"Destination {plan.after(old)} for {old} conflicts with "
                 f"{plan.after(occupant)} from {occupant}. Choose another destination or revise the conflicting row.",
+                [
+                    dict(action="skip_move", path=p)
+                    for p in sorted({old, occupant})
+                    if p in sent.mapping
+                ],
             )
     for old, new in sorted(sent.mapping.items()):
         entry = files.get(old)

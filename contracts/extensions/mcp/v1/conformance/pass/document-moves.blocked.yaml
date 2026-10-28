@@ -83,6 +83,9 @@ issues:
     detail:
       Destination B.md for A.md conflicts with B.md from B.md. Choose another
       destination or revise the conflicting row.
+    choices:
+      - action: skip_move
+        path: A.md
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
     digest: sha256:fa8a80b3e4c48ff830ec14039b34803bf828b07d348f18464eb592ca86f8b02e
@@ -91,3 +94,25 @@ moves:
     path: B.md
 affected_documents: []
 record_changes: []
+card: |
+  `PROPOSED MOVES` · `Needs your choice`
+
+  **1 move · 1 rename · 2 links repaired · 2 notes**
+
+  **Moves (1)**
+
+  1. `A.md` → / as `B.md`
+
+  **Links (2)**
+
+  1. `B.md` · `A.md` → `[[B#^block]]`
+  2. `Index.md` · `A.md` → `[[B]]`
+
+  **Blockers (1)**
+
+  1. Destination B.md for A.md conflicts with B.md from B.md. Choose another destination or revise the conflicting row.
+     - Skip this file (`A.md`)
+
+  Move stays off until each blocker has a choice.
+
+  Say your choice for each blocker, or “Not now”.

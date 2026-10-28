@@ -10445,6 +10445,11 @@
               },
               "received": {
                 "$ref": "common.schema.yaml#/$defs/received"
+              },
+              "card": {
+                "description": "The proposed conventions as markdown. Show it in your reply unchanged.",
+                "type": "string",
+                "minLength": 1
               }
             },
             "additionalProperties": false
@@ -14605,6 +14610,66 @@
             ],
             "default": null,
             "title": "Bindings"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What the moves are for, in one line, such as `File the new files`. The answer echoes it.",
+            "title": "Summary"
+          },
+          "folder": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The folder the moved files come from, such as `Inbox`. The answer echoes it.",
+            "title": "Folder"
+          },
+          "stays": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/MoveStay"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Files you leave where they are, each with the reason the person sees, such as `no document type` from a filing review. The answer echoes them.",
+            "title": "Stays"
+          },
+          "naming": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/MoveNaming"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "For a move's destination `path`, the naming rule or convention that produced its name, such as `date + title`. The answer echoes them.",
+            "title": "Naming"
           }
         },
         "required": [
@@ -14798,12 +14863,55 @@
             "title": "MoveDocument",
             "type": "object"
           },
+          "MoveNaming": {
+            "additionalProperties": false,
+            "description": "The naming rule or convention that produced a move's destination name.",
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/MovePath",
+                "description": "The destination `path` of one move in `moves`."
+              },
+              "rule": {
+                "description": "The rule in a few words, such as `date + title`.",
+                "minLength": 1,
+                "title": "Rule",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "rule"
+            ],
+            "title": "MoveNaming",
+            "type": "object"
+          },
           "MovePath": {
             "description": "Path relative to the knowledge-base root, with forward slashes between folders.",
             "minLength": 1,
             "pattern": "^[^/\\\\\\u0000]+(?:/[^/\\\\\\u0000]+)*$",
             "title": "Move path",
             "type": "string"
+          },
+          "MoveStay": {
+            "additionalProperties": false,
+            "description": "A file the assistant leaves where it is, with the reason the person sees.",
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/MovePath"
+              },
+              "reason": {
+                "description": "Why the file stays, such as `no document type`.",
+                "minLength": 1,
+                "title": "Reason",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "reason"
+            ],
+            "title": "MoveStay",
+            "type": "object"
           },
           "Path": {
             "description": "Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.",
@@ -15078,6 +15186,35 @@
                 "items": {
                   "$ref": "common.schema.yaml#/$defs/document_move"
                 }
+              },
+              "summary": {
+                "description": "What the moves are for, in one line, echoed from the `summary` argument.",
+                "type": "string",
+                "minLength": 1
+              },
+              "folder": {
+                "description": "The folder the moved files come from, echoed from the `folder` argument.",
+                "type": "string",
+                "minLength": 1
+              },
+              "stays": {
+                "description": "Files left where they are, with reasons, echoed from the `stays` argument.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/move_stay"
+                }
+              },
+              "naming": {
+                "description": "The naming rule behind each named destination, echoed from the `naming` argument.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/move_naming"
+                }
+              },
+              "card": {
+                "description": "The move plan as markdown. Show it in your reply unchanged.",
+                "type": "string",
+                "minLength": 1
               }
             },
             "additionalProperties": false
@@ -15188,6 +15325,76 @@
               },
               "detail": {
                 "type": "string"
+              },
+              "choices": {
+                "description": "Resolutions the server can compute for this issue. Absent when it can compute none.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/choice"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "move_stay": {
+            "title": "Move stay",
+            "description": "A file the assistant leaves where it is, with the reason the person sees.",
+            "type": "object",
+            "required": [
+              "path",
+              "reason"
+            ],
+            "properties": {
+              "path": {
+                "$ref": "common.schema.yaml#/$defs/move_path"
+              },
+              "reason": {
+                "description": "Why the file stays, such as `no document type`.",
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "move_naming": {
+            "title": "Move naming",
+            "description": "The naming rule or convention that produced a move's destination name.",
+            "type": "object",
+            "required": [
+              "path",
+              "rule"
+            ],
+            "properties": {
+              "path": {
+                "description": "The destination `path` of one move in `moves`.",
+                "$ref": "common.schema.yaml#/$defs/move_path"
+              },
+              "rule": {
+                "description": "The rule in a few words, such as `date + title`.",
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "choice": {
+            "title": "Move issue choice",
+            "type": "object",
+            "required": [
+              "action",
+              "path"
+            ],
+            "properties": {
+              "action": {
+                "description": "`skip_move` drops the move of `path` from `moves`. `bind_link` sends a binding for the issue's link with `path` as its target.",
+                "enum": [
+                  "skip_move",
+                  "bind_link"
+                ]
+              },
+              "path": {
+                "$ref": "common.schema.yaml#/$defs/move_path"
               }
             },
             "additionalProperties": false
@@ -21359,6 +21566,58 @@
             "description": "Files you read but didn't cite.",
             "title": "Left Out"
           },
+          "document_type": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ProposalDocumentType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The document's type, from kb_get_document_type."
+          },
+          "reader": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ProposalReader"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Who the document is for, from kb_list_audiences, and whether the person confirmed it."
+          },
+          "filing": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FilingNote"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document."
+          },
+          "open_questions": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/ProposalCell"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Questions no source answers, apart from conflicting rows.",
+            "title": "Open Questions"
+          },
           "layout": {
             "$ref": "#/$defs/Layout",
             "default": "table",
@@ -21400,6 +21659,64 @@
             ],
             "title": "Evidence mark",
             "type": "string"
+          },
+          "FileSource": {
+            "additionalProperties": false,
+            "description": "A whole file, with no line or place, such as a sheet you read in full.",
+            "properties": {
+              "file": {
+                "minLength": 1,
+                "title": "File",
+                "type": "string"
+              }
+            },
+            "required": [
+              "file"
+            ],
+            "title": "FileSource",
+            "type": "object"
+          },
+          "FilingNote": {
+            "additionalProperties": false,
+            "description": "Where a new document will be saved and why. Omit it for an existing document.",
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/Path"
+              },
+              "naming_rule": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The naming rule that named the file, or null when none applied.",
+                "title": "Naming Rule"
+              },
+              "reason": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Why you chose the path. Required when `naming_rule` is null.",
+                "title": "Reason"
+              }
+            },
+            "required": [
+              "path",
+              "naming_rule"
+            ],
+            "title": "FilingNote",
+            "type": "object"
           },
           "Layout": {
             "enum": [
@@ -21450,6 +21767,12 @@
             ],
             "title": "LineSource",
             "type": "object"
+          },
+          "Path": {
+            "description": "Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.",
+            "minLength": 1,
+            "title": "Path",
+            "type": "string"
           },
           "PersonSource": {
             "additionalProperties": false,
@@ -21520,6 +21843,59 @@
             "title": "ProposalCell",
             "type": "object"
           },
+          "ProposalDocumentType": {
+            "additionalProperties": false,
+            "description": "The document's type, from kb_get_document_type. Send it whenever you know it.",
+            "properties": {
+              "id": {
+                "description": "Such as `design-proposal`.",
+                "minLength": 1,
+                "title": "Id",
+                "type": "string"
+              },
+              "label": {
+                "description": "Such as `Design proposal`.",
+                "minLength": 1,
+                "title": "Label",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ],
+            "title": "ProposalDocumentType",
+            "type": "object"
+          },
+          "ProposalReader": {
+            "additionalProperties": false,
+            "description": "The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.",
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "title": "Id",
+                "type": "string"
+              },
+              "label": {
+                "description": "Such as `maintainers deciding whether to accept it`.",
+                "minLength": 1,
+                "title": "Label",
+                "type": "string"
+              },
+              "confirmed": {
+                "description": "True when the person confirmed the reader, false when it's your guess.",
+                "title": "Confirmed",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "confirmed"
+            ],
+            "title": "ProposalReader",
+            "type": "object"
+          },
           "ProposalRow": {
             "additionalProperties": false,
             "properties": {
@@ -21560,6 +21936,9 @@
                     },
                     {
                       "$ref": "#/$defs/PersonSource"
+                    },
+                    {
+                      "$ref": "#/$defs/FileSource"
                     }
                   ]
                 },
@@ -21618,6 +21997,25 @@
                 "minItems": 1,
                 "items": {
                   "$ref": "#/$defs/row"
+                }
+              },
+              "document_type": {
+                "description": "The document's type, from kb_get_document_type.",
+                "$ref": "#/$defs/document_type"
+              },
+              "reader": {
+                "description": "Who the document is for, from kb_list_audiences, and whether the person confirmed it.",
+                "$ref": "#/$defs/reader"
+              },
+              "filing": {
+                "description": "For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document.",
+                "$ref": "#/$defs/filing"
+              },
+              "open_questions": {
+                "description": "Questions no source answers, apart from conflicting rows.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/cell"
                 }
               },
               "left_out": {
@@ -21683,6 +22081,9 @@
                     },
                     {
                       "$ref": "#/$defs/person_source"
+                    },
+                    {
+                      "$ref": "#/$defs/file_source"
                     }
                   ]
                 }
@@ -21761,6 +22162,21 @@
             },
             "additionalProperties": false
           },
+          "file_source": {
+            "title": "File source",
+            "description": "A whole file, with no line or place, such as a sheet you read in full.",
+            "type": "object",
+            "required": [
+              "file"
+            ],
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          },
           "person_source": {
             "title": "Person source",
             "description": "The person's words in this conversation.",
@@ -21770,6 +22186,101 @@
             ],
             "properties": {
               "said": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "document_type": {
+            "title": "Proposal document type",
+            "description": "The document's type, from kb_get_document_type. Send it whenever you know it.",
+            "type": "object",
+            "required": [
+              "id",
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "description": "Such as `design-proposal`.",
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "description": "Such as `Design proposal`.",
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "reader": {
+            "title": "Proposal reader",
+            "description": "The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.",
+            "type": "object",
+            "required": [
+              "id",
+              "label",
+              "confirmed"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "description": "Such as `maintainers deciding whether to accept it`.",
+                "type": "string",
+                "minLength": 1
+              },
+              "confirmed": {
+                "description": "True when the person confirmed the reader, false when it's your guess.",
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "filing": {
+            "title": "Filing note",
+            "description": "Where a new document will be saved and why. Omit it for an existing document.",
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "naming_rule": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "type": "object",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "path",
+              "naming_rule"
+            ],
+            "properties": {
+              "path": {
+                "$ref": "common.schema.yaml#/$defs/path"
+              },
+              "naming_rule": {
+                "description": "The naming rule that named the file, or null when none applied.",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1
+              },
+              "reason": {
+                "description": "Why you chose the path. Required when `naming_rule` is null.",
                 "type": "string",
                 "minLength": 1
               }
@@ -23443,7 +23954,7 @@
     {
       "name": "kb_record_edit",
       "title": "Record an edit",
-      "description": "Record an edit right after you make it, so the person can check or undo the change. Returns the edit's id, the digests of `before` and `after`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.\n",
+      "description": "Record an edit right after you make it, so the person can check or undo the change. Send `undoes` when the edit undoes an earlier one. Returns the edit's id, the digests of `before` and `after`, a capped list of the changed lines in `changes`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -23508,6 +24019,18 @@
               }
             ],
             "default": null
+          },
+          "undoes": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EditId"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits."
           }
         },
         "required": [
@@ -23557,6 +24080,11 @@
             ],
             "title": "AllowedBy",
             "type": "object"
+          },
+          "EditId": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Edit id",
+            "type": "string"
           },
           "EditOperation": {
             "additionalProperties": false,
@@ -23622,9 +24150,60 @@
           }
         ],
         "$defs": {
+          "edit_changes": {
+            "title": "Edit changes",
+            "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
+            "type": "object",
+            "required": [
+              "hunks",
+              "lines",
+              "more"
+            ],
+            "properties": {
+              "hunks": {
+                "description": "The number of separate changed blocks.",
+                "type": "integer",
+                "minimum": 0
+              },
+              "lines": {
+                "type": "array",
+                "maxItems": 12,
+                "items": {
+                  "$ref": "#/$defs/changed_line"
+                }
+              },
+              "more": {
+                "description": "The number of changed lines beyond the cap.",
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          },
+          "changed_line": {
+            "title": "Changed line",
+            "type": "object",
+            "required": [
+              "change",
+              "text"
+            ],
+            "properties": {
+              "change": {
+                "enum": [
+                  "removed",
+                  "added"
+                ]
+              },
+              "text": {
+                "description": "The line without its line ending.",
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
           "answer": {
             "title": "Edit receipt",
-            "description": "The recorded edit without `before` and `after`.",
+            "description": "The recorded edit without `before` and `after`, which the agent already has. `changes` carries a capped excerpt of the changed lines instead.",
             "type": "object",
             "if": {
               "type": "object",
@@ -23684,6 +24263,17 @@
               },
               "operation": {
                 "$ref": "common.schema.yaml#/$defs/edit_operation"
+              },
+              "created": {
+                "description": "Present when the edit created the file, that is when `before` was empty.",
+                "const": true
+              },
+              "undoes": {
+                "description": "The id of the earlier edit this edit undoes, as sent.",
+                "$ref": "common.schema.yaml#/$defs/edit_id"
+              },
+              "changes": {
+                "$ref": "#/$defs/edit_changes"
               },
               "card": {
                 "description": "The saved edit as markdown. Show it in your reply unchanged.",

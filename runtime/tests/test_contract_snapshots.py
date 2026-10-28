@@ -19,6 +19,7 @@ from tests.test_document_moves_end_to_end import apply, arguments
 from tests.test_folder_filing_end_to_end import six_notes
 from tests.test_import_end_to_end import THREAD
 from tests.test_proposal_end_to_end import DEMO as PROPOSAL
+from tests.test_proposal_end_to_end import NEW as NEW_PROPOSAL
 from tests.test_proposal_end_to_end import REVISED
 from tests.test_session_start_filing_end_to_end import (
     configuration,
@@ -317,7 +318,7 @@ def story(client: Client) -> Any:
                 "knowledge_bus_folders": [root_folder()],
             },
         )
-        await ask(
+        recorded = await ask(
             "edit.request",
             "kb_record_edit",
             {
@@ -331,6 +332,7 @@ def story(client: Client) -> Any:
             },
         )
         await ask("edits.one-edit", "kb_list_edits", {"location": f"{NOTES}/{DESIGN}"})
+        await edit_stories(ask, recorded["id"])
         await proposal_stories(ask)
         await problem_stories(ask)
         template_catalog = await ask(
@@ -490,7 +492,8 @@ def masked(sample: str, answer: Any) -> Any:
         found = {}
         for key, value in node.items():
             changes = key == "time"
-            changes |= key == "id" and stem == "edit" and top
+            changes |= key in ("id", "undoes") and stem == "edit" and top
+            changes |= key == "card" and stem == "edit" and "undoes" in node
             changes |= key == "id" and stem == "edits" and not top
             changes |= (
                 key in ("record", "digest", "based_on")
@@ -574,9 +577,36 @@ def test_move_snapshot_masks_record_time_and_retains_document_digests():
     assert masked("document-move.ready", first) != masked("document-move.ready", second)
 
 
+async def edit_stories(ask: Any, earlier: str) -> None:
+    """Record an undo of `earlier` and the creation of a file."""
+    await ask(
+        "edit.undo",
+        "kb_record_edit",
+        {
+            "location": f"{NOTES}/{DESIGN}",
+            "allowed_by": {"basis": "request", "text": "Undo the Overview."},
+            "before": AFTER,
+            "after": BEFORE,
+            "undoes": earlier,
+        },
+    )
+    await ask(
+        "edit.created",
+        "kb_record_edit",
+        {
+            "location": f"{NOTES}/cache-proposal.md",
+            "allowed_by": {"basis": "request", "text": "Write the proposal."},
+            "before": "",
+            "after": "Title: Evening build retirement\n",
+            "whole_file": True,
+        },
+    )
+
+
 async def proposal_stories(ask):
     await ask("proposal.demo", "kb_prepare_proposal", PROPOSAL)
     await ask("proposal.revised", "kb_prepare_proposal", REVISED)
+    await ask("proposal.new-document", "kb_prepare_proposal", NEW_PROPOSAL)
     await ask(
         "proposal.based-on",
         "kb_prepare_proposal",
@@ -622,6 +652,37 @@ async def batch_stories(ask):
             "kb_prepare_document_moves",
             {**args, "searched": True, "search": result["search"]},
         )
+    inbox = {"Inbox/a.md": "x", "Inbox/scan-0412.md": "y"}
+    args = arguments(
+        inbox,
+        [("Inbox/a.md", "Notes/2026-10-28 a.md")],
+        allowed_by=INSTRUCTION,
+        summary="File the new files",
+        folder="Inbox",
+        stays=[dict(path="Inbox/scan-0412.md", reason="no document type")],
+        naming=[dict(path="Notes/2026-10-28 a.md", rule="date + title")],
+    )
+    result = await ask(
+        "document-moves.card-context-texts-needed", "kb_prepare_document_moves", args
+    )
+    await ask(
+        "document-moves.card-context",
+        "kb_prepare_document_moves",
+        {**args, "searched": True, "search": result["search"]},
+    )
+    args = arguments(
+        {"A.md": "[[Same]]", "x/Same.md": "1", "y/Same.md": "2"},
+        [("A.md", "Moved/A.md")],
+        allowed_by=INSTRUCTION,
+    )
+    result = await ask(
+        "document-moves.ambiguous-texts-needed", "kb_prepare_document_moves", args
+    )
+    await ask(
+        "document-moves.ambiguous",
+        "kb_prepare_document_moves",
+        {**args, "searched": True, "search": result["search"]},
+    )
     names, files, conventions, values = six_notes()
     await ask(
         "document-types-update.folder-review",

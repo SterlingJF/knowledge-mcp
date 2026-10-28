@@ -90,15 +90,15 @@ export function CardShell({
         className,
       )}
     >
-      {/* Narrow: badge and Full view drop below the title. Wide: they sit at its right. */}
-      <header className="flex flex-col items-start gap-[var(--km-space-4)] @sm:flex-row @sm:justify-between @sm:gap-[var(--km-space-5)]">
-        <div className="min-w-0">
+      {/* Under 480px the title block takes the full width; badge and Full view follow it. */}
+      <header className="flex flex-row items-start justify-between gap-[var(--km-gap-group)] @max-[480px]:flex-col @max-[480px]:gap-[var(--km-gap-inline)]">
+        <div className="min-w-0 @max-[480px]:self-stretch">
           <Eyebrow>{eyebrow}</Eyebrow>
           <Title>{title}</Title>
           {meta != null && <Meta>{meta}</Meta>}
         </div>
         {(shownBadge || (onFullView && live)) && (
-          <span className="flex flex-none items-center gap-[var(--km-space-4)]">
+          <span className="flex flex-none items-center gap-[var(--km-gap-inline)]">
             {shownBadge && (
               <Badge tone={shownBadge.tone}>{shownBadge.label}</Badge>
             )}
@@ -111,7 +111,7 @@ export function CardShell({
       {children}
       {live && why != null && <WhyLine>{why}</WhyLine>}
       {live && actions.length > 0 && (
-        <div className="mt-[var(--km-space-5)] flex flex-wrap items-center gap-[var(--km-space-4)]">
+        <div className="mt-[var(--km-gap-group)] flex flex-wrap items-center gap-[var(--km-gap-inline)]">
           {actions.map((item) => (
             <Button
               key={item.label}

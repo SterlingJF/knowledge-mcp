@@ -34,7 +34,7 @@ export function Note({
       role={kind === "warning" ? "alert" : "note"}
       data-kind={kind}
       className={cn(
-        "flex items-start gap-(--km-space-4) rounded-(--border-radius-lg) bg-(--color-background-secondary) px-(--km-space-5) py-(--km-space-4) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary)",
+        "flex items-start gap-(--km-gap-inline) rounded-(--border-radius-lg) bg-(--color-background-secondary) p-(--km-pad-box) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary)",
         className,
       )}
     >

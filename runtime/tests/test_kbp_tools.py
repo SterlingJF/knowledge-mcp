@@ -716,7 +716,7 @@ def test_saved_release_instructions_reload_for_second_guide(tmp_path, adapt):  #
         "after_digest": "sha256:" + hashlib.sha256(expected).hexdigest(),
     }
     assert {k: v for k, v in edit.items() if k not in {"id", "time"}} == expected_edit
-    assert {k: v for k, v in receipt.items() if k != "card"} == {
+    assert {k: v for k, v in receipt.items() if k not in {"card", "changes"}} == {
         "schema": "knowledge-mcp/edit/2",
         **{k: v for k, v in edit.items() if k not in {"before", "after"}},
     }

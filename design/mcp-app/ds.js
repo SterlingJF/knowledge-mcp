@@ -63,7 +63,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
 .ann{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#d6336c;color:#fff;font:600 10px/1 var(--font-mono);margin:0 4px;vertical-align:middle;flex:none}
 .legend li{margin:0 0 6px 0;list-style:none;display:flex;gap:8px;align-items:flex-start;font-size:12.5px}
 .rows.narrow tr{display:block;border-bottom:1px solid var(--color-border-tertiary);padding:8px 0}.rows.narrow tr:first-child{display:none}.rows.narrow td{display:block;border:0;padding:3px 0}
-.narrowbox{width:360px}
+.narrowbox{width:360px}.dn-row{padding:var(--km-gap-row) 0;border-bottom:var(--border-width-regular) solid var(--color-border-tertiary)}.dn-row:last-child{border-bottom:0}.dn-ex{color:var(--color-text-secondary);margin-top:var(--km-gap-tight);overflow-wrap:anywhere}.dn-pick{margin-top:var(--km-gap-row)}
 .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}.flow .st{flex:1;min-width:190px;border:1px solid var(--color-border-secondary);border-radius:12px;padding:12px 14px;background:var(--color-background-primary);font-size:12.5px}.flow .st b{display:block;margin-bottom:4px}.flow .arr{align-self:center;color:var(--color-text-tertiary);font-size:18px}
 .host-o{border:1px dashed var(--color-border-secondary);border-radius:12px;padding:12px 14px;position:relative}.host-o .lbl{position:absolute;top:-9px;left:12px;background:var(--color-background-tertiary);padding:0 6px;font-size:11px;color:var(--color-text-tertiary)}
 .dt{display:grid;grid-template-columns:1fr 1fr;gap:12px}.do,.dont{border-radius:10px;padding:10px 12px;font-size:12px}.do{background:var(--color-background-success)}.dont{background:var(--color-background-danger)}.do b{color:var(--color-text-success)}.dont b{color:var(--color-text-danger)}
@@ -481,6 +481,14 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           T.spaceUse[k],
         ]),
       )}</div><div class="one">${tbl(
+        ["Role", "Step", "", "Use"],
+        Object.entries(T.gap).map(([k, v]) => [
+          `<span class="mono">${k}</span>`,
+          v.replace("var(", "").replace(")", ""),
+          `<div class="bar" style="width:${parseInt(T.space[v.slice(4, -1)]) * 4}px"></div>`,
+          T.gapUse[k],
+        ]),
+      )}</div><div class="one">${tbl(
         ["Token", "Size", "", "Use"],
         Object.entries(T.radius).map(([k, v]) => [
           `<span class="mono">${k}</span>`,
@@ -502,9 +510,18 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           'None. Claude offers <span class="mono">--shadow-*</span>; a card sits in the chat, not above it.',
         ],
       ])}</div>`,
-      tokens: ["--km-space-1…6", "--border-radius-*", "--border-width-regular"],
+      tokens: [
+        "--km-gap-*",
+        "--km-space-1…7",
+        "--border-radius-*",
+        "--border-width-regular",
+      ],
       rules: [
-        "Nothing interactive flush against an edge: keep --km-space-6 clear (Claude: the composer can overlay the bottom).",
+        "Claude: “Maintain generous padding and logical groupings. Balance information density with readability.” Components space by role (--km-gap-*), never by a bare step.",
+        "Proximity: a gap between groups is twice the gap inside one (group 16px, row and inline 8px, tight 4px). A heading sits closer to what follows it than to what came before.",
+        "Items on one line sit in a flex row with --km-gap-inline, never a typed space; a wrapped run starts at its own left edge, not under the chip before it.",
+        "Every step is on a 4px base; 2px and 6px only inside a badge, chip or button.",
+        "Nothing interactive flush against an edge: keep --km-space-6 clear, and pad the root by hostContext.safeAreaInsets (Claude: the composer can overlay the bottom).",
         "No margin values outside the scale.",
         "No shadows, no gradients.",
       ],
@@ -610,6 +627,11 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
             "mcp-apps/design-guidelines",
           ],
           [
+            "Narrow card",
+            "Under 480px of card the title takes the full width and status and Full view follow it; under 420px each summary label sits 4px above its value, pairs 8px apart; under 560px table rows stack. A breakdown wraps before a separator, never after one, and a number never parts from its noun.",
+            "design-taste-frontend app-screens §7.4, §12",
+          ],
+          [
             "Touch",
             "Every tap target at least 44 × 44pt.",
             "mcp-apps/design-guidelines",
@@ -680,6 +702,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       )}</div><div class="one">${two(vr(labels))}</div><div class="one">${tbl(["Button", "Exact copy"], buttons)}</div><div class="one">${tbl(["Sentence", "Exact copy"], sentences)}</div>`,
       tokens: ["copy rows"],
       rules: [
+        "Hierarchy: the eyebrow names what the card is about (Change, Document, Moves, Conventions), the title names the thing, the badge names its state. None repeats another: no “Saved” eyebrow over a “Saved” badge, no “Undo:” title under an “Undo” eyebrow.",
         "Sentence case everywhere except the eyebrow.",
         "Summary values: terse noun phrases joined by “ · ”. No articles, no semicolons, no colon inside a value (“slide 7 approved, notes disputed”).",
         "Name the thing: a file, a count, a C-number. Never “this item”.",
@@ -973,7 +996,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           ),
           st(
             "Meta",
-            '<span class="meta">Design proposal · for maintainers deciding whether to accept it</span>',
+            '<span class="meta">Design proposal · for maintainers</span>',
           ),
           st(
             "Why line",
@@ -1008,7 +1031,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       purpose:
         "The inline summary’s data points, label left, value right. At most five rows: the generator refuses more.",
       body: two(
-        `<div class="grid2"><div class="mu">Reader</div><div>Maintainers deciding whether to accept it</div><div class="mu">Guidance</div><div>product-dev · Design proposal</div><div class="mu">Since then</div><div><b>4 new files, 1 moved</b> · 3 can be filed by your conventions</div></div>`,
+        `<div class="grid2"><div class="mu">Reader</div><div>Maintainers</div><div class="mu">Guidance</div><div>product-dev · Design proposal</div><div class="mu">Since then</div><div><b>4 new files, 1 moved</b> · 3 can be filed by your conventions</div></div>`,
       ),
       tokens: ["--km-space-3/5", "--color-text-tertiary"],
       rules: ["Labels are nouns from F07 terms.", "Narrow: label above value."],
@@ -1144,7 +1167,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
   const head = {
     eb: "Proposed changes",
     title: "Focus the proposal on retiring the evening build",
-    meta: `${chip("file", '<span class="mono">cache-proposal.md</span>')} Design proposal · for maintainers deciding whether to accept it`,
+    meta: `${chip("file", '<span class="mono">cache-proposal.md</span>')} Design proposal · for maintainers`,
   };
   const rowsLive = (n) =>
     `<table class="rows ${n ? "narrow" : ""}"><tr><th style="width:50px"></th><th>Current</th><th>Proposed</th><th>Source</th></tr><tr><td><span class="cn"><span class="cb">${ic.check}</span>C1</span></td><td><span class="k">Title:</span> <span class="mu">Build schedule and cache rollout</span></td><td>${evTag("suggested")}<span class="k">Title:</span> Evening build retirement</td><td class="srcs">${src("meeting-notes.md:15")}</td></tr><tr class="out"><td><span class="cn"><span class="cb off"></span>C2</span></td><td><span class="k">Motivation:</span> <span class="mu">evening build never finishes</span></td><td>${evTag("supported")}<span class="k">Motivation:</span> 7 of 9 evening runs hit the 6-hour limit</td><td class="srcs">${src("build-timings.xlsx › Evening!A2:D10")}</td></tr></table>`;
@@ -1177,6 +1200,26 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       ],
       "rows",
     );
+  // Narrow: each row is the type, then its example, then the choice. The folder is dropped; the example already shows it.
+  const decisionNarrow = () =>
+    `<div class="dn">${[
+      [
+        "Decision record",
+        "Decisions/2026-10-28 retire evening build.md",
+        pick(""),
+      ],
+      [
+        "Meeting notes",
+        "Calendar/Meetings/2026-10-27 build review.md",
+        pick("a"),
+      ],
+      ["Design proposal", "Proposals/timings-notes.md", pick("d")],
+    ]
+      .map(
+        ([type, example, choice]) =>
+          `<div class="dn-row"><div class="k">${type}</div><div class="mono dn-ex">${example}</div><div class="dn-pick">${choice}</div></div>`,
+      )
+      .join("")}</div>`;
   const P = [
     {
       id: "P01",
@@ -1251,14 +1294,17 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       h: 760,
       purpose:
         "When each row needs its own answer: conventions, guidance changes, move blockers. The card’s primary action waits until rows are answered.",
-      body: two(
-        `<div class="km" style="margin:0">${decision(0)}</div><div class="km">${decision(1)}</div>`,
-      ),
+      body:
+        two(
+          `<div class="km" style="margin:0">${decision(0)}</div><div class="km">${decision(1)}</div>`,
+        ) +
+        `<div class="mu" style="margin:14px 0 8px;font-size:12px">Narrow (under 560px): type, example, choice</div><div class="km narrowbox" style="margin:0">${decisionNarrow()}</div>`,
       tokens: ["K01, K02, K04"],
       rules: [
         "Each row: a segmented choice (K11), not buttons. Changing a row’s value happens in chat.",
         "Decided rows show a badge in place of the choice.",
         "The primary button counts what will be saved.",
+        "Narrow: the header row goes (kept for screen readers); each row reads type (semibold), example (secondary, mono), then the choice. The folder column is dropped because the example path names it.",
       ],
       uses: [/class="seg"/],
     },
@@ -1271,15 +1317,15 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
         "Every outcome is a new card. A result says what was saved, when and on whose OK, with Undo. A refusal says why and that nothing changed.",
       body: two(
         card({
-          eb: "Saved",
+          eb: "Change",
           title: "cache-proposal.md · 4 changes",
           meta: "Recorded Oct 28, 09:41 · approved by you",
           badge: badge("b-grn", "Saved", "check"),
           acts: `${btn("Undo", "", "undo")}${btn("Show the change", "g")}`,
         }) +
           card({
-            eb: "Undo",
-            title: "Undo: cache-proposal.md · 4 changes",
+            eb: "Change",
+            title: "cache-proposal.md · 4 changes",
             badge: badge("b-red", "Can’t undo safely", "warn"),
             body: `<div class="note">${ic.warn}<span>cache-proposal.md changed after this edit (2 later edits). Nothing was changed.</span></div>`,
             acts: btn("Show the later edits", "p"),

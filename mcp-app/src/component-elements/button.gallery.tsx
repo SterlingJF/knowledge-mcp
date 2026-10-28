@@ -11,7 +11,7 @@ const kinds: { variant: ButtonVariant; label: string; icon?: ReactNode }[] = [
 ];
 
 const row = (state: "default" | "focus" | "disabled") => (
-  <span style={{ display: "inline-flex", gap: "var(--km-space-4)" }}>
+  <span style={{ display: "inline-flex", gap: "var(--km-gap-inline)" }}>
     {kinds.map(({ variant, label, icon }) => (
       <Button
         key={variant}

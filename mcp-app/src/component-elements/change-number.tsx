@@ -4,7 +4,7 @@ import { action, change } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 const rowClass =
-  "inline-flex items-center gap-(--km-space-4) whitespace-nowrap font-(family-name:--font-mono) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) font-(--font-weight-semibold) text-(--color-text-tertiary) pointer-coarse:min-h-(--km-target) pointer-coarse:min-w-(--km-target)";
+  "inline-flex items-center gap-(--km-gap-inline) whitespace-nowrap font-(family-name:--font-mono) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) font-(--font-weight-semibold) text-(--color-text-tertiary) relative pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-0 pointer-coarse:before:h-(--km-target) pointer-coarse:before:w-full pointer-coarse:before:min-w-(--km-target) pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']";
 
 const boxClass =
   "size-(--km-check) rounded-(--border-radius-xs) border-(length:--km-check-border) border-(--color-text-tertiary) bg-transparent shadow-none after:hidden data-checked:border-transparent data-checked:bg-(--color-background-inverse) data-checked:text-(--color-text-inverse) data-indeterminate:border-transparent data-indeterminate:bg-(--color-background-inverse) data-indeterminate:text-(--color-text-inverse) data-indeterminate:[&_svg]:hidden data-indeterminate:before:h-(--km-space-1) data-indeterminate:before:w-(--km-space-4) data-indeterminate:before:rounded-(--km-space-1) data-indeterminate:before:bg-current data-indeterminate:before:content-[''] focus-visible:border-transparent focus-visible:ring-0 focus-visible:shadow-(--km-focus-ring) [&_svg]:size-(--km-icon-sm)";
