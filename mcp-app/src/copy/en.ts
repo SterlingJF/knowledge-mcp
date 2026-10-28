@@ -98,6 +98,8 @@ export const line = {
   nothingChanged: "Nothing was changed.",
   /** A no-break space after the dot: a breakdown wraps before a separator, never after it. */
   summaryJoin: " ·\u00a0",
+  /** Between items of one value: `Meetings/, Decisions/`. */
+  listJoin: ", ",
 } as const;
 
 export const source = {
@@ -260,8 +262,25 @@ export const moves = {
     notes === 0
       ? "Waits for you because it moves files. You can undo it afterwards."
       : `Waits for you because it moves files and edits links in ${notes} other ${notes === 1 ? "note" : "notes"}. You can undo it afterwards.`,
+  /** Inline, while a blocker is unanswered. */
   whyBlocked:
+    "Move stays off until each blocker has a choice: open the full view.",
+  /** Full view, while a blocker is unanswered. */
+  whyBlockedFull:
     "Move stays off until each blocker has a choice. To keep both under a new name, say the name in chat.",
+  /** Problem cells: `**Decisions/…md** already exists`. */
+  alreadyExists: "already exists",
+  /** `Link in weekly-2026-43.md matches 2 notes`; E8 brings the link text to lead with. */
+  linkInNoText: (file: string) => `Link in ${file} matches `,
+  notes: "notes",
+  /** Needs you value names for engine issue codes. */
+  issueName: {
+    "destination-occupied": "name taken",
+    "link-ambiguous": "ambiguous link",
+  },
+  /** Full-view stays note: `scan-0412.md has no document type.` */
+  staysSentence: (file: string, reason: string) => `${file} has ${reason}.`,
+  sentenceJoin: " ",
   /** What Move sends. */
   message: (files: number, links: number) =>
     links === 0

@@ -92,19 +92,20 @@ export const m05: DocumentMoves = {
   status: "blocked",
   issues: [
     {
-      code: "name taken",
-      source_path: "Decisions/2026-10-28 retire evening build.md",
+      code: "destination-occupied",
+      source_path: "Inbox/retire-evening.md",
       start: null,
       end: null,
-      detail: "already exists",
+      detail:
+        "Destination Decisions/2026-10-28 retire evening build.md for Inbox/retire-evening.md conflicts with Decisions/2026-10-28 retire evening build.md from Decisions/2026-10-28 retire evening build.md. Choose another destination or revise the conflicting row.",
       choices: [{ action: "skip_move", path: "Inbox/retire-evening.md" }],
     },
     {
-      code: "ambiguous link",
+      code: "link-ambiguous",
       source_path: "weekly-2026-43.md",
       start: 40,
       end: 52,
-      detail: "[[proposal]] matches 2 notes",
+      detail: "Establish the original target with a verified binding.",
       choices: [
         { action: "bind_link", path: "Proposals/cache-proposal.md" },
         { action: "bind_link", path: "Proposals/timings-notes.md" },

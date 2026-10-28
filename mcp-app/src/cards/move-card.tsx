@@ -3,6 +3,7 @@
 // blocker answers. The card holds the answers and the lifecycle, so both survive the switch.
 // The server opens no file: Approve only sends the person's message, and the assistant moves.
 import { useState } from "react";
+import type { ReactNode } from "react";
 
 import { useCardHost } from "@/bridge/bridge";
 import type { ToolResult } from "@/bridge/bridge";
@@ -32,6 +33,19 @@ export type Answers = Record<string, string | null>;
 
 const STATUSES = ["permission_needed", "ready", "blocked"];
 
+/** Absent, or an array of objects whose `keys` are all strings. */
+const optionalList = (value: unknown, keys: string[]) =>
+  value === undefined ||
+  (Array.isArray(value) &&
+    value.every(
+      (v) =>
+        typeof v === "object" &&
+        v !== null &&
+        keys.every(
+          (k) => typeof (v as Record<string, unknown>)[k] === "string",
+        ),
+    ));
+
 export function isMovePlan(
   result: ToolResult | null,
 ): result is ToolResult & DocumentMoves {
@@ -53,6 +67,22 @@ export function isMovePlan(
     Array.isArray(r.links) &&
     r.links.every((l) => typeof l?.source_path === "string") &&
     Array.isArray(r.issues) &&
+    r.issues.every(
+      (i) =>
+        typeof i === "object" &&
+        i !== null &&
+        typeof i.code === "string" &&
+        typeof i.detail === "string" &&
+        (i.choices === undefined ||
+          (Array.isArray(i.choices) &&
+            i.choices.every(
+              (c) =>
+                (c?.action === "skip_move" || c?.action === "bind_link") &&
+                typeof c.path === "string",
+            ))),
+    ) &&
+    optionalList(r.stays, ["path", "reason"]) &&
+    optionalList(r.naming, ["path", "rule"]) &&
     typeof r.based_on === "object" &&
     r.based_on !== null
   );
@@ -64,6 +94,8 @@ const dir = (path: string) => {
 };
 const base = (path: string) => path.split("/").at(-1) ?? path;
 const LINK_LIMIT = 3;
+/** A note's name without folder or ".md", until E8 sends the link's own text. */
+const noteName = (path: string) => base(path).replace(/\.md$/, "");
 const unique = (xs: string[]) => [...new Set(xs)];
 
 /** Issues stop the plan only when it is blocked; otherwise there are none. */
@@ -79,7 +111,9 @@ const linkNotes = (p: DocumentMoves) =>
 /** A blocker with no computed choice can only be answered in chat. */
 const answerable = (issue: MoveIssue) => (issue.choices?.length ?? 0) > 0;
 
+/** A blocked plan never moves from this card, even with no issue listed. */
 export const allAnswered = (p: DocumentMoves, answers: Answers) =>
+  !(p.status === "blocked" && p.issues.length === 0) &&
   blockers(p).every(
     (issue, i) => answerable(issue) && answers[issueId(i)] != null,
   );
@@ -90,10 +124,10 @@ const choiceLabel = (c: MoveChoice) =>
     : moves.linkTo(c.path.replace(/\.md$/, ""));
 
 const fromFolder = (p: DocumentMoves) =>
-  p.folder ?? unique(p.moves.map((m) => dir(m.old_path))).join(", ");
+  p.folder ?? unique(p.moves.map((m) => dir(m.old_path))).join(line.listJoin);
 
 export function summaryRows(p: DocumentMoves): KeyValueRow[] {
-  const to = unique(p.moves.map((m) => dir(m.path))).join(", ");
+  const to = unique(p.moves.map((m) => dir(m.path))).join(line.listJoin);
   const rows: KeyValueRow[] = [
     {
       label: moves.label.moves,
@@ -128,7 +162,7 @@ export function summaryRows(p: DocumentMoves): KeyValueRow[] {
         <>
           <b>{moves.blockersValue(b.length)}</b>
           {line.summaryJoin}
-          {unique(b.map((i) => i.code)).join(", ")}
+          {unique(b.map((i) => issueName(i.code))).join(line.listJoin)}
         </>
       ),
     });
@@ -144,6 +178,45 @@ export function summaryRows(p: DocumentMoves): KeyValueRow[] {
   return rows;
 }
 
+const issueName = (code: string) =>
+  code === "destination-occupied" || code === "link-ambiguous"
+    ? moves.issueName[code]
+    : code;
+
+/** The chosen choice, or null when unanswered: never index with a missing answer. */
+function answerOf(issue: MoveIssue, answer: string | null | undefined) {
+  if (answer == null) return null;
+  return issue.choices?.[Number(answer)] ?? null;
+}
+
+/** The problem cell, built from copy so each number stays with its noun. */
+function problemCell(p: DocumentMoves, issue: MoveIssue): ReactNode {
+  const file = issue.source_path;
+  if (issue.code === "destination-occupied" && file) {
+    const dest = p.moves.find((m) => m.old_path === file)?.path ?? file;
+    return (
+      <>
+        <b>{dest}</b> {moves.alreadyExists}
+      </>
+    );
+  }
+  if (issue.code === "link-ambiguous" && file) {
+    const count = line.counted(issue.choices?.length ?? 0, moves.notes);
+    return (
+      <>
+        {moves.linkInNoText(file)}
+        {count}
+      </>
+    );
+  }
+  return (
+    <>
+      {file && <b>{file} </b>}
+      {issue.detail}
+    </>
+  );
+}
+
 export function moveContext(p: DocumentMoves, answers: Answers) {
   return {
     document_moves: {
@@ -154,7 +227,7 @@ export function moveContext(p: DocumentMoves, answers: Answers) {
       digest: p.digest,
       blockers: blockers(p).map((issue, i) => ({
         ...issue,
-        answer: issue.choices?.[Number(answers[issueId(i)])] ?? null,
+        answer: answerOf(issue, answers[issueId(i)]),
       })),
     },
   };
@@ -186,7 +259,8 @@ export function MoveView({
   const b = blockers(p);
   const repaired = repairedLinks(p);
   const shell = {
-    eyebrow: live ? moves.eyebrow : moves.eyebrowDone,
+    // Only an approved plan becomes a record of moves; Not now keeps it a proposal.
+    eyebrow: pressed === "move" ? moves.eyebrowDone : moves.eyebrow,
     title: p.summary ?? moves.title,
     meta: (
       <>
@@ -209,8 +283,10 @@ export function MoveView({
             : { tone: "waiting" as const, label: badge.waiting.needsOk },
     why: !live
       ? undefined
-      : b.length > 0
-        ? moves.whyBlocked
+      : b.length > 0 && !allAnswered(p, answers)
+        ? displayMode === "fullscreen"
+          ? moves.whyBlockedFull
+          : moves.whyBlocked
         : moves.why(linkNotes(p)),
   };
   const move: CardAction = {
@@ -250,12 +326,7 @@ export function MoveView({
             rows={b.map((issue, i) => ({
               id: issueId(i),
               name: issue.detail,
-              cells: [
-                <>
-                  {issue.source_path && <b>{issue.source_path} </b>}
-                  {issue.detail}
-                </>,
-              ],
+              cells: [problemCell(p, issue)],
               options: (issue.choices ?? []).map((c, n) => ({
                 value: String(n),
                 label: choiceLabel(c),
@@ -316,8 +387,8 @@ function MovesTable({ plan: p }: { plan: DocumentMoves }) {
       {stays.length > 0 && (
         <Note kind="leftOut" fact={moves.staysFact(stays.length)}>
           {stays
-            .map((st) => moves.staysValue(base(st.path), st.reason))
-            .join(line.summaryJoin)}
+            .map((st) => moves.staysSentence(base(st.path), st.reason))
+            .join(moves.sentenceJoin)}
         </Note>
       )}
     </div>
@@ -336,7 +407,7 @@ function LinksTable({ plan: p }: { plan: DocumentMoves }) {
         cells: [
           <PathChip key="note" path={l.source_path} />,
           <span key="now" className={mono}>
-            {l.target_before}
+            {noteName(l.target_before)}
           </span>,
           <span key="after" className={mono}>
             {l.replacement}
