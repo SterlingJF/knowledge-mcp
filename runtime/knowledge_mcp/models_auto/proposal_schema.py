@@ -1,7 +1,7 @@
 # Generated from contracts/extensions/mcp/v1 by just generate_contract_types. Edit the schemas, not this file.
 
 from pydantic import BaseModel, ConfigDict, Field
-from ._internal import Digest, Time
+from ._internal import Digest, FileSource, Path, Time
 from typing import Annotated, Literal
 from . import problem_schema
 
@@ -76,6 +76,67 @@ class PersonSource(BaseModel):
     said: Annotated[str, Field(min_length=1)]
 
 
+class ProposalDocumentType(BaseModel):
+    """
+    The document's type, from kb_get_document_type.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    id: Annotated[str, Field(description="Such as `design-proposal`.", min_length=1)]
+    label: Annotated[str, Field(description="Such as `Design proposal`.", min_length=1)]
+
+
+class ProposalReader(BaseModel):
+    """
+    The audience choice the document is for, from kb_list_audiences.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    id: Annotated[str, Field(min_length=1)]
+    label: Annotated[
+        str,
+        Field(
+            description="Such as `maintainers deciding whether to accept it`.",
+            min_length=1,
+        ),
+    ]
+    confirmed: Annotated[
+        bool,
+        Field(
+            description="True when the person confirmed the reader, false when it's your guess."
+        ),
+    ]
+
+
+class FilingNote(BaseModel):
+    """
+    Where a new document will be saved and why. Omit it for an existing document.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: Path
+    naming_rule: Annotated[
+        str | None,
+        Field(
+            description="The naming rule that named the file, or null when none applied.",
+            min_length=1,
+        ),
+    ]
+    reason: Annotated[
+        str | None,
+        Field(
+            description="Why you chose the path. Required when `naming_rule` is null.",
+            min_length=1,
+        ),
+    ] = None
+
+
 class LeftOutFile(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -120,7 +181,7 @@ class ProposalRow(BaseModel):
     proposed: ProposalCell
     mark: EvidenceMark | None = None
     sources: Annotated[
-        list[LineSource | PlaceSource | PersonSource], Field(min_length=1)
+        list[LineSource | PlaceSource | PersonSource | FileSource], Field(min_length=1)
     ]
 
 
@@ -143,6 +204,13 @@ class Proposal(BaseModel):
             min_length=1,
         ),
     ]
+    document_type: ProposalDocumentType | None = None
+    reader: ProposalReader | None = None
+    filing: FilingNote | None = None
+    open_questions: Annotated[
+        list[ProposalCell] | None,
+        Field(description="Questions no source answers, apart from conflicting rows."),
+    ] = None
     left_out: Annotated[
         list[LeftOutFile] | None, Field(description="Files you read but didn't cite.")
     ] = None

@@ -6,7 +6,7 @@ current_from_parent: []
 proposed_from_parent: []
 file: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
 status: ready
-based_on: sha256:56453ac08b1f7449e94e876e36a677a39ab0ff0a66de5882579c94d887f7ef93
+based_on: sha256:df7f46d4c1143a729d6546a20075d745ac976a6ce5bfd69e029bd3bee59d2f14
 current:
   - universe_spec: codebase-recordkeeping
     document_type: design-proposal
@@ -27,7 +27,7 @@ current:
         Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
         as you work.
       location: AGENTS.md
-    time: "2026-10-18T17:42:08.472251Z"
+    time: "2026-10-28T07:23:20.342549Z"
 changes:
   - change: remove
     universe_spec: codebase-recordkeeping
@@ -45,4 +45,4 @@ record: |
 digest: sha256:46dae9fa51d8c171301b1602f8f8bd8b4fe8cc29af7d6539d43b95f9937f18d9
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
-    digest: sha256:56453ac08b1f7449e94e876e36a677a39ab0ff0a66de5882579c94d887f7ef93
+    digest: sha256:df7f46d4c1143a729d6546a20075d745ac976a6ce5bfd69e029bd3bee59d2f14

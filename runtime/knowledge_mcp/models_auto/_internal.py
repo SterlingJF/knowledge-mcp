@@ -26,6 +26,17 @@ type Path = Annotated[
 ]
 
 
+class FileSource(BaseModel):
+    """
+    A whole file, with no line or place, such as a sheet you read in full.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    file: Annotated[str, Field(min_length=1)]
+
+
 type Fingerprint = Annotated[
     str,
     Field(

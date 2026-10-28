@@ -1,7 +1,7 @@
 ---
 schema: knowledge-mcp/document-types-update/1
 location: ~/notes
-based_on: sha256:687bb092d814a8ac220f14df5701ffdd1c4562bdbea0e91a792c5e14745f6c12
+based_on: sha256:12ae878c098ae8a2272be10178bae8766b9e37a763be0e0c7115e6d5026e2e19
 record: |
   # Your agent rewrites this file with text from knowledge-mcp when files change or you correct an entry.
   # An entry with `set_by: person` overrides any later entry by the agent.
@@ -16,7 +16,7 @@ record: |
         basis: instruction
         text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date as you work.
         location: AGENTS.md
-      time: '2026-10-18T17:42:05.277Z'
+      time: '2026-10-28T07:23:15.547Z'
     ideas.txt:
       no_document_type: true
       set_by: agent
@@ -24,8 +24,8 @@ record: |
         basis: instruction
         text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date as you work.
         location: AGENTS.md
-      time: '2026-10-18T17:42:05.277Z'
-digest: sha256:4be301958a01af4a2aec6c15e99ba9a6f904d7ca9e21cfe634102c4687f0e567
+      time: '2026-10-28T07:23:15.547Z'
+digest: sha256:36c8fd9a513e2456ccda478b479d32773d09c8682d35798e320fe33aba9c34a5
 changed:
   - path: docs/rfcs/0042-caching.md
     change: moved
@@ -41,7 +41,7 @@ changed:
           Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to
           date as you work.
         location: AGENTS.md
-      time: "2026-10-18T17:42:05.277Z"
+      time: "2026-10-28T07:23:15.547Z"
 to_settle: []
 scopes:
   - universe_specs:
@@ -56,7 +56,7 @@ scopes:
     every_document_type: null
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
-    digest: sha256:687bb092d814a8ac220f14df5701ffdd1c4562bdbea0e91a792c5e14745f6c12
+    digest: sha256:12ae878c098ae8a2272be10178bae8766b9e37a763be0e0c7115e6d5026e2e19
 filing:
   - path: docs/rfcs/0042-caching.md
     universe_spec: codebase-recordkeeping

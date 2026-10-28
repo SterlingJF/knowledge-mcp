@@ -36,7 +36,7 @@ record: |
         basis: request
         text: Keep these document types.
       fingerprint: sha256:980fda00f26ad81583d554c6bfe241a7c4570799b94b692d35249aff8cf0390b
-      time: '2026-10-18T17:42:18.381Z'
+      time: '2026-10-28T07:23:30.469Z'
     Inbox/Kickoff.md:
       universe_spec: session-notes
       version: '0.9'
@@ -46,7 +46,7 @@ record: |
         basis: request
         text: Keep these document types.
       fingerprint: sha256:81224e18fbfa831d4650f256837680d67e6a46280eeb84b269b45a3ddcb76981
-      time: '2026-10-18T17:42:18.381Z'
+      time: '2026-10-28T07:23:30.469Z'
     Inbox/Loose thoughts.md:
       no_document_type: true
       set_by: agent
@@ -54,7 +54,7 @@ record: |
         basis: request
         text: Keep these document types.
       fingerprint: sha256:8c8cb92f4e09f0800dcd9ed732a7b2a294fbe54de5d1b9840a76c5a99e684d2c
-      time: '2026-10-18T17:42:18.381Z'
+      time: '2026-10-28T07:23:30.469Z'
     Inbox/Review.md:
       universe_spec: session-notes
       version: '1'
@@ -68,7 +68,7 @@ record: |
         text: Keep these document types.
       fingerprint: sha256:c97ace4c8fef2cee8fa0f3c9f52aab18dbd4f42438afe362ffb8f75ce4c04b84
       time: '2026-10-18T00:00:00Z'
-digest: sha256:9039bceb071b68b271c1aa0c011a09037867bfb95cf9e0ae75af70694d97901e
+digest: sha256:777a3718986a91c0aa99cab1cefad6608ddc5188c48df1220c08cb1b87c0dce3
 listing_changes:
   - change: moved
     path: Inbox/Review.md
@@ -125,7 +125,7 @@ changed:
         basis: request
         text: Keep these document types.
       fingerprint: sha256:980fda00f26ad81583d554c6bfe241a7c4570799b94b692d35249aff8cf0390b
-      time: "2026-10-18T17:42:18.381Z"
+      time: "2026-10-28T07:23:30.469Z"
   - path: Inbox/Kickoff.md
     change: settled
     entry:
@@ -137,7 +137,7 @@ changed:
         basis: request
         text: Keep these document types.
       fingerprint: sha256:81224e18fbfa831d4650f256837680d67e6a46280eeb84b269b45a3ddcb76981
-      time: "2026-10-18T17:42:18.381Z"
+      time: "2026-10-28T07:23:30.469Z"
   - path: Inbox/Loose thoughts.md
     change: settled
     entry:
@@ -147,7 +147,7 @@ changed:
         basis: request
         text: Keep these document types.
       fingerprint: sha256:8c8cb92f4e09f0800dcd9ed732a7b2a294fbe54de5d1b9840a76c5a99e684d2c
-      time: "2026-10-18T17:42:18.381Z"
+      time: "2026-10-28T07:23:30.469Z"
 to_settle: []
 scopes:
   - universe_specs:

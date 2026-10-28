@@ -19,6 +19,7 @@ from tests.test_document_moves_end_to_end import apply, arguments
 from tests.test_folder_filing_end_to_end import six_notes
 from tests.test_import_end_to_end import THREAD
 from tests.test_proposal_end_to_end import DEMO as PROPOSAL
+from tests.test_proposal_end_to_end import NEW as NEW_PROPOSAL
 from tests.test_proposal_end_to_end import REVISED
 from tests.test_session_start_filing_end_to_end import (
     configuration,
@@ -577,6 +578,7 @@ def test_move_snapshot_masks_record_time_and_retains_document_digests():
 async def proposal_stories(ask):
     await ask("proposal.demo", "kb_prepare_proposal", PROPOSAL)
     await ask("proposal.revised", "kb_prepare_proposal", REVISED)
+    await ask("proposal.new-document", "kb_prepare_proposal", NEW_PROPOSAL)
     await ask(
         "proposal.based-on",
         "kb_prepare_proposal",

@@ -33,6 +33,17 @@ $defs:
         minItems: 1
         items:
           $ref: "#/$defs/row"
+      document_type:
+        $ref: "#/$defs/document_type"
+      reader:
+        $ref: "#/$defs/reader"
+      filing:
+        $ref: "#/$defs/filing"
+      open_questions:
+        description: Questions no source answers, apart from conflicting rows.
+        type: array
+        items:
+          $ref: "#/$defs/cell"
       left_out:
         description: Files you read but didn't cite.
         type: array
@@ -78,6 +89,7 @@ $defs:
             - $ref: "#/$defs/line_source"
             - $ref: "#/$defs/place_source"
             - $ref: "#/$defs/person_source"
+            - $ref: common.schema.yaml#/$defs/file_source
   cell:
     title: Proposal cell
     type: object
@@ -141,6 +153,62 @@ $defs:
       - said
     properties:
       said:
+        type: string
+        minLength: 1
+  document_type:
+    title: Proposal document type
+    description: The document's type, from kb_get_document_type.
+    type: object
+    additionalProperties: false
+    required:
+      - id
+      - label
+    properties:
+      id:
+        description: Such as `design-proposal`.
+        type: string
+        minLength: 1
+      label:
+        description: Such as `Design proposal`.
+        type: string
+        minLength: 1
+  reader:
+    title: Proposal reader
+    description: The audience choice the document is for, from kb_list_audiences.
+    type: object
+    additionalProperties: false
+    required:
+      - id
+      - label
+      - confirmed
+    properties:
+      id:
+        type: string
+        minLength: 1
+      label:
+        description: Such as `maintainers deciding whether to accept it`.
+        type: string
+        minLength: 1
+      confirmed:
+        description: True when the person confirmed the reader, false when it's your guess.
+        type: boolean
+  filing:
+    title: Filing note
+    description: Where a new document will be saved and why. Omit it for an existing document.
+    type: object
+    additionalProperties: false
+    required:
+      - path
+      - naming_rule
+    properties:
+      path:
+        $ref: common.schema.yaml#/$defs/path
+      naming_rule:
+        description: The naming rule that named the file, or null when none applied.
+        type: [string, "null"]
+        minLength: 1
+      reason:
+        description: Why you chose the path. Required when `naming_rule` is null.
         type: string
         minLength: 1
   left_out_file:
