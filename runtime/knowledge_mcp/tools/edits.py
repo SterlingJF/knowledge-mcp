@@ -8,7 +8,7 @@ from pydantic import Field
 
 from knowledge_mcp import edits
 from knowledge_mcp.models import AllowedBy
-from knowledge_mcp.models_auto.common_schema import EditOperation
+from knowledge_mcp.models_auto.common_schema import EditId, EditOperation
 from knowledge_mcp.models_auto.edit_schema import EditReceipt
 from knowledge_mcp.models_auto.edits_schema import EditsAnswer
 from knowledge_mcp.scope import Workspace
@@ -73,13 +73,12 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
         ] = None,
         operation: EditOperation | None = None,
         undoes: Annotated[
-            str | None,
+            EditId | None,
             Field(
                 description=(
                     "The id of the earlier edit this edit undoes, from `kb_list_edits`. "
                     "Omit it for other edits."
                 ),
-                pattern="^[0-9a-f]{32}$",
             ),
         ] = None,
     ) -> CallToolResult:
@@ -94,7 +93,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             undoes=undoes,
         )
         if undoes is not None:
-            edits.check_undoes(undoes)
+            edits.check_undoes(location, undoes)
         texts = edits.Texts(
             before=before,
             after=after,

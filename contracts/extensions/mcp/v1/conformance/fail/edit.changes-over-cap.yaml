@@ -38,7 +38,7 @@ changes:
       text: line 11
     - change: added
       text: line 12
-  left_out: 1
+  more: 1
 card: |
   `Saved` · **Edit saved**
 

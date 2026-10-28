@@ -1,7 +1,7 @@
 ---
 schema: knowledge-mcp/edit/2
-id: de9dce4d127f4567b45477c646fe5df9
-time: "2026-10-28T07:34:30.779Z"
+id: 2154b63798b04e7ea34132782b021e2e
+time: "2026-10-18T17:42:13.920Z"
 location: ~/notes/DESIGN.md
 allowed_by:
   basis: request
@@ -19,7 +19,7 @@ changes:
       text: Calm, for small teams.
     - change: added
       text: ""
-  left_out: 0
+  more: 0
 card: |
   `Saved` · **Edit saved**
 

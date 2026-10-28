@@ -3,7 +3,6 @@
 from ._internal import (
     Alias,
     Candidate,
-    ChangedLine,
     ConventionFile,
     ConventionFile1,
     ConventionFile2,
@@ -11,7 +10,6 @@ from ._internal import (
     ConventionsFolder,
     Digest,
     DocumentMove,
-    EditChanges,
     EditId,
     EditOperation,
     FileChange,
@@ -52,7 +50,6 @@ from ._internal import (
 __all__ = [
     "Alias",
     "Candidate",
-    "ChangedLine",
     "ConventionFile",
     "ConventionFile1",
     "ConventionFile2",
@@ -60,7 +57,6 @@ __all__ = [
     "ConventionsFolder",
     "Digest",
     "DocumentMove",
-    "EditChanges",
     "EditId",
     "EditOperation",
     "FileChange",

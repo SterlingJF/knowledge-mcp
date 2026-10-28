@@ -1028,57 +1028,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -3160,57 +3109,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -4548,57 +4446,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",
@@ -7021,57 +6868,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -8627,57 +8423,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",
@@ -11097,57 +10842,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",
@@ -13569,57 +13263,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -15941,57 +15584,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",
@@ -18583,57 +18175,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -20745,57 +20286,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",
@@ -22915,57 +22405,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -24083,16 +23522,14 @@
           "undoes": {
             "anyOf": [
               {
-                "pattern": "^[0-9a-f]{32}$",
-                "type": "string"
+                "$ref": "#/$defs/EditId"
               },
               {
                 "type": "null"
               }
             ],
             "default": null,
-            "description": "The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits.",
-            "title": "Undoes"
+            "description": "The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits."
           }
         },
         "required": [
@@ -24142,6 +23579,11 @@
             ],
             "title": "AllowedBy",
             "type": "object"
+          },
+          "EditId": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Edit id",
+            "type": "string"
           },
           "EditOperation": {
             "additionalProperties": false,
@@ -24207,6 +23649,57 @@
           }
         ],
         "$defs": {
+          "edit_changes": {
+            "title": "Edit changes",
+            "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
+            "type": "object",
+            "required": [
+              "hunks",
+              "lines",
+              "more"
+            ],
+            "properties": {
+              "hunks": {
+                "description": "The number of separate changed blocks.",
+                "type": "integer",
+                "minimum": 0
+              },
+              "lines": {
+                "type": "array",
+                "maxItems": 12,
+                "items": {
+                  "$ref": "#/$defs/changed_line"
+                }
+              },
+              "more": {
+                "description": "The number of changed lines beyond the cap.",
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          },
+          "changed_line": {
+            "title": "Changed line",
+            "type": "object",
+            "required": [
+              "change",
+              "text"
+            ],
+            "properties": {
+              "change": {
+                "enum": [
+                  "removed",
+                  "added"
+                ]
+              },
+              "text": {
+                "description": "The line without its line ending.",
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
           "answer": {
             "title": "Edit receipt",
             "description": "The recorded edit without `before` and `after`, which the agent already has. `changes` carries a capped excerpt of the changed lines instead.",
@@ -24279,7 +23772,7 @@
                 "$ref": "common.schema.yaml#/$defs/edit_id"
               },
               "changes": {
-                "$ref": "common.schema.yaml#/$defs/edit_changes"
+                "$ref": "#/$defs/edit_changes"
               },
               "card": {
                 "description": "The saved edit as markdown. Show it in your reply unchanged.",
@@ -24671,57 +24164,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",
@@ -26763,57 +26205,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -28637,57 +28028,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",
@@ -30513,57 +29853,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",
@@ -32406,57 +31695,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -34294,57 +33532,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -36037,57 +35224,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",
@@ -37900,57 +37036,6 @@
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
               },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
-              },
               "received": {
                 "title": "Received",
                 "description": "Input text digests for reuse in this session. Send a digest in place of its text while the source file remains unchanged.",
@@ -39643,57 +38728,6 @@
                 "title": "Edit id",
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$"
-              },
-              "edit_changes": {
-                "title": "Edit changes",
-                "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
-                "type": "object",
-                "required": [
-                  "hunks",
-                  "lines",
-                  "left_out"
-                ],
-                "properties": {
-                  "hunks": {
-                    "description": "The number of separate changed blocks.",
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "lines": {
-                    "type": "array",
-                    "maxItems": 12,
-                    "items": {
-                      "$ref": "#/$defs/changed_line"
-                    }
-                  },
-                  "left_out": {
-                    "description": "The number of changed lines beyond the cap.",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "additionalProperties": false
-              },
-              "changed_line": {
-                "title": "Changed line",
-                "type": "object",
-                "required": [
-                  "change",
-                  "text"
-                ],
-                "properties": {
-                  "change": {
-                    "enum": [
-                      "removed",
-                      "added"
-                    ]
-                  },
-                  "text": {
-                    "description": "The line without its line ending.",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false
               },
               "received": {
                 "title": "Received",

@@ -10,6 +10,46 @@ oneOf:
   - $ref: "#/$defs/answer"
   - $ref: problem.schema.yaml
 $defs:
+  edit_changes:
+    title: Edit changes
+    description:
+      The changed lines of an edit in document order, capped at 12 lines.
+      Absent when the edit sent `after_digest` without `after`.
+    type: object
+    additionalProperties: false
+    required:
+      - hunks
+      - lines
+      - more
+    properties:
+      hunks:
+        description: The number of separate changed blocks.
+        type: integer
+        minimum: 0
+      lines:
+        type: array
+        maxItems: 12
+        items:
+          $ref: "#/$defs/changed_line"
+      more:
+        description: The number of changed lines beyond the cap.
+        type: integer
+        minimum: 0
+  changed_line:
+    title: Changed line
+    type: object
+    additionalProperties: false
+    required:
+      - change
+      - text
+    properties:
+      change:
+        enum:
+          - removed
+          - added
+      text:
+        description: The line without its line ending.
+        type: string
   answer:
     title: Edit receipt
     description:
@@ -53,7 +93,7 @@ $defs:
         description: The id of the earlier edit this edit undoes, as sent.
         $ref: common.schema.yaml#/$defs/edit_id
       changes:
-        $ref: common.schema.yaml#/$defs/edit_changes
+        $ref: "#/$defs/edit_changes"
       card:
         description: The saved edit as markdown. Show it in your reply unchanged.
         type: string

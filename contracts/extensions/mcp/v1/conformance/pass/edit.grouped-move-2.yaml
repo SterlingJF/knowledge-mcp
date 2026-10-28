@@ -1,7 +1,7 @@
 ---
 schema: knowledge-mcp/edit/2
-id: 149827cabc0a4f2bb3d843ffda8938df
-time: "2026-10-28T07:34:35.398Z"
+id: 587a7ea55ed4459d918ca0fc2bd09bab
+time: "2026-10-18T17:42:18.058Z"
 location: batch-vault
 allowed_by:
   basis: instruction
@@ -25,7 +25,7 @@ changes:
       text: "[[A#^block]]"
     - change: added
       text: "[[Alpha#^block]]"
-  left_out: 0
+  more: 0
 card: |
   `Saved` · **Edit saved**
 

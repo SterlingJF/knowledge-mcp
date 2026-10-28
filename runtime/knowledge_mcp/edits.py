@@ -120,24 +120,21 @@ def changes(before: str, after: str) -> dict[str, Any]:
     return {
         "hunks": hunks,
         "lines": lines[:CHANGED_LINES],
-        "left_out": max(0, len(lines) - CHANGED_LINES),
+        "more": max(0, len(lines) - CHANGED_LINES),
     }
 
 
-def check_undoes(undoes: str) -> None:
-    """Raise EditError when no recorded edit has the id `undoes`."""
-    path = log.directory() / NAME
-    if path.is_file():
-        for line in path.read_text(encoding="utf-8").splitlines():
-            try:
-                entry = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if isinstance(entry, dict) and entry.get("id") == undoes:
-                return
+def check_undoes(location: str, undoes: str) -> None:
+    """Raise EditError when no valid edit recorded for `location` has the id `undoes`.
+
+    A grouped undo is recorded under the group's root, like the edits it undoes.
+    """
+    if any(edit["id"] == undoes for edit in listing(location)["edits"]):
+        return
     msg = (
-        f"No recorded edit has the id {undoes!r}. Call `kb_list_edits` and send the id of "
-        "the edit this one undoes, or leave `undoes` out."
+        f"No edit recorded for {location!r} has the id {undoes!r}. Call `kb_list_edits` "
+        "with the same `location` and send the id of the edit this one undoes, or leave "
+        "`undoes` out."
     )
     raise EditError(msg, pointer=problems.pointer("undoes"))
 
@@ -151,7 +148,7 @@ def receipt(entry: dict[str, Any], undoes: str | None = None) -> dict[str, Any]:
         name: value for name, value in entry.items() if name not in ("before", "after")
     }
     found: dict[str, Any] = {"schema": SCHEMA, **kept}
-    if entry["before"] == "":
+    if entry["before"] == "" and entry.get("whole_file"):
         found["created"] = True
     if undoes is not None:
         found["undoes"] = undoes

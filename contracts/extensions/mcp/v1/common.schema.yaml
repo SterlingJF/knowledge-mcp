@@ -35,46 +35,6 @@ $defs:
     title: Edit id
     type: string
     pattern: ^[0-9a-f]{32}$
-  edit_changes:
-    title: Edit changes
-    description:
-      The changed lines of an edit in document order, capped at 12 lines.
-      Absent when the edit sent `after_digest` without `after`.
-    type: object
-    additionalProperties: false
-    required:
-      - hunks
-      - lines
-      - left_out
-    properties:
-      hunks:
-        description: The number of separate changed blocks.
-        type: integer
-        minimum: 0
-      lines:
-        type: array
-        maxItems: 12
-        items:
-          $ref: "#/$defs/changed_line"
-      left_out:
-        description: The number of changed lines beyond the cap.
-        type: integer
-        minimum: 0
-  changed_line:
-    title: Changed line
-    type: object
-    additionalProperties: false
-    required:
-      - change
-      - text
-    properties:
-      change:
-        enum:
-          - removed
-          - added
-      text:
-        description: The line without its line ending.
-        type: string
   received:
     title: Received
     description:

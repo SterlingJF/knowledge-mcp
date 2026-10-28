@@ -110,7 +110,7 @@ def test_changes_list_removed_and_added_lines_in_document_order(tmp_path):
             {"change": "removed", "text": "old"},
             {"change": "added", "text": "new"},
         ],
-        "left_out": 0,
+        "more": 0,
     }
     card = result.structured_content["card"]
     assert "`cache-proposal.md` · 2 changes" in card
@@ -128,8 +128,8 @@ def test_changes_are_capped_with_a_count_of_lines_left_out(tmp_path):
     found = result.structured_content["changes"]
     assert found["hunks"] == 1
     assert len(found["lines"]) == 12
-    assert found["left_out"] == 8
-    assert "- … 8 more changed lines" in result.structured_content["card"]
+    assert found["more"] == 8
+    assert "- … and 8 more changed lines" in result.structured_content["card"]
 
 
 def test_created_is_set_when_before_is_empty(tmp_path):
@@ -168,6 +168,27 @@ def test_undoes_is_echoed_when_the_earlier_edit_exists(tmp_path):
 
 def test_undoes_an_unknown_edit_is_refused(tmp_path):
     (result,) = call(tmp_path, edit(before="b\n", after="a\n", undoes="f" * 32))
+
+    assert result.is_error
+    assert result.structured_content["errors"][0]["pointer"] == "#/undoes"
+
+
+def test_empty_before_without_whole_file_is_not_a_creation(tmp_path):
+    (result,) = call(tmp_path, edit(before="", after="An inserted line\n"))
+
+    assert "created" not in result.structured_content
+
+
+def test_undoes_an_edit_of_another_document_is_refused(tmp_path):
+    async def steps(client):
+        other = {**edit(before="a\n", after="b\n"), "location": "~/notes/other.md"}
+        first = await client.call_tool("kb_record_edit", other)
+        return await client.call_tool(
+            "kb_record_edit",
+            edit(before="b\n", after="a\n", undoes=first.structured_content["id"]),
+        )
+
+    result = session(server_parameters(tmp_path), steps)
 
     assert result.is_error
     assert result.structured_content["errors"][0]["pointer"] == "#/undoes"

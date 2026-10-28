@@ -125,8 +125,8 @@ def _changes(found: dict[str, Any]) -> list[str]:
             lines.append(f"- ~~{text}~~" if text else "- (blank line removed)")
         else:
             lines.append(f"- {text}" if text else "- (blank line added)")
-    if found["left_out"]:
-        lines.append(f"- … {found['left_out']} more changed lines")
+    if found["more"]:
+        lines.append(f"- … and {found['more']} more changed lines")
     return lines
 
 
