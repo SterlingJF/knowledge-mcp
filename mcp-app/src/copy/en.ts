@@ -169,3 +169,42 @@ export const label = {
   proposed: "Proposed",
   source: "Source",
 } as const;
+
+// C-Move
+export const moves = {
+  eyebrow: "Proposed moves",
+  eyebrowDone: "Moves",
+  title: "Move plan",
+  label: {
+    moves: "Moves",
+    renames: "Renames",
+    links: "Links",
+    blockers: "Needs you",
+    file: "File",
+    goesTo: "Goes to",
+    note: "Note",
+    linkNow: "Link now",
+    afterMove: "After the move",
+    problem: "Problem",
+  },
+  /** `3 · Inbox → Meetings/, Decisions/, Proposals/` */
+  movesValue: (count: number, from: string, to: string) =>
+    `${count} · ${from} → ${to}`,
+  count: (n: number) => `${n}`,
+  /** `5 repaired · 4 notes` */
+  linksValue: (repaired: number, notes: number) =>
+    `${repaired} repaired · ${notes} ${notes === 1 ? "note" : "notes"}`,
+  blockersValue: (n: number) => `${n} ${n === 1 ? "blocker" : "blockers"}`,
+  why: (notes: number) =>
+    notes === 0
+      ? "Waits for you because it moves files. You can undo it afterwards."
+      : `Waits for you because it moves files and edits links in ${notes} other ${notes === 1 ? "note" : "notes"}. You can undo it afterwards.`,
+  whyBlocked:
+    "Move stays off until each blocker has a choice. To use a different name, say it in chat.",
+  /** What Approve sends. */
+  message: (files: number, links: number) =>
+    links === 0
+      ? `Move the ${files} ${files === 1 ? "file" : "files"}`
+      : `Move the ${files} ${files === 1 ? "file" : "files"} and repair the ${links} ${links === 1 ? "link" : "links"}`,
+  root: "top folder",
+} as const;
