@@ -216,7 +216,6 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
         badge("b-red", "Checker refused", "warn") +
         badge("b-red", "Guidance has 2 problems", "warn"),
     ],
-    ["Working", badge("b-blu", "Checking")],
     [
       "Neutral",
       badge("b-nt", "Not saved") +
@@ -755,7 +754,6 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
               badge("b-grn", "Approved", "check"),
           ),
           st("Refused", badge("b-red", "Can’t undo safely", "warn")),
-          st("Working", badge("b-blu", "Checking")),
           st("Neutral", badge("b-nt", "Not saved") + badge("b-nt", "No type")),
           st(
             "Reduced motion",

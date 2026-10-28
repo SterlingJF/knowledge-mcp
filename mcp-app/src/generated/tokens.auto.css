@@ -63,7 +63,8 @@
   color-scheme: light dark;
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+[data-theme="dark"] {
   --color-background-primary: #30302E;
   --color-background-secondary: #262624;
   --color-background-tertiary: #141413;
@@ -84,6 +85,7 @@
   --color-border-secondary: rgba(222,220,209,.3);
   --color-border-tertiary: rgba(222,220,209,.15);
   --color-ring-primary: rgba(250,249,245,.7);
+  color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -17,7 +17,6 @@ export const badge = {
     undone: "Undone",
   },
   refused: { cantUndo: "Can’t undo safely", checkerRefused: "Checker refused" },
-  working: { checking: "Checking" },
   neutral: {
     notSaved: "Not saved",
     notMoved: "Not moved",
@@ -48,6 +47,14 @@ export const action = {
   move: (count: number) => `Move ${count} ${count === 1 ? "file" : "files"}`,
   apply: (count: number) =>
     `Apply ${count} ${count === 1 ? "change" : "changes"}`,
+} as const;
+
+export const decision = {
+  accept: "Accept",
+  drop: "Drop",
+  apply: "Apply",
+  skip: "Skip",
+  keepRefused: "Keep refused",
 } as const;
 
 export const evidence = {

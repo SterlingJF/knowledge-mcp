@@ -768,7 +768,7 @@
           acc
             ? badge("b-grn", "Accepted", "check")
             : meet !== "Meetings/"
-              ? badge("b-blu", "Changed")
+              ? badge("b-nt", "Changed")
               : dec,
         ],
         [
