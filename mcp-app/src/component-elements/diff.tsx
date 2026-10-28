@@ -21,14 +21,14 @@ export function Diff({
         line.kind === "removed" ? (
           <del
             key={index}
-            className="block bg-[var(--color-background-danger)] px-[var(--km-space-5)] py-[var(--km-space-2)] text-[color:var(--color-text-danger)] line-through"
+            className="block bg-[var(--color-background-danger)] p-[var(--km-pad-line)] text-[color:var(--color-text-danger)] line-through"
           >
             {line.text}
           </del>
         ) : (
           <ins
             key={index}
-            className="block bg-[var(--color-background-success)] px-[var(--km-space-5)] py-[var(--km-space-2)] text-[color:var(--color-text-success)] no-underline"
+            className="block bg-[var(--color-background-success)] p-[var(--km-pad-line)] text-[color:var(--color-text-success)] no-underline"
           >
             {line.text}
           </ins>

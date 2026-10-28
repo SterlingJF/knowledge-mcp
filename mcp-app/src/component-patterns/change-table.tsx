@@ -69,7 +69,7 @@ function Sources({ sources }: { sources: Source[] }) {
             <SourceChip
               source={source}
               continuation={short}
-              className="max-w-full min-w-0 whitespace-normal wrap-anywhere"
+              className="max-w-full min-w-0 whitespace-normal"
             />
           </span>
         );
