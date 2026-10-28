@@ -10,10 +10,10 @@ One card per slice. Each card lists the frames it builds, the files it owns, whe
 
 ## Batch 1: elements and engine (workers)
 
-- [ ] **K-A Status and actions:** K01 Badge, K02 Button, K11 Segmented choice, K13 Full view button. Owns `component-elements/{badge,button,segmented-choice,full-view-button}.tsx`. Blocked by 0.1, 0.2.
-- [ ] **K-B Evidence and sources:** K03 Evidence mark, K04 Chips, K05 Change number and tick box (with select-all), K06 Note. Owns `component-elements/{evidence-mark,chips,change-number,note}.tsx`. Blocked by 0.1, 0.2.
-- [ ] **K-C Text and loading:** K07 Text lines, K08 Key–value grid (refuses more than 5 rows), K09 Diff, K10 Skeleton. Owns `component-elements/{text-lines,key-value,diff,skeleton}.tsx`. Blocked by 0.1, 0.2.
-- [ ] **E1 Apps registration:** `mcp.server.apps` resource `ui://knowledge-mcp/app.html`, `_meta.ui.resourceUri` and `prefersBorder: true` on UI tools, CSP for `https://assets.claude.ai`, built HTML shipped in the runtime with a staleness check. Owns `runtime/knowledge_mcp/apps.py`, its tests. Blocked by 0.1.
+- [x] **K-A Status and actions:** K01 Badge, K02 Button, K11 Segmented choice, K13 Full view button. Owns `component-elements/{badge,button,segmented-choice,full-view-button}.tsx`. Blocked by 0.1, 0.2.
+- [x] **K-B Evidence and sources:** K03 Evidence mark, K04 Chips, K05 Change number and tick box (with select-all), K06 Note. Owns `component-elements/{evidence-mark,chips,change-number,note}.tsx`. Blocked by 0.1, 0.2.
+- [x] **K-C Text and loading:** K07 Text lines, K08 Key–value grid (refuses more than 5 rows), K09 Diff, K10 Skeleton. Owns `component-elements/{text-lines,key-value,diff,skeleton}.tsx`. Blocked by 0.1, 0.2.
+- [x] **E1 Apps registration:** `mcp.server.apps` resource `ui://knowledge-mcp/app.html`, `_meta.ui.resourceUri` and `prefersBorder: true` on UI tools, CSP for `https://assets.claude.ai`, built HTML shipped in the runtime with a staleness check. Owns `runtime/knowledge_mcp/apps.py`, its tests. Blocked by 0.1.
 
 ## Batch 2: patterns and the first card
 
