@@ -4,7 +4,7 @@ import { Check, TriangleAlert } from "lucide-react";
 import { Badge as CoreBadge } from "@/component-core/badge";
 import { cn } from "@/lib/utils";
 
-export type BadgeTone = "waiting" | "done" | "refused" | "working" | "neutral";
+export type BadgeTone = "waiting" | "done" | "refused" | "neutral";
 
 const toneClass: Record<BadgeTone, string> = {
   waiting:
@@ -12,9 +12,8 @@ const toneClass: Record<BadgeTone, string> = {
   done: "bg-[var(--color-background-success)] text-[var(--color-text-success)]",
   refused:
     "bg-[var(--color-background-danger)] text-[var(--color-text-danger)]",
-  working: "bg-[var(--color-background-info)] text-[var(--color-text-info)]",
   neutral:
-    "bg-[var(--color-background-secondary)] text-[var(--color-text-tertiary)]",
+    "bg-[var(--color-background-secondary)] text-[var(--color-text-secondary)]",
 };
 
 /** Waiting on the person: a dot whose ring pulses; static when motion is reduced. */

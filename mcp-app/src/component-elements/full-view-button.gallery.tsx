@@ -7,10 +7,17 @@ export default {
   name: "Full view button",
   stories: {
     "Beside the badge": (
-      <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+      <span
+        style={{
+          display: "inline-flex",
+          gap: "var(--km-space-4)",
+          alignItems: "center",
+        }}
+      >
         <Badge tone="waiting">{badge.waiting.nothingSaved}</Badge>
         <FullViewButton onRequestFullView={() => {}} />
       </span>
     ),
+    Focus: <FullViewButton autoFocus onRequestFullView={() => {}} />,
   },
 };

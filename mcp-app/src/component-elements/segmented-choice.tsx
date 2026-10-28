@@ -34,7 +34,7 @@ export function SegmentedChoice<V extends string>({
         if (picked !== undefined && picked !== value) onValueChange(picked);
       }}
       className={cn(
-        "gap-0 overflow-hidden rounded-[var(--border-radius-sm)] border-[length:var(--border-width-regular)] border-solid border-[var(--color-border-secondary)] whitespace-nowrap",
+        "gap-0 overflow-hidden has-focus-visible:shadow-[var(--km-focus-ring)] [&_*]:outline-none rounded-[var(--border-radius-sm)] border-[length:var(--border-width-regular)] border-solid border-[var(--color-border-secondary)] whitespace-nowrap",
         className,
       )}
     >
@@ -42,7 +42,7 @@ export function SegmentedChoice<V extends string>({
         <ToggleGroupItem
           key={option.value}
           value={option.value}
-          className="h-auto min-w-0 rounded-none! px-[var(--km-space-5)] py-[var(--km-space-2)] text-[length:var(--font-text-xs-size)] font-[var(--font-weight-semibold)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-background-secondary)] focus-visible:ring-0 focus-visible:shadow-[inset_0_0_0_2px_var(--color-ring-primary)] pointer-coarse:min-h-[var(--km-target)] [&+&]:border-l-[length:var(--border-width-regular)] [&+&]:border-solid [&+&]:border-[var(--color-border-secondary)] aria-pressed:bg-[var(--color-background-inverse)] aria-pressed:text-[var(--color-text-inverse)]"
+          className="h-auto min-w-0 rounded-none! px-[var(--km-space-5)] py-[var(--km-space-2)] text-[length:var(--font-text-xs-size)] font-[var(--font-weight-semibold)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-background-secondary)] focus-visible:ring-0  pointer-coarse:min-h-[var(--km-target)] [&+&]:border-l-[length:var(--border-width-regular)] [&+&]:border-solid [&+&]:border-[var(--color-border-secondary)] aria-pressed:bg-[var(--color-background-inverse)] aria-pressed:text-[var(--color-text-inverse)]"
         >
           {option.label}
         </ToggleGroupItem>

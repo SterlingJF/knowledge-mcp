@@ -1,25 +1,37 @@
 import { Undo2 } from "lucide-react";
+import type { ReactNode } from "react";
 
-import { action } from "@/copy/en";
-import { Button } from "./button";
+import { action, change } from "@/copy/en";
+import { Button, type ButtonVariant } from "./button";
+
+const kinds: { variant: ButtonVariant; label: string; icon?: ReactNode }[] = [
+  { variant: "primary", label: action.save(change.range(1, 4)) },
+  { variant: "secondary", label: action.undo, icon: <Undo2 /> },
+  { variant: "ghost", label: action.notNow },
+];
+
+const row = (state: "default" | "focus" | "disabled") => (
+  <span style={{ display: "inline-flex", gap: "var(--km-space-4)" }}>
+    {kinds.map(({ variant, label, icon }) => (
+      <Button
+        key={variant}
+        variant={variant}
+        icon={icon}
+        disabled={state === "disabled"}
+        autoFocus={state === "focus" && variant === "primary"}
+      >
+        {label}
+      </Button>
+    ))}
+  </span>
+);
 
 export default {
   id: "K02",
   name: "Button",
   stories: {
-    Primary: <Button variant="primary">{action.apply(3)}</Button>,
-    Secondary: <Button variant="secondary">{action.notNow}</Button>,
-    Ghost: <Button variant="ghost">{action.showWhy}</Button>,
-    "With icon": <Button icon={<Undo2 />}>{action.undo}</Button>,
-    Disabled: (
-      <Button variant="primary" disabled>
-        {action.apply(3)}
-      </Button>
-    ),
-    Focus: (
-      <Button variant="primary" autoFocus>
-        {action.apply(3)}
-      </Button>
-    ),
+    Default: row("default"),
+    "Focus (Tab to move)": row("focus"),
+    Disabled: row("disabled"),
   },
 };

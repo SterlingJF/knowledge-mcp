@@ -7,7 +7,7 @@ export type ButtonVariant = "primary" | "secondary" | "ghost";
 
 const variantClass: Record<ButtonVariant, string> = {
   primary:
-    "border-[var(--color-background-inverse)] bg-[var(--color-background-inverse)] text-[var(--color-text-inverse)] hover:bg-[var(--color-background-inverse)] hover:opacity-88",
+    "border-[var(--color-background-inverse)] bg-[var(--color-background-inverse)] text-[var(--color-text-inverse)] hover:bg-[var(--color-background-inverse)] hover:opacity-[var(--km-opacity-hover)]",
   secondary:
     "border-[var(--color-border-tertiary)] bg-[var(--color-background-primary)] text-[var(--color-text-primary)] hover:bg-[var(--color-background-secondary)]",
   ghost:
@@ -16,7 +16,7 @@ const variantClass: Record<ButtonVariant, string> = {
 
 /** Shared look of every km button: tokens only, visible focus ring, 44pt on touch. */
 export const kmButtonBase =
-  "h-auto gap-[var(--km-space-3)] rounded-[var(--border-radius-md)] border-[length:var(--border-width-regular)] border-solid px-[var(--km-space-5)] py-[var(--km-space-3)] text-[length:var(--font-text-sm-size)] leading-[var(--font-text-sm-line-height)] font-[var(--font-weight-semibold)] focus-visible:border-[var(--color-ring-primary)] focus-visible:ring-0 focus-visible:shadow-[0_0_0_2px_var(--color-background-primary),0_0_0_4px_var(--color-ring-primary)] disabled:opacity-40 pointer-coarse:min-h-[var(--km-target)] [&_svg:not([class*='size-'])]:size-[var(--km-icon)]";
+  "h-auto gap-[var(--km-space-3)] rounded-[var(--border-radius-md)] border-[length:var(--border-width-regular)] border-solid px-[var(--km-space-5)] py-[var(--km-space-3)] text-[length:var(--font-text-sm-size)] leading-[var(--font-text-sm-line-height)] font-[var(--font-weight-semibold)] focus-visible:border-[var(--color-ring-primary)] focus-visible:ring-0 focus-visible:shadow-[var(--km-focus-ring)] disabled:opacity-[var(--km-opacity-disabled)] pointer-coarse:min-h-[var(--km-target)] [&_svg:not([class*='size-'])]:size-[var(--km-icon)]";
 
 export type ButtonProps = Omit<
   ComponentProps<typeof CoreButton>,

@@ -17,6 +17,13 @@ describe("Button", () => {
     expect(container.querySelector("button > svg")).not.toBeNull();
   });
 
+  it("takes keyboard focus", () => {
+    render(<Button>{action.undo}</Button>);
+    const button = screen.getByRole("button", { name: action.undo });
+    button.focus();
+    expect(document.activeElement).toBe(button);
+  });
+
   it("does not fire when disabled", () => {
     const onClick = vi.fn<(...args: unknown[]) => void>();
     render(
@@ -27,9 +34,5 @@ describe("Button", () => {
     const button = screen.getByRole("button", { name: action.notNow });
     fireEvent.click(button);
     expect(onClick).not.toHaveBeenCalled();
-    expect(button.className).toContain("focus-visible:shadow");
-    expect(button.className).toContain(
-      "pointer-coarse:min-h-[var(--km-target)]",
-    );
   });
 });

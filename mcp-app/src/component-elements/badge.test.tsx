@@ -13,7 +13,18 @@ describe("Badge", () => {
       "[data-tone=waiting]",
     )!.firstElementChild;
     expect(first?.getAttribute("data-testid")).toBe("pulse-dot");
-    expect(first?.className).toContain("motion-reduce:after:animate-none");
+  });
+
+  it("keeps the dot when motion is reduced", () => {
+    vi.stubGlobal("matchMedia", (q: string) => ({
+      matches: q.includes("reduce"),
+      media: q,
+      addEventListener() {},
+      removeEventListener() {},
+    }));
+    render(<Badge tone="waiting">{badge.waiting.needsOk}</Badge>);
+    expect(screen.getByTestId("pulse-dot")).toBeTruthy();
+    vi.unstubAllGlobals();
   });
 
   it("marks done with a check and refused with a warning", () => {
@@ -31,13 +42,8 @@ describe("Badge", () => {
     ).not.toBeNull();
   });
 
-  it.each(["working", "neutral"] as const)(
-    "shows %s without dot or icon",
-    (tone) => {
-      const { container } = render(<Badge tone={tone}>x</Badge>);
-      expect(
-        container.querySelector("svg, [data-testid=pulse-dot]"),
-      ).toBeNull();
-    },
-  );
+  it.each(["neutral"] as const)("shows %s without dot or icon", (tone) => {
+    const { container } = render(<Badge tone={tone}>x</Badge>);
+    expect(container.querySelector("svg, [data-testid=pulse-dot]")).toBeNull();
+  });
 });

@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-import { evidence, label } from "@/copy/en";
+import { decision, evidence, label } from "@/copy/en";
 import { SegmentedChoice } from "./segmented-choice";
 
-function Two({ start }: { start: "current" | "proposed" | null }) {
+function Two({ start }: { start: "accept" | "drop" | null }) {
   const [value, setValue] = useState(start);
   const options = [
-    { value: "current", label: label.current },
-    { value: "proposed", label: label.proposed },
+    { value: "accept", label: decision.accept },
+    { value: "drop", label: decision.drop },
   ] as const;
   return (
     <SegmentedChoice
@@ -43,7 +43,7 @@ export default {
   name: "Segmented choice",
   stories: {
     Undecided: <Two start={null} />,
-    Chosen: <Two start="current" />,
+    Chosen: <Two start="accept" />,
     "Three options": <Three />,
   },
 };
