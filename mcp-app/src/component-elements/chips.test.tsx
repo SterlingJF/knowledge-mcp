@@ -16,7 +16,7 @@ test("a file name never breaks at its hyphen", () => {
   );
   expect(chipText("release-calendar.md › row 2")).toBeTruthy();
   expect(screen.getByText("release-calendar.md").className).toContain(
-    "whitespace-nowrap",
+    "inline-block",
   );
 });
 

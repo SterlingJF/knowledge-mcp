@@ -32,7 +32,9 @@ export function LeftOut({
         {files.map((f, i) => (
           <span key={f.file}>
             {i > 0 && ", "}
-            <span className="whitespace-nowrap">{f.file}</span>
+            <span className="inline-block max-w-full wrap-anywhere">
+              {f.file}
+            </span>
           </span>
         ))}
         .

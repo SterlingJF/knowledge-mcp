@@ -58,11 +58,11 @@ export function DecisionRows({
   return (
     <table
       className={cn(
-        "w-full border-collapse text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary)",
+        "w-full border-collapse @max-[560px]:block @max-[560px]:[&_tbody]:block text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary)",
         className,
       )}
     >
-      <thead>
+      <thead className="@max-[560px]:sr-only">
         <tr className="border-b-(length:--border-width-regular) border-(--color-border-tertiary) text-left text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) font-(--font-weight-semibold) text-(--color-text-secondary)">
           {headers.map((h, i) => (
             <th
@@ -79,14 +79,19 @@ export function DecisionRows({
         {rows.map((row) => (
           <tr
             key={row.id}
-            className="border-b-(length:--border-width-regular) border-(--color-border-tertiary) last:border-b-0"
+            className="border-b-(length:--border-width-regular) border-(--color-border-tertiary) last:border-b-0 @max-[560px]:flex @max-[560px]:flex-col @max-[560px]:py-(--km-gap-row) @max-[560px]:[&>td]:py-0 @max-[560px]:[&>td]:pr-0"
           >
             {row.cells.map((c, i) => (
-              <td key={i} className={cell}>
+              <td key={i} className={cn(cell, "wrap-anywhere")}>
                 {c}
               </td>
             ))}
-            <td className={cn(cell, "pr-0 text-right")}>
+            <td
+              className={cn(
+                cell,
+                "pr-0 text-right @max-[560px]:mt-(--km-gap-row) @max-[560px]:text-left",
+              )}
+            >
               {row.decided ? (
                 <Badge tone={row.decided.tone}>{row.decided.label}</Badge>
               ) : (

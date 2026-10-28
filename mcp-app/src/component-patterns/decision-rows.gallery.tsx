@@ -50,7 +50,7 @@ function Live({
   const [choices, setChoices] =
     useState<Record<string, DecisionValue | null>>(initial);
   return (
-    <div>
+    <div className="@container">
       <DecisionRows
         headers={headers}
         rows={base}
@@ -86,6 +86,16 @@ export default {
         choices={{}}
         onChoiceChange={noop}
       />
+    ),
+    "Undecided at 360px": (
+      <div className="w-[360px]">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
+      </div>
+    ),
+    "Undecided at 320px": (
+      <div className="w-[320px]">
+        <Live initial={{ mn: "accept" }} />
+      </div>
     ),
   },
 };

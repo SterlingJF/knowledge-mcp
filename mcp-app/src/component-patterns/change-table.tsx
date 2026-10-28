@@ -99,7 +99,12 @@ export function ChangeTable({
 }: ChangeTableProps) {
   const frozen = draft || onKeptChange == null;
   // One grid for the table; each row is a subgrid, so header and body columns line up.
-  const rowClass = cn(tableRow, "col-span-full grid-cols-subgrid");
+  // On touch, a row holding a tick box is at least the target tall, so hit areas never overlap.
+  const rowClass = cn(
+    tableRow,
+    "col-span-full grid-cols-subgrid",
+    !frozen && "pointer-coarse:min-h-(--km-target)",
+  );
   const keptSet = kept ?? new Set(rows.map((_, i) => i + 1));
   const isKept = (n: number) => frozen || keptSet.has(n);
 
