@@ -40,7 +40,7 @@ body{width:1440px}.sheet{padding:40px 56px 36px}
 .sid{font:600 12px/1 var(--font-mono);color:var(--color-text-tertiary)}
 .sn{font-size:22px;line-height:28px;font-weight:600;margin-top:6px}
 .sp2{color:var(--color-text-tertiary);margin-top:6px;max-width:820px}
-.lay{font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:500;border:1px solid var(--color-border-secondary);border-radius:999px;padding:3px 10px;color:var(--color-text-tertiary);white-space:nowrap}
+.lay{font-size:11px;letter-spacing:var(--km-eyebrow-tracking);text-transform:uppercase;font-weight:500;border:1px solid var(--color-border-secondary);border-radius:999px;padding:3px 10px;color:var(--color-text-tertiary);white-space:nowrap}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:22px;border:1px solid var(--color-border-tertiary);border-radius:14px;overflow:hidden}
 .pane{padding:22px 24px;background:var(--color-background-tertiary);color:var(--color-text-primary)}
 .ptag{font:600 11px/1 var(--font-mono);color:var(--color-text-tertiary);margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
@@ -49,7 +49,7 @@ body{width:1440px}.sheet{padding:40px 56px 36px}
 .vl{font-size:12px;color:var(--color-text-tertiary)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .foot{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:28px;margin-top:22px;font-size:12px;line-height:18px}
-.foot h4{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);font-weight:600;margin-bottom:6px}
+.foot h4{font-size:11px;letter-spacing:var(--km-eyebrow-tracking);text-transform:uppercase;color:var(--color-text-tertiary);font-weight:600;margin-bottom:6px}
 .foot li{margin:0 0 4px 16px}.foot .mono{font-size:11.5px}
 .ids{display:flex;flex-wrap:wrap;gap:4px}.ids span{font:600 11px/1 var(--font-mono);border:1px solid var(--color-border-tertiary);border-radius:6px;padding:3px 6px;background:var(--color-background-primary)}
 table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -136,7 +136,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
   ];
   const typeRows = T.type.map(([tok, w, use, sample]) => [
     `<span class="mono">${tok}-size / -line-height</span><br><span class="mu">${T.font[tok + "-size"]} / ${T.font[tok + "-line-height"]} · ${w}</span>`,
-    `<span style="font-size:var(${tok}-size);line-height:var(${tok}-line-height);font-weight:var(--font-weight-${w});${tok === "--font-text-xs" && sample === sample.toUpperCase() ? "letter-spacing:.07em" : ""}">${sample}</span>`,
+    `<span style="font-size:var(${tok}-size);line-height:var(${tok}-line-height);font-weight:var(--font-weight-${w});${tok === "--font-text-xs" && sample === sample.toUpperCase() ? "letter-spacing:var(--km-eyebrow-tracking)" : ""}">${sample}</span>`,
     use,
   ]);
   const icons = [
@@ -913,7 +913,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           ),
           st(
             "Focus",
-            `<span class="cn"><span class="cb" style="box-shadow:0 0 0 2px var(--color-background-primary),0 0 0 4px var(--color-ring-primary)">${ic.check}</span>C1</span>`,
+            `<span class="cn"><span class="cb" style="box-shadow:var(--km-focus-ring)">${ic.check}</span>C1</span>`,
           ),
           st("Frozen card (no box)", '<span class="cn">C1</span>'),
           st(
@@ -1124,7 +1124,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           ),
           st(
             "Focus",
-            `<span class="xbtn" style="box-shadow:0 0 0 2px var(--color-background-primary),0 0 0 4px var(--color-ring-primary)">${ic.expand}Full view</span>`,
+            `<span class="xbtn" style="box-shadow:var(--km-focus-ring)">${ic.expand}Full view</span>`,
           ),
         ]),
       ),
