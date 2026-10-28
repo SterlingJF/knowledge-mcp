@@ -36,6 +36,7 @@ const flat = {
   ...tokens.motion,
   ...tokens.touch,
   ...tokens.size,
+  ...tokens.effect,
 };
 const css = [
   "/* Generated from design/mcp-app/kmtokens.js by scripts/build-tokens.ts. Edit the tokens, not this file. */\n",
@@ -44,7 +45,11 @@ const css = [
     { ...tokens.color.light, ...flat },
     "\n  color-scheme: light dark;",
   ),
-  block(':root[data-theme="dark"]', tokens.color.dark),
+  block(
+    ':root[data-theme="dark"],\n[data-theme="dark"]',
+    tokens.color.dark,
+    "\n  color-scheme: dark;",
+  ),
   `@media (prefers-color-scheme: dark) {\n${block(
     ":root:not([data-theme])",
     tokens.color.dark,

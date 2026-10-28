@@ -17,7 +17,6 @@ export const badge = {
     undone: "Undone",
   },
   refused: { cantUndo: "Can’t undo safely", checkerRefused: "Checker refused" },
-  working: { checking: "Checking" },
   neutral: {
     notSaved: "Not saved",
     notMoved: "Not moved",
@@ -50,6 +49,14 @@ export const action = {
     `Apply ${count} ${count === 1 ? "change" : "changes"}`,
 } as const;
 
+export const decision = {
+  accept: "Accept",
+  drop: "Drop",
+  apply: "Apply",
+  skip: "Skip",
+  keepRefused: "Keep refused",
+} as const;
+
 export const evidence = {
   supported: "Supported",
   partly: "Partly answered",
@@ -68,6 +75,21 @@ export const line = {
 
 export const source = {
   you: "you",
+  /** A line in a text file: `meeting-notes.md:15`. */
+  line: (file: string, lineNumber: number) => `${file}:${lineNumber}`,
+  /** Another line in the same file, after a chip that named it. */
+  sameFile: (lineNumber: number) => `:${lineNumber}`,
+  /** A place in a sheet or deck: `build-timings.xlsx › Evening!A2:D10`. */
+  place: (file: string, place: string) => `${file} › ${place}`,
+  /** The person's words in this conversation. */
+  said: (text: string) => `you: “${text}”`,
+} as const;
+
+export const change = {
+  /** The contract's name for proposal row n. */
+  number: (n: number) => `C${n}`,
+  range: (from: number, to: number) =>
+    from === to ? `C${from}` : `C${from}–C${to}`,
 } as const;
 
 export const status = {
