@@ -81,10 +81,12 @@ $defs:
         $ref: "#/$defs/cell"
         description: The document's text now. Omit it for an addition.
       proposed:
+        description: The text you propose, in place of `current`.
         $ref: "#/$defs/cell"
       mark:
         $ref: "#/$defs/mark"
       sources:
+        description: Where the proposed text comes from. Cite at least one source per row.
         type: array
         minItems: 1
         items:
@@ -126,9 +128,11 @@ $defs:
       - line_number
     properties:
       file:
+        description: The file's path as you read it, such as `meeting-notes.md`.
         type: string
         minLength: 1
       line_number:
+        description: The 1-based line number in that file.
         type: integer
         minimum: 1
   place_source:
@@ -141,6 +145,7 @@ $defs:
       - place
     properties:
       file:
+        description: The sheet or deck's path as you read it, such as `build-timings.xlsx`.
         type: string
         minLength: 1
       place:
@@ -156,6 +161,7 @@ $defs:
       - file
     properties:
       file:
+        description: The file's path as you read it, such as `build-timings.xlsx`.
         type: string
         minLength: 1
   person_source:
@@ -167,6 +173,7 @@ $defs:
       - said
     properties:
       said:
+        description: What the person said, quoted or closely paraphrased.
         type: string
         minLength: 1
   document_type:
@@ -197,6 +204,7 @@ $defs:
       - confirmed
     properties:
       id:
+        description: The audience's id from kb_list_audiences, such as `maintainers`.
         type: string
         minLength: 1
       label:
@@ -246,9 +254,11 @@ $defs:
       - reason
     properties:
       file:
+        description: The path of a file you read but didn't cite.
         type: string
         minLength: 1
       reason:
+        description: Why you left the file out, in one line.
         type: string
         minLength: 1
   instance:

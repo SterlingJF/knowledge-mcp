@@ -20801,7 +20801,8 @@
                     "text"
                   ],
                   "title": "ProposalCell",
-                  "type": "object"
+                  "type": "object",
+                  "description": "The text you propose, in place of `current`."
                 },
                 "mark": {
                   "description": "How well the sources back the proposed text. `suggested` marks your own wording.",
@@ -20815,6 +20816,7 @@
                   "type": "string"
                 },
                 "sources": {
+                  "description": "Where the proposed text comes from. Cite at least one source per row.",
                   "items": {
                     "anyOf": [
                       {
@@ -20822,11 +20824,13 @@
                         "description": "A line in a text file.",
                         "properties": {
                           "file": {
+                            "description": "The file's path as you read it, such as `meeting-notes.md`.",
                             "minLength": 1,
                             "title": "File",
                             "type": "string"
                           },
                           "line_number": {
+                            "description": "The 1-based line number in that file.",
                             "minimum": 1,
                             "title": "Line Number",
                             "type": "integer"
@@ -20844,6 +20848,7 @@
                         "description": "A place in a sheet or deck.",
                         "properties": {
                           "file": {
+                            "description": "The sheet or deck's path as you read it, such as `build-timings.xlsx`.",
                             "minLength": 1,
                             "title": "File",
                             "type": "string"
@@ -20867,6 +20872,7 @@
                         "description": "The person's words in this conversation.",
                         "properties": {
                           "said": {
+                            "description": "What the person said, quoted or closely paraphrased.",
                             "minLength": 1,
                             "title": "Said",
                             "type": "string"
@@ -20883,6 +20889,7 @@
                         "description": "A whole file, with no line or place, such as a sheet you read in full.",
                         "properties": {
                           "file": {
+                            "description": "The file's path as you read it, such as `build-timings.xlsx`.",
                             "minLength": 1,
                             "title": "File",
                             "type": "string"
@@ -20917,11 +20924,13 @@
               "additionalProperties": false,
               "properties": {
                 "file": {
+                  "description": "The path of a file you read but didn't cite.",
                   "minLength": 1,
                   "title": "File",
                   "type": "string"
                 },
                 "reason": {
+                  "description": "Why you left the file out, in one line.",
                   "minLength": 1,
                   "title": "Reason",
                   "type": "string"
@@ -20967,6 +20976,7 @@
             "description": "Who the document is for, from kb_list_audiences, and whether the person confirmed it.",
             "properties": {
               "id": {
+                "description": "The audience's id from kb_list_audiences, such as `maintainers`.",
                 "minLength": 1,
                 "title": "Id",
                 "type": "string"
@@ -21185,12 +21195,14 @@
                 "$ref": "#/$defs/cell"
               },
               "proposed": {
+                "description": "The text you propose, in place of `current`.",
                 "$ref": "#/$defs/cell"
               },
               "mark": {
                 "$ref": "#/$defs/mark"
               },
               "sources": {
+                "description": "Where the proposed text comes from. Cite at least one source per row.",
                 "type": "array",
                 "minItems": 1,
                 "items": {
@@ -21253,10 +21265,12 @@
             ],
             "properties": {
               "file": {
+                "description": "The file's path as you read it, such as `meeting-notes.md`.",
                 "type": "string",
                 "minLength": 1
               },
               "line_number": {
+                "description": "The 1-based line number in that file.",
                 "type": "integer",
                 "minimum": 1
               }
@@ -21273,6 +21287,7 @@
             ],
             "properties": {
               "file": {
+                "description": "The sheet or deck's path as you read it, such as `build-timings.xlsx`.",
                 "type": "string",
                 "minLength": 1
               },
@@ -21293,6 +21308,7 @@
             ],
             "properties": {
               "file": {
+                "description": "The file's path as you read it, such as `build-timings.xlsx`.",
                 "type": "string",
                 "minLength": 1
               }
@@ -21308,6 +21324,7 @@
             ],
             "properties": {
               "said": {
+                "description": "What the person said, quoted or closely paraphrased.",
                 "type": "string",
                 "minLength": 1
               }
@@ -21347,6 +21364,7 @@
             ],
             "properties": {
               "id": {
+                "description": "The audience's id from kb_list_audiences, such as `maintainers`.",
                 "type": "string",
                 "minLength": 1
               },
@@ -21418,10 +21436,12 @@
             ],
             "properties": {
               "file": {
+                "description": "The path of a file you read but didn't cite.",
                 "type": "string",
                 "minLength": 1
               },
               "reason": {
+                "description": "Why you left the file out, in one line.",
                 "type": "string",
                 "minLength": 1
               }

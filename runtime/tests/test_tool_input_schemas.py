@@ -72,3 +72,19 @@ def test_optional_fields_are_plain_properties(inputs):
 def test_proposal_schema_stays_small(inputs):
     size = len(json.dumps(inputs["kb_prepare_proposal"], separators=(",", ":")))
     assert size <= PROPOSAL_LIMIT
+
+
+def undescribed(node, path="$"):
+    """Paths of properties without a description, following schema keywords only."""
+    for name, prop in node.get("properties", {}).items():
+        if "description" not in prop:
+            yield f"{path}.{name}"
+        yield from undescribed(prop, f"{path}.{name}")
+    if isinstance(node.get("items"), dict):
+        yield from undescribed(node["items"], f"{path}[]")
+    for option in node.get("anyOf", []):
+        yield from undescribed(option, path)
+
+
+def test_every_proposal_property_has_a_description(inputs):
+    assert not set(undescribed(inputs["kb_prepare_proposal"]))

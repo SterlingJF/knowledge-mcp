@@ -47,8 +47,16 @@ class LineSource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    file: Annotated[str, Field(min_length=1)]
-    line_number: Annotated[int, Field(ge=1)]
+    file: Annotated[
+        str,
+        Field(
+            description="The file's path as you read it, such as `meeting-notes.md`.",
+            min_length=1,
+        ),
+    ]
+    line_number: Annotated[
+        int, Field(description="The 1-based line number in that file.", ge=1)
+    ]
 
 
 class PlaceSource(BaseModel):
@@ -59,7 +67,13 @@ class PlaceSource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    file: Annotated[str, Field(min_length=1)]
+    file: Annotated[
+        str,
+        Field(
+            description="The sheet or deck's path as you read it, such as `build-timings.xlsx`.",
+            min_length=1,
+        ),
+    ]
     place: Annotated[
         str, Field(description="Such as `Evening!A2:D10` or `slide 7`.", min_length=1)
     ]
@@ -73,7 +87,13 @@ class FileSource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    file: Annotated[str, Field(min_length=1)]
+    file: Annotated[
+        str,
+        Field(
+            description="The file's path as you read it, such as `build-timings.xlsx`.",
+            min_length=1,
+        ),
+    ]
 
 
 class PersonSource(BaseModel):
@@ -84,7 +104,13 @@ class PersonSource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    said: Annotated[str, Field(min_length=1)]
+    said: Annotated[
+        str,
+        Field(
+            description="What the person said, quoted or closely paraphrased.",
+            min_length=1,
+        ),
+    ]
 
 
 class ProposalDocumentType(BaseModel):
@@ -107,7 +133,13 @@ class ProposalReader(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    id: Annotated[str, Field(min_length=1)]
+    id: Annotated[
+        str,
+        Field(
+            description="The audience's id from kb_list_audiences, such as `maintainers`.",
+            min_length=1,
+        ),
+    ]
     label: Annotated[
         str,
         Field(
@@ -152,8 +184,13 @@ class LeftOutFile(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    file: Annotated[str, Field(min_length=1)]
-    reason: Annotated[str, Field(min_length=1)]
+    file: Annotated[
+        str,
+        Field(description="The path of a file you read but didn't cite.", min_length=1),
+    ]
+    reason: Annotated[
+        str, Field(description="Why you left the file out, in one line.", min_length=1)
+    ]
 
 
 class ProposalInstance(BaseModel):
@@ -189,10 +226,16 @@ class ProposalRow(BaseModel):
         ProposalCell | None,
         Field(description="The document's text now. Omit it for an addition."),
     ] = None
-    proposed: ProposalCell
+    proposed: Annotated[
+        ProposalCell, Field(description="The text you propose, in place of `current`.")
+    ]
     mark: EvidenceMark | None = None
     sources: Annotated[
-        list[LineSource | PlaceSource | PersonSource | FileSource], Field(min_length=1)
+        list[LineSource | PlaceSource | PersonSource | FileSource],
+        Field(
+            description="Where the proposed text comes from. Cite at least one source per row.",
+            min_length=1,
+        ),
     ]
 
 
