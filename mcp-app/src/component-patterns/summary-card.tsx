@@ -8,6 +8,7 @@ import { KeyValue } from "@/component-elements/key-value";
 import type { KeyValueRow } from "@/component-elements/key-value";
 import { CardShell } from "./card-shell";
 import type { CardAction } from "./card-shell";
+import { lifecycleProps } from "./card-lifecycle";
 import type { CardLifecycle } from "./card-lifecycle";
 
 export type SummaryCardProps = {
@@ -34,10 +35,8 @@ export function SummaryCard({
   return (
     <CardShell
       {...shell}
-      state={lifecycle.state}
-      frozenLine={lifecycle.frozenLine}
+      {...lifecycleProps(lifecycle)}
       actions={actions}
-      onAction={lifecycle.press}
       onFullView={
         host.canFullView ? () => void host.requestFullView() : undefined
       }

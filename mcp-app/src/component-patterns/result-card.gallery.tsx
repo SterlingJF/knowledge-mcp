@@ -1,4 +1,4 @@
-import { badge, frozen } from "@/copy/en";
+import { action, badge, frozen } from "@/copy/en";
 import type { CardLifecycle } from "./card-lifecycle";
 import { ResultCard } from "./result-card";
 
@@ -23,7 +23,7 @@ export default {
         who="approved by you"
         undoMessage=""
         secondary={{
-          label: "Show the change",
+          label: action.showChange,
           message: "",
           frozenLine: frozen.approved,
         }}
@@ -38,7 +38,7 @@ export default {
         badgeLabel={badge.refused.cantUndo}
         reason="cache-proposal.md changed after this edit (2 later edits)."
         nextStep={{
-          label: "Show the later edits",
+          label: action.showLaterEdits,
           message: "",
           frozenLine: frozen.notSaved,
           variant: "primary",

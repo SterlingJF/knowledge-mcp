@@ -9,25 +9,26 @@ export const CARD_CHANNEL = "knowledge-mcp";
 
 export type InstanceKey = {
   subject: string;
-  created_at: string | number;
+  /** ISO-8601; compared as a string. */
+  created_at?: string;
   seq: number;
 };
 
 function isInstanceKey(value: unknown): value is InstanceKey {
   if (typeof value !== "object" || value === null) return false;
-  if (!("subject" in value && "created_at" in value && "seq" in value))
-    return false;
+  if (!("subject" in value && "seq" in value)) return false;
+  const createdAt = "created_at" in value ? value.created_at : undefined;
   return (
     typeof value.subject === "string" &&
-    (typeof value.created_at === "string" ||
-      typeof value.created_at === "number") &&
+    (createdAt === undefined || typeof createdAt === "string") &&
     typeof value.seq === "number"
   );
 }
 
-/** True when `a` was made after `b`: later created_at, then higher seq. */
+/** True when `a` was made after `b`: later created_at, then higher seq when equal or missing. */
 export function isYounger(a: InstanceKey, b: InstanceKey): boolean {
-  if (a.created_at !== b.created_at) return a.created_at > b.created_at;
+  if (a.created_at && b.created_at && a.created_at !== b.created_at)
+    return a.created_at > b.created_at;
   return a.seq > b.seq;
 }
 
@@ -52,8 +53,7 @@ export function useCardLifecycle(): CardLifecycle {
   const seq = key?.seq;
 
   useEffect(() => {
-    if (subject === undefined || createdAt === undefined || seq === undefined)
-      return;
+    if (subject === undefined || seq === undefined) return;
     if (typeof BroadcastChannel === "undefined") return;
     const own: InstanceKey = { subject, created_at: createdAt, seq };
     const channel = new BroadcastChannel(CARD_CHANNEL);
@@ -71,18 +71,25 @@ export function useCardLifecycle(): CardLifecycle {
   const send = host.send;
   const press = useCallback(
     (action: CardAction) => {
-      if (pressed.current) return;
+      if (pressed.current || replaced) return;
       pressed.current = true;
       setFrozenLine(action.frozenLine);
       void send(action.message);
     },
-    [send],
+    [send, replaced],
   );
 
-  const state: CardState = replaced
-    ? "replaced"
-    : frozenLine !== undefined
-      ? "frozen"
-      : "live";
+  // A pressed card keeps its frozen line; only a live card stands down.
+  const state: CardState =
+    frozenLine !== undefined ? "frozen" : replaced ? "replaced" : "live";
   return { state, frozenLine, press };
+}
+
+/** The four shell props every card wires from its lifecycle. */
+export function lifecycleProps(lifecycle: CardLifecycle) {
+  return {
+    state: lifecycle.state,
+    frozenLine: lifecycle.frozenLine,
+    onAction: lifecycle.press,
+  };
 }

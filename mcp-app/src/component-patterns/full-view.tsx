@@ -6,6 +6,7 @@ import { useCardHost } from "@/bridge/bridge";
 import type { BadgeTone } from "@/component-elements/badge";
 import { CardShell } from "./card-shell";
 import type { CardAction } from "./card-shell";
+import { lifecycleProps } from "./card-lifecycle";
 import type { CardLifecycle } from "./card-lifecycle";
 
 export type FullViewProps = {
@@ -30,8 +31,7 @@ export function FullView({
     <CardShell
       {...shell}
       flat
-      state={lifecycle.state}
-      frozenLine={lifecycle.frozenLine}
+      {...lifecycleProps(lifecycle)}
       actions={actions}
       onAction={(item) => {
         lifecycle.press(item);

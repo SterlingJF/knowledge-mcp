@@ -7,6 +7,7 @@ import { Note } from "@/component-elements/note";
 import { action as actionCopy, frozen, line } from "@/copy/en";
 import { CardShell } from "./card-shell";
 import type { CardAction } from "./card-shell";
+import { lifecycleProps } from "./card-lifecycle";
 import type { CardLifecycle } from "./card-lifecycle";
 
 type Common = {
@@ -58,9 +59,7 @@ export function ResultCard(props: ResultCardProps) {
         badge={{ tone: "done", label: badgeLabel }}
         why={why}
         actions={actions}
-        onAction={lifecycle.press}
-        state={lifecycle.state}
-        frozenLine={lifecycle.frozenLine}
+        {...lifecycleProps(lifecycle)}
         flat={flat}
       >
         {children}
@@ -74,9 +73,7 @@ export function ResultCard(props: ResultCardProps) {
       badge={{ tone: "refused", label: badgeLabel }}
       why={why}
       actions={[props.nextStep]}
-      onAction={lifecycle.press}
-      state={lifecycle.state}
-      frozenLine={lifecycle.frozenLine}
+      {...lifecycleProps(lifecycle)}
       flat={flat}
     >
       <Note kind="warning" className="mt-[var(--km-space-5)]">
