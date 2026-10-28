@@ -46,6 +46,7 @@ export const action = {
   showWhy: "Show why",
   createFile: "Create the file",
   showChange: "Show the change",
+  hideChange: "Hide the change",
   showLaterEdits: "Show the later edits",
   all: "All",
   save: (changes: string) => `Save ${changes}`,
@@ -179,15 +180,38 @@ export const label = {
 export const editResult = {
   /** Eyebrow for a created file (D06); an edit uses `eyebrow.change`. */
   document: "Document",
-  hideChange: "Hide the change",
   /** After the shown lines of a long diff. */
   moreLines: (n: number) =>
     `… and ${n} more changed ${n === 1 ? "line" : "lines"}`,
-  /** Undo meta when the undone edit's time is known: `undoes the 09:41 edit`. */
+  /** Undo meta: `undoes the 09:41 edit`. */
   undoes: (time: string) => `undoes the ${time} edit`,
-  undoesEarlier: "undoes an earlier edit",
   /** What Undo sends: `Undo the 09:41 edit to cache-proposal.md`. */
   undo: (time: string, file: string) => `Undo the ${time} edit to ${file}`,
   /** Meta when an instruction for agents allowed the edit, not the person in this session. */
   allowedByInstruction: "allowed by your instruction",
+} as const;
+
+// C-Proposal
+export const proposal = {
+  /** Meta line, after the document type: `for maintainers`. */
+  forReader: (reader: string) => `for ${reader}`,
+  /** Badge after a guessed reader, inline. */
+  guess: "guess",
+  /** Badge after a guessed reader, in the full view. */
+  readerGuess: "reader is a guess",
+  noNamingRule: "no naming rule",
+  namedBy: (rule: string) => `named by ${rule}`,
+  /** Note fact before the filing reason: `Design proposal has no naming rule`. */
+  noRuleFor: (type?: string) =>
+    type ? `${type} has no naming rule` : "No naming rule",
+  /** An open question nothing answers: `Rollout owner · no source`. */
+  unsourced: (question: string) => `${question}${line.summaryJoin}no source`,
+  /** Open questions listed in a note: `Rollout owner · no source, Budget · no source.` */
+  openList: (items: Array<string>) => `${items.join(", ")}.`,
+  toAnswer: (count: number) =>
+    count === 1 ? "One thing to answer." : `${count} things to answer.`,
+  staysOpen: (count: number) =>
+    count === 1
+      ? "It stays an open question unless you say."
+      : "They stay open questions unless you say.",
 } as const;

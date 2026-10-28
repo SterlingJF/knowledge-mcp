@@ -1,7 +1,7 @@
 // C-Result: the card for a kb_record_edit result (knowledge-mcp/edit/2).
 // It says what was saved, created or undone, when and on whose OK, with Undo. Undo only sends a message:
 // the assistant checks the edit log and restores the file, and the undo comes back as its own card.
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import type { ToolResult } from "@/bridge/bridge";
 import { Diff } from "@/component-elements/diff";
@@ -49,7 +49,12 @@ export function isEdit(result: ToolResult | null): result is ToolResult & Edit {
     DIGEST.test(e.before_digest) &&
     typeof e.after_digest === "string" &&
     DIGEST.test(e.after_digest) &&
-    (e.changes === undefined || isChanges(e.changes))
+    (e.changes === undefined || isChanges(e.changes)) &&
+    (e.undoes === undefined ||
+      (typeof e.undoes === "object" &&
+        e.undoes !== null &&
+        typeof e.undoes.id === "string" &&
+        !Number.isNaN(Date.parse(e.undoes.time))))
   );
 }
 
@@ -94,40 +99,6 @@ export function undoContext(e: Edit) {
   };
 }
 
-/** R02: Show the change opens the diff in place; it sends nothing and never freezes the card. */
-function ChangeDisclosure({
-  changes,
-  open,
-  onOpenChange,
-}: {
-  changes: EditChanges;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
-  return (
-    <>
-      {open && (
-        <Diff
-          lines={changes.lines.map((l) => ({ kind: l.change, text: l.text }))}
-        />
-      )}
-      {open && changes.more > 0 && (
-        <p className="mt-[var(--km-space-3)] text-[length:var(--font-text-xs-size)] text-[color:var(--color-text-secondary)]">
-          {editResult.moreLines(changes.more)}
-        </p>
-      )}
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={() => onOpenChange(!open)}
-        className="mt-[var(--km-space-4)] inline-flex min-h-[var(--km-target)] cursor-pointer items-center bg-transparent p-0 text-[length:var(--font-text-xs-size)] text-[color:var(--color-text-primary)] underline underline-offset-2 focus-visible:outline-[length:var(--border-width-regular)] focus-visible:outline-[color:var(--color-border-primary)]"
-      >
-        {open ? editResult.hideChange : action.showChange}
-      </button>
-    </>
-  );
-}
-
 export type EditViewProps = {
   edit: Edit;
   lifecycle: CardLifecycle;
@@ -146,9 +117,15 @@ export function EditView({
   onOpenChange,
 }: EditViewProps) {
   const [ownOpen, setOwnOpen] = useState(false);
+  const diffId = useId();
   const open = fixedOpen ?? ownOpen;
   const setOpen = onOpenChange ?? setOwnOpen;
   const message = undoMessage(edit, timeZone);
+  // R03 draws an undone card bare: no Undo, no change to open.
+  const changes =
+    !edit.undoes && edit.changes && edit.changes.lines.length > 0
+      ? edit.changes
+      : undefined;
   // ResultCard owns the Undo action; the context rides along on the press.
   const tracked: CardLifecycle = {
     ...lifecycle,
@@ -157,9 +134,8 @@ export function EditView({
         a.message === message ? { ...a, context: undoContext(edit) } : a,
       ),
   };
-  // The result names only the undone edit's id, not its time.
   const who = edit.undoes
-    ? editResult.undoesEarlier
+    ? editResult.undoes(when(edit.undoes.time, timeZone).time)
     : edit.allowed_by.basis === "instruction"
       ? editResult.allowedByInstruction
       : meta.approvedByYou;
@@ -177,15 +153,31 @@ export function EditView({
       }
       when={when(edit.time, timeZone).full}
       who={who}
-      undoMessage={message}
+      // An undone change is redone through chat (R03).
+      undoMessage={edit.undoes ? undefined : message}
+      disclosure={
+        changes
+          ? {
+              label: open ? action.hideChange : action.showChange,
+              expanded: open,
+              onToggle: () => setOpen(!open),
+              controls: diffId,
+            }
+          : undefined
+      }
       lifecycle={tracked}
     >
-      {edit.changes && edit.changes.lines.length > 0 && (
-        <ChangeDisclosure
-          changes={edit.changes}
-          open={open}
-          onOpenChange={setOpen}
-        />
+      {changes && open && (
+        <div id={diffId}>
+          <Diff
+            lines={changes.lines.map((l) => ({ kind: l.change, text: l.text }))}
+          />
+          {changes.more > 0 && (
+            <p className="mt-[var(--km-space-3)] text-[length:var(--font-text-xs-size)] text-[color:var(--color-text-secondary)]">
+              {editResult.moreLines(changes.more)}
+            </p>
+          )}
+        </div>
       )}
     </ResultCard>
   );

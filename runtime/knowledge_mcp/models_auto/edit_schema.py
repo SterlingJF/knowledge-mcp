@@ -14,6 +14,18 @@ class ChangedLine(BaseModel):
     text: Annotated[str, Field(description="The line without its line ending.")]
 
 
+class UndoneEdit(BaseModel):
+    """
+    The earlier edit this edit undoes, named by the `undoes` argument.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    id: EditId
+    time: Time
+
+
 class EditChanges(BaseModel):
     """
     The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.
@@ -58,8 +70,11 @@ class EditReceipt(BaseModel):
         ),
     ] = None
     undoes: Annotated[
-        EditId | None,
-        Field(description="The id of the earlier edit this edit undoes, as sent."),
+        UndoneEdit | None,
+        Field(
+            description="The earlier edit this edit undoes, named by the `undoes` argument.",
+            title="Undone edit",
+        ),
     ] = None
     changes: EditChanges | None = None
     card: Annotated[

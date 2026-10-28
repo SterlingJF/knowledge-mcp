@@ -34,8 +34,8 @@ export type Edit = {
   operation?: EditOperation;
   /** Set when the whole-file edit started from empty text. */
   created?: true;
-  /** The id of the edit this one undoes. */
-  undoes?: string;
+  /** The edit this one undoes. */
+  undoes?: { id: string; time: string };
   changes?: EditChanges;
   /** The saved edit as markdown, for hosts without the app. */
   card: string;

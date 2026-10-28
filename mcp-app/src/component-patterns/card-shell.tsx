@@ -37,6 +37,18 @@ export type CardAction = {
   context?: Record<string, unknown>;
 };
 
+/**
+ * A show/hide control in the action row (R01/R02 "Show the change"). It sends nothing, never freezes
+ * the card and is not one of the two actions. Hidden once the card is frozen or replaced.
+ */
+export type CardDisclosure = {
+  label: string;
+  expanded: boolean;
+  onToggle: () => void;
+  /** The id of the body content it opens. */
+  controls: string;
+};
+
 export type CardShellProps = {
   eyebrow: ReactNode;
   title: ReactNode;
@@ -48,6 +60,7 @@ export type CardShellProps = {
   why?: ReactNode;
   actions?: readonly CardAction[];
   onAction?: (action: CardAction) => void;
+  disclosure?: CardDisclosure;
   state?: CardState;
   /** Shown when frozen. */
   frozenLine?: ReactNode;
@@ -65,6 +78,7 @@ export function CardShell({
   why,
   actions = [],
   onAction,
+  disclosure,
   state = "live",
   frozenLine,
   flat = false,
@@ -110,7 +124,7 @@ export function CardShell({
       </header>
       {children}
       {live && why != null && <WhyLine>{why}</WhyLine>}
-      {live && actions.length > 0 && (
+      {live && (actions.length > 0 || disclosure) && (
         <div className="mt-[var(--km-gap-group)] flex flex-wrap items-center gap-[var(--km-gap-inline)]">
           {actions.map((item) => (
             <Button
@@ -123,6 +137,17 @@ export function CardShell({
               {item.label}
             </Button>
           ))}
+          {disclosure && (
+            <button
+              type="button"
+              aria-expanded={disclosure.expanded}
+              aria-controls={disclosure.controls}
+              onClick={disclosure.onToggle}
+              className="relative inline-flex cursor-pointer items-center rounded-(--border-radius-xs) border-0 bg-transparent p-0 text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary) underline underline-offset-2 outline-none focus-visible:shadow-(--km-focus-ring) before:absolute before:top-1/2 before:left-1/2 before:h-(--km-target) before:w-full before:min-w-(--km-target) before:-translate-1/2 before:content-['']"
+            >
+              {disclosure.label}
+            </button>
+          )}
         </div>
       )}
       {!live && shownFrozen != null && <FrozenLine>{shownFrozen}</FrozenLine>}

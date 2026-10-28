@@ -16,8 +16,6 @@ export function HarnessFrame({ children }: { children: ReactNode }) {
 export const exampleMeta = (
   <>
     <PathChip path="cache-proposal.md" />
-    <span>
-      Design proposal{meta.join}for maintainers deciding whether to accept it
-    </span>
+    <span>Design proposal{meta.join}for maintainers</span>
   </>
 );

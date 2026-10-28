@@ -11,6 +11,7 @@ import {
   label,
   line,
   message,
+  proposal,
 } from "@/copy/en";
 import type { Proposal } from "@/contracts/proposal";
 import { CardView } from "./registry";
@@ -100,8 +101,14 @@ test("a minimal proposal draws with only its changes", () => {
     ],
     card: "",
   };
-  renderCard(minimal);
+  const { view } = renderCard(minimal);
   expect(screen.getByText("Fix a typo")).toBeTruthy();
+  // No instance, type, reader or filing: no meta line at all.
+  const title = screen.getByText("Fix a typo");
+  expect(title.nextElementSibling).toBeNull();
+  expect(view.container.querySelector("header")?.textContent).not.toContain(
+    proposal.guess,
+  );
   expect(screen.getByText(line.waitsBecause(line.theDocument))).toBeTruthy();
   expect(fileName({ ...e02, instance: undefined })).toBe(line.theDocument);
   expect(
@@ -123,7 +130,12 @@ test("new document: sections, saved as, Create the file, no why line", () => {
     label.sections,
     label.evidence,
     label.savedAs,
+    label.needsYou,
   ]);
+  expect(rows[2].value).toBe(
+    ["Proposals/cache-rollout.md", "no naming rule"].join(line.summaryJoin),
+  );
+  expect(rows[3].value).toBe(joined("Rollout owner · no source"));
   expect(rows[0].value).toBe(
     joined("C1 Motivation · C2 Alternatives · C3 Status"),
   );
@@ -236,4 +248,49 @@ test("the full view of a minimal proposal with nothing left out has no LeftOut",
   );
   expect(screen.getByText("Fix a typo")).toBeTruthy();
   expect(screen.queryByText(line.leftOut(0))).toBeNull();
+});
+
+test("meta shows the type, the reader and a guess badge", () => {
+  renderCard(newDocument);
+  expect(screen.getByText("Design proposal · for maintainers")).toBeTruthy();
+  expect(screen.getByText(proposal.guess)).toBeTruthy();
+});
+
+test("a confirmed reader gets no guess badge, and a rule names the file", () => {
+  renderCard(e02);
+  expect(screen.getByText("Design proposal · for maintainers")).toBeTruthy();
+  expect(screen.queryByText(proposal.guess)).toBeNull();
+  const named = summaryRows({
+    ...newDocument,
+    filing: { path: "Proposals/x.md", naming_rule: "kebab-case title" },
+  });
+  expect(named[2].value).toBe(
+    ["Proposals/x.md", "named by kebab-case title"].join(line.summaryJoin),
+  );
+});
+
+test("more open questions add +n more, still at most four rows", () => {
+  const rows = summaryRows({
+    ...newDocument,
+    open_questions: [
+      { label: "Rollout owner", text: "?" },
+      { text: "Budget" },
+      { text: "Date" },
+    ],
+  });
+  expect(rows.length).toBe(4);
+  expect(rows[3].value).toBe(
+    ["Rollout owner", "no source", "+2 more"].join(line.summaryJoin),
+  );
+});
+
+test("D05F full view: filing note, open questions, whole-file chip", () => {
+  renderCard(newDocument, "fullscreen");
+  expect(screen.getByText(proposal.readerGuess)).toBeTruthy();
+  expect(screen.getByText(proposal.noRuleFor("Design proposal"))).toBeTruthy();
+  expect(screen.getByText(proposal.toAnswer(1))).toBeTruthy();
+  expect(
+    screen.getByText(/Rollout owner · no source\. It stays an open question/),
+  ).toBeTruthy();
+  expect(screen.getByText("vendor-quote.xlsx")).toBeTruthy();
 });

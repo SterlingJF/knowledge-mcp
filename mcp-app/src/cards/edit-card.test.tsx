@@ -65,32 +65,38 @@ test("an empty before digest alone is not created", () => {
   expect(screen.getByText(badge.done.saved)).toBeTruthy();
 });
 
-test("R03: an undo reads Change, Undone, undoes an earlier edit", () => {
+test("R03: an undo reads Change, Undone, undoes the earlier edit's time, no buttons", () => {
   renderCard(r03);
   expect(screen.getByText(eyebrow.change)).toBeTruthy();
   expect(screen.getByText(badge.done.undone)).toBeTruthy();
-  expect(
-    screen.getByText(new RegExp(`${editResult.undoesEarlier}$`)).textContent,
-  ).toMatch(
-    new RegExp(
-      `^Recorded Oct 28, \\d\\d:\\d\\d${meta.join}${editResult.undoesEarlier}$`,
-    ),
+  const undone = editResult.undoes(when(r01.time).time);
+  expect(screen.getByText(new RegExp(`${undone}$`)).textContent).toMatch(
+    new RegExp(`^Recorded Oct 28, \\d\\d:\\d\\d${meta.join}${undone}$`),
   );
+  expect(screen.queryAllByRole("button")).toHaveLength(0);
 });
 
-test("R02: Show the change opens the diff without freezing, then hides it", () => {
+test("R02: Show the change opens the diff without sending or freezing, then hides it", () => {
   const host = renderCard(r01);
+  const show = screen.getByRole("button", { name: action.showChange });
+  expect(show.getAttribute("aria-expanded")).toBe("false");
   expect(screen.queryByText("Title: Evening build retirement")).toBeNull();
-  fireEvent.click(screen.getByRole("button", { name: action.showChange }));
+  fireEvent.click(show);
   expect(screen.getByText("Title: Evening build retirement").tagName).toBe(
     "INS",
   );
   expect(
     screen.getByText("Title: Build schedule and cache rollout").tagName,
   ).toBe("DEL");
+  const hide = screen.getByRole("button", { name: action.hideChange });
+  const panel = document.getElementById(
+    hide.getAttribute("aria-controls") ?? "",
+  );
+  expect(panel?.textContent).toContain("Evening build retirement");
   expect(host.sent).toEqual([]);
+  expect(screen.queryByText(frozen.undoRequested)).toBeNull();
   expect(screen.getByRole("button", { name: action.undo })).toBeTruthy();
-  fireEvent.click(screen.getByRole("button", { name: editResult.hideChange }));
+  fireEvent.click(hide);
   expect(screen.queryByText("Title: Evening build retirement")).toBeNull();
 });
 
@@ -143,6 +149,7 @@ test.each([
   ["no location", { ...r01, location: "" }],
   ["a bad time", { ...r01, time: "yesterday" }],
   ["bad changes", { ...r01, changes: { hunks: 1, lines: "x", more: 0 } }],
+  ["an old undoes id", { ...r01, undoes: r01.id }],
   ["an unknown basis", { ...r01, allowed_by: { basis: "vibes", text: "" } }],
 ])("a malformed result (%s) renders nothing", (_, e) => {
   renderCard(e);

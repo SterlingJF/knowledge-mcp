@@ -13,11 +13,7 @@ export default {
   stories: {
     Eyebrow: <Eyebrow>Proposed changes</Eyebrow>,
     Title: <Title>Focus the proposal on retiring the evening build</Title>,
-    Meta: (
-      <Meta>
-        Design proposal · for maintainers deciding whether to accept it
-      </Meta>
-    ),
+    Meta: <Meta>Design proposal · for maintainers</Meta>,
     "Why line": (
       <WhyLine className="mt-0">
         Waits for you because it changes cache-proposal.md.

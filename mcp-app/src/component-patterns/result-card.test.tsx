@@ -73,3 +73,53 @@ test("refusal: refused badge, warning note, one next step", () => {
   );
   expect(screen.getAllByRole("button")).toHaveLength(1);
 });
+
+test("result: the disclosure toggles the change without sending or freezing", () => {
+  const life = lifecycle();
+  const onToggle = vi.fn<() => void>();
+  render(
+    <ResultCard
+      kind="result"
+      eyebrow="Change"
+      title="cache-proposal.md · 4 changes"
+      badgeLabel={badge.done.saved}
+      when="Oct 28, 09:41"
+      undoMessage="Undo edit 12"
+      disclosure={{
+        label: action.hideChange,
+        expanded: true,
+        onToggle,
+        controls: "diff-12",
+      }}
+      lifecycle={life}
+    >
+      <div id="diff-12">the diff</div>
+    </ResultCard>,
+  );
+  const buttons = screen.getAllByRole("button");
+  expect(buttons.map((b) => b.textContent)).toEqual([
+    action.undo,
+    action.hideChange,
+  ]);
+  fireEvent.click(buttons[1]!);
+  expect(onToggle).toHaveBeenCalledOnce();
+  expect(life.press).not.toHaveBeenCalled();
+  expect(buttons[1]!.getAttribute("aria-expanded")).toBe("true");
+  expect(document.getElementById("diff-12")).toBeTruthy();
+});
+
+test("result without Undo or any action draws no action row", () => {
+  const { container } = render(
+    <ResultCard
+      kind="result"
+      eyebrow="Change"
+      title="cache-proposal.md · 4 changes"
+      badgeLabel={badge.done.undone}
+      when="Oct 28, 09:44"
+      who="undoes the 09:41 edit"
+      lifecycle={lifecycle()}
+    />,
+  );
+  expect(screen.queryAllByRole("button")).toHaveLength(0);
+  expect(container.textContent).toContain("Recorded Oct 28, 09:44");
+});

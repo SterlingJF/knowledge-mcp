@@ -355,7 +355,7 @@
               ],
             ],
           ) +
-          `<div class="note">${ic.info}<span><b>No naming rule for Design proposals</b> (dropped in conventions), so it goes beside cache-proposal.md.</span></div><div class="note">${ic.left}<span><b>One thing to answer.</b> Rollout owner · no source. It stays an open question unless you say.</span></div>`,
+          `<div class="note">${ic.info}<span><b>Design proposal has no naming rule</b> (dropped in conventions), so it goes beside cache-proposal.md.</span></div><div class="note">${ic.left}<span><b>One thing to answer.</b> Rollout owner · no source. It stays an open question unless you say.</span></div>`,
         acts: `${btn("Create the file", "p")}${btn("Not now", "g")}`,
       }),
       composer: wait,
@@ -413,7 +413,7 @@
         card({
           ...rHead,
           badge: badge("b-grn", "Saved", "check"),
-          acts: `${btn("Undo", "", "undo")}${btn("Show the change", "g")}`,
+          acts: `${btn("Undo", "", "undo")}<span class="disc">Show the change</span>`,
         }) +
         `<div class="say">Saved the four changes. The two questions are still open, so the status stays Proposed.</div>` +
         idle,

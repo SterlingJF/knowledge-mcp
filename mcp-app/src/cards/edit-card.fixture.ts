@@ -60,7 +60,7 @@ export const r03: Edit = {
     basis: "request",
     text: "Undo the 09:41 edit to cache-proposal.md",
   },
-  undoes: r01.id,
+  undoes: { id: r01.id, time: r01.time },
   before_digest: r01.after_digest,
   after_digest: r01.before_digest,
   changes: {
