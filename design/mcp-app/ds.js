@@ -628,7 +628,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           ],
           [
             "Narrow card",
-            "Under 480px of card the title takes the full width and status and Full view follow it; under 420px each summary label sits 4px above its value, pairs 8px apart; under 560px table rows stack. A breakdown wraps before a separator, never after one.",
+            "Under 480px of card the title takes the full width and status and Full view follow it; under 420px each summary label sits 4px above its value, pairs 8px apart; under 560px table rows stack. A breakdown wraps before a separator, never after one, and a number never parts from its noun.",
             "design-taste-frontend app-screens §7.4, §12",
           ],
           [
