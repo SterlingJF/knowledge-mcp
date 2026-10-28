@@ -3,7 +3,7 @@
 
 import type { ComponentType } from "react";
 
-import type { ToolResult } from "@/host/host";
+import type { ToolResult } from "@/bridge/bridge";
 
 export type CardProps = { result: ToolResult };
 

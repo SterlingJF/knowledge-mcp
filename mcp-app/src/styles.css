@@ -2,8 +2,10 @@
 @import "tw-animate-css";
 @import "./generated/tokens.auto.css";
 
-/* shadcn's names, pointed at the host style variables, so core components follow Claude's theme. */
-:root {
+/* shadcn's names, pointed at the host style variables, so core components follow Claude's theme.
+   Also declared on themed containers, so they re-resolve inside a dark preview. */
+:root,
+[data-theme] {
   --background: transparent;
   --foreground: var(--color-text-primary);
   --primary: var(--color-background-inverse);

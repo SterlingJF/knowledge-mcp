@@ -50,6 +50,8 @@ const css = [
     tokens.color.dark,
     "\n  color-scheme: dark;",
   ),
+  // Effects reference colours, so they re-resolve inside every themed container.
+  block("[data-theme]", tokens.effect),
   `@media (prefers-color-scheme: dark) {\n${block(
     ":root:not([data-theme])",
     tokens.color.dark,

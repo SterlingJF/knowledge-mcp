@@ -11,7 +11,7 @@ mcp-app/
 │   ├── component-elements/          # K01–K13: badge, button, chips, tick box, note and the rest
 │   ├── component-patterns/          # P01–P07: card shell, change table, summary and full view
 │   ├── cards/                       # One card per tool result schema
-│   ├── host/                        # Connection, host theme, display mode, ui/message
+│   ├── bridge/                      # Harness connection, theme, display mode, ui/message
 │   ├── copy/                        # Every user-facing string
 │   └── generated/                   # tokens.auto.css from design/mcp-app/kmtokens.js
 ├── scripts/                         # Token generator

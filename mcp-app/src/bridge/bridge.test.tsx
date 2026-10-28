@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import type { App } from "@modelcontextprotocol/ext-apps/react";
 
 import { CardView, registerCard } from "@/cards/registry";
-import { cardHost } from "@/host/host";
+import { cardHost } from "@/bridge/bridge";
 
 // A stand-in for the connected App: records what the card asked the host to do.
 function stubApp(modes: Array<string>) {

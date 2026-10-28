@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { CardView } from "./cards/registry";
-import { CardHostProvider, useCardHost } from "./host/host";
+import { CardHostProvider, useCardHost } from "./bridge/bridge";
 
 import "./styles.css";
 
