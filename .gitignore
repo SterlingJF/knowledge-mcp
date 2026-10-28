@@ -25,8 +25,11 @@ __pycache__/
 !.vscode/settings.json
 *.sw?
 
-.claude/worktrees/
-.claude/settings.local.json
+.agents/*
+!.agents/.gitkeep
+!.agents/plugins/
+.claude/*
+!.claude/.gitkeep
 
 /.evidence/*
 !/.evidence/README.md
