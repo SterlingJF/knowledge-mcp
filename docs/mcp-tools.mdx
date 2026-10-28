@@ -216,6 +216,7 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 | `after_digest` | string or null                          | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
 | `whole_file`   | boolean or null                         | no       | True when `before` is the whole file.                                                                                             |
 | `operation`    | [EditOperation](#editoperation) or null | no       |                                                                                                                                   |
+| `undoes`       | [EditId](#editid) or null               | no       | The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits.                                       |
 
 ### `kbp_card`
 
@@ -407,6 +408,10 @@ Type: string, pattern `^sha256:[0-9a-f]{64}$`.
 | ---------- | --------------------- | -------- | ------- |
 | `old_path` | [MovePath](#movepath) | yes      |         |
 | `path`     | [MovePath](#movepath) | yes      |         |
+
+### EditId
+
+Type: string, pattern `^[0-9a-f]{32}$`.
 
 ### EditOperation
 
