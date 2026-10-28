@@ -74,6 +74,8 @@ export const line = {
       ? "Nothing left out"
       : `${count} ${count === 1 ? "file" : "files"} left out`,
   addition: "— addition",
+  /** Every refusal says this after its reason (F07). */
+  nothingChanged: "Nothing was changed.",
   summaryJoin: " · ",
 } as const;
 
