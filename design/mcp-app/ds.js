@@ -130,8 +130,8 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
     ],
     [
       "Unticked box edge (3:1, non-text)",
-      cr(L["--color-border-secondary"], L["--color-background-tertiary"], 3),
-      cr(D["--color-border-secondary"], D["--color-background-tertiary"], 3),
+      cr(L["--color-text-tertiary"], L["--color-background-tertiary"], 3),
+      cr(D["--color-text-tertiary"], D["--color-background-tertiary"], 3),
     ],
   ];
   const typeRows = T.type.map(([tok, w, use, sample]) => [
