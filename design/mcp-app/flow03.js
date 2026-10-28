@@ -43,11 +43,11 @@
   ];
   // Full view only: rows carry the contract's Cn numbers; boxes keep or leave out each change.
   const table = (boxes, off = -1, rows = R) =>
-    `<table class="rows"><tr><th style="width:${boxes ? 50 : 30}px"></th><th style="width:29%">Current</th><th>Proposed</th><th style="width:29%">Source</th></tr>${rows.map((r, i) => `<tr class="${i === off ? "out" : ""}"><td><span class="cn">${boxes ? `<span class="cb ${i === off ? "off" : ""}">${i === off ? "" : ic.check}</span>` : ""}C${i + 1}</span></td><td>${r[0]}</td><td>${r[1]}</td><td class="srcs">${r[2]}</td></tr>`).join("")}</table>`;
+    `<table class="rows"><tr><th style="width:${boxes ? 50 : 30}px">${boxes ? `<span class="cn"><span class="cb ${off >= 0 ? "mixed" : ""}">${off >= 0 ? "" : ic.check}</span>All</span>` : ""}</th><th style="width:29%">Current</th><th>Proposed</th><th style="width:29%">Source</th></tr>${rows.map((r, i) => `<tr class="${i === off ? "out" : ""}"><td><span class="cn">${boxes ? `<span class="cb ${i === off ? "off" : ""}">${i === off ? "" : ic.check}</span>` : ""}C${i + 1}</span></td><td>${r[0]}</td><td>${r[1]}</td><td class="srcs">${r[2]}</td></tr>`).join("")}</table>`;
   const live = table(1);
   // Inline: four data points, the most important one being the conflict.
   const summary = (
-    changes = "C1–C4: title, motivation, status, open question",
+    changes = "C1 Title · C2 Motivation · C3 Status · C4 Open question",
   ) =>
     sum([
       ["Changes", changes],
@@ -55,14 +55,11 @@
         "Evidence",
         "1 supported · 1 partly answered · 1 conflicting · 1 suggested",
       ],
-      [
-        "Needs you",
-        "<b>C3 conflicts:</b> slide 7 says approved, the notes say disputed",
-      ],
-      ["Left out", "2 files: vendor-quote.xlsx, release-calendar.md"],
+      ["Needs you", "<b>C3 Status</b> · slide 7 approved, notes disputed"],
+      ["Left out", "vendor-quote.xlsx · release-calendar.md"],
     ]);
   const leftClosed = `<div class="note">${ic.left}<span><b>2 files left out:</b> vendor-quote.xlsx, release-calendar.md. <u>Show why</u></span></div>`;
-  const leftOpen = `<div class="note">${ic.left}<span><b>2 files left out</b><br>${src("vendor-quote.xlsx")} prices a hosted build service; this proposal decides on retiring a build, so it answers none of its questions.<br>${src("release-calendar.md")} covers release dates, which this proposal doesn't.</span></div>`;
+  const leftOpen = `<div class="note lo-n">${ic.left}<div><b>2 files left out</b><ul class="lo"><li>${src("vendor-quote.xlsx")}<span>Prices a hosted build service. This proposal decides on retiring a build, so it answers none of its questions.</span></li><li>${src("release-calendar.md")}<span>Covers release dates, which this proposal doesn’t.</span></li></ul></div></div>`;
   const why = `<div class="why">Waits for you because it changes cache-proposal.md. Every saved edit is recorded and can be undone.</div>`;
   const acts = (what = "C1–C4") =>
     `${btn(`Save ${what}`, "p")}${btn("Not now", "g")}`;
@@ -199,7 +196,7 @@
           badge: badge("b-amb", "Nothing saved"),
           full: true,
           body:
-            summary("C1–C4, prepared again: C2’s current text is new") +
+            summary("C1–C4 · C2 current text changed") +
             `<div class="note">${ic.warn}<span>Prepared again because the file changed. Open the full view to see C2’s new current text.</span></div>`,
           acts: acts(),
         }) +
@@ -277,13 +274,13 @@
           badge: badge("b-amb", "Nothing saved"),
           full: true,
           body: sum([
-            ["Changes", "C1–C3: motivation, status, open question"],
-            ["Kept as is", "the title; the cache rollout stays as background"],
+            ["Changes", "C1 Motivation · C2 Status · C3 Open question"],
+            ["Unchanged", "Title · cache rollout section"],
             [
               "Needs you",
-              "<b>C2 conflicts:</b> slide 7 says approved, the notes say disputed",
+              "<b>C2 Status</b> · slide 7 approved, notes disputed",
             ],
-            ["Left out", "2 files: vendor-quote.xlsx, release-calendar.md"],
+            ["Left out", "vendor-quote.xlsx · release-calendar.md"],
           ]),
           acts: acts("C1–C3"),
         }) +

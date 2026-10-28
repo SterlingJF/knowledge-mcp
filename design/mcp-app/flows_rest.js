@@ -179,10 +179,10 @@
           title: "cache-proposal.md",
           meta: "Design proposal · from team guidance",
           body: sum([
-            ["Reader", "Maintainers deciding whether to accept it"],
+            ["Reader", "Maintainers · accept or reject"],
             ["Guidance", "product-dev · Design proposal"],
-            ["Checks", `3 of 4 met · <b>missing:</b> Alternatives`],
-            ["Still open", "the timing baseline"],
+            ["Checks", `3 of 4 met · <b>Alternatives missing</b>`],
+            ["Still open", "Timing baseline"],
           ]),
           acts: `${btn("Bring in the meeting notes", "p")}`,
         }) +
@@ -306,15 +306,12 @@
           body: sum([
             [
               "Reader",
-              'Maintainers deciding whether to accept it <span class="badge b-nt">guess</span>',
+              'Maintainers · accept or reject <span class="badge b-nt">guess</span>',
             ],
-            ["Sections", "C1–C3: motivation, alternatives, status"],
+            ["Sections", "C1 Motivation · C2 Alternatives · C3 Status"],
             ["Evidence", "1 supported · 1 partly answered · 1 suggested"],
-            [
-              "Saved as",
-              "beside cache-proposal.md: no naming rule for Design proposals",
-            ],
-            ["Needs you", "No source says who owns the rollout"],
+            ["Saved as", "Proposals/cache-rollout.md · no naming rule"],
+            ["Needs you", "Rollout owner · no source"],
           ]),
           acts: `${btn("Create the file", "p")}${btn("Not now", "g")}`,
         }) +
@@ -362,7 +359,7 @@
               ],
             ],
           ) +
-          `<div class="note">${ic.info}<span><b>No naming rule for Design proposals</b> (dropped in conventions), so it goes beside cache-proposal.md.</span></div><div class="note">${ic.left}<span><b>One thing to answer.</b> No source says who owns the rollout. It stays an open question unless you say.</span></div>`,
+          `<div class="note">${ic.info}<span><b>No naming rule for Design proposals</b> (dropped in conventions), so it goes beside cache-proposal.md.</span></div><div class="note">${ic.left}<span><b>One thing to answer.</b> Rollout owner · no source. It stays an open question unless you say.</span></div>`,
         acts: `${btn("Create the file", "p")}${btn("Not now", "g")}`,
       }),
       composer: wait,
@@ -534,17 +531,12 @@
   );
   const mSum = (blocked) =>
     sum([
-      ["Moves", "3 files out of Inbox: Meetings/, Decisions/, Proposals/"],
-      ["Renames", "2, to date · title"],
-      ["Links", "5 repaired in 4 notes"],
-      ["Stays", "scan-0412.md: no document type"],
+      ["Moves", "3 · Inbox → Meetings/, Decisions/, Proposals/"],
+      ["Renames", "2 · date + title"],
+      ["Links", "5 repaired · 4 notes"],
+      ["Stays", "scan-0412.md · no document type"],
       ...(blocked
-        ? [
-            [
-              "Needs you",
-              "<b>2 blockers:</b> a name already taken, a link that matches 2 notes",
-            ],
-          ]
+        ? [["Needs you", "<b>2 blockers</b> · name taken, ambiguous link"]]
         : []),
     ]);
   const mLeft = `<div class="note">${ic.left}<span><b>1 file stays where it is.</b> scan-0412.md has no document type. <u>Show why</u></span></div>`;
@@ -802,7 +794,7 @@
         "Design proposal",
         `Proposals/ · title${state === "saved" ? " · <b>dropped</b>" : ""}`,
       ],
-      ["Existing files", "keep their names until you approve a move"],
+      ["Existing files", "Unchanged until a move"],
     ]);
   P["p06-conventions"] = [
     {
@@ -845,7 +837,7 @@
         badge: badge("b-amb", "Nothing saved"),
         body:
           cRows("Meetings/", 0) +
-          `<div class="why">Existing files keep their names until you approve a move. To change a folder or name, say it in chat.</div>`,
+          `<div class="why">Existing files Unchanged until a move. To change a folder or name, say it in chat.</div>`,
         acts: `${btn("Save accepted", "p")}${btn("Not now", "g")}`,
       }),
       composer: wait,
@@ -926,15 +918,9 @@
           full: true,
           body:
             sum([
-              [
-                "Changes",
-                "5: 3 by the assistant for you today, 1 yesterday, 1 by you",
-              ],
-              ["Latest", "Saved 2 conventions · Oct 28, 10:03"],
-              [
-                "Can undo",
-                "3 · deploy-runbook.md changed later, so not that one",
-              ],
+              ["Changes", "5 · 3 today, 1 yesterday, 1 by you"],
+              ["Latest", "2 conventions saved · Oct 28, 10:03"],
+              ["Can undo", "3 · deploy-runbook.md changed since"],
             ]) +
             `<div class="why">To undo one, say which in chat, for example “undo the move”.</div>`,
         }) +
@@ -1082,16 +1068,10 @@
           badge: badge("b-amb", "Nothing saved"),
           full: true,
           body: sum([
-            [
-              "Applies",
-              "2 changes: a rollback question, and what an honest empty answer means",
-            ],
-            ["Refused", "1: a cost section (only 1 proposal added one)"],
-            ["Evidence", "4 of 6 proposals added a rollback section by hand"],
-            [
-              "Effect",
-              "every Design proposal is checked for it; version 1.3 → 1.4",
-            ],
+            ["Applies", "2 · rollback question, empty-answer guidance"],
+            ["Refused", "1 · cost section, 1 proposal only"],
+            ["Evidence", "Rollback added by hand in 4 of 6 proposals"],
+            ["Effect", "Every Design proposal checked · v1.3 → 1.4"],
           ]),
           acts: `${btn("Apply 2 changes", "p")}${btn("Not now", "g")}`,
         }) +
@@ -1143,9 +1123,9 @@
           meta: "Version 1.4 · checker passed · recorded in evolve-log.md",
           badge: badge("b-grn", "Applied", "check"),
           body: sum([
-            ["Applied", "2 changes"],
-            ["Refused", "1, kept as refused"],
-            ["Checker", "kbp: passed"],
+            ["Applied", "2"],
+            ["Refused", "1"],
+            ["Checker", "Passed"],
             ["Recorded", "evolve-log.md"],
           ]),
           acts: `${btn("Check cache-proposal.md again", "p")}${btn("Undo", "", "undo")}`,

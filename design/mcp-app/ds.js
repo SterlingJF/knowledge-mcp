@@ -682,6 +682,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       tokens: ["copy rows"],
       rules: [
         "Sentence case everywhere except the eyebrow.",
+        "Summary values: terse noun phrases joined by “ · ”. No articles, no semicolons, no colon inside a value (“slide 7 approved, notes disputed”).",
         "Name the thing: a file, a count, a C-number. Never “this item”.",
         "A refusal always says why and that nothing changed.",
       ],
@@ -915,6 +916,14 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
             `<span class="cn"><span class="cb" style="box-shadow:0 0 0 2px var(--color-background-primary),0 0 0 4px var(--color-ring-primary)">${ic.check}</span>C1</span>`,
           ),
           st("Frozen card (no box)", '<span class="cn">C1</span>'),
+          st(
+            "Header · all selected",
+            `<span class="cn"><span class="cb">${ic.check}</span>All</span>`,
+          ),
+          st(
+            "Header · some left out",
+            '<span class="cn"><span class="cb mixed"></span>All</span>',
+          ),
         ]),
       ),
       tokens: [
@@ -1215,6 +1224,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       rules: [
         "Additions show “— addition” as current text.",
         "A left-out row is struck through and dimmed, never removed.",
+        "The header box selects or clears every row; it shows a dash when some rows are left out.",
         "Frozen tables drop the tick boxes but keep the numbers.",
       ],
       uses: [/class="cn"><span class="cb/],
@@ -1227,7 +1237,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       purpose:
         "Files read but not cited, always present, closed by default, each with its reason when opened (Strategic Theme 2).",
       body: two(
-        `<div class="note">${ic.left}<span><b>2 files left out:</b> vendor-quote.xlsx, release-calendar.md. <u>Show why</u></span></div><div class="note">${ic.left}<span><b>2 files left out</b><br>${src("vendor-quote.xlsx")} prices a hosted build service; this proposal decides on retiring a build.<br>${src("release-calendar.md")} covers release dates, which this proposal doesn't.</span></div>`,
+        `<div class="note">${ic.left}<span><b>2 files left out:</b> vendor-quote.xlsx, release-calendar.md. <u>Show why</u></span></div><div class="note lo-n">${ic.left}<div><b>2 files left out</b><ul class="lo"><li>${src("vendor-quote.xlsx")}<span>Prices a hosted build service. This proposal decides on retiring a build, so it answers none of its questions.</span></li><li>${src("release-calendar.md")}<span>Covers release dates, which this proposal doesn’t.</span></li></ul></div></div>`,
       ),
       tokens: ["K06, K04"],
       rules: [

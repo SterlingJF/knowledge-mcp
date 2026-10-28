@@ -69,7 +69,9 @@ table.rows{width:100%;border-collapse:collapse;margin-top:var(--km-space-5)}
 @keyframes km-spin{to{transform:rotate(360deg)}}
 .dim{opacity:.55}
 .cn{display:inline-flex;gap:var(--km-space-4);align-items:center;font:var(--font-weight-semibold) var(--font-text-xs-size)/var(--font-text-xs-line-height) var(--font-mono);color:var(--color-text-tertiary);white-space:nowrap}.cn .cb{margin-top:0}
-.cb{width:15px;height:15px;border-radius:var(--border-radius-xs);display:inline-grid;place-items:center;background:var(--color-background-inverse);color:var(--color-text-inverse);margin-top:2px}.cb svg{width:11px;height:11px}.cb.off{background:transparent;border:1.5px solid var(--color-border-secondary)}
+.cb{width:15px;height:15px;border-radius:var(--border-radius-xs);display:inline-grid;place-items:center;background:var(--color-background-inverse);color:var(--color-text-inverse);margin-top:2px}.cb svg{width:11px;height:11px}.cb.mixed::after{content:"";width:8px;height:2px;border-radius:1px;background:currentColor}
+.lo-n{align-items:flex-start}.lo{list-style:none;margin:var(--km-space-4) 0 0;padding:0;display:grid;grid-template-columns:max-content 1fr;gap:var(--km-space-4) var(--km-space-5);align-items:baseline}.lo li{display:contents}.lo .chip{justify-self:start}
+.cb.off{background:transparent;border:1.5px solid var(--color-border-secondary)}
 .pulse{width:7px;height:7px;border-radius:50%;background:currentColor;position:relative;flex:none;margin-right:1px}
 .pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:currentColor;animation:km-pulse var(--km-pulse)}
 @keyframes km-pulse{0%{transform:scale(1);opacity:.55}80%,100%{transform:scale(2.6);opacity:0}}
