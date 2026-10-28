@@ -21374,7 +21374,7 @@
               }
             ],
             "default": null,
-            "description": "The digest of the document text you prepared the proposal against. The answer returns it in `based_on` to recheck before saving."
+            "description": "The SHA-256 of the document's current text as UTF-8, written `sha256:` plus 64 lowercase hex digits. Send it whenever you've read the document, so the card can refuse a save after the document changes. The answer returns it in `based_on`."
           }
         },
         "required": [
@@ -21797,7 +21797,7 @@
           },
           "instance": {
             "title": "Proposal instance",
-            "description": "Identifies this card among earlier cards for the same document. A card with a later `created_at`, then a higher `seq`, supersedes it.",
+            "description": "Identifies this card among earlier cards for the same document. A card with a later `created_at`, then a higher `seq`, supersedes it. Ordering uses server wall-clock time, then `seq`.",
             "type": "object",
             "required": [
               "subject",

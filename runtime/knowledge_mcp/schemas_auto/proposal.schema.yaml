@@ -159,7 +159,8 @@ $defs:
   instance:
     title: Proposal instance
     description: Identifies this card among earlier cards for the same document. A card
-      with a later `created_at`, then a higher `seq`, supersedes it.
+      with a later `created_at`, then a higher `seq`, supersedes it. Ordering uses
+      server wall-clock time, then `seq`.
     type: object
     required:
       - subject

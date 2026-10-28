@@ -86,7 +86,7 @@ class LeftOutFile(BaseModel):
 
 class ProposalInstance(BaseModel):
     """
-    Identifies this card among earlier cards for the same document. A card with a later `created_at`, then a higher `seq`, supersedes it.
+    Identifies this card among earlier cards for the same document. A card with a later `created_at`, then a higher `seq`, supersedes it. Ordering uses server wall-clock time, then `seq`.
     """
 
     model_config = ConfigDict(

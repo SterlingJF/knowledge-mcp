@@ -188,14 +188,14 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 
 ### `kb_prepare_proposal`
 
-| Argument          | Type                                        | Required | Meaning                                                                                                                          |
-| ----------------- | ------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `location`        | string                                      | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                  |
-| `summary`         | string                                      | yes      | What the proposal changes, in one line.                                                                                          |
-| `rows`            | list of [ProposalRow](#proposalrow)         | yes      | One row per change, in display order. The card names row n change Cn.                                                            |
-| `left_out`        | list of [LeftOutFile](#leftoutfile) or null | no       | Files you read but didn't cite.                                                                                                  |
-| `layout`          | [Layout](#layout)                           | no       | `list` in a terminal, which can't scroll a wide table sideways.                                                                  |
-| `document_digest` | [Digest](#digest) or null                   | no       | The digest of the document text you prepared the proposal against. The answer returns it in `based_on` to recheck before saving. |
+| Argument          | Type                                        | Required | Meaning                                                                                                                                                                                                                                        |
+| ----------------- | ------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`        | string                                      | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                |
+| `summary`         | string                                      | yes      | What the proposal changes, in one line.                                                                                                                                                                                                        |
+| `rows`            | list of [ProposalRow](#proposalrow)         | yes      | One row per change, in display order. The card names row n change Cn.                                                                                                                                                                          |
+| `left_out`        | list of [LeftOutFile](#leftoutfile) or null | no       | Files you read but didn't cite.                                                                                                                                                                                                                |
+| `layout`          | [Layout](#layout)                           | no       | `list` in a terminal, which can't scroll a wide table sideways.                                                                                                                                                                                |
+| `document_digest` | [Digest](#digest) or null                   | no       | The SHA-256 of the document's current text as UTF-8, written `sha256:` plus 64 lowercase hex digits. Send it whenever you've read the document, so the card can refuse a save after the document changes. The answer returns it in `based_on`. |
 
 ### `kb_record_edit`
 

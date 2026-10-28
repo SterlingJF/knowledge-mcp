@@ -27,8 +27,10 @@ Prepare the proposed-changes card whenever you propose changes to a document, be
 FIELDS = Proposal.model_fields
 DOCUMENT_DIGEST = Field(
     description=(
-        "The digest of the document text you prepared the proposal against. "
-        "The answer returns it in `based_on` to recheck before saving."
+        "The SHA-256 of the document's current text as UTF-8, written `sha256:` plus "
+        "64 lowercase hex digits. Send it whenever you've read the document, so the "
+        "card can refuse a save after the document changes. The answer returns it "
+        "in `based_on`."
     )
 )
 
