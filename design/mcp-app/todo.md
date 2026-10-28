@@ -24,7 +24,7 @@ One card per slice. Each card lists the frames it builds, the files it owns, whe
 
 - [ ] **H1 Local host harness:** a dev page that hosts the built app the way Claude does (ext-apps AppBridge, sandboxed iframe, Claude's style variables, light and dark, inline and fullscreen), feeds it a real `kb_prepare_proposal` result, and records every ui/message and model context. Owns `mcp-app/harness.html`, `mcp-app/src/harness/*`. Blocked by batch 1.
 
-- [ ] **E5 Proposal document type and reader:** the E-frames show "Design proposal · for maintainers deciding whether to accept it" after the file chip, but `knowledge-mcp/proposal/1` has no field for it. Add optional `document_type` and `reader` (the assistant has both from `kb_get_document_type`), then the card shows them. Contract change.
+- [ ] **E5 Proposal document type and reader:** the E-frames show "Design proposal · for maintainers deciding whether to accept it" after the file chip, but `knowledge-mcp/proposal/1` has no field for it. Add optional `document_type` and `reader` (the assistant has both from `kb_get_document_type`), then the card shows them. Contract change. The same contract change also covers three more gaps found while building C-Proposal: the naming-rule note after "Saved as" (D05 "· no naming rule", the D05F panel); an open question with no source (D05 "Needs you · Rollout owner · no source", the D05F "One thing to answer" panel), since proposal/1 has no open questions apart from conflicting rows; and a source that is a whole file with no line or place (D05F "vendor-quote.xlsx").
 
 ## Batch 3: results and moves
 
