@@ -6,7 +6,8 @@ export type SegmentOption<V extends string> = { value: V; label: string };
 export type SegmentedChoiceProps<V extends string> = {
   /** Two or three options, all visible. */
   options: readonly SegmentOption<V>[];
-  value: V;
+  /** null while undecided: no segment is selected. */
+  value: V | null;
   onValueChange: (value: V) => void;
   "aria-label": string;
   className?: string;
@@ -27,7 +28,7 @@ export function SegmentedChoice<V extends string>({
     <ToggleGroup
       aria-label={rest["aria-label"]}
       spacing={0}
-      value={[value]}
+      value={value === null ? [] : [value]}
       onValueChange={(next) => {
         const picked = next[0] as V | undefined;
         if (picked !== undefined && picked !== value) onValueChange(picked);

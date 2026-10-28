@@ -19,11 +19,17 @@ describe("Button", () => {
 
   it("does not fire when disabled", () => {
     const onClick = vi.fn<(...args: unknown[]) => void>();
-    render(<Button disabled onClick={onClick}>{action.notNow}</Button>);
+    render(
+      <Button disabled onClick={onClick}>
+        {action.notNow}
+      </Button>,
+    );
     const button = screen.getByRole("button", { name: action.notNow });
     fireEvent.click(button);
     expect(onClick).not.toHaveBeenCalled();
     expect(button.className).toContain("focus-visible:shadow");
-    expect(button.className).toContain("pointer-coarse:min-h-[var(--km-target)]");
+    expect(button.className).toContain(
+      "pointer-coarse:min-h-[var(--km-target)]",
+    );
   });
 });

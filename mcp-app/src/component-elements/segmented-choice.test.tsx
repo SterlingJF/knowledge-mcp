@@ -12,19 +12,53 @@ describe("SegmentedChoice", () => {
   it("shows the controlled value as pressed and reports a new pick", () => {
     const onValueChange = vi.fn<(...args: unknown[]) => void>();
     render(
-      <SegmentedChoice aria-label={label.changes} options={options} value="current" onValueChange={onValueChange} />,
+      <SegmentedChoice
+        aria-label={label.changes}
+        options={options}
+        value="current"
+        onValueChange={onValueChange}
+      />,
     );
-    expect(screen.getByRole("button", { name: label.current }).getAttribute("aria-pressed")).toBe("true");
+    expect(
+      screen
+        .getByRole("button", { name: label.current })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
     fireEvent.click(screen.getByRole("button", { name: label.proposed }));
     expect(onValueChange).toHaveBeenCalledWith("proposed");
     // Controlled: nothing changes until the parent updates value.
-    expect(screen.getByRole("button", { name: label.proposed }).getAttribute("aria-pressed")).toBe("false");
+    expect(
+      screen
+        .getByRole("button", { name: label.proposed })
+        .getAttribute("aria-pressed"),
+    ).toBe("false");
+  });
+
+  it("starts undecided with nothing pressed", () => {
+    render(
+      <SegmentedChoice
+        aria-label={label.changes}
+        options={options}
+        value={null}
+        onValueChange={() => {}}
+      />,
+    );
+    for (const name of [label.current, label.proposed]) {
+      expect(
+        screen.getByRole("button", { name }).getAttribute("aria-pressed"),
+      ).toBe("false");
+    }
   });
 
   it("never deselects by re-clicking the current option", () => {
     const onValueChange = vi.fn<(...args: unknown[]) => void>();
     render(
-      <SegmentedChoice aria-label={label.changes} options={options} value="current" onValueChange={onValueChange} />,
+      <SegmentedChoice
+        aria-label={label.changes}
+        options={options}
+        value="current"
+        onValueChange={onValueChange}
+      />,
     );
     fireEvent.click(screen.getByRole("button", { name: label.current }));
     expect(onValueChange).not.toHaveBeenCalled();
@@ -33,7 +67,14 @@ describe("SegmentedChoice", () => {
   it("refuses fewer than 2 or more than 3 options", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() =>
-      render(<SegmentedChoice aria-label="x" options={[options[0]]} value="current" onValueChange={() => {}} />),
+      render(
+        <SegmentedChoice
+          aria-label="x"
+          options={[options[0]]}
+          value="current"
+          onValueChange={() => {}}
+        />,
+      ),
     ).toThrow("2 or 3 options");
   });
 });
