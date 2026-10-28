@@ -159,6 +159,11 @@ window.KMT = {
     "--km-gap-group": "var(--km-space-6)",
     "--km-gap-section": "var(--km-space-7)",
   },
+  // Padding of a box that holds text: a note, a diff line. Built from the scale, by role.
+  pad: {
+    "--km-pad-box": "var(--km-space-4) var(--km-space-5)",
+    "--km-pad-line": "var(--km-space-2) var(--km-space-5)",
+  },
   gapUse: {
     "--km-gap-tight":
       "Inside one heading block: eyebrow to title, title to meta",

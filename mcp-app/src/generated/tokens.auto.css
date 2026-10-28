@@ -50,6 +50,8 @@
   --km-gap-row: var(--km-space-4);
   --km-gap-group: var(--km-space-6);
   --km-gap-section: var(--km-space-7);
+  --km-pad-box: var(--km-space-4) var(--km-space-5);
+  --km-pad-line: var(--km-space-2) var(--km-space-5);
   --km-pulse: 1.6s ease-out infinite;
   --km-shimmer: 1.4s ease-in-out infinite;
   --km-target: 44px;

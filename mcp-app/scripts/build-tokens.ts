@@ -34,6 +34,7 @@ const flat = {
   ...tokens.border,
   ...tokens.space,
   ...tokens.gap,
+  ...tokens.pad,
   ...tokens.motion,
   ...tokens.touch,
   ...tokens.size,
