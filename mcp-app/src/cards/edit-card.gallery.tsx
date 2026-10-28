@@ -15,19 +15,36 @@ function Story({
   edit = r01,
   life = lifecycle("live"),
   open,
+  width,
 }: {
+  width?: "360";
   edit?: Edit;
   life?: CardLifecycle;
   open?: boolean;
 }) {
   return (
     <StaticCardHost host={stubCardHost()}>
-      <HarnessFrame>
-        <EditView edit={edit} lifecycle={life} timeZone="UTC" open={open} />
-      </HarnessFrame>
+      <div className={width ? "w-[360px] max-w-full" : undefined}>
+        <HarnessFrame>
+          <EditView edit={edit} lifecycle={life} timeZone="UTC" open={open} />
+        </HarnessFrame>
+      </div>
     </StaticCardHost>
   );
 }
+
+/** R02 with a long unbroken token, to show it wraps at 360px. */
+const digestLine: Edit = {
+  ...r01,
+  changes: {
+    hunks: 5,
+    lines: [
+      ...(r01.changes?.lines ?? []),
+      { change: "added", text: `Digest: ${r01.after_digest}` },
+    ],
+    more: 0,
+  },
+};
 
 export default {
   id: "C-Result",
@@ -41,6 +58,10 @@ export default {
     ),
     "R03 Undone": <Story edit={r03} />,
     "D06 Created and filed": <Story edit={d06} />,
+    "R01 at 360px": <Story width="360" />,
+    "R02 change open at 360px": <Story width="360" edit={digestLine} open />,
+    "R03 undone at 360px": <Story width="360" edit={r03} />,
+    "D06 at 360px": <Story width="360" edit={d06} />,
     Replaced: <Story life={lifecycle("replaced")} />,
   },
 };

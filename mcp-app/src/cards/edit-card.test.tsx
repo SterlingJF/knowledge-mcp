@@ -57,7 +57,13 @@ test("D06: a created file reads Document, Created", () => {
   renderCard(d06);
   expect(screen.getByText(editResult.document)).toBeTruthy();
   expect(screen.getByText(badge.done.created)).toBeTruthy();
-  expect(screen.getByText("cache-rollout.md")).toBeTruthy();
+  expect(screen.getByText("Proposals/cache-rollout.md")).toBeTruthy();
+  expect(
+    screen.getByText(new RegExp(`${meta.approvedByYou}$`)).textContent,
+  ).toMatch(/^Recorded /);
+  expect(screen.getAllByRole("button").map((b) => b.textContent)).toEqual([
+    action.undo,
+  ]);
 });
 
 test("an empty before digest alone is not created", () => {
@@ -139,6 +145,8 @@ test("R03: Undo sends its message with the edit's id and digests, then freezes",
     },
   ]);
   expect(screen.getByText(frozen.undoRequested)).toBeTruthy();
+  expect(screen.getByText(badge.neutral.undoRequested)).toBeTruthy();
+  expect(screen.queryByText(badge.done.saved)).toBeNull();
   expect(screen.queryByRole("button", { name: action.undo })).toBeNull();
 });
 
@@ -149,6 +157,10 @@ test.each([
   ["no location", { ...r01, location: "" }],
   ["a bad time", { ...r01, time: "yesterday" }],
   ["bad changes", { ...r01, changes: { hunks: 1, lines: "x", more: 0 } }],
+  [
+    "an undoes time that is not a string",
+    { ...r01, undoes: { id: r01.id, time: 0 } },
+  ],
   ["an old undoes id", { ...r01, undoes: r01.id }],
   ["an unknown basis", { ...r01, allowed_by: { basis: "vibes", text: "" } }],
 ])("a malformed result (%s) renders nothing", (_, e) => {

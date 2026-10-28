@@ -21,3 +21,16 @@ describe("Diff", () => {
     expect(added.className).toContain("--color-text-success");
   });
 });
+
+test("long unbroken tokens wrap instead of running past the box", () => {
+  const { container } = render(
+    <Diff
+      lines={[
+        { kind: "removed", text: "a" },
+        { kind: "added", text: "b" },
+      ]}
+    />,
+  );
+  for (const el of container.querySelectorAll("del, ins"))
+    expect(el.className).toContain("[overflow-wrap:anywhere]");
+});

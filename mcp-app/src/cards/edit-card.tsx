@@ -10,6 +10,7 @@ import type { CardLifecycle } from "@/component-patterns/card-lifecycle";
 import { ResultCard } from "@/component-patterns/result-card";
 import type { Edit, EditChanges } from "@/contracts/edit";
 import { action, badge, change, editResult, eyebrow, meta } from "@/copy/en";
+import { lastSegment } from "./file-name";
 import { registerCard } from "./registry";
 import type { CardProps } from "./registry";
 
@@ -54,11 +55,12 @@ export function isEdit(result: ToolResult | null): result is ToolResult & Edit {
       (typeof e.undoes === "object" &&
         e.undoes !== null &&
         typeof e.undoes.id === "string" &&
+        typeof e.undoes.time === "string" &&
         !Number.isNaN(Date.parse(e.undoes.time))))
   );
 }
 
-export const fileName = (e: Edit) => e.location.split("/").at(-1) || e.location;
+export const fileName = (e: Edit) => lastSegment(e.location) || e.location;
 
 /** `Oct 28, 09:41` and `09:41`, in the viewer's time zone unless one is given. */
 export function when(iso: string, timeZone?: string) {
@@ -77,11 +79,13 @@ export function when(iso: string, timeZone?: string) {
   return { full: `${day}, ${time}`, time };
 }
 
-/** `cache-proposal.md · 4 changes`, or the file name alone without changes. */
+/** D06: a created file's full location. Otherwise `cache-proposal.md · 4 changes`, or the file name alone. */
 export const editTitle = (e: Edit) =>
-  e.changes
-    ? fileName(e) + meta.join + change.count(e.changes.hunks)
-    : fileName(e);
+  e.created
+    ? e.location
+    : e.changes
+      ? fileName(e) + meta.join + change.count(e.changes.hunks)
+      : fileName(e);
 
 export const undoMessage = (e: Edit, timeZone?: string) =>
   editResult.undo(when(e.time, timeZone).time, fileName(e));
@@ -165,6 +169,7 @@ export function EditView({
             }
           : undefined
       }
+      frozenBadge={badge.neutral.undoRequested}
       lifecycle={tracked}
     >
       {changes && open && (
