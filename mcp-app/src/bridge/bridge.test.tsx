@@ -35,6 +35,28 @@ describe("cardHost", () => {
     ]);
   });
 
+  it("sends model context before the message when a card passes one", async () => {
+    const calls: Array<string> = [];
+    const app = {
+      getHostContext: () => ({ availableDisplayModes: ["inline"] }),
+      updateModelContext: async () => {
+        calls.push("context");
+        return {};
+      },
+      sendMessage: async () => {
+        calls.push("message");
+        return {};
+      },
+    } as unknown as App;
+    await cardHost(app, null, "inline").send(
+      "Save C1–C4 to cache-proposal.md",
+      {
+        based_on: { document_digest: "sha256:" + "a".repeat(64) },
+      },
+    );
+    expect(calls).toEqual(["context", "message"]);
+  });
+
   it("opens the full view only when the host offers fullscreen", async () => {
     const without = stubApp(["inline"]);
     const host = cardHost(without.app, null, "inline");

@@ -9,6 +9,8 @@ import type { CardHost, ToolResult } from "./bridge";
 export type RecordedHost = CardHost & {
   /** Messages the card sent, in order. */
   sent: Array<string>;
+  /** Model context sent with each message, in order (undefined when none). */
+  contexts: Array<Record<string, unknown> | undefined>;
   /** Display modes the card asked for, in order. */
   requested: Array<"inline" | "fullscreen">;
 };
@@ -21,15 +23,18 @@ export function stubCardHost(
   } = {},
 ): RecordedHost {
   const sent: Array<string> = [];
+  const contexts: Array<Record<string, unknown> | undefined> = [];
   const requested: Array<"inline" | "fullscreen"> = [];
   return {
     result: options.result ?? null,
     displayMode: options.displayMode ?? "inline",
     canFullView: options.canFullView ?? true,
     sent,
+    contexts,
     requested,
-    send: async (text) => {
+    send: async (text, context) => {
       sent.push(text);
+      contexts.push(context);
     },
     requestFullView: async () => {
       requested.push("fullscreen");

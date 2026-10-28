@@ -16,8 +16,12 @@ export type CardHost = {
   result: ToolResult | null;
   displayMode: DisplayMode;
   canFullView: boolean;
-  /** Sends text into the conversation as the person's message. */
-  send: (text: string) => Promise<void>;
+  /**
+   * Sends text into the conversation as the person's message. `context` travels with it as
+   * model context the person doesn't see (ui/update-model-context, sent first; the latest wins),
+   * for exact details like a preview's digest that would clutter the visible message.
+   */
+  send: (text: string, context?: Record<string, unknown>) => Promise<void>;
   requestFullView: () => Promise<void>;
   requestInline: () => Promise<void>;
 };
@@ -42,7 +46,12 @@ export function cardHost(
     result,
     displayMode,
     canFullView: modes.includes("fullscreen"),
-    send: async (text) => {
+    send: async (text, context) => {
+      if (context)
+        await app?.updateModelContext({
+          content: [{ type: "text", text: JSON.stringify(context) }],
+          structuredContent: context,
+        });
       await app?.sendMessage({
         role: "user",
         content: [{ type: "text", text }],
