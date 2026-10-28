@@ -1349,15 +1349,23 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
             title: "Focus the proposal on retiring the evening build",
             badge: badge("b-amb", "Nothing saved"),
             full: true,
-            body: K.sum([
-              ["Changes", "C1–C4: title, motivation, status, open question"],
-              [
-                "Evidence",
-                "1 supported · 1 partly answered · 1 conflicting · 1 suggested",
-              ],
-              ["Needs you", "<b>C3 conflicts</b>"],
-              ["Left out", "2 files"],
-            ]),
+            body:
+              K.sum([
+                [
+                  "Changes",
+                  "C1 Title · C2 Motivation · C3 Status · C4 Open question",
+                ],
+                [
+                  "Evidence",
+                  "1 supported · 1 partly answered · 1 conflicting · 1 suggested",
+                ],
+                [
+                  "Needs you",
+                  "<b>C3 Status</b> · slide 7 approved, notes disputed",
+                ],
+                ["Left out", "vendor-quote.xlsx · release-calendar.md"],
+              ]) +
+              `<div class="why">Waits for you because it changes cache-proposal.md. Every saved edit is recorded and can be undone.</div>`,
             acts: `${btn("Save C1–C4", "p")}${btn("Not now", "g")}`,
           }),
         ),
