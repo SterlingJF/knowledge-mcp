@@ -195,6 +195,12 @@ _contract_bundles MODE:
 # Check mcp-app/: token staleness, lint, types, tests and the single-file build.
 check_mcp_app:
   pnpm --filter mcp-app run check
+  cmp -s mcp-app/dist/index.html runtime/knowledge_mcp/ui/app.html || { printf 'runtime/knowledge_mcp/ui/app.html is out of date. Run just generate_mcp_app_html.\n' >&2; exit 1; }
+
+# Build mcp-app and copy the single HTML file into the runtime, which serves it as ui://knowledge-mcp/app.html.
+generate_mcp_app_html:
+  pnpm --filter mcp-app run build
+  cp mcp-app/dist/index.html runtime/knowledge_mcp/ui/app.html
 
 # Lint, type-check and test runtime/, and scan runtime/ for dead code. Check that models_auto and docs/mcp-tools.mdx are current.
 check_runtime: check_mcp_tools_doc (_contract_models '--check')

@@ -53,7 +53,7 @@ Edit YAML schemas in `contracts/extensions/mcp/v1/`, then run `just generate_con
 Keep these boundaries when editing:
 
 - Preserve exact bytes in `runtime/tests/fixtures/`; tests depend on them.
-- Leave `mcp-app/src/component-core/` as shadcn wrote it; wrap a change in an element. Regenerate `mcp-app/src/generated/` with `pnpm --filter mcp-app tokens`.
+- Leave `mcp-app/src/component-core/` as shadcn wrote it; wrap a change in an element. Regenerate `mcp-app/src/generated/` with `pnpm --filter mcp-app tokens`, and `runtime/knowledge_mcp/ui/app.html` with `just generate_mcp_app_html`.
 - Refresh bundled universe specs and the six knowledge-bus skills through `just refresh_knowledge_model <tag>`, following the [upgrade steps](runtime/README.md#upgrade-knowledge-bus). Their hashes are recorded in [UPSTREAM.md](runtime/knowledge-bus/UPSTREAM.md).
 - Replace vendored anti-slop rules from their source, following [their provenance instructions](tools/oxlint/anti-slop/UPSTREAM.md).
 - Update copied module maps from their source READMEs as described below.
