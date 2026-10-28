@@ -1,0 +1,14 @@
+---
+# An instance names its subject, created_at and seq.
+schema: knowledge-mcp/proposal/1
+summary: Focus proposal on retiring the evening build
+card: "`PROPOSED CHANGES`"
+instance:
+  subject: ~/notes/cache-policy.md
+  created_at: "2026-10-28T12:00:00.000Z"
+rows:
+  - proposed:
+      text: Evening build retirement
+    sources:
+      - file: meeting-notes.md
+        line_number: 15

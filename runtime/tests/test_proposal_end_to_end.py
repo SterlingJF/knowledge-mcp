@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 
 from knowledge_mcp.views.markdown import PLACE
 from tests.harness import server_parameters, session
@@ -211,3 +212,43 @@ def test_a_cited_file_is_not_left_out(tmp_path):
 
     assert result.is_error
     assert result.structured_content["errors"][0]["pointer"] == "#/left_out/0/file"
+
+
+DIGEST = "sha256:" + "ab" * 32
+
+
+def test_proposal_returns_the_digest_it_was_prepared_against(tmp_path):
+    result = call(tmp_path, {**DEMO, "document_digest": DIGEST})
+
+    assert not result.is_error, result.content
+    assert result.structured_content["based_on"] == {"document_digest": DIGEST}
+    assert result.structured_content["card"] == TABLE
+
+
+def test_proposal_without_a_digest_omits_based_on(tmp_path):
+    result = call(tmp_path, DEMO)
+
+    assert "based_on" not in result.structured_content
+
+
+def test_proposal_refuses_a_malformed_digest(tmp_path):
+    result = call(tmp_path, {**DEMO, "document_digest": "abc"})
+
+    assert result.is_error
+
+
+def test_proposal_instance_names_the_document_and_counts_up(tmp_path):
+    async def steps(client):
+        first = await client.call_tool("kb_prepare_proposal", DEMO)
+        second = await client.call_tool("kb_prepare_proposal", REVISED)
+        return first, second
+
+    first, second = session(server_parameters(tmp_path), steps)
+    one = first.structured_content["instance"]
+    two = second.structured_content["instance"]
+
+    assert one["subject"] == DEMO["location"]
+    assert re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z", one["created_at"])
+    assert two["seq"] > one["seq"]
+    assert two["created_at"] >= one["created_at"]
+    assert second.structured_content["card"] == REVISED_TABLE

@@ -42,6 +42,19 @@ $defs:
         description: The proposal as markdown. Show it in your reply unchanged.
         type: string
         minLength: 1
+      based_on:
+        description: The input digest to recheck before saving. Present when
+          `document_digest` was sent.
+        title: Proposal inputs
+        type: object
+        additionalProperties: false
+        required:
+          - document_digest
+        properties:
+          document_digest:
+            $ref: common.schema.yaml#/$defs/digest
+      instance:
+        $ref: "#/$defs/instance"
   row:
     title: Proposal row
     type: object
@@ -144,3 +157,25 @@ $defs:
       reason:
         type: string
         minLength: 1
+  instance:
+    title: Proposal instance
+    description:
+      Identifies this card among earlier cards for the same document. A card
+      with a later `created_at`, then a higher `seq`, supersedes it.
+    type: object
+    additionalProperties: false
+    required:
+      - subject
+      - created_at
+      - seq
+    properties:
+      subject:
+        description: The document the proposal is about, as sent in `location`.
+        type: string
+        minLength: 1
+      created_at:
+        $ref: common.schema.yaml#/$defs/time
+      seq:
+        description: Counts up with each proposal this server process prepares.
+        type: integer
+        minimum: 1

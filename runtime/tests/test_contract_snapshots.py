@@ -331,8 +331,7 @@ def story(client: Client) -> Any:
             },
         )
         await ask("edits.one-edit", "kb_list_edits", {"location": f"{NOTES}/{DESIGN}"})
-        await ask("proposal.demo", "kb_prepare_proposal", PROPOSAL)
-        await ask("proposal.revised", "kb_prepare_proposal", REVISED)
+        await proposal_stories(ask)
         await problem_stories(ask)
         template_catalog = await ask(
             "convention-templates.catalog",
@@ -501,6 +500,7 @@ def masked(sample: str, answer: Any) -> Any:
             changes |= stem in ("document-move", "document-moves") and (
                 (top and key in ("record", "digest")) or key == "record_digest"
             )
+            changes |= stem == "proposal" and key in ("created_at", "seq")
             changes |= key == "digest" and (
                 node.get("name")
                 in (RECORD, ".knowledge-bus/plugins/knowledge-mcp/conventions.yaml")
@@ -572,6 +572,16 @@ def test_move_snapshot_masks_record_time_and_retains_document_digests():
     assert masked("document-move.ready", first) == masked("document-move.ready", second)
     second["based_on"]["documents"] = [{"path": "a.md", "digest": "changed content"}]
     assert masked("document-move.ready", first) != masked("document-move.ready", second)
+
+
+async def proposal_stories(ask):
+    await ask("proposal.demo", "kb_prepare_proposal", PROPOSAL)
+    await ask("proposal.revised", "kb_prepare_proposal", REVISED)
+    await ask(
+        "proposal.based-on",
+        "kb_prepare_proposal",
+        {**PROPOSAL, "document_digest": "sha256:" + "ab" * 32},
+    )
 
 
 async def batch_stories(ask):
