@@ -31,3 +31,13 @@ test("arrow keys move between tabs", async () => {
   const second = screen.getByRole("tab", { name: "Links (5)" });
   expect(document.activeElement).toBe(second);
 });
+
+test("Base UI marks orientation and the active tab, which drive the layout and underline", () => {
+  render(<Tabs tabs={tabs} />);
+  const first = screen.getByRole("tab", { name: "Moves (3)" });
+  expect(first.getAttribute("data-orientation")).toBe("horizontal");
+  expect(first.hasAttribute("data-active")).toBe(true);
+  expect(first.className).toContain("data-active:after:opacity-100");
+  expect(first.className).toContain("focus-visible:shadow-(--km-focus-ring)!");
+  expect(first.closest("[data-slot=tabs]")?.className).toContain("flex-col");
+});

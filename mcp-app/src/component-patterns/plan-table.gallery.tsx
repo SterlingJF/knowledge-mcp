@@ -6,6 +6,13 @@ const mono = (t: string) => (
   <span className="font-(family-name:--font-mono) wrap-anywhere">{t}</span>
 );
 
+const file = (name: string, from: string) => (
+  <PlanLines
+    primary={<b className="font-(--font-weight-semibold)">{name}</b>}
+    secondary={from}
+  />
+);
+
 const moves = (
   <PlanTable
     headers={["File", "Goes to"]}
@@ -14,31 +21,28 @@ const moves = (
       {
         id: "1",
         cells: [
-          <PathChip path="retire-evening.md" />,
+          file("build-review-notes.md", "Inbox"),
           <PlanLines
-            primary={mono("Decisions/2026-10-28 retire evening build.md")}
-            secondary="Decision record"
+            primary="Meetings/"
+            secondary="as 2026-10-27 build review.md"
           />,
         ],
       },
       {
         id: "2",
         cells: [
-          <PathChip path="build-review-notes.md" />,
+          file("retire-evening.md", "Inbox"),
           <PlanLines
-            primary={mono("Calendar/Meetings/2026-10-27 build review.md")}
-            secondary="Meeting notes"
+            primary="Decisions/"
+            secondary="as 2026-10-28 retire evening build.md"
           />,
         ],
       },
       {
         id: "3",
         cells: [
-          <PathChip path="timings-notes.md" />,
-          <PlanLines
-            primary={mono("Proposals/timings-notes.md")}
-            secondary="Design proposal"
-          />,
+          file("timings-notes.md", "Inbox"),
+          <PlanLines primary="Proposals/" />,
         ],
       },
     ]}

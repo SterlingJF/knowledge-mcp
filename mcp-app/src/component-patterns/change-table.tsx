@@ -9,19 +9,13 @@ import type { ProposalCell, ProposalRow, Source } from "@/contracts/proposal";
 import { label as labels, line, source as sourceCopy } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
-const xs =
-  "text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height)";
-const headClass = cn(
-  xs,
-  "font-(--font-weight-semibold) text-(--color-text-secondary) @max-[560px]:sr-only",
-);
+import { tableLabel, tableRow } from "./table-classes";
+
+const headClass = cn(tableLabel, "@max-[560px]:sr-only");
 // A left-out row: its text is struck and tertiary; the tick box stays at full strength.
 const tertiary = "text-(--color-text-tertiary)";
 // Only text spans are struck: a strike on the cell would reach the evidence mark.
 const struck = "line-through";
-// Wide: four columns. Narrow (container under 560px): each row stacks.
-const rowBase =
-  "grid items-start gap-x-(--km-space-5) gap-y-(--km-space-3) border-b-(length:--border-width-regular) border-(--color-border-tertiary) py-(--km-space-4) @max-[560px]:grid-cols-1";
 const editCols =
   "grid-cols-[auto_minmax(0,29fr)_minmax(0,42fr)_minmax(0,29fr)]";
 // Draft: Cn, Section, Draft, Source (D05F).
@@ -104,7 +98,7 @@ export function ChangeTable({
   className,
 }: ChangeTableProps) {
   const frozen = draft || onKeptChange == null;
-  const rowClass = cn(rowBase, draft ? draftCols : editCols);
+  const rowClass = cn(tableRow, draft ? draftCols : editCols);
   const keptSet = kept ?? new Set(rows.map((_, i) => i + 1));
   const isKept = (n: number) => frozen || keptSet.has(n);
 
