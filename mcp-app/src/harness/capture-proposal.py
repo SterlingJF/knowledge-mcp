@@ -42,7 +42,7 @@ def main() -> None:
         assert not result.is_error, result.content
         out = HERE / f"{name}.result.json"
         out.write_text(json.dumps(result.structured_content, indent=2) + "\n")
-        print(f"wrote {out}")
+        sys.stdout.write(f"wrote {out}\n")
 
 
 if __name__ == "__main__":

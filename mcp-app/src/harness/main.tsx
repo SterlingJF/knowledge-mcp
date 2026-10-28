@@ -63,9 +63,6 @@ function Frame({
       log,
       displayMode: (asked) => {
         setMode(asked);
-        bridge.setHostContext(
-          hostContext({ ...viewRef.current, displayMode: asked }),
-        );
         return asked;
       },
       height: setHeight,
