@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { StaticCardHost, stubCardHost } from "@/bridge/static";
 import { action, badge, frozen, label, line } from "@/copy/en";
 import type { CardAction } from "./card-shell";
@@ -22,51 +23,54 @@ const actions: CardAction[] = [
 
 const joined = (...parts: string[]) => parts.join(line.summaryJoin);
 
-const summary = (
+const card = (
+  <SummaryCard
+    why={line.waitsBecause("cache-proposal.md")}
+    eyebrow="Proposed changes"
+    title="Focus the proposal on retiring the evening build"
+    badge={{ tone: "waiting", label: badge.waiting.nothingSaved }}
+    meta={exampleMeta}
+    actions={actions}
+    lifecycle={live}
+    rows={[
+      {
+        label: label.changes,
+        value: joined(
+          "C1 Title",
+          "C2 Motivation",
+          "C3 Status",
+          "C4 Open question",
+        ),
+      },
+      {
+        label: label.evidence,
+        value: joined(
+          "1 supported",
+          "1 partly answered",
+          "1 conflicting",
+          "1 suggested",
+        ),
+      },
+      {
+        label: label.needsYou,
+        value: (
+          <>
+            <b>C3 Status</b>
+            {line.summaryJoin}slide 7 approved, notes disputed
+          </>
+        ),
+      },
+      {
+        label: label.leftOut,
+        value: joined("vendor-quote.xlsx", "release-calendar.md"),
+      },
+    ]}
+  />
+);
+
+const framed = (body: ReactNode) => (
   <StaticCardHost host={stubCardHost()}>
-    <HarnessFrame>
-      <SummaryCard
-        eyebrow="Proposed changes"
-        title="Focus the proposal on retiring the evening build"
-        badge={{ tone: "waiting", label: badge.waiting.nothingSaved }}
-        meta={exampleMeta}
-        actions={actions}
-        lifecycle={live}
-        rows={[
-          {
-            label: label.changes,
-            value: joined(
-              "C1 Title",
-              "C2 Motivation",
-              "C3 Status",
-              "C4 Open question",
-            ),
-          },
-          {
-            label: label.evidence,
-            value: joined(
-              "1 supported",
-              "1 partly answered",
-              "1 conflicting",
-              "1 suggested",
-            ),
-          },
-          {
-            label: label.needsYou,
-            value: (
-              <>
-                <b>C3 Status</b>
-                {line.summaryJoin}slide 7 approved, notes disputed
-              </>
-            ),
-          },
-          {
-            label: label.leftOut,
-            value: joined("vendor-quote.xlsx", "release-calendar.md"),
-          },
-        ]}
-      />
-    </HarnessFrame>
+    <HarnessFrame>{body}</HarnessFrame>
   </StaticCardHost>
 );
 
@@ -74,8 +78,8 @@ export default {
   id: "P07",
   name: "Summary",
   stories: {
-    Summary: summary,
+    Summary: framed(card),
     // The narrowest phone: the header stacks and each label sits above its value.
-    "Summary at 360px": <div style={{ width: "360px" }}>{summary}</div>,
+    "Summary at 360px": framed(<div className="w-[360px]">{card}</div>),
   },
 };

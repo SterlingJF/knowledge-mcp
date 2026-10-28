@@ -98,7 +98,8 @@ export function ChangeTable({
   className,
 }: ChangeTableProps) {
   const frozen = draft || onKeptChange == null;
-  const rowClass = cn(tableRow, draft ? draftCols : editCols);
+  // One grid for the table; each row is a subgrid, so header and body columns line up.
+  const rowClass = cn(tableRow, "col-span-full grid-cols-subgrid");
   const keptSet = kept ?? new Set(rows.map((_, i) => i + 1));
   const isKept = (n: number) => frozen || keptSet.has(n);
 
@@ -125,7 +126,8 @@ export function ChangeTable({
     <div
       role="table"
       className={cn(
-        "@container text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary)",
+        "grid gap-x-(--km-gap-group) text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary) @max-[560px]:grid-cols-1",
+        draft ? draftCols : editCols,
         className,
       )}
     >

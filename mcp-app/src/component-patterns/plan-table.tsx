@@ -62,7 +62,7 @@ export function PlanTable({
       role="table"
       style={style}
       className={cn(
-        "@container text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary)",
+        "text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary)",
         className,
       )}
     >
