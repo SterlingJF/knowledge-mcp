@@ -39,6 +39,37 @@ export function ChangeNumber({
   );
 }
 
+/** K05's tick box with any label, for a single yes-or-no answer (a one-option decision row). */
+export function TickBox({
+  label,
+  checked,
+  onCheckedChange,
+  className,
+}: {
+  label: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  className?: string;
+}) {
+  return (
+    <label
+      className={cn(
+        rowClass,
+        // A long label wraps; the box stays on the first line.
+        "cursor-pointer items-start whitespace-normal font-(family-name:--font-sans) text-(--color-text-primary)",
+        className,
+      )}
+    >
+      <Checkbox
+        className={cn(boxClass, "mt-[calc((1lh-var(--km-check))/2)] shrink-0")}
+        checked={checked}
+        onCheckedChange={(c) => onCheckedChange(c)}
+      />
+      <span className="min-w-0">{label}</span>
+    </label>
+  );
+}
+
 /** The header box: ticks every row, clears every row, or shows a dash when some are left out. */
 export function SelectAll({
   keptCount,
