@@ -10520,6 +10520,11 @@
               },
               "received": {
                 "$ref": "common.schema.yaml#/$defs/received"
+              },
+              "card": {
+                "description": "The proposed conventions as markdown. Show it in your reply unchanged.",
+                "type": "string",
+                "minLength": 1
               }
             },
             "additionalProperties": false
@@ -15183,6 +15188,11 @@
                 "items": {
                   "$ref": "common.schema.yaml#/$defs/document_move"
                 }
+              },
+              "card": {
+                "description": "The move plan as markdown. Show it in your reply unchanged.",
+                "type": "string",
+                "minLength": 1
               }
             },
             "additionalProperties": false

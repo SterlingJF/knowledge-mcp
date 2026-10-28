@@ -95,7 +95,7 @@ def call(tool="kb_list_conventions", server=None, **extra):
         ),
     )
     if not result.is_error:
-        assert json.loads(texts(result)[0]) == result.structured_content
+        assert json.loads(texts(result)[-1]) == result.structured_content
     return result.structured_content
 
 
@@ -306,7 +306,7 @@ def test_r20_stdio(tmp_path):
         )
         assert tool.output_schema
         Draft202012Validator(tool.output_schema).validate(result.structured_content)
-        assert json.loads(texts(result)[0]) == result.structured_content
+        assert json.loads(texts(result)[-1]) == result.structured_content
 
     session(server_parameters(tmp_path / "state"), steps)
 
