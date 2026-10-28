@@ -166,7 +166,6 @@ window.KMT = {
     "--km-eyebrow-tracking": "0.07em",
     "--km-opacity-hover": "0.88",
     "--km-opacity-dim": "0.55",
-    "--km-opacity-out": "0.45",
     "--km-opacity-disabled": "0.4",
   },
   layout: {
