@@ -1,0 +1,50 @@
+---
+# Without a naming rule, the filing note says why it chose the path.
+schema: knowledge-mcp/proposal/1
+summary: Cache rollout
+rows:
+  - proposed:
+      label: Motivation
+      text: Cache misses add 40 minutes to each evening run
+    mark: supported
+    sources:
+      - file: build-timings.xlsx
+        place: Cache!B2:B9
+  - proposed:
+      label: Alternatives
+      text: A hosted build service, priced but not compared
+    mark: partly
+    sources:
+      - file: vendor-quote.xlsx
+document_type:
+  id: design-proposal
+  label: Design proposal
+reader:
+  id: maintainers
+  label: maintainers deciding whether to accept it
+  confirmed: false
+filing:
+  path: Proposals/cache-rollout.md
+  naming_rule: null
+open_questions:
+  - label: Rollout owner
+    text: Who owns the rollout?
+card: |
+  `PROPOSED CHANGES` · `Nothing saved`
+
+  **Cache rollout**
+
+  Design proposal · for maintainers deciding whether to accept it (reader is a guess)
+
+  Saved as `Proposals/cache-rollout.md` · no naming rule: none for Design proposals, so it goes beside cache-proposal.md
+
+  | ID | Current | Proposed | Source |
+  | --- | --- | --- | --- |
+  | C1 | — | ● Supported · **Motivation:** Cache misses add 40 minutes to each evening run | `build-timings.xlsx › Cache!B2:B9` |
+  | C2 | — | ◐ Partly answered · **Alternatives:** A hosted build service, priced but not compared | `vendor-quote.xlsx` |
+
+  ? Needs you · **Rollout owner** · no source: Who owns the rollout?
+instance:
+  subject: ~/notes/Proposals/cache-rollout.md
+  created_at: "2026-10-28T07:23:24.511Z"
+  seq: 3

@@ -14,17 +14,6 @@ $defs:
       such as `docs/rfcs/0042-cache.md`.
     type: string
     minLength: 1
-  file_source:
-    title: File source
-    description: A whole file, with no line or place, such as a sheet you read in full.
-    type: object
-    additionalProperties: false
-    required:
-      - file
-    properties:
-      file:
-        type: string
-        minLength: 1
   fingerprint:
     title: Fingerprint
     description:

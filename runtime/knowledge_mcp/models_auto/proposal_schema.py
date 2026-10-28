@@ -1,7 +1,7 @@
 # Generated from contracts/extensions/mcp/v1 by just generate_contract_types. Edit the schemas, not this file.
 
 from pydantic import BaseModel, ConfigDict, Field
-from ._internal import Digest, FileSource, Path, Time
+from ._internal import Digest, Path, Time
 from typing import Annotated, Literal
 from . import problem_schema
 
@@ -65,6 +65,17 @@ class PlaceSource(BaseModel):
     ]
 
 
+class FileSource(BaseModel):
+    """
+    A whole file, with no line or place, such as a sheet you read in full.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    file: Annotated[str, Field(min_length=1)]
+
+
 class PersonSource(BaseModel):
     """
     The person's words in this conversation.
@@ -78,7 +89,7 @@ class PersonSource(BaseModel):
 
 class ProposalDocumentType(BaseModel):
     """
-    The document's type, from kb_get_document_type.
+    The document's type, from kb_get_document_type. Send it whenever you know it.
     """
 
     model_config = ConfigDict(
@@ -90,7 +101,7 @@ class ProposalDocumentType(BaseModel):
 
 class ProposalReader(BaseModel):
     """
-    The audience choice the document is for, from kb_list_audiences.
+    The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.
     """
 
     model_config = ConfigDict(
@@ -204,9 +215,22 @@ class Proposal(BaseModel):
             min_length=1,
         ),
     ]
-    document_type: ProposalDocumentType | None = None
-    reader: ProposalReader | None = None
-    filing: FilingNote | None = None
+    document_type: Annotated[
+        ProposalDocumentType | None,
+        Field(description="The document's type, from kb_get_document_type."),
+    ] = None
+    reader: Annotated[
+        ProposalReader | None,
+        Field(
+            description="Who the document is for, from kb_list_audiences, and whether the person confirmed it."
+        ),
+    ] = None
+    filing: Annotated[
+        FilingNote | None,
+        Field(
+            description="For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document."
+        ),
+    ] = None
     open_questions: Annotated[
         list[ProposalCell] | None,
         Field(description="Questions no source answers, apart from conflicting rows."),

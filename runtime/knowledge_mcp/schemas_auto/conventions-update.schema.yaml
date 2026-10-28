@@ -338,17 +338,6 @@ $defs:
         description: Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.
         type: string
         minLength: 1
-      file_source:
-        title: File source
-        description: A whole file, with no line or place, such as a sheet you read in full.
-        type: object
-        required:
-          - file
-        properties:
-          file:
-            type: string
-            minLength: 1
-        additionalProperties: false
       fingerprint:
         title: Fingerprint
         description: A value that changes only when the file content changes, such as SHA-256 or Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing` that moved.

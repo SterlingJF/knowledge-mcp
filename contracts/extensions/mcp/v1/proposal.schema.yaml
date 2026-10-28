@@ -35,10 +35,13 @@ $defs:
           $ref: "#/$defs/row"
       document_type:
         $ref: "#/$defs/document_type"
+        description: The document's type, from kb_get_document_type.
       reader:
         $ref: "#/$defs/reader"
+        description: Who the document is for, from kb_list_audiences, and whether the person confirmed it.
       filing:
         $ref: "#/$defs/filing"
+        description: For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document.
       open_questions:
         description: Questions no source answers, apart from conflicting rows.
         type: array
@@ -89,7 +92,7 @@ $defs:
             - $ref: "#/$defs/line_source"
             - $ref: "#/$defs/place_source"
             - $ref: "#/$defs/person_source"
-            - $ref: common.schema.yaml#/$defs/file_source
+            - $ref: "#/$defs/file_source"
   cell:
     title: Proposal cell
     type: object
@@ -144,6 +147,17 @@ $defs:
         description: Such as `Evening!A2:D10` or `slide 7`.
         type: string
         minLength: 1
+  file_source:
+    title: File source
+    description: A whole file, with no line or place, such as a sheet you read in full.
+    type: object
+    additionalProperties: false
+    required:
+      - file
+    properties:
+      file:
+        type: string
+        minLength: 1
   person_source:
     title: Person source
     description: The person's words in this conversation.
@@ -157,7 +171,7 @@ $defs:
         minLength: 1
   document_type:
     title: Proposal document type
-    description: The document's type, from kb_get_document_type.
+    description: The document's type, from kb_get_document_type. Send it whenever you know it.
     type: object
     additionalProperties: false
     required:
@@ -174,7 +188,7 @@ $defs:
         minLength: 1
   reader:
     title: Proposal reader
-    description: The audience choice the document is for, from kb_list_audiences.
+    description: The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.
     type: object
     additionalProperties: false
     required:
@@ -200,6 +214,18 @@ $defs:
     required:
       - path
       - naming_rule
+    if:
+      type: object
+      properties:
+        naming_rule:
+          type: "null"
+    then:
+      type: object
+      required:
+        - reason
+      properties:
+        reason:
+          type: string
     properties:
       path:
         $ref: common.schema.yaml#/$defs/path

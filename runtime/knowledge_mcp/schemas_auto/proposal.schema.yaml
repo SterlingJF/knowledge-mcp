@@ -32,10 +32,13 @@ $defs:
         items:
           $ref: "#/$defs/row"
       document_type:
+        description: The document's type, from kb_get_document_type.
         $ref: "#/$defs/document_type"
       reader:
+        description: Who the document is for, from kb_list_audiences, and whether the person confirmed it.
         $ref: "#/$defs/reader"
       filing:
+        description: For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document.
         $ref: "#/$defs/filing"
       open_questions:
         description: Questions no source answers, apart from conflicting rows.
@@ -87,7 +90,7 @@ $defs:
             - $ref: "#/$defs/line_source"
             - $ref: "#/$defs/place_source"
             - $ref: "#/$defs/person_source"
-            - $ref: common.schema.yaml#/$defs/file_source
+            - $ref: "#/$defs/file_source"
     additionalProperties: false
   cell:
     title: Proposal cell
@@ -143,6 +146,17 @@ $defs:
         type: string
         minLength: 1
     additionalProperties: false
+  file_source:
+    title: File source
+    description: A whole file, with no line or place, such as a sheet you read in full.
+    type: object
+    required:
+      - file
+    properties:
+      file:
+        type: string
+        minLength: 1
+    additionalProperties: false
   person_source:
     title: Person source
     description: The person's words in this conversation.
@@ -156,7 +170,7 @@ $defs:
     additionalProperties: false
   document_type:
     title: Proposal document type
-    description: The document's type, from kb_get_document_type.
+    description: The document's type, from kb_get_document_type. Send it whenever you know it.
     type: object
     required:
       - id
@@ -173,7 +187,7 @@ $defs:
     additionalProperties: false
   reader:
     title: Proposal reader
-    description: The audience choice the document is for, from kb_list_audiences.
+    description: The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.
     type: object
     required:
       - id
@@ -195,6 +209,18 @@ $defs:
     title: Filing note
     description: Where a new document will be saved and why. Omit it for an existing document.
     type: object
+    if:
+      type: object
+      properties:
+        naming_rule:
+          type: "null"
+    then:
+      type: object
+      required:
+        - reason
+      properties:
+        reason:
+          type: string
     required:
       - path
       - naming_rule
@@ -629,17 +655,6 @@ $defs:
         description: Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.
         type: string
         minLength: 1
-      file_source:
-        title: File source
-        description: A whole file, with no line or place, such as a sheet you read in full.
-        type: object
-        required:
-          - file
-        properties:
-          file:
-            type: string
-            minLength: 1
-        additionalProperties: false
       fingerprint:
         title: Fingerprint
         description: A value that changes only when the file content changes, such as SHA-256 or Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing` that moved.
