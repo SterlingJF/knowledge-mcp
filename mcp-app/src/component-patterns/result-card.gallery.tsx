@@ -87,24 +87,6 @@ export default {
     "R02 change open at 360px": at("360", <Saved open />),
     "R03 undone at 760px": at("760", undone),
     "R03 undone at 360px": at("360", undone),
-    Result: (
-      <HarnessFrame>
-        <ResultCard
-          kind="result"
-          eyebrow="Saved"
-          title="cache-proposal.md · 4 changes"
-          badgeLabel={badge.done.saved}
-          when="Oct 28, 09:41"
-          undoMessage=""
-          secondary={{
-            label: action.showChange,
-            message: "",
-            frozenLine: frozen.approved,
-          }}
-          lifecycle={live}
-        />
-      </HarnessFrame>
-    ),
     Refusal: (
       <HarnessFrame>
         <ResultCard

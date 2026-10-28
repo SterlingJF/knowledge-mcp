@@ -8,6 +8,7 @@ import type { BadgeTone } from "@/component-elements/badge";
 import { Button } from "@/component-elements/button";
 import type { ButtonVariant } from "@/component-elements/button";
 import { FullViewButton } from "@/component-elements/full-view-button";
+import { LinkButton } from "@/component-elements/link-button";
 import {
   Eyebrow,
   FrozenLine,
@@ -138,15 +139,13 @@ export function CardShell({
             </Button>
           ))}
           {disclosure && (
-            <button
-              type="button"
+            <LinkButton
               aria-expanded={disclosure.expanded}
               aria-controls={disclosure.controls}
               onClick={disclosure.onToggle}
-              className="relative inline-flex cursor-pointer items-center rounded-(--border-radius-xs) border-0 bg-transparent p-0 text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary) underline underline-offset-2 outline-none focus-visible:shadow-(--km-focus-ring) before:absolute before:top-1/2 before:left-1/2 before:h-(--km-target) before:w-full before:min-w-(--km-target) before:-translate-1/2 before:content-['']"
             >
               {disclosure.label}
-            </button>
+            </LinkButton>
           )}
         </div>
       )}

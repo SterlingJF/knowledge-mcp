@@ -111,6 +111,17 @@ const blockers: DecisionRow[] = [
       { value: "c", label: "Link to Proposals/timings-notes" },
     ],
   },
+  {
+    id: "notype",
+    name: "No document type",
+    cells: [
+      <span>
+        <b className="font-(--font-weight-semibold)">scan-0412.md</b> has no
+        document type
+      </span>,
+    ],
+    options: [],
+  },
 ];
 
 function Blockers() {
