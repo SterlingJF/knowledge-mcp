@@ -1,8 +1,20 @@
 # Generated from contracts/extensions/mcp/v1 by just generate_contract_types. Edit the schemas, not this file.
 
-from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
+from ._internal import Digest, Time
+from typing import Annotated, Literal
 from . import problem_schema
+
+
+class ProposalInputs(BaseModel):
+    """
+    The input digest to recheck before saving. Present when `document_digest` was sent.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    document_digest: Digest
 
 
 class ProposalCell(BaseModel):
@@ -72,6 +84,31 @@ class LeftOutFile(BaseModel):
     reason: Annotated[str, Field(min_length=1)]
 
 
+class ProposalInstance(BaseModel):
+    """
+    Identifies this card among earlier cards for the same document. A card with a later `created_at`, then a higher `seq`, supersedes it. Ordering uses server wall-clock time, then `seq`.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    subject: Annotated[
+        str,
+        Field(
+            description="The document the proposal is about, as sent in `location`.",
+            min_length=1,
+        ),
+    ]
+    created_at: Time
+    seq: Annotated[
+        int,
+        Field(
+            description="Counts up with each proposal this server process prepares.",
+            ge=1,
+        ),
+    ]
+
+
 class ProposalRow(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -116,6 +153,14 @@ class Proposal(BaseModel):
             min_length=1,
         ),
     ]
+    based_on: Annotated[
+        ProposalInputs | None,
+        Field(
+            description="The input digest to recheck before saving. Present when `document_digest` was sent.",
+            title="Proposal inputs",
+        ),
+    ] = None
+    instance: ProposalInstance | None = None
 
 
 type KbPrepareProposalResult = Annotated[

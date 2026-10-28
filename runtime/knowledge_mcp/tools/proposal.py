@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 from functools import partial
+from itertools import count
 from typing import Annotated
 
 from mcp.server import MCPServer
 from mcp.types import CallToolResult
 from pydantic import Field
 
-from knowledge_mcp import problems
+from knowledge_mcp import log, problems
+from knowledge_mcp.models_auto.common_schema import Digest
 from knowledge_mcp.models_auto.proposal_schema import (
     LeftOutFile,
     PersonSource,
@@ -23,6 +25,14 @@ PREPARE = """\
 Prepare the proposed-changes card whenever you propose changes to a document, before any edit. Send each change as a row with its sources and evidence mark, and each file you read but didn't cite. Returns the card as markdown in `card` and saves nothing. Show `card` in your reply unchanged, then add your own lines. Appends the answer to `log.jsonl` and opens no knowledge-base file.
 """
 FIELDS = Proposal.model_fields
+DOCUMENT_DIGEST = Field(
+    description=(
+        "The SHA-256 of the document's current text as UTF-8, written `sha256:` plus "
+        "64 lowercase hex digits. Send it whenever you've read the document, so the "
+        "card can refuse a save after the document changes. The answer returns it "
+        "in `based_on`."
+    )
+)
 
 
 def _uncited(rows: list[ProposalRow], left_out: list[LeftOutFile]) -> None:
@@ -42,6 +52,7 @@ def _uncited(rows: list[ProposalRow], left_out: list[LeftOutFile]) -> None:
 def register(mcp: MCPServer, workspace: Workspace) -> None:
     """Ignore `workspace`, which only keeps this signature the same as the other register() functions."""
     del workspace
+    seq = count(1)
 
     @mcp.tool(
         name="kb_prepare_proposal",
@@ -60,6 +71,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
                 description="`list` in a terminal, which can't scroll a wide table sideways."
             ),
         ] = "table",
+        document_digest: Annotated[Digest | None, DOCUMENT_DIGEST] = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
@@ -67,12 +79,20 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             rows=rows,
             left_out=left_out,
             layout=layout,
+            document_digest=document_digest,
         )
         _uncited(rows, left_out or [])
         data = {"schema": "knowledge-mcp/proposal/1"} | {
             name: arguments[name]
             for name in ("summary", "rows", "left_out")
             if name in arguments
+        }
+        if document_digest is not None:
+            data["based_on"] = {"document_digest": arguments["document_digest"]}
+        data["instance"] = {
+            "subject": location,
+            "created_at": log.now(),
+            "seq": next(seq),
         }
         return respond.answer(
             "kb_prepare_proposal",
