@@ -158,4 +158,38 @@ describe("SegmentedChoice", () => {
     ).toThrow("2 or more options");
     vi.restoreAllMocks();
   });
+
+  it("stacks in the same commit as a shrinking resize, before any paint", () => {
+    let fire = () => {};
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(cb: () => void) {
+          fire = cb;
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    const width = vi
+      .spyOn(HTMLElement.prototype, "clientWidth", "get")
+      .mockReturnValue(400);
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(300);
+    render(
+      <SegmentedChoice
+        aria-label="x"
+        options={two}
+        value={null}
+        onValueChange={() => {}}
+      />,
+    );
+    const group = screen.getByRole("radiogroup");
+    expect(group.getAttribute("data-layout")).toBe("row");
+    width.mockReturnValue(200);
+    // No act(): the observer callback itself must commit the stacked layout synchronously.
+    fire();
+    expect(group.getAttribute("data-layout")).toBe("stacked");
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
 });

@@ -1,5 +1,6 @@
 // K11 Segmented choice: pick one of 2 or more answers. 2–3 sit side by side and stack when they don't fit; 4+ always stack.
 import { useLayoutEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 
 import { ToggleGroup, ToggleGroupItem } from "@/component-core/toggle-group";
 import { cn } from "@/lib/utils";
@@ -54,10 +55,14 @@ function useStacked(always: boolean, key: string) {
       const w = wrap.current;
       const g = group.current;
       if (!w || !g) return;
-      setStacked((was) => {
-        if (!was) natural.current = g.scrollWidth;
-        return natural.current > w.clientWidth;
-      });
+      // ResizeObserver runs after layout and before paint; committing synchronously means the
+      // overflowing row is never painted.
+      flushSync(() =>
+        setStacked((was) => {
+          if (!was) natural.current = g.scrollWidth;
+          return natural.current > w.clientWidth;
+        }),
+      );
     });
     ro.observe(wrap.current);
     return () => ro.disconnect();
