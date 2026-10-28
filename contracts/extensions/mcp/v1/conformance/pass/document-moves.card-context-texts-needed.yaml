@@ -1,0 +1,126 @@
+---
+schema: knowledge-mcp/document-moves/1
+location: unreachable://vault
+status: texts_needed
+allowed_by:
+  basis: instruction
+  text:
+    Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
+    as you work.
+  location: AGENTS.md
+search:
+  - "%"
+  - "%2E%2E%2F%49%6E%62%6F%78%2F%61"
+  - "%2E%2E%2F%49%6E%62%6F%78%2F%61%2E%6D%64"
+  - "%2E%2E%2F%4E%6F%74%65%73%2F%32%30%32%36%2D%31%30%2D%32%38%20%61"
+  - "%2E%2E%2F%4E%6F%74%65%73%2F%32%30%32%36%2D%31%30%2D%32%38%20%61%2E%6D%64"
+  - "%2E%2E/%49%6E%62%6F%78/%61"
+  - "%2E%2E/%49%6E%62%6F%78/%61.md"
+  - "%2E%2E/%4E%6F%74%65%73/%32%30%32%36%2D%31%30%2D%32%38%20%61"
+  - "%2E%2E/%4E%6F%74%65%73/%32%30%32%36%2D%31%30%2D%32%38%20%61.md"
+  - "%2E%2F%2E%2E%2F%49%6E%62%6F%78%2F%61"
+  - "%2E%2F%2E%2E%2F%49%6E%62%6F%78%2F%61%2E%6D%64"
+  - "%2E%2F%2E%2E%2F%4E%6F%74%65%73%2F%32%30%32%36%2D%31%30%2D%32%38%20%61"
+  - "%2E%2F%2E%2E%2F%4E%6F%74%65%73%2F%32%30%32%36%2D%31%30%2D%32%38%20%61%2E%6D%64"
+  - "%2E%2F%32%30%32%36%2D%31%30%2D%32%38%20%61"
+  - "%2E%2F%32%30%32%36%2D%31%30%2D%32%38%20%61%2E%6D%64"
+  - "%2E%2F%61"
+  - "%2E%2F%61%2E%6D%64"
+  - "%2E/%2E%2E/%49%6E%62%6F%78/%61"
+  - "%2E/%2E%2E/%49%6E%62%6F%78/%61.md"
+  - "%2E/%2E%2E/%4E%6F%74%65%73/%32%30%32%36%2D%31%30%2D%32%38%20%61"
+  - "%2E/%2E%2E/%4E%6F%74%65%73/%32%30%32%36%2D%31%30%2D%32%38%20%61.md"
+  - "%2E/%32%30%32%36%2D%31%30%2D%32%38%20%61"
+  - "%2E/%32%30%32%36%2D%31%30%2D%32%38%20%61.md"
+  - "%2E/%61"
+  - "%2E/%61.md"
+  - "%32%30%32%36%2D%31%30%2D%32%38%20%61"
+  - "%32%30%32%36%2D%31%30%2D%32%38%20%61%2E%6D%64"
+  - "%32%30%32%36%2D%31%30%2D%32%38%20%61.md"
+  - "%49%6E%62%6F%78%2F%61"
+  - "%49%6E%62%6F%78%2F%61%2E%6D%64"
+  - "%49%6E%62%6F%78/%61"
+  - "%49%6E%62%6F%78/%61.md"
+  - "%4E%6F%74%65%73%2F%32%30%32%36%2D%31%30%2D%32%38%20%61"
+  - "%4E%6F%74%65%73%2F%32%30%32%36%2D%31%30%2D%32%38%20%61%2E%6D%64"
+  - "%4E%6F%74%65%73/%32%30%32%36%2D%31%30%2D%32%38%20%61"
+  - "%4E%6F%74%65%73/%32%30%32%36%2D%31%30%2D%32%38%20%61.md"
+  - "%61"
+  - "%61%2E%6D%64"
+  - "%61.md"
+  - ../Inbox/%61
+  - ../Inbox/%61.md
+  - ../Inbox/a
+  - ../Inbox/a.md
+  - ../Notes/%32%30%32%36%2D%31%30%2D%32%38%20%61
+  - ../Notes/%32%30%32%36%2D%31%30%2D%32%38%20%61.md
+  - ../Notes/2026-10-28 a
+  - ../Notes/2026-10-28 a.md
+  - ../Notes/2026-10-28%20a
+  - ../Notes/2026-10-28%20a.md
+  - ./%32%30%32%36%2D%31%30%2D%32%38%20%61
+  - ./%32%30%32%36%2D%31%30%2D%32%38%20%61.md
+  - ./%61
+  - ./%61.md
+  - ./../Inbox/%61
+  - ./../Inbox/%61.md
+  - ./../Inbox/a
+  - ./../Inbox/a.md
+  - ./../Notes/%32%30%32%36%2D%31%30%2D%32%38%20%61
+  - ./../Notes/%32%30%32%36%2D%31%30%2D%32%38%20%61.md
+  - ./../Notes/2026-10-28 a
+  - ./../Notes/2026-10-28 a.md
+  - ./../Notes/2026-10-28%20a
+  - ./../Notes/2026-10-28%20a.md
+  - ./2026-10-28 a
+  - ./2026-10-28 a.md
+  - ./2026-10-28%20a
+  - ./2026-10-28%20a.md
+  - ./a
+  - ./a.md
+  - 2026-10-28 a
+  - 2026-10-28 a.md
+  - 2026-10-28%20a
+  - 2026-10-28%20a.md
+  - Inbox/%61
+  - Inbox/%61.md
+  - Inbox/a
+  - Inbox/a.md
+  - Notes/%32%30%32%36%2D%31%30%2D%32%38%20%61
+  - Notes/%32%30%32%36%2D%31%30%2D%32%38%20%61.md
+  - Notes/2026-10-28 a
+  - Notes/2026-10-28 a.md
+  - Notes/2026-10-28%20a
+  - Notes/2026-10-28%20a.md
+  - a
+  - a.md
+based_on:
+  listing_digest: sha256:de12a74c0341a49f6a674b1b756ceb8077fcb4b616f4fed27ed750f9e07ff2fd
+  record_digest: sha256:39cfaeada1319c6351e622e3acd249e48b8a37640ffd13c392ad60a9b74ea139
+  documents:
+    - path: Inbox/a.md
+      digest: sha256:2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881
+    - path: Inbox/scan-0412.md
+      digest: sha256:a1fce4363854ff888cff4b8e7875d600c2682390412a8cf79b37d0b11148b0fa
+  configuration: []
+writes: []
+record: null
+digest: null
+links: []
+issues: []
+received:
+  - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
+    digest: sha256:39cfaeada1319c6351e622e3acd249e48b8a37640ffd13c392ad60a9b74ea139
+moves:
+  - old_path: Inbox/a.md
+    path: Notes/2026-10-28 a.md
+affected_documents: []
+record_changes: []
+summary: File the new files
+folder: Inbox
+stays:
+  - path: Inbox/scan-0412.md
+    reason: no document type
+naming:
+  - path: Notes/2026-10-28 a.md
+    rule: date + title

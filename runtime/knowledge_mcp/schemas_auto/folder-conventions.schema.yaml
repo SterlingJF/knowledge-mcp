@@ -1038,6 +1038,37 @@ $defs:
           path:
             $ref: "#/$defs/move_path"
         additionalProperties: false
+      move_stay:
+        title: Move stay
+        description: A file the assistant leaves where it is, with the reason the person sees.
+        type: object
+        required:
+          - path
+          - reason
+        properties:
+          path:
+            $ref: "#/$defs/move_path"
+          reason:
+            description: Why the file stays, such as `no document type`.
+            type: string
+            minLength: 1
+        additionalProperties: false
+      move_naming:
+        title: Move naming
+        description: The naming rule or convention that produced a move's destination name.
+        type: object
+        required:
+          - path
+          - rule
+        properties:
+          path:
+            description: The destination `path` of one move in `moves`.
+            $ref: "#/$defs/move_path"
+          rule:
+            description: The rule in a few words, such as `date + title`.
+            type: string
+            minLength: 1
+        additionalProperties: false
       edit_operation:
         title: Edit operation
         type: object

@@ -622,6 +622,37 @@ async def batch_stories(ask):
             "kb_prepare_document_moves",
             {**args, "searched": True, "search": result["search"]},
         )
+    inbox = {"Inbox/a.md": "x", "Inbox/scan-0412.md": "y"}
+    args = arguments(
+        inbox,
+        [("Inbox/a.md", "Notes/2026-10-28 a.md")],
+        allowed_by=INSTRUCTION,
+        summary="File the new files",
+        folder="Inbox",
+        stays=[dict(path="Inbox/scan-0412.md", reason="no document type")],
+        naming=[dict(path="Notes/2026-10-28 a.md", rule="date + title")],
+    )
+    result = await ask(
+        "document-moves.card-context-texts-needed", "kb_prepare_document_moves", args
+    )
+    await ask(
+        "document-moves.card-context",
+        "kb_prepare_document_moves",
+        {**args, "searched": True, "search": result["search"]},
+    )
+    args = arguments(
+        {"A.md": "[[Same]]", "x/Same.md": "1", "y/Same.md": "2"},
+        [("A.md", "Moved/A.md")],
+        allowed_by=INSTRUCTION,
+    )
+    result = await ask(
+        "document-moves.ambiguous-texts-needed", "kb_prepare_document_moves", args
+    )
+    await ask(
+        "document-moves.ambiguous",
+        "kb_prepare_document_moves",
+        {**args, "searched": True, "search": result["search"]},
+    )
     names, files, conventions, values = six_notes()
     await ask(
         "document-types-update.folder-review",

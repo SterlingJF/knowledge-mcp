@@ -1,7 +1,16 @@
 # Generated from contracts/extensions/mcp/v1 by just generate_contract_types. Edit the schemas, not this file.
 
 from pydantic import BaseModel, ConfigDict, Field
-from ._internal import AllowedBy, Digest, DocumentMove, MovePath, Path, Received
+from ._internal import (
+    AllowedBy,
+    Digest,
+    DocumentMove,
+    MoveNaming,
+    MovePath,
+    MoveStay,
+    Path,
+    Received,
+)
 from typing import Annotated, Literal
 from . import problem_schema
 
@@ -68,6 +77,19 @@ class MoveLink(BaseModel):
     ]
 
 
+class MoveIssueChoice(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    action: Annotated[
+        Literal["skip_move", "bind_link"],
+        Field(
+            description="`skip_move` drops the move of `path` from `moves`. `bind_link` sends a binding for the issue's link with `path` as its target."
+        ),
+    ]
+    path: MovePath
+
+
 class MoveIssue(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -77,6 +99,13 @@ class MoveIssue(BaseModel):
     start: Annotated[int | None, Field(ge=0)]
     end: Annotated[int | None, Field(ge=0)]
     detail: str
+    choices: Annotated[
+        list[MoveIssueChoice] | None,
+        Field(
+            description="Resolutions the server can compute for this issue. Absent when it can compute none.",
+            min_length=1,
+        ),
+    ] = None
 
 
 class DocumentMovesAnswer(BaseModel):
@@ -121,6 +150,32 @@ class DocumentMovesAnswer(BaseModel):
     moves: list[DocumentMove]
     affected_documents: list[DocumentMove]
     record_changes: list[DocumentMove]
+    summary: Annotated[
+        str | None,
+        Field(
+            description="What the moves are for, in one line, echoed from the `summary` argument.",
+            min_length=1,
+        ),
+    ] = None
+    folder: Annotated[
+        str | None,
+        Field(
+            description="The folder the moved files come from, echoed from the `folder` argument.",
+            min_length=1,
+        ),
+    ] = None
+    stays: Annotated[
+        list[MoveStay] | None,
+        Field(
+            description="Files left where they are, with reasons, echoed from the `stays` argument."
+        ),
+    ] = None
+    naming: Annotated[
+        list[MoveNaming] | None,
+        Field(
+            description="The naming rule behind each named destination, echoed from the `naming` argument."
+        ),
+    ] = None
 
 
 type KbPrepareDocumentMovesResult = Annotated[

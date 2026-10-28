@@ -83,6 +83,9 @@ issues:
     detail:
       Destination B.md for A.md conflicts with B.md from B.md. Choose another
       destination or revise the conflicting row.
+    choices:
+      - action: skip_move
+        path: A.md
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
     digest: sha256:fa8a80b3e4c48ff830ec14039b34803bf828b07d348f18464eb592ca86f8b02e
