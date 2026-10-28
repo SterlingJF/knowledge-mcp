@@ -44,6 +44,12 @@
   --km-space-4: 8px;
   --km-space-5: 12px;
   --km-space-6: 16px;
+  --km-space-7: 24px;
+  --km-gap-tight: var(--km-space-2);
+  --km-gap-inline: var(--km-space-4);
+  --km-gap-row: var(--km-space-4);
+  --km-gap-group: var(--km-space-6);
+  --km-gap-section: var(--km-space-7);
   --km-pulse: 1.6s ease-out infinite;
   --km-shimmer: 1.4s ease-in-out infinite;
   --km-target: 44px;
@@ -54,6 +60,7 @@
   --km-dot: 7px;
   --km-label-col: 150px;
   --km-row: 28px;
+  --km-underline: 2px;
   --km-focus-ring: 0 0 0 2px var(--color-background-primary), 0 0 0 4px var(--color-ring-primary);
   --km-eyebrow-tracking: 0.07em;
   --km-opacity-hover: 0.88;

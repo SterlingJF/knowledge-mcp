@@ -131,7 +131,7 @@ window.KMT = {
     "--border-radius-full": "Badges, evidence marks",
   },
   border: { "--border-width-regular": "0.5px" },
-  // Ours, not host variables: spacing has no host equivalent.
+  // Ours, not host variables: spacing has no host equivalent. A 4px base; 2px only inside badges and chips.
   space: {
     "--km-space-1": "2px",
     "--km-space-2": "4px",
@@ -139,14 +139,36 @@ window.KMT = {
     "--km-space-4": "8px",
     "--km-space-5": "12px",
     "--km-space-6": "16px",
+    "--km-space-7": "24px",
   },
   spaceUse: {
-    "--km-space-1": "Icon to text inside a badge",
-    "--km-space-2": "Between chips, between a mark and its text",
-    "--km-space-3": "Grid row gap",
-    "--km-space-4": "Row padding, action gap, note padding (block)",
-    "--km-space-5": "Between card sections, note padding (inline)",
+    "--km-space-1": "Block padding inside a badge or chip",
+    "--km-space-2": "Icon to its label",
+    "--km-space-3": "Block padding inside a button",
+    "--km-space-4": "Inline padding of a badge, row padding",
+    "--km-space-5": "Inline padding of a button or note",
     "--km-space-6": "Gap from any edge (safe area)",
+    "--km-space-7": "Between sections of the full view",
+  },
+  // Spacing by role: components use these, never a bare step, so every card keeps one rhythm.
+  // A gap between groups is twice the gap inside one (proximity), and a group's header sits closer to what follows it.
+  gap: {
+    "--km-gap-tight": "var(--km-space-2)",
+    "--km-gap-inline": "var(--km-space-4)",
+    "--km-gap-row": "var(--km-space-4)",
+    "--km-gap-group": "var(--km-space-6)",
+    "--km-gap-section": "var(--km-space-7)",
+  },
+  gapUse: {
+    "--km-gap-tight":
+      "Inside one heading block: eyebrow to title, title to meta",
+    "--km-gap-inline":
+      "Between items on one line: chip and text, chip and chip, button and button",
+    "--km-gap-row":
+      "Between rows of one group: summary rows, table rows, list rows",
+    "--km-gap-group":
+      "Between groups of a card: header, summary, note, actions",
+    "--km-gap-section": "Between sections of the full view",
   },
   motion: {
     "--km-pulse": "1.6s ease-out infinite",
@@ -162,6 +184,7 @@ window.KMT = {
     "--km-dot": "7px",
     "--km-label-col": "150px",
     "--km-row": "28px",
+    "--km-underline": "2px",
   },
   // One focus ring, one tracking, four opacities: each used by more than one part.
   effect: {

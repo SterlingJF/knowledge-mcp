@@ -481,6 +481,14 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           T.spaceUse[k],
         ]),
       )}</div><div class="one">${tbl(
+        ["Role", "Step", "", "Use"],
+        Object.entries(T.gap).map(([k, v]) => [
+          `<span class="mono">${k}</span>`,
+          v.replace("var(", "").replace(")", ""),
+          `<div class="bar" style="width:${parseInt(T.space[v.slice(4, -1)]) * 4}px"></div>`,
+          T.gapUse[k],
+        ]),
+      )}</div><div class="one">${tbl(
         ["Token", "Size", "", "Use"],
         Object.entries(T.radius).map(([k, v]) => [
           `<span class="mono">${k}</span>`,
@@ -502,9 +510,18 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           'None. Claude offers <span class="mono">--shadow-*</span>; a card sits in the chat, not above it.',
         ],
       ])}</div>`,
-      tokens: ["--km-space-1…6", "--border-radius-*", "--border-width-regular"],
+      tokens: [
+        "--km-gap-*",
+        "--km-space-1…7",
+        "--border-radius-*",
+        "--border-width-regular",
+      ],
       rules: [
-        "Nothing interactive flush against an edge: keep --km-space-6 clear (Claude: the composer can overlay the bottom).",
+        "Claude: “Maintain generous padding and logical groupings. Balance information density with readability.” Components space by role (--km-gap-*), never by a bare step.",
+        "Proximity: a gap between groups is twice the gap inside one (group 16px, row and inline 8px, tight 4px). A heading sits closer to what follows it than to what came before.",
+        "Items on one line sit in a flex row with --km-gap-inline, never a typed space; a wrapped run starts at its own left edge, not under the chip before it.",
+        "Every step is on a 4px base; 2px and 6px only inside a badge, chip or button.",
+        "Nothing interactive flush against an edge: keep --km-space-6 clear, and pad the root by hostContext.safeAreaInsets (Claude: the composer can overlay the bottom).",
         "No margin values outside the scale.",
         "No shadows, no gradients.",
       ],
