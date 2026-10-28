@@ -149,6 +149,16 @@ window.KMT = {
     "--km-shimmer": "1.4s ease-in-out infinite",
   },
   touch: { "--km-target": "44px" },
+  // Fixed sizes with no host variable: icons, the tick box, the pulse dot, the summary label column, a skeleton row.
+  size: {
+    "--km-icon": "13px",
+    "--km-icon-sm": "11px",
+    "--km-check": "15px",
+    "--km-check-border": "1.5px",
+    "--km-dot": "7px",
+    "--km-label-col": "150px",
+    "--km-row": "28px",
+  },
   layout: {
     min: "From 320px to fullscreen, by container queries, no fixed breakpoints",
     narrow: "Under 560px of container: table rows stack",
