@@ -1361,7 +1361,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
                 ],
                 [
                   "Needs you",
-                  "<b>C3 Status</b> · slide 7 approved, notes disputed",
+                  "<b>C3 Status</b> · Proposed. Approval is disputed.",
                 ],
                 ["Left out", "vendor-quote.xlsx · release-calendar.md"],
               ]) +
