@@ -179,34 +179,47 @@ export const label = {
 export const moves = {
   eyebrow: "Proposed moves",
   eyebrowDone: "Moves",
+  /** Only when the plan carries no summary. */
   title: "Move plan",
+  newFiles: "new files",
   label: {
     moves: "Moves",
     renames: "Renames",
     links: "Links",
-    blockers: "Needs you",
+    stays: "Stays",
     file: "File",
     goesTo: "Goes to",
     note: "Note",
     linkNow: "Link now",
     afterMove: "After the move",
     problem: "Problem",
+    yourChoice: "Your choice",
   },
   /** `3 · Inbox → Meetings/, Decisions/, Proposals/` */
   movesValue: (count: number, from: string, to: string) =>
     `${count} · ${from} → ${to}`,
-  count: (n: number) => `${n}`,
+  /** `2 · date + title`, or the count alone when renames follow different rules. */
+  renamesValue: (count: number, rule?: string) =>
+    rule ? `${count} · ${rule}` : `${count}`,
   /** `5 repaired · 4 notes` */
   linksValue: (repaired: number, notes: number) =>
     `${repaired} repaired · ${notes} ${notes === 1 ? "note" : "notes"}`,
+  /** `scan-0412.md · no document type` */
+  staysValue: (path: string, reason: string) => `${path} · ${reason}`,
   blockersValue: (n: number) => `${n} ${n === 1 ? "blocker" : "blockers"}`,
+  /** Under Goes to, when the file is renamed. */
+  as: (name: string) => `as ${name}`,
+  staysFact: (n: number) =>
+    `${n} ${n === 1 ? "file stays" : "files stay"} where ${n === 1 ? "it is" : "they are"}.`,
+  skipFile: "Skip this file",
+  linkTo: (path: string) => `Link to ${path}`,
   why: (notes: number) =>
     notes === 0
       ? "Waits for you because it moves files. You can undo it afterwards."
       : `Waits for you because it moves files and edits links in ${notes} other ${notes === 1 ? "note" : "notes"}. You can undo it afterwards.`,
   whyBlocked:
     "Move stays off until each blocker has a choice. To use a different name, say it in chat.",
-  /** What Approve sends. */
+  /** What Move sends. */
   message: (files: number, links: number) =>
     links === 0
       ? `Move the ${files} ${files === 1 ? "file" : "files"}`

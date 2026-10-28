@@ -2,10 +2,10 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 import { StaticCardHost, stubCardHost } from "@/bridge/static";
 import type { ToolResult } from "@/bridge/bridge";
-import { action, badge, decision, frozen, message, moves } from "@/copy/en";
+import { action, badge, frozen, label, line, message, moves } from "@/copy/en";
 import { CardView } from "./registry";
 import { MoveCard, summaryRows } from "./move-card";
-import { m01, m05 } from "./move-card.fixture";
+import { m01, m05, m05Link } from "./move-card.fixture";
 
 const asResult = (p: unknown) => p as ToolResult;
 
@@ -25,67 +25,100 @@ function renderCard(
 const moveButton = () =>
   screen.getByRole("button", { name: action.move(3) }) as HTMLButtonElement;
 
-test("summary: moves, renames, links from a real-shaped plan", () => {
+test("summary: moves, renames with rule, links, stays", () => {
   const rows = summaryRows(m01);
   expect(rows.map((r) => r.label)).toEqual([
     moves.label.moves,
     moves.label.renames,
     moves.label.links,
+    moves.label.stays,
   ]);
-  expect(rows[0].value).toBe("3 · Inbox/ → Meetings/, Decisions/, Proposals/");
-  expect(rows[1].value).toBe("2");
+  expect(rows[0].value).toBe("3 · Inbox → Meetings/, Decisions/, Proposals/");
+  expect(rows[1].value).toBe("2 · date + title");
   expect(rows[2].value).toBe("5 repaired · 4 notes");
+  expect(rows[3].value).toBe("scan-0412.md · no document type");
   renderCard(m01);
+  expect(screen.getByText("File the new files")).toBeTruthy();
   expect(screen.getByText(moves.eyebrow)).toBeTruthy();
+  expect(screen.getByText("Inbox")).toBeTruthy();
+  expect(
+    screen.getByText(line.counted(4, moves.newFiles), { normalizer: (t) => t }),
+  ).toBeTruthy();
   expect(screen.getByText(badge.waiting.needsOk)).toBeTruthy();
   expect(screen.getByText(moves.why(4))).toBeTruthy();
   expect(moveButton().disabled).toBe(false);
 });
 
-test("full view lists every move and every link repair", () => {
-  renderCard(m01, "fullscreen");
-  for (const m of m01.moves) expect(screen.getByText(m.path)).toBeTruthy();
-  for (const l of m01.links)
-    expect(screen.getAllByText(l.replacement!).length).toBeGreaterThan(0);
-  expect(screen.getAllByText(/weekly-2026-43\.md/).length).toBe(2);
+test("without a summary the fixed title shows", () => {
+  renderCard({ ...m01, summary: undefined });
+  expect(screen.getByText(moves.title)).toBeTruthy();
 });
 
-test("blockers keep Move off until each is answered", () => {
-  renderCard(m05, "fullscreen");
-  expect(screen.getByText(badge.waiting.needsChoice)).toBeTruthy();
-  expect(moveButton().disabled).toBe(true);
-  const accepts = screen.getAllByRole("button", { name: decision.accept });
-  fireEvent.click(accepts[0]);
-  expect(moveButton().disabled).toBe(true);
-  fireEvent.click(screen.getAllByRole("button", { name: decision.drop })[1]);
-  expect(moveButton().disabled).toBe(false);
-});
-
-test("inline blocked plan names the blockers and keeps Move off", () => {
+test("blocked summary shows Needs you in place of Stays", () => {
+  const rows = summaryRows(m05);
+  expect(rows.map((r) => r.label)).toEqual([
+    moves.label.moves,
+    moves.label.renames,
+    moves.label.links,
+    label.needsYou,
+  ]);
   renderCard(m05);
   expect(screen.getByText(moves.blockersValue(2))).toBeTruthy();
   expect(moveButton().disabled).toBe(true);
 });
 
-test("Move sends the message with digests and answers, then freezes", () => {
-  const host = renderCard(m05, "fullscreen");
-  fireEvent.click(screen.getAllByRole("button", { name: decision.accept })[0]);
-  fireEvent.click(screen.getAllByRole("button", { name: decision.drop })[1]);
+test("full view: moves tab, stays note, links tab with +N more", () => {
+  renderCard(m01, "fullscreen");
+  expect(screen.getByText(moves.as("2026-10-27 build review.md"))).toBeTruthy();
+  expect(screen.getByText(moves.staysFact(1))).toBeTruthy();
+  fireEvent.click(
+    screen.getByRole("tab", { name: label.withCount(moves.label.links, 5) }),
+  );
+  expect(screen.getByText(line.andMore(2))).toBeTruthy();
+  fireEvent.click(screen.getByText(line.andMore(2)));
+  expect(screen.getAllByText(/^\[\[/).length).toBe(5);
+});
+
+test("blocker choices come from the plan; Move waits for each answer", () => {
+  renderCard(m05Link, "fullscreen");
+  expect(screen.getByText(badge.waiting.needsChoice)).toBeTruthy();
+  expect(moveButton().disabled).toBe(true);
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: moves.linkTo("Proposals/timings-notes"),
+    }),
+  );
+  expect(moveButton().disabled).toBe(false);
+});
+
+test("a blocker with one computed choice can't be answered in the card", () => {
+  renderCard(m05, "fullscreen");
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: moves.linkTo("Proposals/cache-proposal"),
+    }),
+  );
+  expect(moveButton().disabled).toBe(true);
+});
+
+test("Move sends the message with digests and the chosen binding, then freezes", () => {
+  const host = renderCard(m05Link, "fullscreen");
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: moves.linkTo("Proposals/timings-notes"),
+    }),
+  );
   fireEvent.click(moveButton());
   expect(host.sent).toEqual([moves.message(3, 5)]);
   const ctx = host.contexts[0] as {
-    document_moves: {
-      based_on: unknown;
-      blockers: Array<{ answer: string }>;
-    };
+    document_moves: { based_on: unknown; blockers: Array<{ answer: unknown }> };
   };
   expect(ctx.document_moves.based_on).toEqual(m05.based_on);
-  expect(ctx.document_moves.blockers.map((b) => b.answer)).toEqual([
-    "accept",
-    "drop",
-  ]);
+  expect(ctx.document_moves.blockers[0].answer).toEqual({
+    action: "bind_link",
+    path: "Proposals/timings-notes.md",
+  });
   expect(screen.getByText(frozen.approved)).toBeTruthy();
-  expect(screen.getByText(badge.done.approved)).toBeTruthy();
   expect(host.requested).toEqual(["inline"]);
 });
 
@@ -118,5 +151,5 @@ test("CardView picks the move card by schema", () => {
       <CardView result={asResult(m01)} />
     </StaticCardHost>,
   );
-  expect(screen.getByText(moves.title)).toBeTruthy();
+  expect(screen.getByText("File the new files")).toBeTruthy();
 });

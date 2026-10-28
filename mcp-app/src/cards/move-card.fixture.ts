@@ -75,6 +75,16 @@ export const m01: DocumentMoves = {
   ],
   affected_documents: [],
   record_changes: [],
+  summary: "File the new files",
+  folder: "Inbox",
+  stays: [{ path: "Inbox/scan-0412.md", reason: "no document type" }],
+  naming: [
+    { path: "Meetings/2026-10-27 build review.md", rule: "date + title" },
+    {
+      path: "Decisions/2026-10-28 retire evening build.md",
+      rule: "date + title",
+    },
+  ],
 };
 
 export const m05: DocumentMoves = {
@@ -87,6 +97,7 @@ export const m05: DocumentMoves = {
       start: null,
       end: null,
       detail: "already exists",
+      choices: [{ action: "skip_move", path: "Inbox/retire-evening.md" }],
     },
     {
       code: "ambiguous link",
@@ -94,6 +105,13 @@ export const m05: DocumentMoves = {
       start: 40,
       end: 52,
       detail: "[[proposal]] matches 2 notes",
+      choices: [
+        { action: "bind_link", path: "Proposals/cache-proposal.md" },
+        { action: "bind_link", path: "Proposals/timings-notes.md" },
+      ],
     },
   ],
 };
+
+/** M05 with only the blocker the card can answer: an ambiguous link. */
+export const m05Link: DocumentMoves = { ...m05, issues: [m05.issues[1]] };

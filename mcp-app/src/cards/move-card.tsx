@@ -11,18 +11,24 @@ import type { KeyValueRow } from "@/component-elements/key-value";
 import type { CardAction } from "@/component-patterns/card-shell";
 import { useCardLifecycle } from "@/component-patterns/card-lifecycle";
 import type { CardLifecycle } from "@/component-patterns/card-lifecycle";
-import { ChangeTable } from "@/component-patterns/change-table";
-import { DecisionRows } from "@/component-patterns/decision-rows";
-import type { DecisionValue } from "@/component-patterns/decision-rows";
+import { Note } from "@/component-elements/note";
+import { SegmentedChoice } from "@/component-elements/segmented-choice";
+import { Tabs } from "@/component-elements/tabs";
 import { FullView } from "@/component-patterns/full-view";
+import { PlanLines, PlanTable } from "@/component-patterns/plan-table";
 import { SummaryCard } from "@/component-patterns/summary-card";
-import type { DocumentMoves, MoveIssue } from "@/contracts/document-moves";
-import { action, badge, frozen, line, message, moves } from "@/copy/en";
+import type {
+  DocumentMoves,
+  MoveChoice,
+  MoveIssue,
+} from "@/contracts/document-moves";
+import { action, badge, frozen, label, line, message, moves } from "@/copy/en";
 import { registerCard } from "./registry";
 import type { CardProps } from "./registry";
 
 export type Pressed = "move" | "notNow";
-export type Answers = Record<string, DecisionValue | null>;
+/** Blocker id to the index of the chosen choice. */
+export type Answers = Record<string, string | null>;
 
 const STATUSES = ["permission_needed", "ready", "blocked"];
 
@@ -57,6 +63,7 @@ const dir = (path: string) => {
   return i < 0 ? moves.root : path.slice(0, i + 1);
 };
 const base = (path: string) => path.split("/").at(-1) ?? path;
+const LINK_LIMIT = 3;
 const unique = (xs: string[]) => [...new Set(xs)];
 
 /** Issues stop the plan only when it is blocked; otherwise there are none. */
@@ -69,24 +76,44 @@ export const repairedLinks = (p: DocumentMoves) =>
 const linkNotes = (p: DocumentMoves) =>
   unique(repairedLinks(p).map((l) => l.source_path)).length;
 
+/** A blocker is answerable in the card only with two or three computed choices. */
+const answerable = (issue: MoveIssue) =>
+  (issue.choices?.length ?? 0) >= 2 && (issue.choices?.length ?? 0) <= 3;
+
 export const allAnswered = (p: DocumentMoves, answers: Answers) =>
-  blockers(p).every((_, i) => answers[issueId(i)] != null);
+  blockers(p).every(
+    (issue, i) => answerable(issue) && answers[issueId(i)] != null,
+  );
+
+const choiceLabel = (c: MoveChoice) =>
+  c.action === "skip_move"
+    ? moves.skipFile
+    : moves.linkTo(c.path.replace(/\.md$/, ""));
+
+const fromFolder = (p: DocumentMoves) =>
+  p.folder ?? unique(p.moves.map((m) => dir(m.old_path))).join(", ");
 
 export function summaryRows(p: DocumentMoves): KeyValueRow[] {
-  const from = unique(p.moves.map((m) => dir(m.old_path))).join(", ");
   const to = unique(p.moves.map((m) => dir(m.path))).join(", ");
   const rows: KeyValueRow[] = [
     {
       label: moves.label.moves,
-      value: moves.movesValue(p.moves.length, from, to),
+      value: moves.movesValue(p.moves.length, fromFolder(p), to),
     },
   ];
   const renames = p.moves.filter((m) => base(m.old_path) !== base(m.path));
-  if (renames.length > 0)
+  if (renames.length > 0) {
+    const rules = unique(
+      renames.map((m) => p.naming?.find((n) => n.path === m.path)?.rule ?? ""),
+    );
     rows.push({
       label: moves.label.renames,
-      value: moves.count(renames.length),
+      value: moves.renamesValue(
+        renames.length,
+        rules.length === 1 && rules[0] ? rules[0] : undefined,
+      ),
     });
+  }
   const repaired = repairedLinks(p).length;
   if (repaired > 0)
     rows.push({
@@ -94,16 +121,26 @@ export function summaryRows(p: DocumentMoves): KeyValueRow[] {
       value: moves.linksValue(repaired, linkNotes(p)),
     });
   const b = blockers(p);
+  const stays = p.stays ?? [];
   if (b.length > 0)
     rows.push({
-      label: moves.label.blockers,
+      label: label.needsYou,
       value: (
         <>
           <b>{moves.blockersValue(b.length)}</b>
           {line.summaryJoin}
-          {unique(b.map((i) => i.code)).join(line.summaryJoin)}
+          {unique(b.map((i) => i.code)).join(", ")}
         </>
       ),
+    });
+  else if (stays.length > 0)
+    rows.push({
+      label: moves.label.stays,
+      value:
+        moves.staysValue(base(stays[0].path), stays[0].reason) +
+        (stays.length > 1
+          ? `${line.summaryJoin}${line.andMore(stays.length - 1)}`
+          : ""),
     });
   return rows;
 }
@@ -118,7 +155,7 @@ export function moveContext(p: DocumentMoves, answers: Answers) {
       digest: p.digest,
       blockers: blockers(p).map((issue, i) => ({
         ...issue,
-        answer: answers[issueId(i)] ?? null,
+        answer: issue.choices?.[Number(answers[issueId(i)])] ?? null,
       })),
     },
   };
@@ -128,10 +165,12 @@ export type MoveViewProps = {
   plan: DocumentMoves;
   displayMode: "inline" | "fullscreen";
   answers: Answers;
-  onAnswer: (id: string, value: DecisionValue) => void;
+  onAnswer: (id: string, value: string) => void;
   lifecycle: CardLifecycle;
   pressed?: Pressed;
   onPressed?: (pressed: Pressed) => void;
+  /** The full view's first tab; the gallery opens Links. */
+  defaultTab?: "moves" | "links";
 };
 
 export function MoveView({
@@ -142,14 +181,25 @@ export function MoveView({
   lifecycle,
   pressed,
   onPressed,
+  defaultTab,
 }: MoveViewProps) {
   const live = lifecycle.state === "live";
   const b = blockers(p);
   const repaired = repairedLinks(p);
   const shell = {
     eyebrow: live ? moves.eyebrow : moves.eyebrowDone,
-    title: moves.title,
-    meta: <PathChip path={p.location} />,
+    title: p.summary ?? moves.title,
+    meta: (
+      <>
+        <PathChip folder path={p.folder ?? p.location} />
+        <span>
+          {line.counted(
+            p.moves.length + (p.stays?.length ?? 0),
+            moves.newFiles,
+          )}
+        </span>
+      </>
+    ),
     badge:
       pressed === "move"
         ? { tone: "done" as const, label: badge.done.approved }
@@ -190,43 +240,114 @@ export function MoveView({
   if (displayMode === "fullscreen")
     return (
       <FullView {...card}>
-        {b.length > 0 && (
-          <DecisionRows
-            headers={[moves.label.problem]}
+        {b.length > 0 ? (
+          <PlanTable
+            headers={[moves.label.problem, moves.label.yourChoice]}
+            columns={[45, 55]}
             rows={b.map((issue, i) => ({
               id: issueId(i),
-              name: issue.detail,
               cells: [
                 <>
-                  <b>{issue.source_path ?? issue.code}</b>
-                  {line.summaryJoin}
+                  {issue.source_path && <b>{issue.source_path} </b>}
                   {issue.detail}
                 </>,
+                answerable(issue) ? (
+                  <SegmentedChoice
+                    aria-label={issue.detail}
+                    options={issue.choices!.map((c, n) => ({
+                      value: String(n),
+                      label: choiceLabel(c),
+                    }))}
+                    value={answers[issueId(i)] ?? null}
+                    onValueChange={(v) => live && onAnswer(issueId(i), v)}
+                  />
+                ) : null,
               ],
             }))}
-            choices={answers}
-            onChoiceChange={live ? onAnswer : () => {}}
           />
-        )}
-        <ChangeTable
-          draft
-          rows={p.moves.map((m) => ({
-            proposed: { label: m.old_path, text: m.path },
-            sources: [],
-          }))}
-        />
-        {p.links.length > 0 && (
-          <ChangeTable
-            rows={p.links.map((l) => ({
-              current: { label: l.source_path, text: l.target_before },
-              proposed: { text: l.replacement ?? l.target_after },
-              sources: [],
-            }))}
+        ) : (
+          <Tabs
+            defaultValue={defaultTab}
+            tabs={[
+              {
+                value: "moves",
+                label: moves.label.moves,
+                count: p.moves.length,
+                content: <MovesTable plan={p} />,
+              },
+              {
+                value: "links",
+                label: moves.label.links,
+                count: repaired.length,
+                content: <LinksTable plan={p} />,
+              },
+            ]}
           />
         )}
       </FullView>
     );
   return <SummaryCard {...card} rows={summaryRows(p)} />;
+}
+
+function MovesTable({ plan: p }: { plan: DocumentMoves }) {
+  const stays = p.stays ?? [];
+  return (
+    <div className="flex flex-col gap-(--km-gap-group)">
+      <PlanTable
+        headers={[moves.label.file, moves.label.goesTo]}
+        columns={[45, 55]}
+        rows={p.moves.map((m) => ({
+          id: m.old_path,
+          cells: [
+            <PlanLines
+              key="from"
+              primary={<b>{base(m.old_path)}</b>}
+              secondary={dir(m.old_path).replace(/\/$/, "")}
+            />,
+            <PlanLines
+              key="to"
+              primary={dir(m.path)}
+              secondary={
+                base(m.old_path) !== base(m.path)
+                  ? moves.as(base(m.path))
+                  : undefined
+              }
+            />,
+          ],
+        }))}
+      />
+      {stays.length > 0 && (
+        <Note kind="leftOut" fact={moves.staysFact(stays.length)}>
+          {stays
+            .map((st) => moves.staysValue(base(st.path), st.reason))
+            .join(line.summaryJoin)}
+        </Note>
+      )}
+    </div>
+  );
+}
+
+function LinksTable({ plan: p }: { plan: DocumentMoves }) {
+  const mono = "font-(family-name:--font-mono) wrap-anywhere";
+  return (
+    <PlanTable
+      headers={[moves.label.note, moves.label.linkNow, moves.label.afterMove]}
+      columns={[30, 30, 40]}
+      limit={LINK_LIMIT}
+      rows={repairedLinks(p).map((l) => ({
+        id: `${l.source_path}:${l.start}`,
+        cells: [
+          <PathChip key="note" path={l.source_path} />,
+          <span key="now" className={mono}>
+            {l.target_before}
+          </span>,
+          <span key="after" className={mono}>
+            {l.replacement}
+          </span>,
+        ],
+      }))}
+    />
+  );
 }
 
 function LiveMove({ plan }: { plan: DocumentMoves }) {

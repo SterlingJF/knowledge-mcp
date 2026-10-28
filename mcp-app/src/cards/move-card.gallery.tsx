@@ -5,7 +5,7 @@ import type { DocumentMoves } from "@/contracts/document-moves";
 import { frozen } from "@/copy/en";
 import { MoveView } from "./move-card";
 import type { Answers, Pressed } from "./move-card";
-import { m01, m05 } from "./move-card.fixture";
+import { m01, m05, m05Link } from "./move-card.fixture";
 
 const lifecycle = (
   state: CardLifecycle["state"],
@@ -18,7 +18,9 @@ function Story({
   life = lifecycle("live"),
   answers = {},
   pressed,
+  tab,
 }: {
+  tab?: "moves" | "links";
   plan?: DocumentMoves;
   mode?: "inline" | "fullscreen";
   life?: CardLifecycle;
@@ -35,6 +37,7 @@ function Story({
           onAnswer={() => {}}
           lifecycle={life}
           pressed={pressed}
+          defaultTab={tab}
         />
       </HarnessFrame>
     </StaticCardHost>
@@ -47,17 +50,14 @@ export default {
   stories: {
     "M01 Plan": <Story />,
     "M02 Full view": <Story mode="fullscreen" />,
+    "M02 Full view, Links": <Story mode="fullscreen" tab="links" />,
     "M03 Approved": (
       <Story life={lifecycle("frozen", frozen.approved)} pressed="move" />
     ),
     "M05 Blockers": <Story plan={m05} />,
     "M05F Answer the blockers": <Story plan={m05} mode="fullscreen" />,
-    "M05F Answered": (
-      <Story
-        plan={m05}
-        mode="fullscreen"
-        answers={{ b1: "accept", b2: "drop" }}
-      />
+    "M05F Answered (link only)": (
+      <Story plan={m05Link} mode="fullscreen" answers={{ b1: "1" }} />
     ),
     "M06 Not now": (
       <Story life={lifecycle("frozen", frozen.notMoved)} pressed="notNow" />
