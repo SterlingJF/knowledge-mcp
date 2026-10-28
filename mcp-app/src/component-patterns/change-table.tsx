@@ -1,0 +1,165 @@
+// P02 Change table: one row per Cn — what is there now, what is proposed with its evidence mark, and the exact sources.
+import type { ReactNode } from "react";
+
+import { ChangeNumber, SelectAll } from "@/component-elements/change-number";
+import { SourceChip } from "@/component-elements/chips";
+import { EvidenceMark } from "@/component-elements/evidence-mark";
+import { CurrentText } from "@/component-elements/text-lines";
+import type { ProposalCell, ProposalRow, Source } from "@/contracts/proposal";
+import { label as labels, line } from "@/copy/en";
+import { cn } from "@/lib/utils";
+
+const xs =
+  "text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height)";
+const headClass = cn(
+  xs,
+  "font-(--font-weight-semibold) text-(--color-text-secondary) @max-[560px]:sr-only",
+);
+// Wide: four columns. Narrow (container under 560px): each row stacks.
+const rowClass =
+  "grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-x-(--km-space-5) gap-y-(--km-space-3) border-b-(length:--border-width-regular) border-(--color-border-tertiary) py-(--km-space-4) @max-[560px]:grid-cols-1";
+
+function Cell({
+  label,
+  text,
+  className,
+}: ProposalCell & { className?: string }) {
+  return (
+    <span className={className}>
+      {label != null && (
+        <span className="font-(--font-weight-semibold)">{label}:</span>
+      )}
+      {label != null && " "}
+      {text}
+    </span>
+  );
+}
+
+function sameFileAsPrevious(sources: Source[], i: number): boolean {
+  const here = sources[i];
+  const before = sources[i - 1];
+  return (
+    before != null &&
+    "line_number" in here &&
+    "line_number" in before &&
+    here.file === before.file
+  );
+}
+
+function Sources({ sources }: { sources: Source[] }) {
+  return (
+    <span className="flex flex-wrap items-center gap-(--km-space-2)">
+      {sources.map((source, i) => (
+        <SourceChip
+          key={i}
+          source={source}
+          continuation={sameFileAsPrevious(sources, i)}
+        />
+      ))}
+    </span>
+  );
+}
+
+export type ChangeTableProps = {
+  /** Row n (from 1) is change Cn. */
+  rows: ProposalRow[];
+  /** Numbers of the changes kept. Ignored when frozen. */
+  kept?: Set<number>;
+  /** Omit for a frozen table: numbers stay, boxes go. */
+  onKeptChange?: (kept: Set<number>) => void;
+  className?: string;
+};
+
+export function ChangeTable({
+  rows,
+  kept,
+  onKeptChange,
+  className,
+}: ChangeTableProps) {
+  const frozen = onKeptChange == null;
+  const keptSet = kept ?? new Set(rows.map((_, i) => i + 1));
+  const isKept = (n: number) => frozen || keptSet.has(n);
+
+  const setOne = (n: number, keep: boolean) => {
+    const next = new Set(keptSet);
+    if (keep) next.add(n);
+    else next.delete(n);
+    onKeptChange?.(next);
+  };
+
+  let head: ReactNode = <span />;
+  if (!frozen)
+    head = (
+      <SelectAll
+        keptCount={rows.filter((_, i) => keptSet.has(i + 1)).length}
+        total={rows.length}
+        onChange={(all) =>
+          onKeptChange(new Set(all ? rows.map((_, i) => i + 1) : []))
+        }
+      />
+    );
+
+  return (
+    <div
+      role="table"
+      className={cn(
+        "@container text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary)",
+        className,
+      )}
+    >
+      <div role="row" className={cn(rowClass, "py-(--km-space-3)")}>
+        <span role="columnheader">{head}</span>
+        <span role="columnheader" className={headClass}>
+          {labels.current}
+        </span>
+        <span role="columnheader" className={headClass}>
+          {labels.proposed}
+        </span>
+        <span role="columnheader" className={headClass}>
+          {labels.source}
+        </span>
+      </div>
+      {rows.map((row, i) => {
+        const n = i + 1;
+        const out = !isKept(n);
+        return (
+          <div
+            role="row"
+            key={n}
+            data-left-out={out || undefined}
+            className={cn(
+              rowClass,
+              out && "line-through opacity-(--km-opacity-out)",
+            )}
+          >
+            <span role="cell">
+              <ChangeNumber
+                n={n}
+                kept={!out}
+                onKeptChange={frozen ? undefined : (keep) => setOne(n, keep)}
+              />
+            </span>
+            <span role="cell">
+              {row.current ? (
+                <CurrentText label={row.current.label ?? labels.current}>
+                  {row.current.text}
+                </CurrentText>
+              ) : (
+                <span className="text-(--color-text-tertiary)">
+                  {line.addition}
+                </span>
+              )}
+            </span>
+            <span role="cell" className="flex flex-col gap-(--km-space-2)">
+              {row.mark && <EvidenceMark mark={row.mark} />}
+              <Cell {...row.proposed} />
+            </span>
+            <span role="cell">
+              <Sources sources={row.sources} />
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
