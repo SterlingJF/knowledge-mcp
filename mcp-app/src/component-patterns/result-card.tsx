@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { Undo2 } from "lucide-react";
 
 import { Note } from "@/component-elements/note";
-import { action as actionCopy, frozen, line } from "@/copy/en";
+import { action as actionCopy, frozen, line, meta } from "@/copy/en";
 import { CardShell } from "./card-shell";
 import type { CardAction } from "./card-shell";
 import { lifecycleProps } from "./card-lifecycle";
@@ -24,9 +24,10 @@ type Common = {
 export type ResultCardProps =
   | (Common & {
       kind: "result";
-      what: string;
+      /** When it was recorded: `Oct 28, 09:41`. */
       when: string;
-      who: string;
+      /** Whose OK; defaults to `meta.approvedByYou`. */
+      who?: string;
       /** The message Undo sends. */
       undoMessage: string;
       secondary?: CardAction;
@@ -55,7 +56,11 @@ export function ResultCard(props: ResultCardProps) {
       <CardShell
         eyebrow={eyebrow}
         title={title}
-        meta={[props.what, props.when, props.who].join(line.summaryJoin)}
+        meta={
+          meta.recorded(props.when) +
+          meta.join +
+          (props.who ?? meta.approvedByYou)
+        }
         badge={{ tone: "done", label: badgeLabel }}
         why={why}
         actions={actions}

@@ -13,7 +13,7 @@ function lifecycle(): CardLifecycle {
   };
 }
 
-test("result: done badge, what · when · who, Undo first", () => {
+test("result: done badge, recorded when and by whom, Undo first", () => {
   const life = lifecycle();
   render(
     <ResultCard
@@ -21,9 +21,7 @@ test("result: done badge, what · when · who, Undo first", () => {
       eyebrow="Edit"
       title="cache-proposal.md"
       badgeLabel={badge.done.saved}
-      what="4 changes"
-      when="just now"
-      who="you"
+      when="Oct 28, 09:41"
       undoMessage="Undo edit 12"
       secondary={{
         label: "Open",
@@ -36,7 +34,9 @@ test("result: done badge, what · when · who, Undo first", () => {
   expect(
     screen.getByText(badge.done.saved).closest("[data-tone]"),
   ).toHaveProperty("dataset.tone", "done");
-  expect(screen.getByText("4 changes · just now · you")).toBeTruthy();
+  expect(
+    screen.getByText("Recorded Oct 28, 09:41 · approved by you"),
+  ).toBeTruthy();
   const buttons = screen.getAllByRole("button");
   expect(buttons.map((b) => b.textContent)).toEqual([action.undo, "Open"]);
   fireEvent.click(buttons[0]!);

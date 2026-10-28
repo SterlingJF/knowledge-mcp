@@ -86,5 +86,5 @@ test("flat drops the frame", () => {
   const { container } = render(<CardShell eyebrow="e" title="t" flat />);
   const section = container.querySelector("section")!;
   expect(section.dataset.flat).toBe("true");
-  expect(section.className).not.toMatch(/border-solid/);
+  expect(section.className).toMatch(/border-0/);
 });
