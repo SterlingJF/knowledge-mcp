@@ -158,6 +158,8 @@ export const message = {
 export const label = {
   changes: "Changes",
   sections: "Sections",
+  /** A tab label with its count: `Moves (3)`. */
+  withCount: (name: string, count: number) => `${name} (${count})`,
   section: "Section",
   draft: "Draft",
   savedAs: "Saved as",
