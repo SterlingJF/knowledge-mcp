@@ -10,7 +10,8 @@ import { cn } from "@/lib/utils";
 export type LineSource = { file: string; line_number: number };
 export type PlaceSource = { file: string; place: string };
 export type PersonSource = { said: string };
-export type Source = LineSource | PlaceSource | PersonSource;
+export type FileSource = { file: string };
+export type Source = LineSource | PlaceSource | FileSource | PersonSource;
 
 const chipClass =
   "inline-flex max-w-full items-center whitespace-nowrap gap-(--km-space-2) rounded-(--border-radius-sm) border-(length:--border-width-regular) border-(--color-border-tertiary) bg-(--color-background-primary) px-(--km-space-3) py-(--km-space-1) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary)";
@@ -100,6 +101,12 @@ export function SourceChip({
     return (
       <Chip icon={placeIcon(source.place)} className={className}>
         {sourceCopy.place(source.file, source.place)}
+      </Chip>
+    );
+  if (!("line_number" in source))
+    return (
+      <Chip icon={FileText} className={className}>
+        {source.file}
       </Chip>
     );
   return (

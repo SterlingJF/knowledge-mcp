@@ -45,6 +45,12 @@ export const e02: Proposal = {
       ],
     },
   ],
+  document_type: { id: "design-proposal", label: "Design proposal" },
+  reader: {
+    id: "maintainers",
+    label: "maintainers deciding whether to accept it",
+    confirmed: true,
+  },
   left_out: [
     {
       file: "vendor-quote.xlsx",
@@ -82,13 +88,23 @@ export const newDocument: Proposal = {
         text: "A hosted build service, priced but not compared",
       },
       mark: "partly",
-      sources: [{ file: "vendor-quote.xlsx", place: "Sheet1" }],
+      sources: [{ file: "vendor-quote.xlsx" }],
     },
     {
       proposed: { label: "Status", text: "Proposed" },
       mark: "suggested",
       sources: [{ said: "a proposal … on its own" }],
     },
+  ],
+  document_type: { id: "design-proposal", label: "Design proposal" },
+  reader: { id: "maintainers", label: "maintainers", confirmed: false },
+  filing: {
+    path: "Proposals/cache-rollout.md",
+    naming_rule: null,
+    reason: "(dropped in conventions), so it goes beside cache-proposal.md.",
+  },
+  open_questions: [
+    { label: "Rollout owner", text: "Who owns the cache rollout?" },
   ],
   card: "Proposed document Proposals/cache-rollout.md (C1–C3).",
   instance: {

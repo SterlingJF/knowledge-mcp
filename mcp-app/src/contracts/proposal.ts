@@ -9,7 +9,9 @@ export type EvidenceMark = "supported" | "partly" | "conflicting" | "suggested";
 export type LineSource = { file: string; line_number: number };
 export type PlaceSource = { file: string; place: string };
 export type PersonSource = { said: string };
-export type Source = LineSource | PlaceSource | PersonSource;
+/** A whole file, with no line or place, such as a sheet read in full. */
+export type FileSource = { file: string };
+export type Source = LineSource | PlaceSource | FileSource | PersonSource;
 
 export type ProposalRow = {
   /** The document's text now; absent for an addition. */
@@ -19,6 +21,10 @@ export type ProposalRow = {
   sources: Array<Source>;
 };
 
+export type Filing =
+  | { path: string; naming_rule: string; reason?: string }
+  | { path: string; naming_rule: null; reason: string };
+
 export type LeftOutFile = { file: string; reason: string };
 
 export type Proposal = {
@@ -26,6 +32,14 @@ export type Proposal = {
   summary: string;
   /** Row n is change Cn. */
   rows: Array<ProposalRow>;
+  /** The document's type, from kb_get_document_type. */
+  document_type?: { id: string; label: string };
+  /** Who the document is for; `confirmed` is false when the assistant guessed. */
+  reader?: { id: string; label: string; confirmed: boolean };
+  /** For a new document: where it will be saved and whether a naming rule applied. */
+  filing?: Filing;
+  /** Questions no source answers, apart from conflicting rows. */
+  open_questions?: Array<ProposalCell>;
   left_out?: Array<LeftOutFile>;
   /** The Markdown text card, for hosts without the app. */
   card: string;
