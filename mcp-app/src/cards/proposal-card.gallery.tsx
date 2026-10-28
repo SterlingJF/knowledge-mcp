@@ -42,7 +42,10 @@ export default {
   name: "Proposal card",
   stories: {
     Inline: <Story />,
-    "Full view": <Story mode="fullscreen" kept={new Set([2, 3, 4])} />,
+    "Full view": <Story mode="fullscreen" />,
+    "Full view, C1 left out": (
+      <Story mode="fullscreen" kept={new Set([2, 3, 4])} />
+    ),
     "Frozen approved": <Story life={lifecycle("frozen", frozen.approved)} />,
     "Not saved": <Story life={lifecycle("frozen", frozen.notSaved)} />,
     Replaced: <Story life={lifecycle("replaced")} />,

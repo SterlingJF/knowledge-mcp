@@ -41,7 +41,7 @@ test("summary data points come from the proposal, at most four", () => {
   expect(rows[3].value).toBe("vendor-quote.xlsx · release-calendar.md");
   renderCard(e02);
   expect(screen.getByText(eyebrow.proposedChanges)).toBeTruthy();
-  expect(screen.getByText("docs/proposals/cache-proposal.md")).toBeTruthy();
+  expect(screen.getByText("cache-proposal.md")).toBeTruthy();
   expect(screen.getByText("C3 Status")).toBeTruthy();
 });
 
@@ -79,11 +79,14 @@ test("Not now freezes the card and sends", () => {
   expect(screen.queryByRole("button", { name: action.notNow })).toBeNull();
 });
 
-test("Save is not offered when nothing is kept", () => {
-  renderCard(e02, "fullscreen");
+test("Save is disabled when nothing is kept", () => {
+  const host = renderCard(e02, "fullscreen");
   const selectAll = within(screen.getAllByRole("row")[0]).getByRole("checkbox");
   fireEvent.click(selectAll);
-  expect(screen.queryByRole("button", { name: /^Save/ })).toBeNull();
+  const save = screen.getByRole("button", { name: /^Save/ });
+  expect((save as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(save);
+  expect(host.sent).toEqual([]);
   expect(screen.getByRole("button", { name: action.notNow })).toBeTruthy();
 });
 

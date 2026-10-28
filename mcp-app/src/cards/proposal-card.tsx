@@ -1,10 +1,9 @@
 // C-Proposal: the card for every kb_prepare_proposal result (knowledge-mcp/proposal/1).
 // Inline it summarises the changes; the full view shows every change with its tick box.
 // The card holds the kept set and the lifecycle, so both survive the display-mode switch.
-import { useMemo, useRef, useState } from "react";
+import { useState } from "react";
 
-import { HostContext, useCardHost } from "@/bridge/bridge";
-import type { CardHost } from "@/bridge/bridge";
+import { useCardHost } from "@/bridge/bridge";
 import { PathChip } from "@/component-elements/chips";
 import type { KeyValueRow } from "@/component-elements/key-value";
 import type { CardAction } from "@/component-patterns/card-shell";
@@ -64,8 +63,13 @@ export function saveContext(p: Proposal, kept: Set<number>) {
   };
 }
 
+/** A change's name: the section it touches, else its proposed text. */
+const rowName = (p: Proposal, i: number) =>
+  p.rows[i].current?.label ??
+  p.rows[i].proposed.label ??
+  p.rows[i].proposed.text;
 const rowLabel = (p: Proposal, i: number) =>
-  `${change.number(i + 1)} ${p.rows[i].proposed.label ?? p.rows[i].proposed.text}`;
+  `${change.number(i + 1)} ${rowName(p, i)}`;
 
 export function summaryRows(p: Proposal): KeyValueRow[] {
   const isNew = p.rows.every((r) => !r.current);
@@ -91,10 +95,7 @@ export function summaryRows(p: Proposal): KeyValueRow[] {
       label: label.needsYou,
       value: (
         <>
-          <b>
-            {change.number(conflict + 1)}{" "}
-            {p.rows[conflict].proposed.label ?? ""}
-          </b>
+          <b>{rowLabel(p, conflict)}</b>
           {line.summaryJoin}
           {p.rows[conflict].proposed.text}
         </>
@@ -127,9 +128,15 @@ export function ProposalView({
   const isNew = p.rows.every((r) => !r.current);
   const file = fileName(p);
   const shell = {
-    eyebrow: isNew ? eyebrow.proposedDocument : eyebrow.proposedChanges,
+    // Once pressed, the card is a record of one change, not a proposal.
+    eyebrow:
+      lifecycle.state === "frozen"
+        ? eyebrow.change
+        : isNew
+          ? eyebrow.proposedDocument
+          : eyebrow.proposedChanges,
     title: p.summary,
-    meta: p.instance ? <PathChip path={p.instance.subject} /> : undefined,
+    meta: p.instance ? <PathChip path={file} /> : undefined,
     badge:
       lifecycle.frozenLine === frozen.approved
         ? { tone: "done" as const, label: badge.done.approved }
@@ -144,14 +151,15 @@ export function ProposalView({
     message: saveMessage(p, kept),
     frozenLine: frozen.approved,
     variant: "primary",
+    disabled: kept.size === 0,
+    context: saveContext(p, kept),
   };
   const notNow: CardAction = {
     label: action.notNow,
     message: message.notNow,
     frozenLine: frozen.notSaved,
   };
-  // Nothing kept: Save is withheld, Not now stays.
-  const actions = kept.size > 0 ? [save, notNow] : [notNow];
+  const actions = [save, notNow];
 
   if (displayMode === "fullscreen")
     return (
@@ -176,32 +184,13 @@ export function ProposalCard({ result }: CardProps) {
   const proposal = result as unknown as Proposal;
   const host = useCardHost();
   const [kept, setKept] = useState(() => new Set(numbers(proposal)));
-  const keptRef = useRef(kept);
-  keptRef.current = kept;
-  // The lifecycle sends only text; a save also carries the proposal's digest as model context.
-  const withContext = useMemo<CardHost>(
-    () => ({
-      ...host,
-      send: (text, context) =>
-        host.send(
-          text,
-          context ??
-            (text === message.notNow
-              ? undefined
-              : saveContext(proposal, keptRef.current)),
-        ),
-    }),
-    [host, proposal],
-  );
   return (
-    <HostContext value={withContext}>
-      <LiveProposal
-        proposal={proposal}
-        displayMode={host.displayMode}
-        kept={kept}
-        onKeptChange={setKept}
-      />
-    </HostContext>
+    <LiveProposal
+      proposal={proposal}
+      displayMode={host.displayMode}
+      kept={kept}
+      onKeptChange={setKept}
+    />
   );
 }
 

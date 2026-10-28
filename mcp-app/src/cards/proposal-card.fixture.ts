@@ -6,39 +6,43 @@ export const e02: Proposal = {
   summary: "Focus the proposal on retiring the evening build",
   rows: [
     {
-      current: { label: "Title", text: "Cache proposal" },
-      proposed: { label: "Title", text: "Retire the evening build" },
-      mark: "supported",
-      sources: [{ file: "meeting-notes.md", line_number: 4 }],
+      current: { label: "Title", text: "Build schedule and cache rollout" },
+      proposed: { label: "Title", text: "Evening build retirement" },
+      mark: "suggested",
+      sources: [{ file: "meeting-notes.md", line_number: 15 }],
     },
     {
-      current: { label: "Motivation", text: "Builds are slow." },
+      current: { label: "Motivation", text: "evening build never finishes" },
       proposed: {
         label: "Motivation",
-        text: "The evening build takes 41 minutes and blocks releases.",
+        text: "7 of 9 evening runs hit the 6-hour limit",
       },
-      mark: "partly",
+      mark: "supported",
       sources: [{ file: "build-timings.xlsx", place: "Evening!A2:D10" }],
     },
     {
-      current: { label: "Status", text: "Draft" },
-      proposed: {
-        label: "Status",
-        text: "slide 7 approved, notes disputed",
-      },
+      proposed: { label: "Status", text: "slide 7 approved, notes disputed" },
       mark: "conflicting",
       sources: [
+        { file: "cache-rollout-review.pptx", place: "slide 7" },
         { file: "meeting-notes.md", line_number: 11 },
         { file: "meeting-notes.md", line_number: 19 },
       ],
     },
     {
-      proposed: {
+      current: {
         label: "Open question",
-        text: "Who owns the cache after launch?",
+        text: "what baseline would show build times doubled?",
       },
-      mark: "suggested",
-      sources: [{ said: "ask who owns the cache" }],
+      proposed: {
+        label: "Still open",
+        text: "no timings from before the cache",
+      },
+      mark: "partly",
+      sources: [
+        { file: "build-timings.xlsx", place: "Evening!A2" },
+        { file: "meeting-notes.md", line_number: 21 },
+      ],
     },
   ],
   left_out: [
@@ -63,7 +67,7 @@ export const e02: Proposal = {
 export const newDocument: Proposal = {
   ...e02,
   summary: "A design proposal for retiring the evening build",
-  rows: e02.rows.slice(0, 2).map((r) => ({ ...r, current: undefined })),
+  rows: e02.rows.map((r) => ({ ...r, current: undefined })),
   left_out: undefined,
   instance: {
     created_at: "2026-10-28T09:41:00.000Z",
