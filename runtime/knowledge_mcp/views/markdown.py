@@ -165,7 +165,7 @@ def saved(answer: dict[str, Any]) -> str:
         f"The {verb} {name} is recorded.\n"
     )
     if answer.get("undoes"):
-        text += f"\nIt undoes edit {code(answer['undoes'])}.\n"
+        text += f"\nIt undoes the edit from {answer['undoes']['time']}.\n"
     found = answer.get("changes")
     if found and found["hunks"]:
         heading, *rest = _changes(found)

@@ -155,15 +155,21 @@ def test_undoes_is_echoed_when_the_earlier_edit_exists(tmp_path):
         first = await client.call_tool(
             "kb_record_edit", edit(before="a\n", after="b\n")
         )
-        earlier = first.structured_content["id"]
+        earlier = {
+            "id": first.structured_content["id"],
+            "time": first.structured_content["time"],
+        }
         return earlier, await client.call_tool(
-            "kb_record_edit", edit(before="b\n", after="a\n", undoes=earlier)
+            "kb_record_edit", edit(before="b\n", after="a\n", undoes=earlier["id"])
         )
 
     earlier, result = session(server_parameters(tmp_path), steps)
 
     assert result.structured_content["undoes"] == earlier
-    assert f"It undoes edit `{earlier}`." in result.structured_content["card"]
+    assert (
+        f"It undoes the edit from {earlier['time']}."
+        in result.structured_content["card"]
+    )
 
 
 def test_undoes_an_unknown_edit_is_refused(tmp_path):

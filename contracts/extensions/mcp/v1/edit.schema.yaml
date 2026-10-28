@@ -90,8 +90,18 @@ $defs:
         description: Present when the edit created the file, that is when `before` was empty.
         const: true
       undoes:
-        description: The id of the earlier edit this edit undoes, as sent.
-        $ref: common.schema.yaml#/$defs/edit_id
+        title: Undone edit
+        description: The earlier edit this edit undoes, named by the `undoes` argument.
+        type: object
+        additionalProperties: false
+        required:
+          - id
+          - time
+        properties:
+          id:
+            $ref: common.schema.yaml#/$defs/edit_id
+          time:
+            $ref: common.schema.yaml#/$defs/time
       changes:
         $ref: "#/$defs/edit_changes"
       card:

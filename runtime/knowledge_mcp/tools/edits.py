@@ -92,8 +92,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             operation=operation,
             undoes=undoes,
         )
-        if undoes is not None:
-            edits.check_undoes(location, undoes)
+        undone = None if undoes is None else edits.check_undoes(location, undoes)
         texts = edits.Texts(
             before=before,
             after=after,
@@ -106,7 +105,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             location,
             arguments,
             EditReceipt,
-            edits.receipt(entry, undoes),
+            edits.receipt(entry, undone),
             view=markdown.saved,
         )
 

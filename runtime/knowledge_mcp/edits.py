@@ -124,13 +124,14 @@ def changes(before: str, after: str) -> dict[str, Any]:
     }
 
 
-def check_undoes(location: str, undoes: str) -> None:
-    """Raise EditError when no valid edit recorded for `location` has the id `undoes`.
+def check_undoes(location: str, undoes: str) -> dict[str, str]:
+    """Return the id and time of the undone edit. Raise EditError when no valid edit recorded for `location` has the id `undoes`.
 
     A grouped undo is recorded under the group's root, like the edits it undoes.
     """
-    if any(edit["id"] == undoes for edit in listing(location)["edits"]):
-        return
+    for edit in listing(location)["edits"]:
+        if edit["id"] == undoes:
+            return {"id": edit["id"], "time": edit["time"]}
     msg = (
         f"No edit recorded for {location!r} has the id {undoes!r}. Call `kb_list_edits` "
         "with the same `location` and send the id of the edit this one undoes, or leave "
@@ -139,7 +140,9 @@ def check_undoes(location: str, undoes: str) -> None:
     raise EditError(msg, pointer=problems.pointer("undoes"))
 
 
-def receipt(entry: dict[str, Any], undoes: str | None = None) -> dict[str, Any]:
+def receipt(
+    entry: dict[str, Any], undoes: dict[str, str] | None = None
+) -> dict[str, Any]:
     """Return the entry with `schema` and without `before` and `after`, which the agent already has.
 
     Add `changes`, a capped excerpt of the changed lines, so the receipt stays small.
