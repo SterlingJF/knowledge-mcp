@@ -31,6 +31,10 @@ export type CardAction = {
   /** Defaults to ghost, the decline look; the first action is usually primary. */
   variant?: ButtonVariant;
   icon?: ReactNode;
+  /** Shown but not pressable, e.g. Save with no change kept. */
+  disabled?: boolean;
+  /** Model context sent with the message, unseen by the person (e.g. a preview's digest). */
+  context?: Record<string, unknown>;
 };
 
 export type CardShellProps = {
@@ -113,6 +117,7 @@ export function CardShell({
               key={item.label}
               variant={item.variant ?? "ghost"}
               icon={item.icon}
+              disabled={item.disabled}
               onClick={() => onAction?.(item)}
             >
               {item.label}
