@@ -87,6 +87,30 @@
   color-scheme: dark;
 }
 
+[data-theme="light"] {
+  --color-background-primary: #FFFFFF;
+  --color-background-secondary: #F5F4ED;
+  --color-background-tertiary: #FAF9F5;
+  --color-background-inverse: #141413;
+  --color-background-info: #D6E4F6;
+  --color-background-success: #E9F1DC;
+  --color-background-warning: #F6EEDF;
+  --color-background-danger: #F7ECEC;
+  --color-text-primary: #141413;
+  --color-text-secondary: #3D3D3A;
+  --color-text-tertiary: #73726C;
+  --color-text-inverse: #FFFFFF;
+  --color-text-info: #3266AD;
+  --color-text-success: #265B19;
+  --color-text-warning: #5A4815;
+  --color-text-danger: #7F2C28;
+  --color-border-primary: rgba(31,30,29,.4);
+  --color-border-secondary: rgba(31,30,29,.3);
+  --color-border-tertiary: rgba(31,30,29,.15);
+  --color-ring-primary: rgba(20,20,19,.7);
+  color-scheme: light;
+}
+
 [data-theme] {
   --km-focus-ring: 0 0 0 2px var(--color-background-primary), 0 0 0 4px var(--color-ring-primary);
   --km-eyebrow-tracking: 0.07em;

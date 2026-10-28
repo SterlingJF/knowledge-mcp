@@ -50,6 +50,8 @@ const css = [
     tokens.color.dark,
     "\n  color-scheme: dark;",
   ),
+  // A container can force light inside a dark page too (the gallery's light column).
+  block('[data-theme="light"]', tokens.color.light, "\n  color-scheme: light;"),
   // Effects reference colours, so they re-resolve inside every themed container.
   block("[data-theme]", tokens.effect),
   `@media (prefers-color-scheme: dark) {\n${block(
