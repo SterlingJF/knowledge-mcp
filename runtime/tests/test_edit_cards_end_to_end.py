@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from knowledge_mcp.views.markdown import when
 from tests.harness import server_parameters, session
 
 ACCEPTED = {
@@ -167,7 +168,7 @@ def test_undoes_is_echoed_when_the_earlier_edit_exists(tmp_path):
 
     assert result.structured_content["undoes"] == earlier
     assert (
-        f"It undoes the edit from {earlier['time']}."
+        f"It undoes the edit from {when(earlier['time'])}."
         in result.structured_content["card"]
     )
 
@@ -198,3 +199,8 @@ def test_undoes_an_edit_of_another_document_is_refused(tmp_path):
 
     assert result.is_error
     assert result.structured_content["errors"][0]["pointer"] == "#/undoes"
+
+
+def test_when_shows_a_short_utc_time():
+    assert when("2026-10-18T17:42:13.920Z") == "Oct 18, 17:42 UTC"
+    assert when("2026-10-08T09:41:00+02:00") == "Oct 8, 07:41 UTC"

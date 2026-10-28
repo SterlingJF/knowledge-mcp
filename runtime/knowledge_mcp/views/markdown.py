@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import PurePosixPath
 from typing import Any, Literal
 
@@ -23,6 +24,12 @@ def code(text: str) -> str:
         fence += "`"
     padding = " " if text.startswith("`") or text.endswith("`") else ""
     return f"{fence}{padding}{text}{padding}{fence}"
+
+
+def when(time: str) -> str:
+    """An ISO timestamp as `Oct 18, 17:42 UTC`."""
+    moment = datetime.fromisoformat(time.replace("Z", "+00:00")).astimezone(UTC)
+    return f"{moment:%b} {moment.day}, {moment:%H:%M} UTC"
 
 
 def _line(text: str) -> str:
@@ -165,7 +172,7 @@ def saved(answer: dict[str, Any]) -> str:
         f"The {verb} {name} is recorded.\n"
     )
     if answer.get("undoes"):
-        text += f"\nIt undoes the edit from {answer['undoes']['time']}.\n"
+        text += f"\nIt undoes the edit from {when(answer['undoes']['time'])}.\n"
     found = answer.get("changes")
     if found and found["hunks"]:
         heading, *rest = _changes(found)
