@@ -65,24 +65,40 @@ function Live({
   );
 }
 
+// M05F: one Problem cell per blocker, then its choice.
 const blockers: DecisionRow[] = [
   {
-    id: "name",
+    id: "exists",
     name: "Name taken",
     cells: [
-      mono("timings-notes.md"),
-      "Proposals/timings-notes.md already exists",
+      <span>
+        <b className="font-(--font-weight-semibold)">
+          Decisions/2026-10-28 retire evening build.md
+        </b>{" "}
+        already exists
+      </span>,
     ],
-    options: [
-      { value: "rename", label: "Rename to timings-notes-2.md" },
-      { value: "replace", label: "Replace the existing file" },
-      { value: "skip", label: "Skip this file" },
-    ],
+    options: [{ value: "skip", label: "Skip this file" }],
   },
   {
     id: "link",
     name: "Ambiguous link",
-    cells: [mono("weekly-2026-43.md:7"), mono("[[build review]]")],
+    cells: [
+      <span>{mono("[[proposal]]")} in weekly-2026-43.md matches 2 notes</span>,
+    ],
+    options: [
+      { value: "a", label: "Link to Proposals/cache-proposal" },
+      { value: "b", label: "Link to Proposals/timings-notes" },
+    ],
+  },
+  {
+    id: "long",
+    name: "Ambiguous link",
+    cells: [
+      <span>
+        {mono("[[build review]]")} in weekly-2026-43.md matches 3 notes
+      </span>,
+    ],
     options: [
       {
         value: "a",
@@ -92,13 +108,8 @@ const blockers: DecisionRow[] = [
         value: "b",
         label: "Link to Calendar/Meetings/2026-10-27 build review",
       },
+      { value: "c", label: "Link to Proposals/timings-notes" },
     ],
-  },
-  {
-    id: "scan",
-    name: "No document type",
-    cells: [mono("scan-0412.md"), "No document type"],
-    options: [{ value: "skip", label: "Skip this file" }],
   },
 ];
 
@@ -107,8 +118,10 @@ function Blockers() {
   return (
     <div className="@container">
       <DecisionRows
-        headers={["File", "Blocker"]}
+        headers={["Problem", "Your choice"]}
         rows={blockers}
+        narrow={{ title: 0 }}
+        align="start"
         choices={choices}
         onChoiceChange={(id, v) => setChoices({ ...choices, [id]: v })}
       />
@@ -123,6 +136,36 @@ export default {
     "Move blockers at 727px": (
       <div className="w-[727px] max-w-full">
         <Blockers />
+      </div>
+    ),
+    "Move blockers at 816px": (
+      <div className="w-[816px] max-w-full">
+        <Blockers />
+      </div>
+    ),
+    "Move blockers at 320px": (
+      <div className="w-[320px] max-w-full">
+        <Blockers />
+      </div>
+    ),
+    "Conventions at 816px": (
+      <div className="w-[816px] max-w-full">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
+      </div>
+    ),
+    "Conventions at 727px": (
+      <div className="w-[727px] max-w-full">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
+      </div>
+    ),
+    "Conventions at 360px": (
+      <div className="w-[360px] max-w-full">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
+      </div>
+    ),
+    "Conventions at 320px": (
+      <div className="w-[320px] max-w-full">
+        <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Move blockers at 360px": (

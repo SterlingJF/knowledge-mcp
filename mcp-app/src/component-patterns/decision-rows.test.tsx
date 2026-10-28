@@ -124,3 +124,54 @@ test("a one-option row is a tick box that sets and clears the value", () => {
   fireEvent.click(screen.getByRole("checkbox", { name: "Skip this file" }));
   expect(onChoiceChange).toHaveBeenLastCalledWith("s", null);
 });
+
+test("narrow layout marks the title, detail and hidden cells", () => {
+  render(
+    <DecisionRows
+      headers={["Type", "Folder", "Example", "Choice"]}
+      rows={[
+        {
+          id: "a",
+          name: "a",
+          cells: ["Decision record", "Decisions/", "x.md"],
+        },
+      ]}
+      onChoiceChange={() => {}}
+    />,
+  );
+  expect(screen.getByText("Decision record").className).toContain(
+    "@max-[560px]:font-(--font-weight-semibold)",
+  );
+  expect(screen.getByText("Decisions/").className).toContain(
+    "@max-[560px]:hidden",
+  );
+  expect(screen.getByText("x.md").className).toContain(
+    "@max-[560px]:text-(--color-text-secondary)",
+  );
+  expect(screen.getByText("Choice").tagName).toBe("TH");
+});
+
+test("move blockers: problem is the title, nothing hidden, choice at the start", () => {
+  render(
+    <DecisionRows
+      headers={["Problem", "Your choice"]}
+      rows={[
+        {
+          id: "a",
+          name: "a",
+          cells: ["a.md already exists"],
+          options: [{ value: "s", label: "Skip" }],
+        },
+      ]}
+      narrow={{ title: 0 }}
+      align="start"
+      onChoiceChange={() => {}}
+    />,
+  );
+  const cell = screen.getByText("a.md already exists");
+  expect(cell.className).toContain(
+    "@max-[560px]:font-(--font-weight-semibold)",
+  );
+  expect(cell.className).not.toContain("hidden");
+  expect(screen.getByText("Your choice").className).not.toContain("text-right");
+});

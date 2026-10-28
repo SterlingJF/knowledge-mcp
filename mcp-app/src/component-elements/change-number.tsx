@@ -55,16 +55,17 @@ export function TickBox({
     <label
       className={cn(
         rowClass,
-        "cursor-pointer font-(family-name:--font-sans) text-(--color-text-primary)",
+        // A long label wraps; the box stays on the first line.
+        "cursor-pointer items-start whitespace-normal font-(family-name:--font-sans) text-(--color-text-primary)",
         className,
       )}
     >
       <Checkbox
-        className={boxClass}
+        className={cn(boxClass, "mt-[calc((1lh-var(--km-check))/2)] shrink-0")}
         checked={checked}
         onCheckedChange={(c) => onCheckedChange(c)}
       />
-      {label}
+      <span className="min-w-0">{label}</span>
     </label>
   );
 }

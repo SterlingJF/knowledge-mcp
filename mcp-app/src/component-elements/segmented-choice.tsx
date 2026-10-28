@@ -20,21 +20,37 @@ const groupClass =
   "gap-0 overflow-hidden has-focus-visible:shadow-(--km-focus-ring) rounded-(--border-radius-sm) border-(length:--border-width-regular) border-solid border-(--color-border-secondary)";
 
 const itemClass =
-  "h-auto min-w-0 rounded-none! px-(--km-space-5) py-(--km-space-2) text-(length:--font-text-xs-size) font-(--font-weight-semibold) text-(--color-text-tertiary) hover:bg-(--color-background-secondary) focus-visible:ring-0 focus-visible:shadow-[inset_0_0_0_2px_var(--color-ring-primary),inset_0_0_0_4px_var(--color-background-primary)] focus-visible:relative focus-visible:z-10 pointer-coarse:min-h-(--km-target) pointer-coarse:min-w-(--km-target) [&+&]:border-solid [&+&]:border-(--color-border-secondary) data-[state=on]:bg-(--color-background-inverse) aria-checked:bg-(--color-background-inverse) aria-checked:text-(--color-text-inverse)";
+  "h-auto min-w-0 rounded-none! px-(--km-space-5) py-(--km-space-2) text-(length:--font-text-xs-size) font-(--font-weight-semibold) text-(--color-text-tertiary) hover:bg-(--color-background-secondary) focus-visible:ring-0 focus-visible:shadow-[inset_0_0_0_2px_var(--color-ring-primary),inset_0_0_0_4px_var(--color-background-primary)] focus-visible:relative focus-visible:z-10 pointer-coarse:min-h-(--km-target) pointer-coarse:min-w-(--km-target) [&+&]:border-solid [&+&]:border-(--color-border-secondary) aria-checked:bg-(--color-background-inverse) aria-checked:text-(--color-text-inverse)";
 
 /**
- * Stacks when the side-by-side row is wider than the space it has.
- * The row's natural width is remembered while it is side by side, so it only returns when it fits again.
+ * Stacks when the side-by-side row is wider than the space it has (the wrapper's max width).
+ * The row's natural width is measured whenever it is side by side, and again when the options change,
+ * so it only returns to a row when that width fits.
  */
-function useStacked(always: boolean) {
+function useStacked(always: boolean, key: string) {
   const wrap = useRef<HTMLDivElement>(null);
   const group = useRef<HTMLDivElement>(null);
   const natural = useRef(0);
-  const [stacked, setStacked] = useState(always);
+  const [stacked, setStacked] = useState(false);
 
+  // New options or labels: lay out as a row again and re-measure.
   useLayoutEffect(() => {
-    if (always || typeof ResizeObserver === "undefined") return;
-    const measure = () => {
+    natural.current = 0;
+    setStacked(false);
+  }, [key]);
+
+  // While side by side, record the natural width and stack if it overflows.
+  useLayoutEffect(() => {
+    if (always || stacked || !wrap.current || !group.current) return;
+    natural.current = group.current.scrollWidth;
+    if (natural.current > wrap.current.clientWidth) setStacked(true);
+  });
+
+  // On resize, switch either way.
+  useLayoutEffect(() => {
+    if (always || typeof ResizeObserver === "undefined" || !wrap.current)
+      return;
+    const ro = new ResizeObserver(() => {
       const w = wrap.current;
       const g = group.current;
       if (!w || !g) return;
@@ -42,10 +58,8 @@ function useStacked(always: boolean) {
         if (!was) natural.current = g.scrollWidth;
         return natural.current > w.clientWidth;
       });
-    };
-    const ro = new ResizeObserver(measure);
-    if (wrap.current) ro.observe(wrap.current);
-    measure();
+    });
+    ro.observe(wrap.current);
     return () => ro.disconnect();
   }, [always]);
 
@@ -61,13 +75,18 @@ export function SegmentedChoice<V extends string>({
 }: SegmentedChoiceProps<V>) {
   if (options.length < 2)
     throw new Error("SegmentedChoice takes 2 or more options");
-  const { wrap, group, stacked } = useStacked(options.length > 3);
+  const key = options.map((o) => `${o.value}\u0000${o.label}`).join("\u0001");
+  const { wrap, group, stacked } = useStacked(options.length > 3, key);
 
   return (
-    // inline-size containment: the row's width never props open its column; it stacks instead.
+    // As wide as its row, never wider than its space (a caller may cap it with max-w); past that it stacks.
     <div
       ref={wrap}
-      className={cn("w-full min-w-0 [contain:inline-size]", className)}
+      className={cn(
+        "max-w-full min-w-0",
+        stacked ? "w-full" : "w-max",
+        className,
+      )}
     >
       <ToggleGroup
         ref={group}

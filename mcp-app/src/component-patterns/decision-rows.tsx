@@ -40,7 +40,11 @@ export type DecisionRow = {
   decided?: { tone: BadgeTone; label: string };
 };
 
-/** How many rows will be saved: the count for the card's primary button. */
+/**
+ * How many rows will be saved: the count for the card's primary button.
+ * Counts only the preset answers "accept" and "apply". A per-row option (a move blocker's answer)
+ * never counts: answering a blocker is not accepting a row.
+ */
 export function countAccepted(
   choices: Record<string, string | null | undefined>,
 ): number {
@@ -48,13 +52,23 @@ export function countAccepted(
     .length;
 }
 
+/** Which cell plays which part when the table stacks under 560px. Column indexes. */
+export type NarrowLayout = { title: number; detail?: number; hide?: number[] };
+/** The conventions layout: type as the title, example as the detail, folder hidden. */
+const conventionsNarrow: NarrowLayout = { title: 0, detail: 2, hide: [1] };
+
+// The choice column sizes to its content, up to about two-thirds of the table; past that the label wraps or the options stack.
+const cap = "w-max max-w-[65cqi] @max-[560px]:max-w-full";
+
 function Choice({
   row,
   kind,
+  align,
   choices,
   onChoiceChange,
 }: {
   row: DecisionRow;
+  align: "start" | "end";
   kind: DecisionKind;
   choices: Record<string, string | null | undefined>;
   onChoiceChange: (id: string, value: string | null) => void;
@@ -71,13 +85,15 @@ function Choice({
         label={only.label}
         checked={value === only.value}
         onCheckedChange={(on) => onChoiceChange(row.id, on ? only.value : null)}
+        className={cap}
       />
     );
   }
   return (
     <SegmentedChoice<string>
       aria-label={row.name}
-      className="[&>[role=radiogroup]]:ml-auto @max-[560px]:[&>[role=radiogroup]]:ml-0"
+      // Capped so long options stack instead of widening the column.
+      className={cn(cap, align === "end" && "ml-auto @max-[560px]:ml-0")}
       options={options}
       value={value}
       onValueChange={(v) => onChoiceChange(row.id, v)}
@@ -91,8 +107,11 @@ export function DecisionRows({
   kind = "acceptDrop",
   choices = {},
   onChoiceChange,
+  narrow = conventionsNarrow,
+  align = "end",
   className,
 }: {
+  /** One per cell; one more labels the choice column (M05F "Your choice"). */
   headers: ReactNode[];
   rows: DecisionRow[];
   kind?: DecisionKind;
@@ -100,8 +119,20 @@ export function DecisionRows({
   choices?: Record<string, string | null | undefined>;
   /** null only when a single-option row's tick box is cleared. */
   onChoiceChange: (id: string, value: string | null) => void;
+  /** Under 560px: the title cell is semibold, the detail secondary mono, hidden cells go. Defaults to conventions. */
+  narrow?: NarrowLayout;
+  /** Where the choice sits in its column: "end" for conventions (P04), "start" for move blockers (M05F). */
+  align?: "start" | "end";
   className?: string;
 }) {
+  const cellCount = rows[0]?.cells.length ?? headers.length;
+  const part = (i: number) =>
+    cn(
+      i === narrow.title && "@max-[560px]:font-(--font-weight-semibold)",
+      i === narrow.detail &&
+        "@max-[560px]:font-(family-name:--font-mono) @max-[560px]:text-(--color-text-secondary)",
+      narrow.hide?.includes(i) && "@max-[560px]:hidden",
+    );
   const cell = "py-(--km-gap-row) pr-(--km-gap-group) align-top";
   return (
     <table
@@ -112,7 +143,7 @@ export function DecisionRows({
     >
       <thead className="@max-[560px]:sr-only">
         <tr className="border-b-(length:--border-width-regular) border-(--color-border-tertiary) text-left text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) font-(--font-weight-semibold) text-(--color-text-secondary)">
-          {headers.map((h, i) => (
+          {headers.slice(0, cellCount).map((h, i) => (
             <th
               key={i}
               className={cn(cell, "pt-0 pb-(--km-gap-row) font-[inherit]")}
@@ -120,7 +151,15 @@ export function DecisionRows({
               {h}
             </th>
           ))}
-          <th className={cn(cell, "pr-0")} />
+          <th
+            className={cn(
+              cell,
+              "pt-0 pr-0 pb-(--km-gap-row) font-[inherit]",
+              align === "end" && "text-right",
+            )}
+          >
+            {headers[cellCount]}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -130,18 +169,20 @@ export function DecisionRows({
             className="border-b-(length:--border-width-regular) border-(--color-border-tertiary) last:border-b-0 @max-[560px]:flex @max-[560px]:flex-col @max-[560px]:py-(--km-gap-row) @max-[560px]:[&>td]:py-0 @max-[560px]:[&>td]:pr-0"
           >
             {row.cells.map((c, i) => (
-              <td key={i} className={cn(cell, "wrap-anywhere")}>
+              <td key={i} className={cn(cell, "break-words", part(i))}>
                 {c}
               </td>
             ))}
             <td
               className={cn(
                 cell,
-                "w-2/5 pr-0 text-right @max-[560px]:mt-(--km-gap-row) @max-[560px]:w-auto @max-[560px]:text-left",
+                "w-px pr-0 @max-[560px]:mt-(--km-gap-row) @max-[560px]:w-auto",
+                align === "end" && "text-right @max-[560px]:text-left",
               )}
             >
               <Choice
                 row={row}
+                align={align}
                 kind={kind}
                 choices={choices}
                 onChoiceChange={onChoiceChange}
