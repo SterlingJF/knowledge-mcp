@@ -66,6 +66,20 @@ class MoveLink(BaseModel):
             description="The complete replacement link token, or null when the original token needs no change."
         ),
     ]
+    line: Annotated[
+        int | None,
+        Field(
+            description="One-based line number of the link token in its source note. Present when the source text was supplied.",
+            ge=1,
+        ),
+    ] = None
+    text: Annotated[
+        str | None,
+        Field(
+            description="The original link token exactly as written, such as `[[retire-evening]]`. Present when the source text was supplied.",
+            min_length=1,
+        ),
+    ] = None
 
 
 class MoveStay(BaseModel):
@@ -126,6 +140,20 @@ class MoveIssue(BaseModel):
     start: Annotated[int | None, Field(ge=0)]
     end: Annotated[int | None, Field(ge=0)]
     detail: str
+    line: Annotated[
+        int | None,
+        Field(
+            description="One-based line number of the link token for a `link-*` issue. Present when the source text was supplied.",
+            ge=1,
+        ),
+    ] = None
+    text: Annotated[
+        str | None,
+        Field(
+            description="The link token exactly as written for a `link-*` issue. Present when the source text was supplied.",
+            min_length=1,
+        ),
+    ] = None
     choices: Annotated[
         list[MoveIssueChoice] | None,
         Field(

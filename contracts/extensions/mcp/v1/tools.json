@@ -15285,6 +15285,16 @@
                   "string",
                   "null"
                 ]
+              },
+              "line": {
+                "description": "One-based line number of the link token in its source note. Present when the source text was supplied.",
+                "type": "integer",
+                "minimum": 1
+              },
+              "text": {
+                "description": "The original link token exactly as written, such as `[[retire-evening]]`. Present when the source text was supplied.",
+                "type": "string",
+                "minLength": 1
               }
             },
             "additionalProperties": false
@@ -15325,6 +15335,16 @@
               },
               "detail": {
                 "type": "string"
+              },
+              "line": {
+                "description": "One-based line number of the link token for a `link-*` issue. Present when the source text was supplied.",
+                "type": "integer",
+                "minimum": 1
+              },
+              "text": {
+                "description": "The link token exactly as written for a `link-*` issue. Present when the source text was supplied.",
+                "type": "string",
+                "minLength": 1
               },
               "choices": {
                 "description": "Resolutions the server can compute for this issue. Absent when it can compute none.",

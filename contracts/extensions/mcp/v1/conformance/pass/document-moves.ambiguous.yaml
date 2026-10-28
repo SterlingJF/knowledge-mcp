@@ -92,6 +92,8 @@ issues:
     start: 0
     end: 8
     detail: Establish the original target with a verified binding.
+    line: 1
+    text: "[[Same]]"
     choices:
       - action: bind_link
         path: x/Same.md

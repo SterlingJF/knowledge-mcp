@@ -196,24 +196,32 @@ links:
     target_before: Decisions/Beta.md
     target_after: B.md
     replacement: "[[B#Heading]]"
+    line: 1
+    text: "[[Beta#Heading]]"
   - source_path: Decisions/Beta.md
     start: 0
     end: 16
     target_before: Decisions/Alpha.md
     target_after: A.md
     replacement: "[[A#^block]]"
+    line: 1
+    text: "[[Alpha#^block]]"
   - source_path: Index.md
     start: 0
     end: 9
     target_before: Decisions/Alpha.md
     target_after: A.md
     replacement: "[[A]]"
+    line: 1
+    text: "[[Alpha]]"
   - source_path: Index.md
     start: 10
     end: 18
     target_before: Decisions/Beta.md
     target_after: B.md
     replacement: "[[B]]"
+    line: 1
+    text: "[[Beta]]"
 issues: []
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
@@ -249,7 +257,7 @@ card: |
 
   **Links (4)**
 
-  1. `Decisions/Alpha.md` · `Decisions/Beta.md` → `[[B#Heading]]`
-  2. `Decisions/Beta.md` · `Decisions/Alpha.md` → `[[A#^block]]`
-  3. `Index.md` · `Decisions/Alpha.md` → `[[A]]`
-  4. `Index.md` · `Decisions/Beta.md` → `[[B]]`
+  1. `Decisions/Alpha.md:1` · `[[Beta#Heading]]` → `[[B#Heading]]`
+  2. `Decisions/Beta.md:1` · `[[Alpha#^block]]` → `[[A#^block]]`
+  3. `Index.md:1` · `[[Alpha]]` → `[[A]]`
+  4. `Index.md:1` · `[[Beta]]` → `[[B]]`
