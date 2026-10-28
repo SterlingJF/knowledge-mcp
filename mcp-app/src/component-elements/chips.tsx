@@ -7,11 +7,14 @@ import { source as sourceCopy } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 /** The contract's three source kinds (proposal.schema.yaml). */
-export type LineSource = { file: string; line_number: number };
-export type PlaceSource = { file: string; place: string };
-export type PersonSource = { said: string };
-export type FileSource = { file: string };
-export type Source = LineSource | PlaceSource | FileSource | PersonSource;
+import type { Source } from "@/contracts/proposal";
+export type {
+  FileSource,
+  LineSource,
+  PersonSource,
+  PlaceSource,
+  Source,
+} from "@/contracts/proposal";
 
 const chipClass =
   "inline-flex max-w-full items-center whitespace-nowrap gap-(--km-space-2) rounded-(--border-radius-sm) border-(length:--border-width-regular) border-(--color-border-tertiary) bg-(--color-background-primary) px-(--km-space-3) py-(--km-space-1) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary)";

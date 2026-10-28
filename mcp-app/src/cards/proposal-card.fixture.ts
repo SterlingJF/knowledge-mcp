@@ -48,7 +48,7 @@ export const e02: Proposal = {
   document_type: { id: "design-proposal", label: "Design proposal" },
   reader: {
     id: "maintainers",
-    label: "maintainers deciding whether to accept it",
+    label: "maintainers",
     confirmed: true,
   },
   left_out: [

@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useCardHost } from "@/bridge/bridge";
 import type { ToolResult } from "@/bridge/bridge";
 import { Badge } from "@/component-elements/badge";
-import { PathChip } from "@/component-elements/chips";
+import { NoBreakName, PathChip } from "@/component-elements/chips";
 import { Note } from "@/component-elements/note";
 import type { KeyValueRow } from "@/component-elements/key-value";
 import type { CardAction } from "@/component-patterns/card-shell";
@@ -174,15 +174,21 @@ export function summaryRows(p: Proposal): KeyValueRow[] {
   return rows.slice(0, MAX_ROWS);
 }
 
-/** The first open question as `Rollout owner · no source`, then `+n more`. */
+/** An open question as `Rollout owner · no source`. */
+const unsourced = (q: ProposalCell) =>
+  proposalCopy.unsourced(q.label ?? q.text);
+
+/** The first open question, then `+n more`. */
 function openQuestion(questions: ProposalCell[]): string {
   const [first] = questions;
   return [
-    first.label ?? first.text,
-    proposalCopy.noSource,
+    unsourced(first),
     ...(questions.length > 1 ? [line.andMore(questions.length - 1)] : []),
   ].join(line.summaryJoin);
 }
+
+const hasMeta = (p: Proposal) =>
+  Boolean(p.filing ?? p.instance ?? p.document_type ?? p.reader);
 
 /** File chip, document type, reader, and a badge when the reader is a guess. */
 function MetaLine({ p, full }: { p: Proposal; full: boolean }) {
@@ -191,7 +197,6 @@ function MetaLine({ p, full }: { p: Proposal; full: boolean }) {
     p.document_type?.label,
     p.reader && proposalCopy.forReader(p.reader.label),
   ].filter((w): w is string => w != null);
-  if (!where && words.length === 0) return null;
   return (
     <>
       {where && <PathChip path={where} />}
@@ -236,7 +241,9 @@ export function ProposalView({
         ? eyebrow.proposedDocument
         : eyebrow.proposedChanges,
     title: p.summary,
-    meta: <MetaLine p={p} full={displayMode === "fullscreen"} />,
+    meta: hasMeta(p) ? (
+      <MetaLine p={p} full={displayMode === "fullscreen"} />
+    ) : undefined,
     badge:
       pressed === "save"
         ? { tone: "done" as const, label: badge.done.approved }
@@ -285,7 +292,7 @@ export function ProposalView({
             kind="info"
             fact={proposalCopy.noRuleFor(p.document_type?.label)}
           >
-            {p.filing.reason}
+            <NoBreakName>{p.filing.reason}</NoBreakName>
           </Note>
         )}
         {p.open_questions && p.open_questions.length > 0 && (
@@ -293,13 +300,8 @@ export function ProposalView({
             kind="leftOut"
             fact={proposalCopy.toAnswer(p.open_questions.length)}
           >
-            {`${p.open_questions
-              .map((q) =>
-                [q.label ?? q.text, proposalCopy.noSource].join(
-                  line.summaryJoin,
-                ),
-              )
-              .join(", ")}. ${proposalCopy.staysOpen(p.open_questions.length)}`}
+            {proposalCopy.openList(p.open_questions.map(unsourced))}{" "}
+            {proposalCopy.staysOpen(p.open_questions.length)}
           </Note>
         )}
         {p.left_out && p.left_out.length > 0 && <LeftOut files={p.left_out} />}

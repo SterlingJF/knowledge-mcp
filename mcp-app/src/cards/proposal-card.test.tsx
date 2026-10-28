@@ -101,8 +101,14 @@ test("a minimal proposal draws with only its changes", () => {
     ],
     card: "",
   };
-  renderCard(minimal);
+  const { view } = renderCard(minimal);
   expect(screen.getByText("Fix a typo")).toBeTruthy();
+  // No instance, type, reader or filing: no meta line at all.
+  const title = screen.getByText("Fix a typo");
+  expect(title.nextElementSibling).toBeNull();
+  expect(view.container.querySelector("header")?.textContent).not.toContain(
+    proposal.guess,
+  );
   expect(screen.getByText(line.waitsBecause(line.theDocument))).toBeTruthy();
   expect(fileName({ ...e02, instance: undefined })).toBe(line.theDocument);
   expect(
@@ -252,11 +258,7 @@ test("meta shows the type, the reader and a guess badge", () => {
 
 test("a confirmed reader gets no guess badge, and a rule names the file", () => {
   renderCard(e02);
-  expect(
-    screen.getByText(
-      "Design proposal · for maintainers deciding whether to accept it",
-    ),
-  ).toBeTruthy();
+  expect(screen.getByText("Design proposal · for maintainers")).toBeTruthy();
   expect(screen.queryByText(proposal.guess)).toBeNull();
   const named = summaryRows({
     ...newDocument,
