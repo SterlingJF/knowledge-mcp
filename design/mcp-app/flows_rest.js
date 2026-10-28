@@ -300,14 +300,10 @@
         card({
           eb: "Proposed document",
           title: "Cache rollout",
-          meta: `${chip("file", '<span class="mono">Proposals/cache-rollout.md</span>')} Design proposal`,
+          meta: `${chip("file", '<span class="mono">Proposals/cache-rollout.md</span>')} Design proposal · for maintainers <span class="badge b-nt">guess</span>`,
           badge: badge("b-amb", "Nothing saved"),
           full: true,
           body: sum([
-            [
-              "Reader",
-              'Maintainers · accept or reject <span class="badge b-nt">guess</span>',
-            ],
             ["Sections", "C1 Motivation · C2 Alternatives · C3 Status"],
             ["Evidence", "1 supported · 1 partly answered · 1 suggested"],
             ["Saved as", "Proposals/cache-rollout.md · no naming rule"],
@@ -318,7 +314,7 @@
         wait,
       cap: [
         "Asks for a new document.",
-        "Five data points: reader (a guess), sections, evidence, where it goes and why, the one thing no source answers.",
+        "Four data points: sections, evidence, where it goes and why, the one thing no source answers. The reader, a guess, sits in the meta line.",
         "kb_get_document_type, kbp_card, kb_list_audiences; kb_prepare_proposal draws the card, rows as additions; nothing written.",
         "kb-write-document steps 2–12; Claude design guidelines inline limits; amended recommendation 1.",
       ],

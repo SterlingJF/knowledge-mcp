@@ -44,6 +44,7 @@ export const action = {
   prepareAgain: "Prepare again",
   fullView: "Full view",
   showWhy: "Show why",
+  createFile: "Create the file",
   showChange: "Show the change",
   showLaterEdits: "Show the later edits",
   all: "All",
@@ -157,6 +158,7 @@ export const message = {
 export const label = {
   changes: "Changes",
   sections: "Sections",
+  savedAs: "Saved as",
   evidence: "Evidence",
   needsYou: "Needs you",
   leftOut: "Left out",
