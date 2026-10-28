@@ -4,6 +4,7 @@
 import { useState } from "react";
 
 import { useCardHost } from "@/bridge/bridge";
+import type { ToolResult } from "@/bridge/bridge";
 import { PathChip } from "@/component-elements/chips";
 import type { KeyValueRow } from "@/component-elements/key-value";
 import type { CardAction } from "@/component-patterns/card-shell";
@@ -18,7 +19,7 @@ import {
   action,
   badge,
   change,
-  evidence,
+  evidenceCount,
   eyebrow,
   frozen,
   label,
@@ -35,15 +36,45 @@ const MARKS: EvidenceMark[] = [
   "suggested",
 ];
 const MAX_ROWS = 4;
+/** More changes than this and the summary counts them instead of naming them. */
+const MAX_NAMED = 4;
+
+/** Which of the two actions was pressed; undefined while live. */
+export type Pressed = "save" | "notNow";
 
 const numbers = (p: Proposal) => p.rows.map((_, i) => i + 1);
 
+export function isProposal(
+  result: ToolResult | null,
+): result is ToolResult & Proposal {
+  if (!result || result.schema !== "knowledge-mcp/proposal/1") return false;
+  const { summary, rows } = result as Partial<Proposal>;
+  return (
+    typeof summary === "string" &&
+    Array.isArray(rows) &&
+    rows.every(
+      (r) =>
+        typeof r === "object" &&
+        r !== null &&
+        typeof r.proposed?.text === "string" &&
+        Array.isArray(r.sources),
+    )
+  );
+}
+
+export const isNewDocument = (p: Proposal) => p.rows.every((r) => !r.current);
+
 /** The last path segment of the subject, or "the document" without one. */
 export function fileName(p: Proposal): string {
-  return p.instance?.subject.split("/").at(-1) || "the document";
+  return p.instance?.subject.split("/").at(-1) || line.theDocument;
 }
 
 export function saveMessage(p: Proposal, kept: Set<number>): string {
+  if (isNewDocument(p))
+    return message.create(
+      p.instance?.subject ?? line.theDocument,
+      change.list([...kept]),
+    );
   const out = numbers(p).filter((n) => !kept.has(n));
   return message.save(
     change.list([...kept]),
@@ -72,11 +103,14 @@ const rowLabel = (p: Proposal, i: number) =>
   `${change.number(i + 1)} ${rowName(p, i)}`;
 
 export function summaryRows(p: Proposal): KeyValueRow[] {
-  const isNew = p.rows.every((r) => !r.current);
+  const isNew = isNewDocument(p);
   const rows: KeyValueRow[] = [
     {
       label: isNew ? label.sections : label.changes,
-      value: p.rows.map((_, i) => rowLabel(p, i)).join(line.summaryJoin),
+      value:
+        p.rows.length > MAX_NAMED
+          ? change.count(p.rows.length)
+          : p.rows.map((_, i) => rowLabel(p, i)).join(line.summaryJoin),
     },
   ];
   const counts = MARKS.map(
@@ -86,22 +120,30 @@ export function summaryRows(p: Proposal): KeyValueRow[] {
     rows.push({
       label: label.evidence,
       value: counts
-        .map(([mark, n]) => `${n} ${evidence[mark].toLowerCase()}`)
+        .map(([mark, n]) => `${n} ${evidenceCount[mark]}`)
         .join(line.summaryJoin),
     });
-  const conflict = p.rows.findIndex((r) => r.mark === "conflicting");
-  if (conflict >= 0)
+  if (isNew && p.instance)
+    rows.push({ label: label.savedAs, value: p.instance.subject });
+  const conflicts = p.rows.flatMap((r, i) =>
+    r.mark === "conflicting" ? [i] : [],
+  );
+  if (conflicts.length > 0) {
+    const [first] = conflicts;
     rows.push({
       label: label.needsYou,
       value: (
         <>
-          <b>{rowLabel(p, conflict)}</b>
+          <b>{rowLabel(p, first)}</b>
           {line.summaryJoin}
-          {p.rows[conflict].proposed.text}
+          {p.rows[first].proposed.text}
+          {conflicts.length > 1 &&
+            `${line.summaryJoin}${line.andMore(conflicts.length - 1)}`}
         </>
       ),
     });
-  if (p.left_out && p.left_out.length > 0)
+  }
+  if (!isNew && p.left_out && p.left_out.length > 0)
     rows.push({
       label: label.leftOut,
       value: p.left_out.map((f) => f.file).join(line.summaryJoin),
@@ -115,6 +157,7 @@ export type ProposalViewProps = {
   kept: Set<number>;
   onKeptChange: (kept: Set<number>) => void;
   lifecycle: CardLifecycle;
+  pressed?: Pressed;
 };
 
 /** The drawn card, given its state; the gallery renders it with fixed lifecycles. */
@@ -124,30 +167,30 @@ export function ProposalView({
   kept,
   onKeptChange,
   lifecycle,
+  pressed,
 }: ProposalViewProps) {
-  const isNew = p.rows.every((r) => !r.current);
-  const file = fileName(p);
+  const isNew = isNewDocument(p);
+  const live = lifecycle.state === "live";
   const shell = {
-    // Once pressed, the card is a record of one change, not a proposal.
-    eyebrow:
-      lifecycle.state === "frozen"
-        ? eyebrow.change
-        : isNew
-          ? eyebrow.proposedDocument
-          : eyebrow.proposedChanges,
+    // Once pressed or replaced, the card is a record of one change, not a proposal.
+    eyebrow: !live
+      ? eyebrow.change
+      : isNew
+        ? eyebrow.proposedDocument
+        : eyebrow.proposedChanges,
     title: p.summary,
-    meta: p.instance ? <PathChip path={file} /> : undefined,
+    meta: p.instance ? <PathChip path={p.instance.subject} /> : undefined,
     badge:
-      lifecycle.frozenLine === frozen.approved
+      pressed === "save"
         ? { tone: "done" as const, label: badge.done.approved }
-        : lifecycle.frozenLine === frozen.notSaved
+        : pressed === "notNow"
           ? { tone: "neutral" as const, label: badge.neutral.notSaved }
           : { tone: "waiting" as const, label: badge.waiting.nothingSaved },
-    why: line.waitsBecause(file),
+    why: isNew ? undefined : line.waitsBecause(fileName(p)),
     lifecycle,
   };
   const save: CardAction = {
-    label: action.save(change.list([...kept])),
+    label: isNew ? action.createFile : action.save(change.list([...kept])),
     message: saveMessage(p, kept),
     frozenLine: frozen.approved,
     variant: "primary",
@@ -167,31 +210,45 @@ export function ProposalView({
         <ChangeTable
           rows={p.rows}
           kept={kept}
-          onKeptChange={lifecycle.state === "live" ? onKeptChange : undefined}
+          onKeptChange={live ? onKeptChange : undefined}
         />
-        {p.left_out && <LeftOut files={p.left_out} />}
+        {p.left_out && p.left_out.length > 0 && <LeftOut files={p.left_out} />}
       </FullView>
     );
   return <SummaryCard {...shell} rows={summaryRows(p)} actions={actions} />;
 }
 
-function LiveProposal(props: Omit<ProposalViewProps, "lifecycle">) {
-  const lifecycle = useCardLifecycle();
-  return <ProposalView {...props} lifecycle={lifecycle} />;
-}
-
-export function ProposalCard({ result }: CardProps) {
-  const proposal = result as unknown as Proposal;
+function LiveProposal({ proposal }: { proposal: Proposal }) {
   const host = useCardHost();
   const [kept, setKept] = useState(() => new Set(numbers(proposal)));
+  const [pressed, setPressed] = useState<Pressed>();
+  const inner = useCardLifecycle();
+  const lifecycle: CardLifecycle = {
+    ...inner,
+    press: (a) => {
+      if (inner.state !== "live" || a.disabled) return;
+      setPressed(a.message === message.notNow ? "notNow" : "save");
+      inner.press(a);
+    },
+  };
   return (
-    <LiveProposal
+    <ProposalView
       proposal={proposal}
       displayMode={host.displayMode}
       kept={kept}
       onKeptChange={setKept}
+      lifecycle={lifecycle}
+      pressed={pressed}
     />
   );
+}
+
+export function ProposalCard({ result }: CardProps) {
+  if (!isProposal(result)) return null;
+  const i = result.instance;
+  // A new result starts over: its kept set is derived afresh.
+  const key = i ? `${i.subject}|${i.created_at}|${i.seq}` : result.summary;
+  return <LiveProposal key={key} proposal={result} />;
 }
 
 registerCard("knowledge-mcp/proposal/1", ProposalCard);

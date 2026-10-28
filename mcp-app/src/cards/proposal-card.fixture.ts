@@ -21,7 +21,7 @@ export const e02: Proposal = {
       sources: [{ file: "build-timings.xlsx", place: "Evening!A2:D10" }],
     },
     {
-      proposed: { label: "Status", text: "slide 7 approved, notes disputed" },
+      proposed: { label: "Status", text: "Proposed. Approval is disputed." },
       mark: "conflicting",
       sources: [
         { file: "cache-rollout-review.pptx", place: "slide 7" },
@@ -48,7 +48,7 @@ export const e02: Proposal = {
   left_out: [
     {
       file: "vendor-quote.xlsx",
-      reason: "Pricing only; no claim about the build.",
+      reason: "Pricing only, no claim about the build.",
     },
     { file: "release-calendar.md", reason: "Dates predate the proposal." },
   ],
@@ -58,20 +58,42 @@ export const e02: Proposal = {
       "sha256:3f1a9c0e7b2d4a6f8e1c3b5d7f9a0c2e4b6d8f0a1c3e5b7d9f1a3c5e7b9d1f3a",
   },
   instance: {
-    subject: "docs/proposals/cache-proposal.md",
+    subject: "cache-proposal.md",
     created_at: "2026-10-28T09:41:00.000Z",
     seq: 1,
   },
 };
 
 export const newDocument: Proposal = {
-  ...e02,
-  summary: "A design proposal for retiring the evening build",
-  rows: e02.rows.map((r) => ({ ...r, current: undefined })),
-  left_out: undefined,
+  schema: "knowledge-mcp/proposal/1",
+  summary: "Cache rollout",
+  rows: [
+    {
+      proposed: {
+        label: "Motivation",
+        text: "Cache misses add 40 minutes to each evening run",
+      },
+      mark: "supported",
+      sources: [{ file: "build-timings.xlsx", place: "Cache!B2:B9" }],
+    },
+    {
+      proposed: {
+        label: "Alternatives",
+        text: "A hosted build service, priced but not compared",
+      },
+      mark: "partly",
+      sources: [{ file: "vendor-quote.xlsx", place: "Sheet1" }],
+    },
+    {
+      proposed: { label: "Status", text: "Proposed" },
+      mark: "suggested",
+      sources: [{ said: "a proposal … on its own" }],
+    },
+  ],
+  card: "Proposed document Proposals/cache-rollout.md (C1–C3).",
   instance: {
-    created_at: "2026-10-28T09:41:00.000Z",
+    subject: "Proposals/cache-rollout.md",
+    created_at: "2026-10-28T10:02:00.000Z",
     seq: 2,
-    subject: "docs/proposals/evening-build.md",
   },
 };

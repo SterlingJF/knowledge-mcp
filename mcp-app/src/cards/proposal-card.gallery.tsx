@@ -4,6 +4,7 @@ import { HarnessFrame } from "@/component-patterns/card-shell.harness";
 import type { Proposal } from "@/contracts/proposal";
 import { frozen } from "@/copy/en";
 import { ProposalView } from "./proposal-card";
+import type { Pressed } from "./proposal-card";
 import { e02, newDocument } from "./proposal-card.fixture";
 
 const lifecycle = (
@@ -16,7 +17,9 @@ function Story({
   mode = "inline",
   life = lifecycle("live"),
   kept = new Set([1, 2, 3, 4]),
+  pressed,
 }: {
+  pressed?: Pressed;
   proposal?: Proposal;
   mode?: "inline" | "fullscreen";
   life?: CardLifecycle;
@@ -31,6 +34,7 @@ function Story({
           kept={kept}
           onKeptChange={() => {}}
           lifecycle={life}
+          pressed={pressed}
         />
       </HarnessFrame>
     </StaticCardHost>
@@ -46,9 +50,22 @@ export default {
     "Full view, C1 left out": (
       <Story mode="fullscreen" kept={new Set([2, 3, 4])} />
     ),
-    "Frozen approved": <Story life={lifecycle("frozen", frozen.approved)} />,
-    "Not saved": <Story life={lifecycle("frozen", frozen.notSaved)} />,
+    "Frozen approved": (
+      <Story life={lifecycle("frozen", frozen.approved)} pressed="save" />
+    ),
+    "Not saved": (
+      <Story life={lifecycle("frozen", frozen.notSaved)} pressed="notNow" />
+    ),
     Replaced: <Story life={lifecycle("replaced")} />,
-    "New document": <Story proposal={newDocument} kept={new Set([1, 2])} />,
+    "New document (D05)": (
+      <Story proposal={newDocument} kept={new Set([1, 2, 3])} />
+    ),
+    "New document full view (D05F)": (
+      <Story
+        proposal={newDocument}
+        mode="fullscreen"
+        kept={new Set([1, 2, 3])}
+      />
+    ),
   },
 };
