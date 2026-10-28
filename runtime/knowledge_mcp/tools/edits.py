@@ -8,7 +8,7 @@ from pydantic import Field
 
 from knowledge_mcp import edits
 from knowledge_mcp.models import AllowedBy
-from knowledge_mcp.models_auto.common_schema import EditOperation
+from knowledge_mcp.models_auto.common_schema import EditId, EditOperation
 from knowledge_mcp.models_auto.edit_schema import EditReceipt
 from knowledge_mcp.models_auto.edits_schema import EditsAnswer
 from knowledge_mcp.scope import Workspace
@@ -17,7 +17,7 @@ from knowledge_mcp.tools.kbp import READS, Location
 from knowledge_mcp.views import markdown
 
 RECORD = """\
-Record an edit right after you make it, so the person can check or undo the change. Returns the edit's id, the digests of `before` and `after`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.
+Record an edit right after you make it, so the person can check or undo the change. Send `undoes` when the edit undoes an earlier one. Returns the edit's id, the digests of `before` and `after`, a capped list of the changed lines in `changes`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.
 """
 
 LIST = """\
@@ -72,6 +72,15 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             Field(description="True when `before` is the whole file."),
         ] = None,
         operation: EditOperation | None = None,
+        undoes: Annotated[
+            EditId | None,
+            Field(
+                description=(
+                    "The id of the earlier edit this edit undoes, from `kb_list_edits`. "
+                    "Omit it for other edits."
+                ),
+            ),
+        ] = None,
     ) -> CallToolResult:
         arguments = respond.sent(
             location=location,
@@ -81,7 +90,10 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             after_digest=after_digest,
             whole_file=whole_file,
             operation=operation,
+            undoes=undoes,
         )
+        if undoes is not None:
+            edits.check_undoes(location, undoes)
         texts = edits.Texts(
             before=before,
             after=after,
@@ -94,7 +106,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
             location,
             arguments,
             EditReceipt,
-            edits.receipt(entry),
+            edits.receipt(entry, undoes),
             view=markdown.saved,
         )
 

@@ -23954,7 +23954,7 @@
     {
       "name": "kb_record_edit",
       "title": "Record an edit",
-      "description": "Record an edit right after you make it, so the person can check or undo the change. Returns the edit's id, the digests of `before` and `after`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.\n",
+      "description": "Record an edit right after you make it, so the person can check or undo the change. Send `undoes` when the edit undoes an earlier one. Returns the edit's id, the digests of `before` and `after`, a capped list of the changed lines in `changes`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -24019,6 +24019,18 @@
               }
             ],
             "default": null
+          },
+          "undoes": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EditId"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits."
           }
         },
         "required": [
@@ -24068,6 +24080,11 @@
             ],
             "title": "AllowedBy",
             "type": "object"
+          },
+          "EditId": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Edit id",
+            "type": "string"
           },
           "EditOperation": {
             "additionalProperties": false,
@@ -24133,9 +24150,60 @@
           }
         ],
         "$defs": {
+          "edit_changes": {
+            "title": "Edit changes",
+            "description": "The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.",
+            "type": "object",
+            "required": [
+              "hunks",
+              "lines",
+              "more"
+            ],
+            "properties": {
+              "hunks": {
+                "description": "The number of separate changed blocks.",
+                "type": "integer",
+                "minimum": 0
+              },
+              "lines": {
+                "type": "array",
+                "maxItems": 12,
+                "items": {
+                  "$ref": "#/$defs/changed_line"
+                }
+              },
+              "more": {
+                "description": "The number of changed lines beyond the cap.",
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          },
+          "changed_line": {
+            "title": "Changed line",
+            "type": "object",
+            "required": [
+              "change",
+              "text"
+            ],
+            "properties": {
+              "change": {
+                "enum": [
+                  "removed",
+                  "added"
+                ]
+              },
+              "text": {
+                "description": "The line without its line ending.",
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
           "answer": {
             "title": "Edit receipt",
-            "description": "The recorded edit without `before` and `after`.",
+            "description": "The recorded edit without `before` and `after`, which the agent already has. `changes` carries a capped excerpt of the changed lines instead.",
             "type": "object",
             "if": {
               "type": "object",
@@ -24195,6 +24263,17 @@
               },
               "operation": {
                 "$ref": "common.schema.yaml#/$defs/edit_operation"
+              },
+              "created": {
+                "description": "Present when the edit created the file, that is when `before` was empty.",
+                "const": true
+              },
+              "undoes": {
+                "description": "The id of the earlier edit this edit undoes, as sent.",
+                "$ref": "common.schema.yaml#/$defs/edit_id"
+              },
+              "changes": {
+                "$ref": "#/$defs/edit_changes"
               },
               "card": {
                 "description": "The saved edit as markdown. Show it in your reply unchanged.",

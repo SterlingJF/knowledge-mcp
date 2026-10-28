@@ -318,7 +318,7 @@ def story(client: Client) -> Any:
                 "knowledge_bus_folders": [root_folder()],
             },
         )
-        await ask(
+        recorded = await ask(
             "edit.request",
             "kb_record_edit",
             {
@@ -332,6 +332,7 @@ def story(client: Client) -> Any:
             },
         )
         await ask("edits.one-edit", "kb_list_edits", {"location": f"{NOTES}/{DESIGN}"})
+        await edit_stories(ask, recorded["id"])
         await proposal_stories(ask)
         await problem_stories(ask)
         template_catalog = await ask(
@@ -491,7 +492,8 @@ def masked(sample: str, answer: Any) -> Any:
         found = {}
         for key, value in node.items():
             changes = key == "time"
-            changes |= key == "id" and stem == "edit" and top
+            changes |= key in ("id", "undoes") and stem == "edit" and top
+            changes |= key == "card" and stem == "edit" and "undoes" in node
             changes |= key == "id" and stem == "edits" and not top
             changes |= (
                 key in ("record", "digest", "based_on")
@@ -573,6 +575,32 @@ def test_move_snapshot_masks_record_time_and_retains_document_digests():
     assert masked("document-move.ready", first) == masked("document-move.ready", second)
     second["based_on"]["documents"] = [{"path": "a.md", "digest": "changed content"}]
     assert masked("document-move.ready", first) != masked("document-move.ready", second)
+
+
+async def edit_stories(ask: Any, earlier: str) -> None:
+    """Record an undo of `earlier` and the creation of a file."""
+    await ask(
+        "edit.undo",
+        "kb_record_edit",
+        {
+            "location": f"{NOTES}/{DESIGN}",
+            "allowed_by": {"basis": "request", "text": "Undo the Overview."},
+            "before": AFTER,
+            "after": BEFORE,
+            "undoes": earlier,
+        },
+    )
+    await ask(
+        "edit.created",
+        "kb_record_edit",
+        {
+            "location": f"{NOTES}/cache-proposal.md",
+            "allowed_by": {"basis": "request", "text": "Write the proposal."},
+            "before": "",
+            "after": "Title: Evening build retirement\n",
+            "whole_file": True,
+        },
+    )
 
 
 async def proposal_stories(ask):

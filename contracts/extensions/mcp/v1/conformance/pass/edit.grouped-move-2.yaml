@@ -18,7 +18,20 @@ operation:
   count: 4
   old_path: B.md
   path: Decisions/Beta.md
+changes:
+  hunks: 1
+  lines:
+    - change: removed
+      text: "[[A#^block]]"
+    - change: added
+      text: "[[Alpha#^block]]"
+  more: 0
 card: |
   `Saved` · **Edit saved**
 
   The edit to `batch-vault` is recorded.
+
+  `batch-vault` · 1 change
+
+  - ~~[[A#^block]]~~
+  - [[Alpha#^block]]
