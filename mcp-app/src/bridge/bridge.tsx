@@ -9,6 +9,14 @@ import type { App } from "@modelcontextprotocol/ext-apps/react";
 
 type DisplayMode = "inline" | "fullscreen";
 
+/** hostContext.safeAreaInsets, in px. */
+export type SafeAreaInsets = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+};
+
 export type ToolResult = { schema?: string } & Record<string, unknown>;
 
 export type CardHost = {
@@ -24,6 +32,8 @@ export type CardHost = {
   send: (text: string, context?: Record<string, unknown>) => Promise<void>;
   requestFullView: () => Promise<void>;
   requestInline: () => Promise<void>;
+  /** The host's safe area; HostRoot pads the app root by it. */
+  safeAreaInsets?: SafeAreaInsets;
 };
 
 /** Exported for StaticCardHost (bridge/static.tsx); cards read it through useCardHost. */
@@ -40,10 +50,12 @@ export function cardHost(
   app: App | null,
   result: ToolResult | null,
   displayMode: DisplayMode,
+  safeAreaInsets?: SafeAreaInsets,
 ): CardHost {
   const modes = app?.getHostContext()?.availableDisplayModes ?? [];
   return {
     result,
+    safeAreaInsets,
     displayMode,
     canFullView: modes.includes("fullscreen"),
     send: async (text, context) => {
@@ -67,9 +79,30 @@ export function cardHost(
   };
 }
 
+/** The app root: padded by the host's safe area so nothing sits under a notch or home bar. */
+export function HostRoot({ children }: { children: ReactNode }) {
+  const insets = useCardHost().safeAreaInsets;
+  return (
+    <div
+      data-km-root=""
+      style={
+        insets && {
+          paddingTop: insets.top,
+          paddingRight: insets.right,
+          paddingBottom: insets.bottom,
+          paddingLeft: insets.left,
+        }
+      }
+    >
+      {children}
+    </div>
+  );
+}
+
 export function CardHostProvider({ children }: { children: ReactNode }) {
   const [result, setResult] = useState<ToolResult | null>(null);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("inline");
+  const [insets, setInsets] = useState<SafeAreaInsets | undefined>();
   const { app } = useApp({
     appInfo: { name: "knowledge-mcp", version: "0.1.0" },
     capabilities: { availableDisplayModes: ["inline", "fullscreen"] },
@@ -83,18 +116,25 @@ export function CardHostProvider({ children }: { children: ReactNode }) {
           params.displayMode === "fullscreen"
         )
           setDisplayMode(params.displayMode);
+        if (params.safeAreaInsets) setInsets(params.safeAreaInsets);
       };
     },
   });
   // Theme, Claude's style variables and fonts, re-applied whenever the host context changes.
   useHostStyles(app, app?.getHostContext());
   useEffect(() => {
-    const mode = app?.getHostContext()?.displayMode;
+    const context = app?.getHostContext();
+    const mode = context?.displayMode;
     if (mode === "inline" || mode === "fullscreen") setDisplayMode(mode);
+    if (context?.safeAreaInsets) setInsets(context.safeAreaInsets);
   }, [app]);
   const host = useMemo(
-    () => cardHost(app, result, displayMode),
-    [app, result, displayMode],
+    () => cardHost(app, result, displayMode, insets),
+    [app, result, displayMode, insets],
   );
-  return <HostContext value={host}>{children}</HostContext>;
+  return (
+    <HostContext value={host}>
+      <HostRoot>{children}</HostRoot>
+    </HostContext>
+  );
 }

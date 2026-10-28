@@ -10,7 +10,7 @@ export default {
       <span
         style={{
           display: "inline-flex",
-          gap: "var(--km-space-4)",
+          gap: "var(--km-gap-inline)",
           alignItems: "center",
         }}
       >

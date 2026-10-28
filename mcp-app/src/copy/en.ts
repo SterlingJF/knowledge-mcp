@@ -78,6 +78,8 @@ export const evidence = {
 } as const;
 
 export const line = {
+  /** A number and its noun never part across a line: `1 conflicting`. */
+  counted: (n: number, noun: string) => `${n}\u00a0${noun}`,
   waitsBecause: (file: string) =>
     `Waits for you because it changes ${file}. Every saved edit is recorded and can be undone.`,
   leftOut: (count: number) =>
@@ -91,7 +93,8 @@ export const line = {
   andMore: (count: number) => `+${count} more`,
   /** Every refusal says this after its reason (F07). */
   nothingChanged: "Nothing was changed.",
-  summaryJoin: " · ",
+  /** A no-break space after the dot: a breakdown wraps before a separator, never after it. */
+  summaryJoin: " ·\u00a0",
 } as const;
 
 export const source = {
@@ -114,7 +117,7 @@ export const change = {
   range: (from: number, to: number) =>
     from === to ? `C${from}` : `C${from}–C${to}`,
   /** More changes than a summary line can name: `6 changes`. */
-  count: (n: number) => `${n} ${n === 1 ? "change" : "changes"}`,
+  count: (n: number) => `${n}\u00a0${n === 1 ? "change" : "changes"}`,
   /** Change numbers as runs: [1,2,3,4] → "C1–C4"; [1,3,4] → "C1, C3–C4". */
   list: (numbers: Array<number>) =>
     numbers
@@ -138,7 +141,7 @@ export const meta = {
   /** Result-card meta: `Recorded Oct 28, 09:41 · approved by you`. */
   recorded: (when: string) => `Recorded ${when}`,
   approvedByYou: "approved by you",
-  join: " · ",
+  join: " ·\u00a0",
 } as const;
 
 export const eyebrow = {
@@ -158,6 +161,8 @@ export const message = {
 export const label = {
   changes: "Changes",
   sections: "Sections",
+  /** A tab label with its count: `Moves (3)`. */
+  withCount: (name: string, count: number) => `${name} (${count})`,
   section: "Section",
   draft: "Draft",
   savedAs: "Saved as",

@@ -62,3 +62,12 @@ moves:
     path: A.md
 affected_documents: []
 record_changes: []
+card: |
+  `PROPOSED MOVES` · `Nothing saved`
+
+  **2 moves · 2 renames · 0 links repaired**
+
+  **Moves (2)**
+
+  1. `A.md` → / as `B.md`
+  2. `B.md` → / as `A.md`

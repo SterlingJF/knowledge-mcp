@@ -68,6 +68,55 @@ class MoveLink(BaseModel):
     ]
 
 
+class MoveStay(BaseModel):
+    """
+    A file the assistant leaves where it is, with the reason the person sees.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: MovePath
+    reason: Annotated[
+        str,
+        Field(
+            description="Why the file stays, such as `no document type`.", min_length=1
+        ),
+    ]
+
+
+class MoveNaming(BaseModel):
+    """
+    The naming rule or convention that produced a move's destination name.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    path: Annotated[
+        MovePath, Field(description="The destination `path` of one move in `moves`.")
+    ]
+    rule: Annotated[
+        str,
+        Field(
+            description="The rule in a few words, such as `date + title`.", min_length=1
+        ),
+    ]
+
+
+class MoveIssueChoice(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    action: Annotated[
+        Literal["skip_move", "bind_link"],
+        Field(
+            description="`skip_move` drops the move of `path` from `moves`. `bind_link` sends a binding for the issue's link with `path` as its target."
+        ),
+    ]
+    path: MovePath
+
+
 class MoveIssue(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -77,6 +126,13 @@ class MoveIssue(BaseModel):
     start: Annotated[int | None, Field(ge=0)]
     end: Annotated[int | None, Field(ge=0)]
     detail: str
+    choices: Annotated[
+        list[MoveIssueChoice] | None,
+        Field(
+            description="Resolutions the server can compute for this issue. Absent when it can compute none.",
+            min_length=1,
+        ),
+    ] = None
 
 
 class DocumentMovesAnswer(BaseModel):
@@ -121,6 +177,39 @@ class DocumentMovesAnswer(BaseModel):
     moves: list[DocumentMove]
     affected_documents: list[DocumentMove]
     record_changes: list[DocumentMove]
+    summary: Annotated[
+        str | None,
+        Field(
+            description="What the moves are for, in one line, echoed from the `summary` argument.",
+            min_length=1,
+        ),
+    ] = None
+    folder: Annotated[
+        str | None,
+        Field(
+            description="The folder the moved files come from, echoed from the `folder` argument.",
+            min_length=1,
+        ),
+    ] = None
+    stays: Annotated[
+        list[MoveStay] | None,
+        Field(
+            description="Files left where they are, with reasons, echoed from the `stays` argument."
+        ),
+    ] = None
+    naming: Annotated[
+        list[MoveNaming] | None,
+        Field(
+            description="The naming rule behind each named destination, echoed from the `naming` argument."
+        ),
+    ] = None
+    card: Annotated[
+        str | None,
+        Field(
+            description="The move plan as markdown. Show it in your reply unchanged.",
+            min_length=1,
+        ),
+    ] = None
 
 
 type KbPrepareDocumentMovesResult = Annotated[

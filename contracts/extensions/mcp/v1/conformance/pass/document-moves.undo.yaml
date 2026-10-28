@@ -237,3 +237,19 @@ record_changes:
     path: B.md
   - old_path: Index.md
     path: Index.md
+card: |
+  `PROPOSED MOVES` · `Approved`
+
+  **2 moves · 2 renames · 4 links repaired · 3 notes**
+
+  **Moves (2)**
+
+  1. `Decisions/Alpha.md` → / as `A.md`
+  2. `Decisions/Beta.md` → / as `B.md`
+
+  **Links (4)**
+
+  1. `Decisions/Alpha.md` · `Decisions/Beta.md` → `[[B#Heading]]`
+  2. `Decisions/Beta.md` · `Decisions/Alpha.md` → `[[A#^block]]`
+  3. `Index.md` · `Decisions/Alpha.md` → `[[A]]`
+  4. `Index.md` · `Decisions/Beta.md` → `[[B]]`

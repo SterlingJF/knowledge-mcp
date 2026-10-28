@@ -35,11 +35,11 @@ export function LeftOut({
 
   return (
     <Note kind="leftOut" fact={count} className={className}>
-      <div className="mt-(--km-space-3) grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-(--km-space-5) gap-y-(--km-space-3)">
+      <div className="mt-(--km-gap-row) grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-(--km-gap-group) gap-y-(--km-gap-row)">
         {files.map((f) => (
           <div key={f.file} className="contents">
             <PathChip path={f.file} />
-            <span className="pt-(--km-space-1)">{f.reason}</span>
+            <span>{f.reason}</span>
           </div>
         ))}
       </div>

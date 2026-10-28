@@ -38,7 +38,10 @@ export function FullView({
         void host.requestInline();
       }}
     >
-      {children}
+      {/* The body: one group gap after the header and between its parts (E02F). */}
+      <div className="mt-(--km-gap-group) flex flex-col gap-(--km-gap-group)">
+        {children}
+      </div>
     </CardShell>
   );
 }

@@ -3,7 +3,7 @@ import { PathChip, SourceChip } from "./chips";
 const row = {
   display: "flex",
   flexWrap: "wrap",
-  gap: "var(--km-space-2)",
+  gap: "var(--km-gap-inline)",
   alignItems: "center",
 } as const;
 
@@ -18,7 +18,7 @@ export default {
       <div
         style={{
           display: "grid",
-          gap: "var(--km-space-2)",
+          gap: "var(--km-gap-inline)",
           justifyItems: "start",
         }}
       >

@@ -118,6 +118,28 @@ $defs:
         type: array
         items:
           $ref: common.schema.yaml#/$defs/document_move
+      summary:
+        description: What the moves are for, in one line, echoed from the `summary` argument.
+        type: string
+        minLength: 1
+      folder:
+        description: The folder the moved files come from, echoed from the `folder` argument.
+        type: string
+        minLength: 1
+      stays:
+        description: Files left where they are, with reasons, echoed from the `stays` argument.
+        type: array
+        items:
+          $ref: "#/$defs/move_stay"
+      naming:
+        description: The naming rule behind each named destination, echoed from the `naming` argument.
+        type: array
+        items:
+          $ref: "#/$defs/move_naming"
+      card:
+        description: The move plan as markdown. Show it in your reply unchanged.
+        type: string
+        minLength: 1
     if:
       type: object
       required:
@@ -223,6 +245,62 @@ $defs:
           - "null"
         minimum: 0
       detail: *id001
+      choices:
+        description:
+          Resolutions the server can compute for this issue. Absent when it can
+          compute none.
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/choice"
+  move_stay:
+    title: Move stay
+    description: A file the assistant leaves where it is, with the reason the person sees.
+    type: object
+    additionalProperties: false
+    required:
+      - path
+      - reason
+    properties:
+      path:
+        $ref: common.schema.yaml#/$defs/move_path
+      reason:
+        description: Why the file stays, such as `no document type`.
+        type: string
+        minLength: 1
+  move_naming:
+    title: Move naming
+    description: The naming rule or convention that produced a move's destination name.
+    type: object
+    additionalProperties: false
+    required:
+      - path
+      - rule
+    properties:
+      path:
+        description: The destination `path` of one move in `moves`.
+        $ref: common.schema.yaml#/$defs/move_path
+      rule:
+        description: The rule in a few words, such as `date + title`.
+        type: string
+        minLength: 1
+  choice:
+    title: Move issue choice
+    type: object
+    additionalProperties: false
+    required:
+      - action
+      - path
+    properties:
+      action:
+        description:
+          "`skip_move` drops the move of `path` from `moves`. `bind_link` sends a
+          binding for the issue's link with `path` as its target."
+        enum:
+          - skip_move
+          - bind_link
+      path:
+        $ref: common.schema.yaml#/$defs/move_path
 description:
   Prepared replacement text and link target checks against supplied inputs for moves
   prepared together. The agent applies the moves and verifies the saved files.

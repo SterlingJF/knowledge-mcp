@@ -2,6 +2,7 @@
 import type { ReactNode } from "react";
 
 import { PathChip } from "@/component-elements/chips";
+import { meta } from "@/copy/en";
 
 export function HarnessFrame({ children }: { children: ReactNode }) {
   return (
@@ -14,7 +15,9 @@ export function HarnessFrame({ children }: { children: ReactNode }) {
 /** The example meta line from the frames: the file chip, then the type and reader. */
 export const exampleMeta = (
   <>
-    <PathChip path="cache-proposal.md" /> Design proposal · for maintainers
-    deciding whether to accept it
+    <PathChip path="cache-proposal.md" />
+    <span>
+      Design proposal{meta.join}for maintainers deciding whether to accept it
+    </span>
   </>
 );

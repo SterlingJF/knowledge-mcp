@@ -13,7 +13,7 @@ export function Diff({
   return (
     <div
       className={cn(
-        "mt-[var(--km-space-5)] overflow-hidden rounded-[var(--border-radius-lg)] border-[length:var(--border-width-regular)] border-solid border-[color:var(--color-border-tertiary)] text-[length:var(--font-text-xs-size)]",
+        "mt-[var(--km-gap-group)] overflow-hidden rounded-[var(--border-radius-lg)] border-[length:var(--border-width-regular)] border-solid border-[color:var(--color-border-tertiary)] text-[length:var(--font-text-xs-size)]",
         className,
       )}
     >

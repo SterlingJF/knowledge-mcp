@@ -157,6 +157,10 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 | `searched`              | boolean                                           | no       |                                                                                                                                                                                                                                                                                                                     |
 | `search`                | list of string or null                            | no       |                                                                                                                                                                                                                                                                                                                     |
 | `bindings`              | list of [LinkBinding](#linkbinding) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
+| `summary`               | string or null                                    | no       | What the moves are for, in one line, such as `File the new files`. The answer echoes it.                                                                                                                                                                                                                            |
+| `folder`                | string or null                                    | no       | The folder the moved files come from, such as `Inbox`. The answer echoes it.                                                                                                                                                                                                                                        |
+| `stays`                 | list of [MoveStay](#movestay) or null             | no       | Files you leave where they are, each with the reason the person sees, such as `no document type` from a filing review. The answer echoes them.                                                                                                                                                                      |
+| `naming`                | list of [MoveNaming](#movenaming) or null         | no       | For a move's destination `path`, the naming rule or convention that produced its name, such as `date + title`. The answer echoes them.                                                                                                                                                                              |
 
 ### `kb_prepare_document_types`
 
@@ -539,11 +543,29 @@ An independently verified original target for a complete internal link token.
 | `path` | [MovePath](#movepath) | yes      |         |
 | `text` | string                | yes      |         |
 
+### MoveNaming
+
+The naming rule or convention that produced a move's destination name.
+
+| Field  | Type                  | Required | Meaning                                          |
+| ------ | --------------------- | -------- | ------------------------------------------------ |
+| `path` | [MovePath](#movepath) | yes      | The destination `path` of one move in `moves`.   |
+| `rule` | string                | yes      | The rule in a few words, such as `date + title`. |
+
 ### MovePath
 
 Path relative to the knowledge-base root, with forward slashes between folders.
 
 Type: string, pattern `^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$`.
+
+### MoveStay
+
+A file the assistant leaves where it is, with the reason the person sees.
+
+| Field    | Type                  | Required | Meaning                                         |
+| -------- | --------------------- | -------- | ----------------------------------------------- |
+| `path`   | [MovePath](#movepath) | yes      |                                                 |
+| `reason` | string                | yes      | Why the file stays, such as `no document type`. |
 
 ### Part
 

@@ -81,7 +81,7 @@ export function ResultCard(props: ResultCardProps) {
       {...lifecycleProps(lifecycle)}
       flat={flat}
     >
-      <Note kind="warning" className="mt-[var(--km-space-5)]">
+      <Note kind="warning" className="mt-[var(--km-gap-group)]">
         {props.reason} {line.nothingChanged}
       </Note>
       {children}
