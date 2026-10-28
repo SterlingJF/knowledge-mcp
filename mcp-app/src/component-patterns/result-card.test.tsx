@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { useState } from "react";
 import { vi } from "vitest";
 
 import { action, badge, frozen } from "@/copy/en";
@@ -122,4 +123,40 @@ test("result without Undo or any action draws no action row", () => {
   );
   expect(screen.queryAllByRole("button")).toHaveLength(0);
   expect(container.textContent).toContain("Recorded Oct 28, 09:44");
+});
+
+test("result: the toggle shows and hides the change", () => {
+  function Harness() {
+    const [open, setOpen] = useState(false);
+    return (
+      <ResultCard
+        kind="result"
+        eyebrow="Change"
+        title="t"
+        badgeLabel={badge.done.saved}
+        when="Oct 28, 09:41"
+        undoMessage="Undo"
+        disclosure={{
+          label: open ? action.hideChange : action.showChange,
+          expanded: open,
+          onToggle: () => setOpen(!open),
+          controls: "diff-x",
+        }}
+        lifecycle={lifecycle()}
+      >
+        <div id="diff-x" hidden={!open}>
+          the diff
+        </div>
+      </ResultCard>
+    );
+  }
+  render(<Harness />);
+  const diff = () => document.getElementById("diff-x")!;
+  expect(diff().hidden).toBe(true);
+  fireEvent.click(screen.getByRole("button", { name: action.showChange }));
+  expect(diff().hidden).toBe(false);
+  const hide = screen.getByRole("button", { name: action.hideChange });
+  expect(hide.getAttribute("aria-expanded")).toBe("true");
+  fireEvent.click(hide);
+  expect(diff().hidden).toBe(true);
 });

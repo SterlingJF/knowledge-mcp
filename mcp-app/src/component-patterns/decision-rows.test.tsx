@@ -175,3 +175,27 @@ test("move blockers: no title, nothing hidden, choice at the start", () => {
   expect(cell.className).not.toContain("hidden");
   expect(screen.getByText("Your choice").className).not.toContain("text-right");
 });
+
+test("a row with no options asks for an answer in chat and stays unanswered", () => {
+  const onChoiceChange = vi.fn<(id: string, v: string | null) => void>();
+  render(
+    <DecisionRows
+      headers={["Problem", "Your choice"]}
+      rows={[
+        {
+          id: "x",
+          name: "x",
+          cells: ["scan-0412.md has no type"],
+          options: [],
+        },
+      ]}
+      align="start"
+      onChoiceChange={onChoiceChange}
+    />,
+  );
+  expect(screen.getByText("Answer in chat")).toBeTruthy();
+  expect(screen.queryByRole("button")).toBeNull();
+  expect(screen.queryByRole("checkbox")).toBeNull();
+  expect(document.querySelector("[data-tone]")).toBeNull();
+  expect(countAccepted({ x: null })).toBe(0);
+});

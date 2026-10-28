@@ -61,6 +61,8 @@ export const decision = {
   apply: "Apply",
   skip: "Skip",
   keepRefused: "Keep refused",
+  /** A blocker the plan offers no choice for. */
+  answerInChat: "Answer in chat",
 } as const;
 
 /** Evidence marks as they read inside a summary count: `1 partly answered`. */

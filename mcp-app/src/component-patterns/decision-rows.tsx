@@ -32,7 +32,7 @@ export type DecisionRow = {
   /** Names the row for its choice's accessible label. */
   name: string;
   cells: ReactNode[];
-  /** This row's own answers: 1 is a K05 tick box, 2+ a segmented choice (4+ stack). Omit to use the table's `kind` preset. */
+  /** This row's own answers: none is "Answer in chat", 1 is a K05 tick box, 2+ a segmented choice (4+ stack). Omit to use the table's `kind` preset. */
   options?: readonly SegmentOption<string>[];
   /** This row's answer; overrides `choices[id]`. */
   value?: string | null;
@@ -78,6 +78,13 @@ function Choice({
     return <Badge tone={row.decided.tone}>{row.decided.label}</Badge>;
   const options = row.options ?? decisionOptions[kind];
   const value = row.value !== undefined ? row.value : (choices[row.id] ?? null);
+  // No answer the card can offer: it is answered in chat, and the row stays unanswered.
+  if (options.length === 0)
+    return (
+      <span className="text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-secondary)">
+        {decision.answerInChat}
+      </span>
+    );
   // One answer: a K05 tick box. Ticking sets it; clearing goes back to undecided.
   if (options.length === 1) {
     const only = options[0];
