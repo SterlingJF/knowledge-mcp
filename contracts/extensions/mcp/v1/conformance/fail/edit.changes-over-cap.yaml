@@ -1,0 +1,45 @@
+---
+schema: knowledge-mcp/edit/2
+id: 3f1c2a9b8d7e4f60a1b2c3d4e5f60718
+time: "2026-10-28T09:00:00.000Z"
+location: ~/notes/cache-proposal.md
+allowed_by:
+  basis: request
+  text: Undo the cache proposal.
+whole_file: true
+before_digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+after_digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+changes:
+  hunks: 1
+  lines:
+    - change: added
+      text: line 0
+    - change: added
+      text: line 1
+    - change: added
+      text: line 2
+    - change: added
+      text: line 3
+    - change: added
+      text: line 4
+    - change: added
+      text: line 5
+    - change: added
+      text: line 6
+    - change: added
+      text: line 7
+    - change: added
+      text: line 8
+    - change: added
+      text: line 9
+    - change: added
+      text: line 10
+    - change: added
+      text: line 11
+    - change: added
+      text: line 12
+  left_out: 1
+card: |
+  `Saved` · **Edit saved**
+
+  The creation of `cache-proposal.md` is recorded.

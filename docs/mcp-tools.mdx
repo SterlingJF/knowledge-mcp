@@ -199,15 +199,16 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 
 ### `kb_record_edit`
 
-| Argument       | Type                                    | Required | Meaning                                                                                                                           |
-| -------------- | --------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `location`     | string                                  | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                   |
-| `allowed_by`   | [AllowedBy](#allowedby)                 | yes      |                                                                                                                                   |
-| `before`       | string                                  | yes      | The replaced text. Send an empty string for a new file.                                                                           |
-| `after`        | string or null                          | no       | The text that replaced `before`. Omit it only for a whole-file edit sent with `after_digest`.                                     |
-| `after_digest` | string or null                          | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
-| `whole_file`   | boolean or null                         | no       | True when `before` is the whole file.                                                                                             |
-| `operation`    | [EditOperation](#editoperation) or null | no       |                                                                                                                                   |
+| Argument       | Type                                     | Required | Meaning                                                                                                                           |
+| -------------- | ---------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `location`     | string                                   | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                   |
+| `allowed_by`   | [AllowedBy](#allowedby)                  | yes      |                                                                                                                                   |
+| `before`       | string                                   | yes      | The replaced text. Send an empty string for a new file.                                                                           |
+| `after`        | string or null                           | no       | The text that replaced `before`. Omit it only for a whole-file edit sent with `after_digest`.                                     |
+| `after_digest` | string or null                           | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
+| `whole_file`   | boolean or null                          | no       | True when `before` is the whole file.                                                                                             |
+| `operation`    | [EditOperation](#editoperation) or null  | no       |                                                                                                                                   |
+| `undoes`       | string, pattern `^[0-9a-f]{32}$` or null | no       | The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits.                                       |
 
 ### `kbp_card`
 

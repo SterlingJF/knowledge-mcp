@@ -2,13 +2,21 @@
 
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
-from ._internal import AllowedBy, Digest, EditId, EditOperation, Location, Time
+from ._internal import (
+    AllowedBy,
+    Digest,
+    EditChanges,
+    EditId,
+    EditOperation,
+    Location,
+    Time,
+)
 from . import problem_schema
 
 
 class EditReceipt(BaseModel):
     """
-    The recorded edit without `before` and `after`.
+    The recorded edit without `before` and `after`, which the agent already has. `changes` carries a capped excerpt of the changed lines instead.
     """
 
     model_config = ConfigDict(
@@ -26,6 +34,17 @@ class EditReceipt(BaseModel):
     before_digest: Digest
     after_digest: Digest
     operation: EditOperation | None = None
+    created: Annotated[
+        Literal[True] | None,
+        Field(
+            description="Present when the edit created the file, that is when `before` was empty."
+        ),
+    ] = None
+    undoes: Annotated[
+        EditId | None,
+        Field(description="The id of the earlier edit this edit undoes, as sent."),
+    ] = None
+    changes: EditChanges | None = None
     card: Annotated[
         str,
         Field(

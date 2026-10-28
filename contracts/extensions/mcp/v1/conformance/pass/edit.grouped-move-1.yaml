@@ -1,7 +1,7 @@
 ---
 schema: knowledge-mcp/edit/2
-id: 1332254c1fc24a2daae3192a91503436
-time: "2026-10-18T17:42:18.053Z"
+id: 30e376b8b5ed4bd6b10a18d9dc5fb202
+time: "2026-10-28T07:34:35.390Z"
 location: batch-vault
 allowed_by:
   basis: instruction
@@ -18,7 +18,20 @@ operation:
   count: 4
   old_path: A.md
   path: Decisions/Alpha.md
+changes:
+  hunks: 1
+  lines:
+    - change: removed
+      text: "[[B#Heading]]"
+    - change: added
+      text: "[[Beta#Heading]]"
+  left_out: 0
 card: |
   `Saved` · **Edit saved**
 
   The edit to `batch-vault` is recorded.
+
+  `batch-vault` · 1 change
+
+  - ~~[[B#Heading]]~~
+  - [[Beta#Heading]]

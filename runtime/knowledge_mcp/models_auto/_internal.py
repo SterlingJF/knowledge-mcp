@@ -58,6 +58,14 @@ type Time = Annotated[
 type EditId = Annotated[str, Field(pattern="^[0-9a-f]{32}$", title="Edit id")]
 
 
+class ChangedLine(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    change: Literal["removed", "added"]
+    text: Annotated[str, Field(description="The line without its line ending.")]
+
+
 class ReceivedText(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -444,6 +452,23 @@ class FilingReview(BaseModel):
             description="Include descendants; false limits the review to direct children."
         ),
     ] = False
+
+
+class EditChanges(BaseModel):
+    """
+    The changed lines of an edit in document order, capped at 12 lines. Absent when the edit sent `after_digest` without `after`.
+    """
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    hunks: Annotated[
+        int, Field(description="The number of separate changed blocks.", ge=0)
+    ]
+    lines: Annotated[list[ChangedLine], Field(max_length=12)]
+    left_out: Annotated[
+        int, Field(description="The number of changed lines beyond the cap.", ge=0)
+    ]
 
 
 type FileChange = Annotated[

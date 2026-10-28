@@ -116,11 +116,34 @@ def _title(entry: dict[str, Any]) -> str:
     return "Edit"
 
 
+def _changes(found: dict[str, Any]) -> list[str]:
+    hunks = found["hunks"]
+    lines = [f"{hunks} change" + ("" if hunks == 1 else "s"), ""]
+    for line in found["lines"]:
+        text = _line(line["text"])
+        if line["change"] == "removed":
+            lines.append(f"- ~~{text}~~" if text else "- (blank line removed)")
+        else:
+            lines.append(f"- {text}" if text else "- (blank line added)")
+    if found["left_out"]:
+        lines.append(f"- … {found['left_out']} more changed lines")
+    return lines
+
+
 def saved(answer: dict[str, Any]) -> str:
-    return (
+    name = code(_name(answer))
+    verb = "creation of" if answer.get("created") else "edit to"
+    text = (
         f"{code('Saved')} · **{_title(answer)} saved**\n\n"
-        f"The edit to {code(_name(answer))} is recorded.\n"
+        f"The {verb} {name} is recorded.\n"
     )
+    if answer.get("undoes"):
+        text += f"\nIt undoes edit {code(answer['undoes'])}.\n"
+    found = answer.get("changes")
+    if found and found["hunks"]:
+        heading, *rest = _changes(found)
+        text += "\n" + "\n".join([f"{name} · {heading}", *rest]) + "\n"
+    return text
 
 
 def pickup(answer: dict[str, Any]) -> str | None:

@@ -12,7 +12,9 @@ oneOf:
 $defs:
   answer:
     title: Edit receipt
-    description: The recorded edit without `before` and `after`.
+    description:
+      The recorded edit without `before` and `after`, which the agent already
+      has. `changes` carries a capped excerpt of the changed lines instead.
     type: object
     additionalProperties: false
     required:
@@ -44,6 +46,14 @@ $defs:
         $ref: common.schema.yaml#/$defs/digest
       operation:
         $ref: common.schema.yaml#/$defs/edit_operation
+      created:
+        description: Present when the edit created the file, that is when `before` was empty.
+        const: true
+      undoes:
+        description: The id of the earlier edit this edit undoes, as sent.
+        $ref: common.schema.yaml#/$defs/edit_id
+      changes:
+        $ref: common.schema.yaml#/$defs/edit_changes
       card:
         description: The saved edit as markdown. Show it in your reply unchanged.
         type: string

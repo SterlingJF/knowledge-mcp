@@ -1,0 +1,26 @@
+---
+schema: knowledge-mcp/edit/2
+id: 933a154b380944389a69c0dd3c91d7c1
+time: "2026-10-28T07:34:30.864Z"
+location: ~/notes/cache-proposal.md
+allowed_by:
+  basis: request
+  text: Write the proposal.
+whole_file: true
+before_digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+after_digest: sha256:9f8c4f821badb86283796d1621fa06d6b5c2fedbfe30d834f0e88ce899ecb947
+created: true
+changes:
+  hunks: 1
+  lines:
+    - change: added
+      text: "Title: Evening build retirement"
+  left_out: 0
+card: |
+  `Saved` · **Edit saved**
+
+  The creation of `cache-proposal.md` is recorded.
+
+  `cache-proposal.md` · 1 change
+
+  - Title: Evening build retirement
