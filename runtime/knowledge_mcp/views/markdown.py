@@ -217,8 +217,11 @@ def _move(move: dict[str, Any]) -> str:
 
 
 def _link(link: dict[str, Any]) -> str:
-    before = code(link["target_before"])
     after = code(link["replacement"])
+    if "line" in link and "text" in link:
+        note = code(f"{link['source_path']}:{link['line']}")
+        return f"{note}{JOIN}{code(link['text'])}{ARROW}{after}"
+    before = code(link["target_before"])
     return f"{code(link['source_path'])}{JOIN}{before}{ARROW}{after}"
 
 

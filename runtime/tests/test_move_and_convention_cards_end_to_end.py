@@ -30,7 +30,7 @@ PLAN = """\
 
 **Links (1)**
 
-1. `Index.md` · `Inbox/retire-evening.md` → `[[2026-10-28 retire evening build]]`
+1. `Index.md:1` · `[[retire-evening]]` → `[[2026-10-28 retire evening build]]`
 
 Waits for you because it moves files and edits links in 1 note. You can undo it afterwards.
 

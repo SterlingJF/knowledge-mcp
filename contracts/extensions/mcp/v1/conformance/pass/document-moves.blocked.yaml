@@ -57,24 +57,32 @@ links:
     target_before: B.md
     target_after: B.md
     replacement: null
+    line: 1
+    text: "[[B#Heading]]"
   - source_path: B.md
     start: 0
     end: 12
     target_before: A.md
     target_after: B.md
     replacement: "[[B#^block]]"
+    line: 1
+    text: "[[A#^block]]"
   - source_path: Index.md
     start: 0
     end: 5
     target_before: A.md
     target_after: B.md
     replacement: "[[B]]"
+    line: 1
+    text: "[[A]]"
   - source_path: Index.md
     start: 6
     end: 11
     target_before: B.md
     target_after: B.md
     replacement: null
+    line: 1
+    text: "[[B]]"
 issues:
   - code: destination-occupied
     source_path: A.md
@@ -105,8 +113,8 @@ card: |
 
   **Links (2)**
 
-  1. `B.md` · `A.md` → `[[B#^block]]`
-  2. `Index.md` · `A.md` → `[[B]]`
+  1. `B.md:1` · `[[A#^block]]` → `[[B#^block]]`
+  2. `Index.md:1` · `[[A]]` → `[[B]]`
 
   **Blockers (1)**
 
