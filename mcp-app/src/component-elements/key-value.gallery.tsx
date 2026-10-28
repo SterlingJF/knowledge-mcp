@@ -8,7 +8,10 @@ export default {
       <KeyValue
         className="mt-0"
         rows={[
-          { label: "Reader", value: "Maintainers deciding whether to accept it" },
+          {
+            label: "Reader",
+            value: "Maintainers deciding whether to accept it",
+          },
           { label: "Guidance", value: "product-dev · Design proposal" },
           {
             label: "Since then",

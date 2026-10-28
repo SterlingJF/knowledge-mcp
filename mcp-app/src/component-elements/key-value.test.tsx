@@ -20,9 +20,9 @@ describe("KeyValue", () => {
 
   it("refuses more than five rows", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(() => render(<KeyValue rows={[1, 2, 3, 4, 5, 6].map(row)} />)).toThrow(
-      /at most 5 rows/,
-    );
+    expect(() =>
+      render(<KeyValue rows={[1, 2, 3, 4, 5, 6].map(row)} />),
+    ).toThrow(/at most 5 rows/);
     spy.mockRestore();
   });
 });

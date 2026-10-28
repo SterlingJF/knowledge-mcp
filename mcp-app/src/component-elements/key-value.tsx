@@ -22,8 +22,8 @@ export function KeyValue({
   }
   return (
     <div className={cn("@container mt-[var(--km-space-5)]", className)}>
-      {/* Narrow: label above value. Wide: a label column the width of the drawn 150px (9 × space-6 + space-3). */}
-      <dl className="m-0 grid grid-cols-1 gap-x-[var(--km-space-5)] gap-y-[var(--km-space-3)] @sm:grid-cols-[calc(var(--km-space-6)*9+var(--km-space-3))_1fr]">
+      {/* Narrow: label above value. Wide: a label column. */}
+      <dl className="m-0 grid grid-cols-1 gap-x-[var(--km-space-5)] gap-y-[var(--km-space-3)] @sm:grid-cols-[var(--km-label-col)_1fr]">
         {rows.map((row, index) => (
           <div key={index} className="contents">
             <dt className="text-[color:var(--color-text-tertiary)]">

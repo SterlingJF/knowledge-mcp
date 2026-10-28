@@ -73,7 +73,9 @@ export function CurrentText({
 }) {
   return (
     <span className={className} {...props}>
-      <span className="font-[weight:var(--font-weight-semibold)]">{label}:</span>{" "}
+      <span className="font-[weight:var(--font-weight-semibold)]">
+        {label}:
+      </span>{" "}
       <span className={tertiary}>{children}</span>
     </span>
   );
