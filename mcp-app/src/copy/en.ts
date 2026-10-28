@@ -46,6 +46,7 @@ export const action = {
   showWhy: "Show why",
   createFile: "Create the file",
   showChange: "Show the change",
+  hideChange: "Hide the change",
   showLaterEdits: "Show the later edits",
   all: "All",
   save: (changes: string) => `Save ${changes}`,
