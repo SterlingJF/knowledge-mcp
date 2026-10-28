@@ -19,6 +19,7 @@ from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
 from knowledge_mcp.tools.kbp import READS, Location
 from knowledge_mcp.type_scope import Scopes
+from knowledge_mcp.views import markdown
 
 ConventionsText = Annotated[
     str | None,
@@ -120,4 +121,5 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
                     ),
                 ),
             },
+            view=markdown.conventions,
         )

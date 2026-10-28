@@ -51,7 +51,7 @@ def invoke(server=None, **args):
     )
     answer = result.structured_content
     if not result.is_error:
-        assert json.loads(texts(result)[0]) == answer
+        assert json.loads(texts(result)[-1]) == answer
     return answer
 
 

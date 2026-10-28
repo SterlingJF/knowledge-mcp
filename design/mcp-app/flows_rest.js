@@ -329,7 +329,7 @@
         eb: "Proposed document",
         title: "Cache rollout",
         flat: true,
-        meta: `${chip("file", '<span class="mono">Proposals/cache-rollout.md</span>')} Design proposal · for maintainers deciding whether to accept it <span class="badge b-nt">reader is a guess</span>`,
+        meta: `${chip("file", '<span class="mono">Proposals/cache-rollout.md</span>')} Design proposal · for maintainers <span class="badge b-nt">reader is a guess</span>`,
         badge: badge("b-amb", "Nothing saved"),
         body:
           tbl(
@@ -377,7 +377,7 @@
         tool("kb_record_edit", "Proposals/cache-rollout.md created") +
         tool("kb_prepare_document_types", "document types updated") +
         card({
-          eb: "Created",
+          eb: "Document",
           title: "Proposals/cache-rollout.md",
           meta: "Design proposal · recorded Oct 28, 10:12 · approved by you",
           badge: badge("b-grn", "Created", "check"),
@@ -396,7 +396,7 @@
 
   // 04 Edit result
   const rHead = {
-    eb: "Saved",
+    eb: "Change",
     title: "cache-proposal.md · 4 changes",
     meta: "Recorded Oct 28, 09:41 · approved by you",
   };
@@ -460,9 +460,9 @@
         tool("kb_list_edits", "the file still holds what was written") +
         tool("kb_record_edit", "earlier text restored") +
         card({
-          eb: "Undo",
-          title: "Undo: cache-proposal.md · 4 changes",
-          meta: "Recorded Oct 28, 09:44",
+          eb: "Change",
+          title: "cache-proposal.md · 4 changes",
+          meta: "Recorded Oct 28, 09:44 · undoes the 09:41 edit",
           badge: badge("b-grn", "Undone", "check"),
         }) +
         `<div class="say">cache-proposal.md is back to how it was before 09:41.</div>` +
@@ -489,8 +489,8 @@
         sent("Undo the 09:41 edit to cache-proposal.md") +
         tool("kb_list_edits", "2 later edits") +
         card({
-          eb: "Undo",
-          title: "Undo: cache-proposal.md · 4 changes",
+          eb: "Change",
+          title: "cache-proposal.md · 4 changes",
           badge: badge("b-red", "Can’t undo safely", "warn"),
           body: `<div class="note">${ic.warn}<span>cache-proposal.md changed after this edit (2 later edits). Undoing would overwrite them. Nothing was changed.</span></div>`,
           acts: `${btn("Show the later edits", "p")}`,
@@ -597,7 +597,7 @@
       content:
         tool("kb_record_edit", "8 of 8 writes recorded · every link checked") +
         card({
-          eb: "Moved",
+          eb: "Moves",
           title: "File the new files",
           meta: "3 files · 5 links repaired and checked",
           badge: badge("b-grn", "Moved", "check"),
@@ -880,7 +880,7 @@
         tool("kb_prepare_conventions", "prepared with your OK") +
         tool("kb_record_edit", "conventions.yaml recorded") +
         card({
-          eb: "Saved",
+          eb: "Conventions",
           title: `Naming and filing for ${S}`,
           meta: "2 conventions saved · 1 dropped",
           badge: badge("b-grn", "Saved", "check"),

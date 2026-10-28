@@ -481,6 +481,14 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           T.spaceUse[k],
         ]),
       )}</div><div class="one">${tbl(
+        ["Role", "Step", "", "Use"],
+        Object.entries(T.gap).map(([k, v]) => [
+          `<span class="mono">${k}</span>`,
+          v.replace("var(", "").replace(")", ""),
+          `<div class="bar" style="width:${parseInt(T.space[v.slice(4, -1)]) * 4}px"></div>`,
+          T.gapUse[k],
+        ]),
+      )}</div><div class="one">${tbl(
         ["Token", "Size", "", "Use"],
         Object.entries(T.radius).map(([k, v]) => [
           `<span class="mono">${k}</span>`,
@@ -502,9 +510,18 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           'None. Claude offers <span class="mono">--shadow-*</span>; a card sits in the chat, not above it.',
         ],
       ])}</div>`,
-      tokens: ["--km-space-1…6", "--border-radius-*", "--border-width-regular"],
+      tokens: [
+        "--km-gap-*",
+        "--km-space-1…7",
+        "--border-radius-*",
+        "--border-width-regular",
+      ],
       rules: [
-        "Nothing interactive flush against an edge: keep --km-space-6 clear (Claude: the composer can overlay the bottom).",
+        "Claude: “Maintain generous padding and logical groupings. Balance information density with readability.” Components space by role (--km-gap-*), never by a bare step.",
+        "Proximity: a gap between groups is twice the gap inside one (group 16px, row and inline 8px, tight 4px). A heading sits closer to what follows it than to what came before.",
+        "Items on one line sit in a flex row with --km-gap-inline, never a typed space; a wrapped run starts at its own left edge, not under the chip before it.",
+        "Every step is on a 4px base; 2px and 6px only inside a badge, chip or button.",
+        "Nothing interactive flush against an edge: keep --km-space-6 clear, and pad the root by hostContext.safeAreaInsets (Claude: the composer can overlay the bottom).",
         "No margin values outside the scale.",
         "No shadows, no gradients.",
       ],
@@ -610,6 +627,11 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
             "mcp-apps/design-guidelines",
           ],
           [
+            "Narrow card",
+            "Under 480px of card the title takes the full width and status and Full view follow it; under 420px each summary label sits 4px above its value, pairs 8px apart; under 560px table rows stack. A breakdown wraps before a separator, never after one, and a number never parts from its noun.",
+            "design-taste-frontend app-screens §7.4, §12",
+          ],
+          [
             "Touch",
             "Every tap target at least 44 × 44pt.",
             "mcp-apps/design-guidelines",
@@ -680,6 +702,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       )}</div><div class="one">${two(vr(labels))}</div><div class="one">${tbl(["Button", "Exact copy"], buttons)}</div><div class="one">${tbl(["Sentence", "Exact copy"], sentences)}</div>`,
       tokens: ["copy rows"],
       rules: [
+        "Hierarchy: the eyebrow names what the card is about (Change, Document, Moves, Conventions), the title names the thing, the badge names its state. None repeats another: no “Saved” eyebrow over a “Saved” badge, no “Undo:” title under an “Undo” eyebrow.",
         "Sentence case everywhere except the eyebrow.",
         "Summary values: terse noun phrases joined by “ · ”. No articles, no semicolons, no colon inside a value (“slide 7 approved, notes disputed”).",
         "Name the thing: a file, a count, a C-number. Never “this item”.",
@@ -973,7 +996,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           ),
           st(
             "Meta",
-            '<span class="meta">Design proposal · for maintainers deciding whether to accept it</span>',
+            '<span class="meta">Design proposal · for maintainers</span>',
           ),
           st(
             "Why line",
@@ -1008,7 +1031,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       purpose:
         "The inline summary’s data points, label left, value right. At most five rows: the generator refuses more.",
       body: two(
-        `<div class="grid2"><div class="mu">Reader</div><div>Maintainers deciding whether to accept it</div><div class="mu">Guidance</div><div>product-dev · Design proposal</div><div class="mu">Since then</div><div><b>4 new files, 1 moved</b> · 3 can be filed by your conventions</div></div>`,
+        `<div class="grid2"><div class="mu">Reader</div><div>Maintainers</div><div class="mu">Guidance</div><div>product-dev · Design proposal</div><div class="mu">Since then</div><div><b>4 new files, 1 moved</b> · 3 can be filed by your conventions</div></div>`,
       ),
       tokens: ["--km-space-3/5", "--color-text-tertiary"],
       rules: ["Labels are nouns from F07 terms.", "Narrow: label above value."],
@@ -1144,7 +1167,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
   const head = {
     eb: "Proposed changes",
     title: "Focus the proposal on retiring the evening build",
-    meta: `${chip("file", '<span class="mono">cache-proposal.md</span>')} Design proposal · for maintainers deciding whether to accept it`,
+    meta: `${chip("file", '<span class="mono">cache-proposal.md</span>')} Design proposal · for maintainers`,
   };
   const rowsLive = (n) =>
     `<table class="rows ${n ? "narrow" : ""}"><tr><th style="width:50px"></th><th>Current</th><th>Proposed</th><th>Source</th></tr><tr><td><span class="cn"><span class="cb">${ic.check}</span>C1</span></td><td><span class="k">Title:</span> <span class="mu">Build schedule and cache rollout</span></td><td>${evTag("suggested")}<span class="k">Title:</span> Evening build retirement</td><td class="srcs">${src("meeting-notes.md:15")}</td></tr><tr class="out"><td><span class="cn"><span class="cb off"></span>C2</span></td><td><span class="k">Motivation:</span> <span class="mu">evening build never finishes</span></td><td>${evTag("supported")}<span class="k">Motivation:</span> 7 of 9 evening runs hit the 6-hour limit</td><td class="srcs">${src("build-timings.xlsx › Evening!A2:D10")}</td></tr></table>`;

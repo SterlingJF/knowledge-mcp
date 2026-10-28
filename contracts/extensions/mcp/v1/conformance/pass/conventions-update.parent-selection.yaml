@@ -33,3 +33,11 @@ received:
     digest: sha256:1ddeb76484f8e9230f839647ba3eb82fc85a3e774c29c9eb6f245156d84d25ef
   - name: Finance/.knowledge-bus/plugins/knowledge-mcp/conventions.yaml
     digest: sha256:3d65b8202b7f6cdd25df71ed68256df5a50ec23a100bac398e9b7498942f4169
+card: |
+  `PROPOSED CONVENTIONS` · `Approved`
+
+  **Naming and filing for Finance**
+
+  No changes
+
+  Existing files unchanged until a move.
