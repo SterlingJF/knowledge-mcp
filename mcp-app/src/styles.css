@@ -74,9 +74,13 @@
 html,
 body {
   background: transparent;
+  margin: 0;
+}
+
+/* Body text size on body, not html, so rem keeps the browser's 16px and rem-based sizes stay true. */
+body {
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   font-size: var(--font-text-sm-size);
   line-height: var(--font-text-sm-line-height);
-  margin: 0;
 }
