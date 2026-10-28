@@ -34,6 +34,7 @@ One card per slice. Each card lists the frames it builds, the files it owns, whe
 - [ ] **E6 Edit result contract:** the changed lines (capped) and a change count for R01–R02, a created flag for D06, the undone edit's id for R03. Owns `edit.schema.yaml`, `tools/edits.py`, the `saved` view.
 - [ ] **E7 Move plan contract:** a title, files that stay and why, the naming rule behind each rename, the source summary, and blocker choices where the tool can compute them (M01, M02, M05, M05F). Owns `document-moves.schema.yaml`, `tools/document_moves.py`.
 - [ ] **K14 Tabs and P08 Plan table:** tabs with counts and a read-only table with given columns and "+ N more", for M02 and M05F. Owns `component-elements/tabs.*`, `component-core/tabs.tsx`, `component-patterns/plan-table.*`.
+- Open: an undo's `undoes` is in the receipt only, not in edits.jsonl, so `kb_list_edits` can't show which edit undid which, and pickup could offer to undo an undo. Storing it changes the stored file: edits/3.
 - Open: R04 (undo no longer safe) is the assistant's check against `kb_list_edits`; no tool result draws it yet. M04 (moved, links checked) is the result of the assistant's `kb_record_edit` writes, so C-Result draws it once E6 lands.
 
 ## Batch 4: the rest
