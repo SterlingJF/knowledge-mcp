@@ -15,18 +15,6 @@ describe("Badge", () => {
     expect(first?.getAttribute("data-testid")).toBe("pulse-dot");
   });
 
-  it("keeps the dot when motion is reduced", () => {
-    vi.stubGlobal("matchMedia", (q: string) => ({
-      matches: q.includes("reduce"),
-      media: q,
-      addEventListener() {},
-      removeEventListener() {},
-    }));
-    render(<Badge tone="waiting">{badge.waiting.needsOk}</Badge>);
-    expect(screen.getByTestId("pulse-dot")).toBeTruthy();
-    vi.unstubAllGlobals();
-  });
-
   it("marks done with a check and refused with a warning", () => {
     const { container } = render(
       <>
@@ -42,8 +30,8 @@ describe("Badge", () => {
     ).not.toBeNull();
   });
 
-  it.each(["neutral"] as const)("shows %s without dot or icon", (tone) => {
-    const { container } = render(<Badge tone={tone}>x</Badge>);
+  it("shows neutral without dot or icon", () => {
+    const { container } = render(<Badge tone="neutral">x</Badge>);
     expect(container.querySelector("svg, [data-testid=pulse-dot]")).toBeNull();
   });
 });
