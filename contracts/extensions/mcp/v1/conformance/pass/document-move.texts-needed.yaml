@@ -56,7 +56,7 @@ search:
   - docs/rfcs/0042-caching.md
 based_on:
   listing_digest: sha256:6cf4518aff1cfc53a8f05e71a7e7a61fafdca564b1190d6a709af6fe817da061
-  record_digest: sha256:12ae878c098ae8a2272be10178bae8766b9e37a763be0e0c7115e6d5026e2e19
+  record_digest: sha256:687bb092d814a8ac220f14df5701ffdd1c4562bdbea0e91a792c5e14745f6c12
   documents:
     - path: docs/rfcs/0042-cache.md
       digest: sha256:1e9c3db972db81f18382c36f930fe2e203e2270894d47024e63d7b47a6de8329
@@ -67,4 +67,4 @@ links: []
 issues: []
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
-    digest: sha256:12ae878c098ae8a2272be10178bae8766b9e37a763be0e0c7115e6d5026e2e19
+    digest: sha256:687bb092d814a8ac220f14df5701ffdd1c4562bdbea0e91a792c5e14745f6c12
