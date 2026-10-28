@@ -44,6 +44,8 @@ export const action = {
   prepareAgain: "Prepare again",
   fullView: "Full view",
   showWhy: "Show why",
+  showChange: "Show the change",
+  showLaterEdits: "Show the later edits",
   all: "All",
   save: (changes: string) => `Save ${changes}`,
   move: (count: number) => `Move ${count} ${count === 1 ? "file" : "files"}`,

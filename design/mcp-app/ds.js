@@ -1221,7 +1221,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       tokens: ["K03, K04, K05, K07"],
       rules: [
         "Additions show “— addition” as current text.",
-        "A left-out row is struck through and dimmed, never removed.",
+        "A left-out row keeps its place: its text is struck through in tertiary colour (AA), its chips turn tertiary, and its tick box stays at full strength. Never dim with opacity.",
         "The header box selects or clears every row; it shows a dash when some rows are left out.",
         "Frozen tables drop the tick boxes but keep the numbers.",
       ],
