@@ -210,8 +210,8 @@ importers:
         specifier: 3.9.9
         version: 3.9.9
       prettier-plugin-toml:
-        specifier: 3.0.2
-        version: 3.0.2(prettier@3.9.9)
+        specifier: 4.1.0
+        version: 4.1.0(prettier@3.9.9)
       smol-toml:
         specifier: 1.9.0
         version: 1.9.0
@@ -238,9 +238,6 @@ packages:
 
   '@cacheable/utils@2.5.0':
     resolution: {integrity: sha512-buipgOVDkkPXNR5+xBpDw7Zk2n1EvU7qBJCNUcL7rhQ//kfpOXPAvQ511Os0vpLYJ1pZnvudNytkQt2hst3wqA==}
-
-  '@dual-bundle/import-meta-resolve@4.2.1':
-    resolution: {integrity: sha512-id+7YRUgoUX6CgV0DtuhirQWodeeA7Lf4i2x71JS/vtA5pRb/hIGWlw+G6MeXvsM+MXrz0VAydTGElX1rAfgPg==}
 
   '@emnapi/core@1.11.2':
     resolution: {integrity: sha512-TC8MkTuZUtcTSiFeuC0ksCh9QIJ5+F21MvZ4Wn4ORfYaFJ/0dsiudv5tVkejgwZlwQ39jL9WWDe2lz8x0WglOA==}
@@ -735,8 +732,154 @@ packages:
     peerDependencies:
       eslint: ^9.0.0 || ^10.0.0
 
-  '@tombi-toml/wasm-lib@1.8.0':
-    resolution: {integrity: sha512-aeV1D5dwOzlfv6PFXwJHneKhOhYfA/+NFzuLJteFQC0cKLK+nkoysT3bJWSd+6gw0qMKrhZQK1v+gABrraIScQ==}
+  '@tombit/binding-android-arm-eabi@0.1.7':
+    resolution: {integrity: sha512-iyPsflbdpyrQuFGjsq/2F0EY3mwgtYMSjHOo8E28lRw7Bk0q60YHSsrgDY31MCfEOEgzDqfjX8Olr6iYTFwMjw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [arm]
+    os: [android]
+
+  '@tombit/binding-android-arm64@0.1.7':
+    resolution: {integrity: sha512-PDe05sj7SnGBhrOFda7Zbc4HPoV9pc9YfiioH2prhKWCsdkOPdRrsINNzKaQ9zB/UidMu35EsgDfpzR7GAPTvA==}
+    engines: {node: '>=20.0.0'}
+    cpu: [arm64]
+    os: [android]
+
+  '@tombit/binding-darwin-arm64@0.1.7':
+    resolution: {integrity: sha512-miTaFHWcB3ZrP+LR/V7P6itH4rt5GqubfOhg99U84KVmRhNAUSqq9OcSaUU4nJAS+KKea9Ee2qSCXxfNWfNLCw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@tombit/binding-darwin-x64@0.1.7':
+    resolution: {integrity: sha512-8AdCarDY+voPiQO+Nes3AMnG/b5cnt4PJpgFG78fss9YlQwvttxiDXydDeEtb3VQ6hK8tJk1bt0j1mrbu323HA==}
+    engines: {node: '>=20.0.0'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@tombit/binding-freebsd-x64@0.1.7':
+    resolution: {integrity: sha512-3+FbhwB5/SZPe2hYH9LhS3X977kMIn9ulnCu3T8ToSDe3g9YwZzUobYxIXazQvNwerQEhri7kcRqqVizr3UJ1A==}
+    engines: {node: '>=20.0.0'}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@tombit/binding-linux-arm-gnueabihf@0.1.7':
+    resolution: {integrity: sha512-pBweM11IOeWxEEeFQ2ldNC8RLFOnr4T+Zs43zHIPGAB0eBi6QBn2LpD6O7aSB5jBOgR3rYAJ5VNZ3XdDYzDzkw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [arm]
+    os: [linux]
+
+  '@tombit/binding-linux-arm-musleabihf@0.1.7':
+    resolution: {integrity: sha512-vJSsAeTHGuTzZCT+ibOXtBfkSHFbBs+0Ckz+zpQLzJzrYooWXb4vxbq5YcU7ANnJ8BHFHq3bfpQd9ld9wvo2Xw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [arm]
+    os: [linux]
+
+  '@tombit/binding-linux-arm64-gnu@0.1.7':
+    resolution: {integrity: sha512-v/xQuHzUi2Y4fgAWjKekMOEYtDNnE7bNYuZhX/TUmL1rL7MES5+e19cSiPPqwZTx7XlA3PIeOtwV/gBpbr+/iw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@tombit/binding-linux-arm64-musl@0.1.7':
+    resolution: {integrity: sha512-HgRIXOh99HKd/IkRqPvNMy5LSZ0mXVRj7yM6l62lHbxS1rDMW0fyJtxikrJX6FMMAZrbCcYKpOjNFqWdln8Zzg==}
+    engines: {node: '>=20.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@tombit/binding-linux-loong64-gnu@0.1.7':
+    resolution: {integrity: sha512-vGmWQG+A2VgiX1YmcPkzDrCmdphjk1pc8Y724SeSz1nggJRsD6qy42kpxFR4Mwmpv3fneKfsP9AA5DvgNMBMCA==}
+    engines: {node: '>=20.0.0'}
+    cpu: [loong64]
+    os: [linux]
+    libc: [glibc]
+
+  '@tombit/binding-linux-loong64-musl@0.1.7':
+    resolution: {integrity: sha512-BjepP36zGh0PX2ok3v/Q1HHZLHSJkCTdnLwQxpWp0Ts3Jm2lUL7oBpwTFqBMVW7qEmoezH3RcYa+hIlCEht/mw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [loong64]
+    os: [linux]
+    libc: [musl]
+
+  '@tombit/binding-linux-ppc64-gnu@0.1.7':
+    resolution: {integrity: sha512-aTYG3ND7CcLUZ4QCWyWnW6b8g2L481n3dRx564BB2tsdMYR+UTTMT9Ht8GCk8NRni5jR4qOj8/6opZU5iUWepw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [glibc]
+
+  '@tombit/binding-linux-ppc64-musl@0.1.7':
+    resolution: {integrity: sha512-cLJegaEISxKO1+l6o+tePYL9e4zZ+7e/HC6akVKIUA5KlINLgBRoi1f1wdSAWVeN3p73zGC1HZnCwflmu5ueOA==}
+    engines: {node: '>=20.0.0'}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [musl]
+
+  '@tombit/binding-linux-riscv64-gnu@0.1.7':
+    resolution: {integrity: sha512-pmrjVWhX7f2ze8rGPvceRSYP2R57R2Y1hUkks0qDnAweFvNlJM6tn575ArDUF/Wq3jcbjmfuFQOnfeB3qIEoRg==}
+    engines: {node: '>=20.0.0'}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [glibc]
+
+  '@tombit/binding-linux-riscv64-musl@0.1.7':
+    resolution: {integrity: sha512-cSOZ3ybyJa3SY9mM0ZM9p2xwrw/emdcSPSg+sRkqpT9Pk/LvAL1Tckj3+fm2WtphctAnjDNhuvL7hOdUTDqlMA==}
+    engines: {node: '>=20.0.0'}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [musl]
+
+  '@tombit/binding-linux-s390x-gnu@0.1.7':
+    resolution: {integrity: sha512-KZir6MHNSXi06kUQ4D6VJdTmVekH2qgVP5lCCI3+19u0fNaXwG4ncB0AG+JYm76o8/bneS5QHjUtzAoh+paaPA==}
+    engines: {node: '>=20.0.0'}
+    cpu: [s390x]
+    os: [linux]
+    libc: [glibc]
+
+  '@tombit/binding-linux-x64-gnu@0.1.7':
+    resolution: {integrity: sha512-lvEGWsuTK7tBf/ck5tb07qxC2eEv4MP5ZRS5VnOsJg+cUwdthEkrYkb8oeCyu2j4nwHW3U9QoHXChv7Gs8/51w==}
+    engines: {node: '>=20.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@tombit/binding-linux-x64-musl@0.1.7':
+    resolution: {integrity: sha512-BT84fASpACpaID1xj2Td0nPpuzGt3jDr1uU+fxi0uczVrNcrWLDSBjllD2ttf3lPiJ/Q/ceQGESTOy9a5+nZgQ==}
+    engines: {node: '>=20.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@tombit/binding-openharmony-arm64@0.1.7':
+    resolution: {integrity: sha512-bouy+zR5Z+oKAuVpPFoxiv0EZynvVaJLJkmz35InQ2Cle/0RHnnk5C/SF8DAksfXf7Cz1M+mjtoB3DQ0+Qvphw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@tombit/binding-openharmony-x64@0.1.7':
+    resolution: {integrity: sha512-I/CIJsBu1DKS5Lvq+pp4o7BMuVANeTFO61BV1BY4W9Unkc9H020WVkpDKAkMhdDOI3qhI2GcafunkdIUIa/8Vw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [x64]
+    os: [openharmony]
+
+  '@tombit/binding-win32-arm64-msvc@0.1.7':
+    resolution: {integrity: sha512-W7wJ+grPsqk0QAzqlgQgwVFY7mapKU5XKVLMU/ZVSZn72bAb0dyhc9mceuPIzZHFS/emmWpsPD6+bIiraJObYA==}
+    engines: {node: '>=20.0.0'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@tombit/binding-win32-ia32-msvc@0.1.7':
+    resolution: {integrity: sha512-hpM4AxTVmwf9K4Wo2/sLpqJEHPDAecaF7a5K5sg66A2/XCwX+s86vBXLeXuDdMm8+U1svM6nOsqqFjWz3VnhFw==}
+    engines: {node: '>=20.0.0'}
+    cpu: [ia32]
+    os: [win32]
+
+  '@tombit/binding-win32-x64-msvc@0.1.7':
+    resolution: {integrity: sha512-qWtuJEDiZCn01ha9WBaVp0hx6xjveWs4eQzITXQbXtSNrm0c4UtdQApMmgOS9TzwRhoxyZyKgLKBLnJTBHBy4w==}
+    engines: {node: '>=20.0.0'}
+    cpu: [x64]
+    os: [win32]
 
   '@tybys/wasm-util@0.10.4':
     resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
@@ -1332,6 +1475,11 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
+  napi-postinstall@0.3.7:
+    resolution: {integrity: sha512-jyU4cU4kVAmy/3qjP+DcoQTNXfINHc+dFw54gGqWC8nu0mpV0kOnk7kff+J+Q18SbX0k3Np8Rm7yFjd3phatNQ==}
+    engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
+    hasBin: true
+
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
@@ -1397,9 +1545,9 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier-plugin-toml@3.0.2:
-    resolution: {integrity: sha512-1t1FOSGaXNy7xN6ffE7ND71VqsnbUtanGEKAD1hTwFDrGIH1cwZ0KH6lMThDVItjdV/UUJWqD3f1+16AHG3eUQ==}
-    engines: {node: '>=18.0.0'}
+  prettier-plugin-toml@4.1.0:
+    resolution: {integrity: sha512-6+qgmRqD79kSsincO3odPzMpteTCpeP+WxxYmI7vDrhfpiQMFeciozuqUcnWc4XfJ97OZiuWeUfVcDktvACIDg==}
+    engines: {node: '>=20.0.0'}
     peerDependencies:
       prettier: ^3.0.3
 
@@ -1473,6 +1621,10 @@ packages:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
 
+  tombit@0.1.7:
+    resolution: {integrity: sha512-0jMD7Zji2JV6yIia7krTZVxle/jmKGWvqaIrcjSuRIhR3qIGEkSYfjcdz9dAf9EJC37pyW/A4nz+sjErLgfZHg==}
+    engines: {node: '>=20.0.0'}
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -1540,8 +1692,6 @@ snapshots:
     dependencies:
       hashery: 1.5.1
       keyv: 5.6.0
-
-  '@dual-bundle/import-meta-resolve@4.2.1': {}
 
   '@emnapi/core@1.11.2':
     dependencies:
@@ -1845,7 +1995,74 @@ snapshots:
       estraverse: 5.3.0
       picomatch: 4.0.7
 
-  '@tombi-toml/wasm-lib@1.8.0': {}
+  '@tombit/binding-android-arm-eabi@0.1.7':
+    optional: true
+
+  '@tombit/binding-android-arm64@0.1.7':
+    optional: true
+
+  '@tombit/binding-darwin-arm64@0.1.7':
+    optional: true
+
+  '@tombit/binding-darwin-x64@0.1.7':
+    optional: true
+
+  '@tombit/binding-freebsd-x64@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-arm-gnueabihf@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-arm-musleabihf@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-arm64-gnu@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-arm64-musl@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-loong64-gnu@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-loong64-musl@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-ppc64-gnu@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-ppc64-musl@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-riscv64-gnu@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-riscv64-musl@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-s390x-gnu@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-x64-gnu@0.1.7':
+    optional: true
+
+  '@tombit/binding-linux-x64-musl@0.1.7':
+    optional: true
+
+  '@tombit/binding-openharmony-arm64@0.1.7':
+    optional: true
+
+  '@tombit/binding-openharmony-x64@0.1.7':
+    optional: true
+
+  '@tombit/binding-win32-arm64-msvc@0.1.7':
+    optional: true
+
+  '@tombit/binding-win32-ia32-msvc@0.1.7':
+    optional: true
+
+  '@tombit/binding-win32-x64-msvc@0.1.7':
+    optional: true
 
   '@tybys/wasm-util@0.10.4':
     dependencies:
@@ -2494,6 +2711,8 @@ snapshots:
 
   ms@2.1.3: {}
 
+  napi-postinstall@0.3.7: {}
+
   natural-compare@1.4.0: {}
 
   optionator@0.9.4:
@@ -2613,12 +2832,10 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-toml@3.0.2(prettier@3.9.9):
+  prettier-plugin-toml@4.1.0(prettier@3.9.9):
     dependencies:
-      '@dual-bundle/import-meta-resolve': 4.2.1
-      '@tombi-toml/wasm-lib': 1.8.0
       prettier: 3.9.9
-      smol-toml: 1.9.0
+      tombit: 0.1.7
 
   prettier@3.9.9: {}
 
@@ -2671,6 +2888,34 @@ snapshots:
   to-regex-range@5.0.1:
     dependencies:
       is-number: 7.0.0
+
+  tombit@0.1.7:
+    dependencies:
+      napi-postinstall: 0.3.7
+    optionalDependencies:
+      '@tombit/binding-android-arm-eabi': 0.1.7
+      '@tombit/binding-android-arm64': 0.1.7
+      '@tombit/binding-darwin-arm64': 0.1.7
+      '@tombit/binding-darwin-x64': 0.1.7
+      '@tombit/binding-freebsd-x64': 0.1.7
+      '@tombit/binding-linux-arm-gnueabihf': 0.1.7
+      '@tombit/binding-linux-arm-musleabihf': 0.1.7
+      '@tombit/binding-linux-arm64-gnu': 0.1.7
+      '@tombit/binding-linux-arm64-musl': 0.1.7
+      '@tombit/binding-linux-loong64-gnu': 0.1.7
+      '@tombit/binding-linux-loong64-musl': 0.1.7
+      '@tombit/binding-linux-ppc64-gnu': 0.1.7
+      '@tombit/binding-linux-ppc64-musl': 0.1.7
+      '@tombit/binding-linux-riscv64-gnu': 0.1.7
+      '@tombit/binding-linux-riscv64-musl': 0.1.7
+      '@tombit/binding-linux-s390x-gnu': 0.1.7
+      '@tombit/binding-linux-x64-gnu': 0.1.7
+      '@tombit/binding-linux-x64-musl': 0.1.7
+      '@tombit/binding-openharmony-arm64': 0.1.7
+      '@tombit/binding-openharmony-x64': 0.1.7
+      '@tombit/binding-win32-arm64-msvc': 0.1.7
+      '@tombit/binding-win32-ia32-msvc': 0.1.7
+      '@tombit/binding-win32-x64-msvc': 0.1.7
 
   tslib@2.8.1:
     optional: true
