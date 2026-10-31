@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "@redocly/cli": "2.53.3",
-    "@sourcemeta/jsonschema": "17.2.0"
+    "@redocly/cli": "2.71.0",
+    "@sourcemeta/jsonschema": "17.2.1"
   }
 }

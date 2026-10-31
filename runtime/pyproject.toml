@@ -7,7 +7,7 @@ license = "MIT"
 authors = [
   { name = "Sterling Freeman", email = "sterling.j.freeman@gmail.com" }
 ]
-requires-python = ">=3.14,<3.15"
+requires-python = ">=3.15,<3.16"
 dependencies = [
   # Click rejects abbreviated options by default.
   "click==8.5.0",
@@ -15,7 +15,7 @@ dependencies = [
   "json-five==1.1.2",
   # Provides kbp. After changing this pin, run uv lock, then `just refresh_knowledge_model <tag>`.
   "knowledge-bus @ https://github.com/SterlingJF/knowledge-bus/releases/download/v0.10.0/knowledge_bus-0.10.0.tar.gz",
-  "mcp==2.2.0",
+  "mcp==2.3.0",
   "pydantic==2.14.1",
   "pyyaml==6.0.3",
 ]
