@@ -77,23 +77,7 @@ describe("SegmentedChoice", () => {
     );
   });
 
-  it("three options sit side by side", () => {
-    const three = [...two, { value: "x", label: "x" }];
-    render(
-      <SegmentedChoice
-        aria-label="x"
-        options={three}
-        value={null}
-        onValueChange={() => {}}
-      />,
-    );
-    expect(screen.getByRole("radiogroup").getAttribute("data-layout")).toBe(
-      "row",
-    );
-    expect(screen.getAllByRole("radio")).toHaveLength(3);
-  });
-
-  it("more than three options always stack", () => {
+  it("shows every option, however many", () => {
     render(
       <SegmentedChoice
         aria-label="x"
@@ -102,46 +86,7 @@ describe("SegmentedChoice", () => {
         onValueChange={() => {}}
       />,
     );
-    const group = screen.getByRole("radiogroup");
-    expect(group.getAttribute("data-layout")).toBe("stacked");
-    expect(group.getAttribute("aria-orientation")).toBe("vertical");
     expect(screen.getAllByRole("radio")).toHaveLength(5);
-  });
-
-  it("stacks when the row is wider than its space", () => {
-    let fire = () => {};
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(cb: () => void) {
-          fire = cb;
-        }
-        observe() {}
-        disconnect() {}
-      },
-    );
-    const width = vi
-      .spyOn(HTMLElement.prototype, "clientWidth", "get")
-      .mockReturnValue(100);
-    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(300);
-    render(
-      <SegmentedChoice
-        aria-label="x"
-        options={two}
-        value={null}
-        onValueChange={() => {}}
-      />,
-    );
-    expect(screen.getByRole("radiogroup").getAttribute("data-layout")).toBe(
-      "stacked",
-    );
-    width.mockReturnValue(400);
-    act(() => fire());
-    expect(screen.getByRole("radiogroup").getAttribute("data-layout")).toBe(
-      "row",
-    );
-    vi.unstubAllGlobals();
-    vi.restoreAllMocks();
   });
 
   it("refuses fewer than 2 options", () => {
@@ -156,40 +101,6 @@ describe("SegmentedChoice", () => {
         />,
       ),
     ).toThrow("2 or more options");
-    vi.restoreAllMocks();
-  });
-
-  it("stacks in the same commit as a shrinking resize, before any paint", () => {
-    let fire = () => {};
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(cb: () => void) {
-          fire = cb;
-        }
-        observe() {}
-        disconnect() {}
-      },
-    );
-    const width = vi
-      .spyOn(HTMLElement.prototype, "clientWidth", "get")
-      .mockReturnValue(400);
-    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(300);
-    render(
-      <SegmentedChoice
-        aria-label="x"
-        options={two}
-        value={null}
-        onValueChange={() => {}}
-      />,
-    );
-    const group = screen.getByRole("radiogroup");
-    expect(group.getAttribute("data-layout")).toBe("row");
-    width.mockReturnValue(200);
-    // No act(): the observer callback itself must commit the stacked layout synchronously.
-    fire();
-    expect(group.getAttribute("data-layout")).toBe("stacked");
-    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 });

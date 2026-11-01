@@ -33,7 +33,6 @@ const diffLines = [
 
 function Saved({ open: start }: { open: boolean }) {
   const [open, setOpen] = useState(start);
-  const id = start ? "r02-diff" : "r01-diff";
   return (
     <ResultCard
       kind="result"
@@ -44,15 +43,12 @@ function Saved({ open: start }: { open: boolean }) {
       undoMessage="Undo the 09:41 edit to cache-proposal.md"
       disclosure={{
         label: open ? action.hideChange : action.showChange,
-        expanded: open,
-        onToggle: () => setOpen(!open),
-        controls: id,
+        open,
+        onOpenChange: setOpen,
       }}
       lifecycle={live}
     >
-      <div id={id} hidden={!open}>
-        <Diff lines={diffLines} />
-      </div>
+      <Diff lines={diffLines} />
     </ResultCard>
   );
 }
@@ -97,7 +93,7 @@ export default {
             label: action.showLaterEdits,
             message: "",
             frozenLine: frozen.notSaved,
-            variant: "primary",
+            variant: "default",
           }}
           lifecycle={live}
         />

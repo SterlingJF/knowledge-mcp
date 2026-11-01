@@ -175,7 +175,9 @@ function useSupersession(result: unknown, onReplaced: () => void) {
   const createdAt = id?.created_at;
   const seq = id?.seq;
   const replacedRef = useRef(onReplaced);
-  replacedRef.current = onReplaced;
+  useEffect(() => {
+    replacedRef.current = onReplaced;
+  }, [onReplaced]);
 
   useEffect(() => {
     if (subject === undefined || seq === undefined) return;

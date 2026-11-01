@@ -22,12 +22,8 @@ describe("Badge", () => {
         <Badge tone="refused">{badge.refused.cantUndo}</Badge>
       </>,
     );
-    expect(
-      container.querySelector("[data-tone=done] [data-icon=done]"),
-    ).not.toBeNull();
-    expect(
-      container.querySelector("[data-tone=refused] [data-icon=refused]"),
-    ).not.toBeNull();
+    expect(container.querySelector("[data-tone=done] svg")).not.toBeNull();
+    expect(container.querySelector("[data-tone=refused] svg")).not.toBeNull();
   });
 
   it("shows neutral without dot or icon", () => {

@@ -2,8 +2,16 @@
 import type { ReactNode } from "react";
 
 import { Badge } from "@/component-elements/badge";
-import { TickBox } from "@/component-elements/change-number";
 import type { BadgeTone } from "@/component-elements/badge";
+import { TickBox } from "@/component-patterns/change-number";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/component-elements/table";
 import { SegmentedChoice } from "@/component-patterns/segmented-choice";
 import type { SegmentOption } from "@/component-patterns/segmented-choice";
 import { decision } from "@/copy/en";
@@ -32,7 +40,7 @@ export type DecisionRow = {
   /** Names the row for its choice's accessible label. */
   name: string;
   cells: ReactNode[];
-  /** This row's own answers: none is "Answer in chat", 1 is a K05 tick box, 2+ a segmented choice (4+ stack). Omit to use the table's `kind` preset. */
+  /** This row's own answers: none is "Answer in chat", 1 is a K05 tick box, 2+ a choice, one option per line. Omit to use the table's `kind` preset. */
   options?: readonly SegmentOption<string>[];
   /** This row's answer; overrides `choices[id]`. */
   value?: string | null;
@@ -52,14 +60,11 @@ export function countAccepted(
     .length;
 }
 
-/** Which cell plays which part when the table stacks under 560px. Column indexes. */
+/** Which cell plays which part when the table stacks under 576px. Column indexes. */
 /** Leave `title` unset when the cell bolds its own part (M05F bolds only the file name). */
 export type NarrowLayout = { title?: number; detail?: number; hide?: number[] };
 /** The conventions layout: type as the title, example as the detail, folder hidden. */
 const conventionsNarrow: NarrowLayout = { title: 0, detail: 2, hide: [1] };
-
-// The choice column sizes to its content, up to about two-thirds of the table; past that the label wraps or the options stack.
-const cap = "w-max max-w-[65cqi] @max-[560px]:max-w-full";
 
 function Choice({
   row,
@@ -81,7 +86,7 @@ function Choice({
   // No answer the card can offer: it is answered in chat, and the row stays unanswered.
   if (options.length === 0)
     return (
-      <span className="whitespace-nowrap text-xs leading-xs text-secondary">
+      <span className="text-xs whitespace-nowrap text-muted-foreground">
         {decision.answerInChat}
       </span>
     );
@@ -93,15 +98,13 @@ function Choice({
         label={only.label}
         checked={value === only.value}
         onCheckedChange={(on) => onChoiceChange(row.id, on ? only.value : null)}
-        className={cap}
       />
     );
   }
   return (
     <SegmentedChoice<string>
       aria-label={row.name}
-      // Capped so long options stack instead of widening the column.
-      className={cn(cap, align === "end" && "ml-auto @max-[560px]:ml-0")}
+      className={cn(align === "end" && "justify-end @max-xl:justify-start")}
       options={options}
       value={value}
       onValueChange={(v) => onChoiceChange(row.id, v)}
@@ -127,67 +130,46 @@ export function DecisionRows({
   choices?: Record<string, string | null | undefined>;
   /** null only when a single-option row's tick box is cleared. */
   onChoiceChange: (id: string, value: string | null) => void;
-  /** Under 560px: the title cell is semibold, the detail secondary mono, hidden cells go. Defaults to conventions. */
+  /** Under 576px: the title cell is semibold, the detail secondary mono, hidden cells go. Defaults to conventions. */
   narrow?: NarrowLayout;
   /** Where the choice sits in its column: "end" for conventions (P04), "start" for move blockers (M05F). */
   align?: "start" | "end";
   className?: string;
 }) {
   const cellCount = rows[0]?.cells.length ?? headers.length;
-  const part = (i: number) =>
-    cn(
-      i === narrow.title && "@max-[560px]:font-semibold",
-      i === narrow.detail &&
-        "@max-[560px]:font-mono @max-[560px]:text-secondary",
-      narrow.hide?.includes(i) && "@max-[560px]:hidden",
-    );
-  const cell = "py-km-gap-row pr-km-gap-group align-top";
   return (
-    <table
-      className={cn(
-        "w-full border-collapse @max-[560px]:block @max-[560px]:[&_tbody]:block text-sm leading-sm text-foreground",
-        className,
-      )}
-    >
-      <thead className="@max-[560px]:sr-only">
-        <tr className="border-b-hairline border-border text-left text-xs leading-xs font-semibold text-secondary">
+    <Table className={className}>
+      <TableHeader>
+        <TableRow>
           {headers.slice(0, cellCount).map((h, i) => (
-            <th
-              key={i}
-              className={cn(cell, "pt-0 pb-km-gap-row font-[inherit]")}
-            >
-              {h}
-            </th>
+            <TableHead key={i}>{h}</TableHead>
           ))}
-          <th
-            className={cn(
-              cell,
-              // The choice header never wraps; the column grows to it.
-              "pt-0 pr-0 pb-km-gap-row font-[inherit] whitespace-nowrap",
-              align === "end" && "text-right",
-            )}
-          >
+          <TableHead className={cn(align === "end" && "text-right")}>
             {headers[cellCount]}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
         {rows.map((row) => (
-          <tr
-            key={row.id}
-            className="border-b-hairline border-border last:border-b-0 @max-[560px]:flex @max-[560px]:flex-col @max-[560px]:py-km-gap-row @max-[560px]:[&>td]:py-0 @max-[560px]:[&>td]:pr-0"
-          >
+          <TableRow key={row.id}>
             {row.cells.map((c, i) => (
-              <td key={i} className={cn(cell, "break-words", part(i))}>
+              <TableCell
+                key={i}
+                stacked={
+                  i === narrow.title
+                    ? "title"
+                    : i === narrow.detail
+                      ? "detail"
+                      : narrow.hide?.includes(i)
+                        ? "hidden"
+                        : undefined
+                }
+              >
                 {c}
-              </td>
+              </TableCell>
             ))}
-            <td
-              className={cn(
-                cell,
-                "w-px pr-0 @max-[560px]:mt-km-gap-row @max-[560px]:w-auto",
-                align === "end" && "text-right @max-[560px]:text-left",
-              )}
+            <TableCell
+              className={cn(align === "end" && "text-right @max-xl:text-left")}
             >
               <Choice
                 row={row}
@@ -196,10 +178,10 @@ export function DecisionRows({
                 choices={choices}
                 onChoiceChange={onChoiceChange}
               />
-            </td>
-          </tr>
+            </TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 }

@@ -1,29 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "shadcn/tailwind.css";
 @import "./generated/tokens.auto.css";
-
-/* The harness is a dev page without Tailwind; its words must not add classes to the app. */
-@source not "./harness";
 
 /* shadcn's names, the host mapping and every token class are generated into tokens.auto.css from kmtokens.js. */
 
-/* Shared motion: the waiting pulse and the loading shimmer (F05). Elements reference these by name. */
-@keyframes km-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.55;
-  }
-  80%,
-  100% {
-    transform: scale(2.6);
-    opacity: 0;
+/* shadcn's base: borders and outlines take the theme's colours, not currentColor. */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
 }
 
-@keyframes km-shimmer {
-  50% {
-    opacity: 0.55;
-  }
+/* The host's safe area, set on <html> by the bridge from hostContext.safeAreaInsets. */
+[data-app-root] {
+  padding: var(--safe-area-top, 0) var(--safe-area-right, 0)
+    var(--safe-area-bottom, 0) var(--safe-area-left, 0);
 }
 
 /* A themed container sets its own text colour, so nested text follows its theme, not the page's. */

@@ -1,19 +1,24 @@
 // P08 Plan table: a read-only table of what a plan will do (M02 moves and links). Not built around Cn rows.
+// Narrow, each cell shows its header above it.
 import { useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
+import { Button } from "@/component-core/button";
 import { NoBreakName } from "@/component-elements/chips";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/component-elements/table";
 import { line } from "@/copy/en";
-import { cn } from "@/lib/utils";
-
-import { tableLabel, tableRow } from "./table-classes";
 
 export type PlanRow = { id: string; cells: ReactNode[] };
 
-const xs = "text-xs leading-xs";
-const label = tableLabel;
-// Narrow, each cell shows its header label above it.
-const rowClass = cn(tableRow, "grid-cols-(--plan-cols)");
+const named = (text: ReactNode) =>
+  typeof text === "string" ? <NoBreakName>{text}</NoBreakName> : text;
 
 /** A primary line with a secondary line under it. */
 export function PlanLines({
@@ -25,20 +30,10 @@ export function PlanLines({
 }) {
   return (
     <span className="flex min-w-0 flex-col">
-      <span>
-        {typeof primary === "string" ? (
-          <NoBreakName>{primary}</NoBreakName>
-        ) : (
-          primary
-        )}
-      </span>
+      <span>{named(primary)}</span>
       {secondary != null && (
-        <span className={cn(xs, "text-muted-foreground")}>
-          {typeof secondary === "string" ? (
-            <NoBreakName>{secondary}</NoBreakName>
-          ) : (
-            secondary
-          )}
+        <span className="text-xs text-muted-foreground">
+          {named(secondary)}
         </span>
       )}
     </span>
@@ -47,14 +42,11 @@ export function PlanLines({
 
 export function PlanTable({
   headers,
-  columns,
   rows,
   limit,
   className,
 }: {
   headers: string[];
-  /** One fraction per column, e.g. [40, 60]. */
-  columns: number[];
   rows: PlanRow[];
   /** Show only this many rows, then "+N more", which opens the rest in place. */
   limit?: number;
@@ -63,52 +55,40 @@ export function PlanTable({
   const [open, setOpen] = useState(false);
   const hidden = limit != null && !open ? Math.max(rows.length - limit, 0) : 0;
   const shown = hidden > 0 ? rows.slice(0, limit) : rows;
-  const style = {
-    "--plan-cols": columns.map((f) => `minmax(0,${f}fr)`).join(" "),
-  } as CSSProperties;
 
   return (
-    <div
-      role="table"
-      style={style}
-      className={cn("text-sm leading-sm text-foreground", className)}
-    >
-      <div
-        role="row"
-        className={cn(rowClass, "pt-0 pb-km-gap-row @max-[560px]:sr-only")}
-      >
-        {headers.map((h) => (
-          <span key={h} role="columnheader" className={label}>
-            {h}
-          </span>
-        ))}
-      </div>
-      {shown.map((row) => (
-        <div key={row.id} role="row" className={rowClass}>
-          {row.cells.map((c, i) => (
-            <span key={i} role="cell" className="min-w-0">
-              <span
-                aria-hidden
-                data-stack-label
-                className={cn(label, "hidden @max-[560px]:block")}
-              >
-                {headers[i]}
-              </span>
-              {c}
-            </span>
+    <div className={className}>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {headers.map((h) => (
+              <TableHead key={h}>{h}</TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {shown.map((row) => (
+            <TableRow key={row.id}>
+              {row.cells.map((c, i) => (
+                <TableCell key={i}>
+                  <span
+                    aria-hidden
+                    data-stack-label
+                    className="hidden text-xs text-muted-foreground @max-xl:block"
+                  >
+                    {headers[i]}
+                  </span>
+                  {c}
+                </TableCell>
+              ))}
+            </TableRow>
           ))}
-        </div>
-      ))}
+        </TableBody>
+      </Table>
       {hidden > 0 && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className={cn(
-            "text-sm leading-sm cursor-pointer rounded-xs border-0 bg-transparent px-0 py-km-4 text-secondary outline-none hover:text-foreground focus-visible:shadow-km-focus-ring pointer-coarse:min-h-km-target",
-          )}
-        >
+        <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
           {line.andMore(hidden)}
-        </button>
+        </Button>
       )}
     </div>
   );

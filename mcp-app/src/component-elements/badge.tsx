@@ -1,3 +1,5 @@
+// K01 Status badge: core Badge in the host's status colours. Waiting carries a pulsing dot, done a check,
+// refused a warning sign, so the state never rests on colour alone.
 import type { ReactNode } from "react";
 import { Check, TriangleAlert } from "lucide-react";
 
@@ -5,17 +7,6 @@ import { Badge as CoreBadge } from "@/component-core/badge";
 import { cn } from "@/lib/utils";
 
 export type BadgeTone = "waiting" | "done" | "refused" | "neutral";
-
-/** Waiting on the person: a dot whose ring pulses; static when motion is reduced. */
-function PulseDot() {
-  return (
-    <span
-      aria-hidden="true"
-      data-testid="pulse-dot"
-      className="relative size-km-dot flex-none rounded-full bg-current after:absolute after:inset-0 after:rounded-full after:bg-current after:content-[''] after:animate-km-pulse motion-reduce:after:animate-none"
-    />
-  );
-}
 
 export type BadgeProps = {
   tone: BadgeTone;
@@ -28,19 +19,29 @@ export function Badge({ tone, children, className }: BadgeProps) {
   return (
     <CoreBadge
       data-tone={tone}
+      variant={
+        tone === "refused"
+          ? "destructive"
+          : tone === "neutral"
+            ? "outline"
+            : "default"
+      }
       className={cn(
-        "h-auto gap-km-2 rounded-full border-0 px-km-4 py-km-1 text-xs leading-xs font-semibold [&>svg]:size-km-icon!",
-        tone === "waiting" && "bg-warning text-warning",
-        tone === "done" && "bg-success text-success",
-        tone === "refused" && "bg-danger text-destructive",
-        tone === "neutral" && "bg-muted text-secondary",
+        tone === "waiting" && "bg-warning text-warning-foreground",
+        tone === "done" && "bg-success text-success-foreground",
         className,
       )}
     >
-      {tone === "waiting" && <PulseDot />}
-      {tone === "done" && <Check aria-hidden="true" data-icon="done" />}
+      {tone === "waiting" && (
+        <span
+          aria-hidden="true"
+          data-testid="pulse-dot"
+          className="size-1.5 rounded-full bg-current motion-safe:animate-pulse"
+        />
+      )}
+      {tone === "done" && <Check aria-hidden="true" data-icon="inline-start" />}
       {tone === "refused" && (
-        <TriangleAlert aria-hidden="true" data-icon="refused" />
+        <TriangleAlert aria-hidden="true" data-icon="inline-start" />
       )}
       {children}
     </CoreBadge>

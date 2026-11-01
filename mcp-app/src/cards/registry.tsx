@@ -1,6 +1,7 @@
 // Picks the card for a tool result by its schema, such as knowledge-mcp/proposal/1.
 // A result with no card here draws nothing: the host still shows the tool's text card.
 
+import { createElement } from "react";
 import type { ComponentType } from "react";
 
 import type { ToolResult } from "@/bridge/bridge";
@@ -24,6 +25,6 @@ export function cardFor(
 }
 
 export function CardView({ result }: { result: ToolResult | null }) {
-  const Card = cardFor(result);
-  return Card && result ? <Card result={result} /> : null;
+  const card = cardFor(result);
+  return card && result ? createElement(card, { result }) : null;
 }

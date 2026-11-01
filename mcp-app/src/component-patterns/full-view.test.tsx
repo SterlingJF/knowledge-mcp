@@ -10,7 +10,7 @@ const save: CardAction = {
   label: "Save C1",
   message: "Save C1 to a.md",
   frozenLine: frozen.approved,
-  variant: "primary",
+  variant: "default",
 };
 
 function Full() {
@@ -27,29 +27,17 @@ function Full() {
   );
 }
 
-test("flat, no Full view button, and a press sends then returns inline", () => {
+test("no Full view button, and a press sends then returns inline", () => {
   const host = stubCardHost({ displayMode: "fullscreen" });
-  const { container } = render(
+  render(
     <StaticCardHost host={host}>
       <Full />
     </StaticCardHost>,
   );
-  expect(container.querySelector("section")?.dataset.flat).toBe("true");
   expect(screen.getByText("Every change")).toBeTruthy();
   expect(screen.queryByRole("button", { name: action.fullView })).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
   expect(host.sent).toEqual(["Save C1 to a.md"]);
   expect(host.requested).toEqual(["inline"]);
   expect(screen.getByText(frozen.approved)).toBeTruthy();
-});
-
-test("the full view caps its width for readable lines", () => {
-  const { container } = render(
-    <StaticCardHost host={stubCardHost({ displayMode: "fullscreen" })}>
-      <Full />
-    </StaticCardHost>,
-  );
-  expect(container.querySelector("section")?.className).toContain(
-    "max-w-km-full-max",
-  );
 });

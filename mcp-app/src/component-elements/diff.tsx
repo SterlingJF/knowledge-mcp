@@ -1,4 +1,5 @@
-// K09 Diff: the exact before and after of a saved edit. Removed lines are struck through so the meaning survives without colour.
+// K09 Diff: the exact before and after of a saved edit. Each line starts with − or +, so the meaning
+// survives without colour.
 import { cn } from "@/lib/utils";
 
 export type DiffLine = { kind: "removed" | "added"; text: string };
@@ -13,27 +14,30 @@ export function Diff({
   return (
     <div
       className={cn(
-        "mt-km-gap-group overflow-hidden rounded-lg border-hairline border-solid border-border text-xs",
+        "overflow-hidden rounded-lg border font-mono text-xs",
         className,
       )}
     >
-      {lines.map((line, index) =>
-        line.kind === "removed" ? (
-          <del
+      {lines.map((line, index) => {
+        const removed = line.kind === "removed";
+        const Line = removed ? "del" : "ins";
+        return (
+          <Line
             key={index}
-            className="block bg-danger p-km-pad-line text-destructive line-through wrap-anywhere"
+            className={cn(
+              "flex gap-2 px-3 py-1 no-underline",
+              removed
+                ? "bg-destructive/10 text-destructive"
+                : "bg-success text-success-foreground",
+            )}
           >
-            {line.text}
-          </del>
-        ) : (
-          <ins
-            key={index}
-            className="block bg-success p-km-pad-line text-success no-underline wrap-anywhere"
-          >
-            {line.text}
-          </ins>
-        ),
-      )}
+            <span aria-hidden="true" className="select-none">
+              {removed ? "−" : "+"}
+            </span>
+            <span className="min-w-0 wrap-anywhere">{line.text}</span>
+          </Line>
+        );
+      })}
     </div>
   );
 }

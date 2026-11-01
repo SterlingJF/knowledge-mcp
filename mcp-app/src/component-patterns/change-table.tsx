@@ -1,25 +1,19 @@
 // P02 Change table: one row per Cn — what is there now, what is proposed with its evidence mark, and the exact sources.
-import type { ReactNode } from "react";
-
-import { ChangeNumber, SelectAll } from "@/component-elements/change-number";
+import { ChangeNumber, SelectAll } from "@/component-patterns/change-number";
 import { SourceChip } from "@/component-elements/chips";
 import { EvidenceMark } from "@/component-elements/evidence-mark";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/component-elements/table";
 import { CurrentText } from "@/component-elements/text-lines";
 import type { ProposalCell, ProposalRow, Source } from "@/contracts/proposal";
 import { label as labels, line, source as sourceCopy } from "@/copy/en";
 import { cn } from "@/lib/utils";
-
-import { tableLabel, tableRow } from "./table-classes";
-
-const headClass = cn(tableLabel, "@max-[560px]:sr-only");
-// A left-out row: its text is struck and tertiary; the tick box stays at full strength.
-const tertiary = "text-muted-foreground";
-// Only text spans are struck: a strike on the cell would reach the evidence mark.
-const struck = "line-through";
-const editCols =
-  "grid-cols-[auto_minmax(0,29fr)_minmax(0,42fr)_minmax(0,29fr)]";
-// Draft: Cn, Section, Draft, Source (D05F).
-const draftCols = "grid-cols-[auto_auto_minmax(0,55fr)_minmax(0,45fr)]";
 
 function Cell({
   label,
@@ -48,25 +42,17 @@ function sameFileAsPrevious(sources: Source[], i: number): boolean {
 
 function Sources({ sources }: { sources: Source[] }) {
   return (
-    <span
-      data-testid="sources"
-      className="flex min-w-0 flex-col items-start gap-km-gap-tight"
-    >
+    <span data-testid="sources" className="flex min-w-0 flex-col gap-1">
       {sources.map((source, i) => {
         const short = sameFileAsPrevious(sources, i);
         return (
-          <span
-            key={i}
-            className="flex max-w-full min-w-0 items-center gap-km-gap-inline"
-          >
+          <span key={i} className="flex min-w-0 items-baseline gap-1">
             {short && (
-              <span className="text-muted-foreground">{sourceCopy.versus}</span>
+              <span className="text-xs text-muted-foreground">
+                {sourceCopy.versus}
+              </span>
             )}
-            <SourceChip
-              source={source}
-              continuation={short}
-              className="max-w-full min-w-0 whitespace-normal"
-            />
+            <SourceChip source={source} continuation={short} />
           </span>
         );
       })}
@@ -94,13 +80,6 @@ export function ChangeTable({
   className,
 }: ChangeTableProps) {
   const frozen = draft || onKeptChange == null;
-  // One grid for the table; each row is a subgrid, so header and body columns line up.
-  // On touch, a row holding a tick box is at least the target tall, so hit areas never overlap.
-  const rowClass = cn(
-    tableRow,
-    "col-span-full grid-cols-subgrid",
-    !frozen && "pointer-coarse:min-h-km-target",
-  );
   const keptSet = kept ?? new Set(rows.map((_, i) => i + 1));
   // A frozen table given `kept` still shows what was left out; without it every row reads as kept.
   const isKept = (n: number) => draft || keptSet.has(n);
@@ -112,108 +91,79 @@ export function ChangeTable({
     onKeptChange?.(next);
   };
 
-  let head: ReactNode = <span />;
-  if (!frozen && onKeptChange)
-    head = (
-      <SelectAll
-        keptCount={rows.filter((_, i) => keptSet.has(i + 1)).length}
-        total={rows.length}
-        onChange={(all) =>
-          onKeptChange(new Set(all ? rows.map((_, i) => i + 1) : []))
-        }
-      />
-    );
-
   return (
-    <div
-      role="table"
-      className={cn(
-        "grid gap-x-km-gap-group text-sm leading-sm text-foreground @max-[560px]:grid-cols-1",
-        draft ? draftCols : editCols,
-        className,
-      )}
-    >
-      <div role="row" className={cn(rowClass, "pt-0 pb-km-gap-row")}>
-        <span role="columnheader">{head}</span>
-        <span role="columnheader" className={headClass}>
-          {draft ? labels.section : labels.current}
-        </span>
-        <span role="columnheader" className={headClass}>
-          {draft ? labels.draft : labels.proposed}
-        </span>
-        <span role="columnheader" className={headClass}>
-          {labels.source}
-        </span>
-      </div>
-      {rows.map((row, i) => {
-        const n = i + 1;
-        const out = !isKept(n);
-        return (
-          <div
-            role="row"
-            key={n}
-            data-left-out={out || undefined}
-            className={rowClass}
-          >
-            <span role="cell">
-              <ChangeNumber
-                n={n}
-                kept={!out}
-                onKeptChange={frozen ? undefined : (keep) => setOne(n, keep)}
+    <Table className={className}>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-16">
+            {!draft && onKeptChange && (
+              <SelectAll
+                keptCount={rows.filter((_, i) => keptSet.has(i + 1)).length}
+                total={rows.length}
+                onChange={(all) =>
+                  onKeptChange(new Set(all ? rows.map((_, i) => i + 1) : []))
+                }
               />
-            </span>
-            <span role="cell" className={cn(out && tertiary)}>
-              {draft ? (
-                <span className="whitespace-nowrap">{row.proposed.label}</span>
-              ) : row.current ? (
-                row.current.label != null ? (
+            )}
+          </TableHead>
+          <TableHead className={draft ? "w-1/5" : "w-1/4"}>
+            {draft ? labels.section : labels.current}
+          </TableHead>
+          <TableHead>{draft ? labels.draft : labels.proposed}</TableHead>
+          <TableHead className="w-1/4">{labels.source}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {rows.map((row, i) => {
+          const n = i + 1;
+          const out = !isKept(n);
+          return (
+            <TableRow key={n} data-left-out={out || undefined}>
+              <TableCell>
+                <ChangeNumber
+                  n={n}
+                  kept={!out}
+                  onKeptChange={frozen ? undefined : (keep) => setOne(n, keep)}
+                />
+              </TableCell>
+              <TableCell>
+                {draft ? (
+                  <span className="font-semibold">{row.proposed.label}</span>
+                ) : row.current?.label != null ? (
                   <CurrentText label={row.current.label} struck={out}>
                     {row.current.text}
                   </CurrentText>
                 ) : (
-                  <span className={cn(out && struck)}>
-                    {/* The header names the column; stacked, the header row is hidden, so the cell says it. */}
-                    <span
-                      data-narrow-label
-                      className="hidden font-semibold @max-[560px]:inline"
-                    >
-                      {labels.current}:{" "}
-                    </span>
-                    <span className={tertiary}>{row.current.text}</span>
+                  <span
+                    className={cn(
+                      "text-muted-foreground",
+                      out && "line-through",
+                    )}
+                  >
+                    {row.current?.text ?? line.addition}
                   </span>
-                )
-              ) : (
-                <span className={cn(tertiary, out && struck)}>
-                  {line.addition}
+                )}
+              </TableCell>
+              <TableCell>
+                <span className="flex flex-col gap-1">
+                  {draft ? (
+                    <span>{row.proposed.text}</span>
+                  ) : (
+                    <Cell
+                      {...row.proposed}
+                      className={cn(out && "line-through")}
+                    />
+                  )}
+                  {row.mark && <EvidenceMark mark={row.mark} />}
                 </span>
-              )}
-            </span>
-            <span
-              role="cell"
-              className={cn(
-                "flex flex-col gap-km-gap-tight",
-                out && tertiary,
-                out && "[&_[data-mark]]:text-muted-foreground",
-              )}
-            >
-              {row.mark && <EvidenceMark mark={row.mark} />}
-              {draft ? (
-                <span>{row.proposed.text}</span>
-              ) : (
-                <Cell {...row.proposed} className={cn(out && struck)} />
-              )}
-            </span>
-            <span
-              role="cell"
-              className={cn(
-                out && "text-muted-foreground [&_*]:text-muted-foreground",
-              )}
-            >
-              <Sources sources={row.sources} />
-            </span>
-          </div>
-        );
-      })}
-    </div>
+              </TableCell>
+              <TableCell>
+                <Sources sources={row.sources} />
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }

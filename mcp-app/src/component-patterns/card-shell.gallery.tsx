@@ -8,7 +8,7 @@ const actions: CardAction[] = [
     label: action.save("C1–C4"),
     message: "",
     frozenLine: frozen.approved,
-    variant: "primary",
+    variant: "default",
   },
   { label: action.notNow, message: "", frozenLine: frozen.notSaved },
 ];
@@ -54,6 +54,5 @@ export default {
         <CardShell {...base} eyebrow="Change" state="replaced" />
       </HarnessFrame>
     ),
-    "Flat (inside the full view)": <CardShell {...base} flat />,
   },
 };

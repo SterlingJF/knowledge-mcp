@@ -14,10 +14,9 @@ const files = [
 
 export default {
   id: "P03",
-  name: "Left-out disclosure",
+  name: "Left out",
   stories: {
-    Closed: <LeftOut files={files} />,
-    Open: <LeftOut files={files} defaultOpen />,
+    "Two files": <LeftOut files={files} />,
     "None left out": <LeftOut files={[]} />,
   },
 };

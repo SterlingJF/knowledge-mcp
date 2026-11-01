@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { Undo2 } from "lucide-react";
 
-import { Note } from "@/component-elements/note";
+import { Note } from "@/component-patterns/note";
 import { action as actionCopy, frozen, line, meta } from "@/copy/en";
 import { CardShell } from "./card-shell";
 import type { CardAction, CardDisclosure } from "./card-shell";
@@ -18,7 +18,6 @@ type Common = {
   children?: ReactNode;
   why?: ReactNode;
   lifecycle: CardLifecycle;
-  flat?: boolean;
 };
 
 export type ResultCardProps =
@@ -33,7 +32,7 @@ export type ResultCardProps =
       secondary?: CardAction;
       /** A neutral badge once Undo froze the card, like the shell's Replaced: `badge.neutral.undoRequested`. */
       frozenBadge?: ReactNode;
-      /** "Show the change" beside Undo; the Diff it opens goes in children with id === controls. */
+      /** "Show the change" beside Undo; it opens the children (the Diff). */
       disclosure?: CardDisclosure;
     })
   | (Common & {
@@ -44,7 +43,7 @@ export type ResultCardProps =
     });
 
 export function ResultCard(props: ResultCardProps) {
-  const { eyebrow, title, badgeLabel, children, why, lifecycle, flat } = props;
+  const { eyebrow, title, badgeLabel, children, why, lifecycle } = props;
   if (props.kind === "result") {
     const actions: CardAction[] = [];
     if (props.undoMessage != null)
@@ -52,8 +51,8 @@ export function ResultCard(props: ResultCardProps) {
         label: actionCopy.undo,
         message: props.undoMessage,
         frozenLine: frozen.undoRequested,
-        variant: "secondary",
-        icon: <Undo2 aria-hidden="true" />,
+        variant: "outline",
+        icon: <Undo2 aria-hidden="true" data-icon="inline-start" />,
       });
     if (props.secondary) actions.push(props.secondary);
     return (
@@ -74,7 +73,6 @@ export function ResultCard(props: ResultCardProps) {
         actions={actions}
         disclosure={props.disclosure}
         {...lifecycleProps(lifecycle)}
-        flat={flat}
       >
         {children}
       </CardShell>
@@ -88,9 +86,8 @@ export function ResultCard(props: ResultCardProps) {
       why={why}
       actions={[props.nextStep]}
       {...lifecycleProps(lifecycle)}
-      flat={flat}
     >
-      <Note kind="warning" className="mt-km-gap-group">
+      <Note kind="warning">
         {props.reason} {line.nothingChanged}
       </Note>
       {children}

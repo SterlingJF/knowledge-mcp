@@ -7,7 +7,7 @@ import { useCardHost } from "@/bridge/bridge";
 import type { ToolResult } from "@/bridge/bridge";
 import { Badge } from "@/component-elements/badge";
 import { NoBreakName, PathChip } from "@/component-elements/chips";
-import { Note } from "@/component-elements/note";
+import { Note } from "@/component-patterns/note";
 import type { KeyValueRow } from "@/component-elements/key-value";
 import type { CardAction } from "@/component-patterns/card-shell";
 import { useCardLifecycle } from "@/component-patterns/card-lifecycle";
@@ -279,7 +279,7 @@ export function ProposalView({
     label: isNew ? action.createFile : action.save(change.list([...kept])),
     message: saveMessage(p, sending),
     frozenLine: frozen.approved,
-    variant: "primary",
+    variant: "default",
     disabled: sending.size === 0,
     context: saveContext(p, sending),
   };

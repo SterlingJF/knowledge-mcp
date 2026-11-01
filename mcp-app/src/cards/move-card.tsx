@@ -12,7 +12,7 @@ import type { KeyValueRow } from "@/component-elements/key-value";
 import type { CardAction } from "@/component-patterns/card-shell";
 import { useCardLifecycle } from "@/component-patterns/card-lifecycle";
 import type { CardLifecycle } from "@/component-patterns/card-lifecycle";
-import { Note } from "@/component-elements/note";
+import { Note } from "@/component-patterns/note";
 import { Tabs } from "@/component-patterns/tabs";
 import { DecisionRows } from "@/component-patterns/decision-rows";
 import { FullView } from "@/component-patterns/full-view";
@@ -293,7 +293,7 @@ export function MoveView({
     label: action.move(p.moves.length),
     message: moves.message(p.moves.length, repaired.length),
     frozenLine: frozen.approved,
-    variant: "primary",
+    variant: "default",
     disabled: !allAnswered(p, answers),
     context: moveContext(p, answers),
   };
@@ -360,10 +360,9 @@ export function MoveView({
 function MovesTable({ plan: p }: { plan: DocumentMoves }) {
   const stays = p.stays ?? [];
   return (
-    <div className="flex flex-col gap-km-gap-group">
+    <div className="flex flex-col gap-4">
       <PlanTable
         headers={[moves.label.file, moves.label.goesTo]}
-        columns={[45, 55]}
         rows={p.moves.map((m) => ({
           id: m.old_path,
           cells: [
@@ -400,7 +399,6 @@ function LinksTable({ plan: p }: { plan: DocumentMoves }) {
   return (
     <PlanTable
       headers={[moves.label.note, moves.label.linkNow, moves.label.afterMove]}
-      columns={[30, 30, 40]}
       limit={LINK_LIMIT}
       rows={repairedLinks(p).map((l) => ({
         id: `${l.source_path}:${l.start}`,

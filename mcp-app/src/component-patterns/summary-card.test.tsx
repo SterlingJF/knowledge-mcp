@@ -10,7 +10,7 @@ const save: CardAction = {
   label: "Save C1",
   message: "Save C1 to a.md",
   frozenLine: frozen.approved,
-  variant: "primary",
+  variant: "default",
 };
 
 function Summary() {

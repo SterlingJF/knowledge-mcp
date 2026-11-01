@@ -28,132 +28,34 @@ const block = (
     .map(([name, value]) => `  ${name}: ${value};`)
     .join("\n")}${extra}\n}\n`;
 
-const flat = {
-  ...tokens.font,
-  ...tokens.radius,
-  ...tokens.border,
-  ...tokens.space,
-  ...tokens.gap,
-  ...tokens.pad,
-  ...tokens.motion,
-  ...tokens.touch,
-  ...tokens.size,
-  ...tokens.effect,
-};
-// shadcn's names, pointed at the host roles, so core components follow Claude's theme.
-// Also declared on themed containers, so they re-resolve inside a dark preview.
-const shadcn = {
-  "--background": "transparent",
-  "--foreground": "var(--color-text-primary)",
-  "--primary": "var(--color-background-inverse)",
-  "--primary-foreground": "var(--color-text-inverse)",
-  // Crossover: shadcn's secondary surface is the host's background-primary, so bg-secondary is that role.
-  "--secondary": "var(--color-background-primary)",
-  "--secondary-foreground": "var(--color-text-primary)",
-  "--muted": "var(--color-background-secondary)",
-  "--muted-foreground": "var(--color-text-tertiary)",
-  "--accent": "var(--color-background-secondary)",
-  "--accent-foreground": "var(--color-text-primary)",
-  "--destructive": "var(--color-text-danger)",
-  "--border": "var(--color-border-tertiary)",
-  "--input": "var(--color-border-secondary)",
-  "--ring": "var(--color-ring-primary)",
-  "--radius": "var(--border-radius-md)",
-} satisfies Record<string, string>;
-
-// The shadcn names as Tailwind colours, and the host fonts and radii shadcn's classes read.
-const shadcnTheme = {
-  "--font-sans": "var(--font-sans)",
-  "--font-mono": "var(--font-mono)",
-  ...Object.fromEntries(
-    Object.keys(shadcn)
-      .filter((name) => name !== "--radius")
-      .map((name) => [`--color-${name.slice(2)}`, `var(${name})`]),
-  ),
-  "--radius-sm": "var(--border-radius-sm)",
-  "--radius-md": "var(--border-radius-md)",
-  "--radius-lg": "var(--border-radius-lg)",
-  "--radius-xl": "var(--border-radius-xl)",
-} satisfies Record<string, string>;
-
+const flat = { ...tokens.font, ...tokens.radius, ...tokens.border };
 const host = (name: string): string => `var(${name})`;
-const renamed = (
-  values: Record<string, string>,
-  rename: (name: string) => string | null,
-): Record<string, string> =>
-  Object.fromEntries(
-    Object.keys(values).flatMap((name) => {
-      const to = rename(name);
-      return to ? [[to, host(name)]] : [];
-    }),
-  );
-const statuses = ["info", "success", "warning", "danger"];
 
-// The app's own roles, by utility, so bg-success and text-success name different host variables.
-// Roles shadcn already names (foreground, muted, border, input, ring, destructive) use shadcn's class.
-const colourTheme = {
-  "--background-color-inverse": host("--color-background-inverse"),
-  "--background-color-tertiary": host("--color-background-tertiary"),
-  ...Object.fromEntries(
-    statuses.map((s) => [
-      `--background-color-${s}`,
-      host(`--color-background-${s}`),
-    ]),
-  ),
-  "--text-color-inverse": host("--color-text-inverse"),
-  "--text-color-secondary": host("--color-text-secondary"),
-  ...Object.fromEntries(
-    statuses
-      .filter((s) => s !== "danger")
-      .map((s) => [`--text-color-${s}`, host(`--color-text-${s}`)]),
-  ),
-  "--border-color-inverse": host("--color-background-inverse"),
-} satisfies Record<string, string>;
-
-// Type, spacing, radius, borders, motion and effects as Tailwind theme namespaces: a token becomes a class.
+// shadcn's names as Tailwind colours, and the host fonts, type sizes, radii and border width its classes read.
 const typeSizes = {
   xs: "--font-text-xs",
   sm: "--font-text-sm",
   base: "--font-heading-md",
 } satisfies Record<string, string>;
-const scaleTheme = {
-  "--font-weight-normal": host("--font-weight-normal"),
-  "--font-weight-semibold": host("--font-weight-semibold"),
+const theme = {
+  "--font-sans": host("--font-sans"),
+  "--font-mono": host("--font-mono"),
+  ...Object.fromEntries(
+    Object.keys(tokens.shadcn)
+      .filter((name) => name !== "--radius")
+      .map((name) => [`--color-${name.slice(2)}`, host(name)]),
+  ),
   ...Object.fromEntries(
     Object.entries(typeSizes).flatMap(([size, token]) => [
       [`--text-${size}`, host(`${token}-size`)],
       [`--text-${size}--line-height`, host(`${token}-line-height`)],
-      [`--leading-${size}`, host(`${token}-line-height`)],
     ]),
   ),
-  ...renamed(tokens.space, (name) =>
-    name.replace("--km-space-", "--spacing-km-"),
-  ),
-  ...renamed({ ...tokens.gap, ...tokens.pad, ...tokens.touch }, (name) =>
-    name.replace("--km-", "--spacing-km-"),
-  ),
-  ...renamed(tokens.size, (name) =>
-    ["--km-check-border", "--km-label-col"].includes(name)
-      ? null
-      : name.replace("--km-", "--spacing-km-"),
-  ),
-  ...renamed(tokens.radius, (name) =>
-    name.replace("--border-radius-", "--radius-"),
-  ),
-  "--radius-km-1": host("--km-space-1"),
-  "--border-width-hairline": host("--border-width-regular"),
-  "--border-width-km-check": host("--km-check-border"),
-  ...Object.fromEntries(
-    Object.keys(tokens.motion).map((name) => [
-      `--animate-${name.slice(2)}`,
-      `${name.slice(2)} ${host(name)}`,
-    ]),
-  ),
-  "--shadow-km-focus-ring": host("--km-focus-ring"),
-  "--tracking-km-eyebrow": host("--km-eyebrow-tracking"),
-  "--opacity-km-hover": host("--km-opacity-hover"),
-  "--opacity-km-dim": host("--km-opacity-dim"),
-  "--opacity-km-disabled": host("--km-opacity-disabled"),
+  "--radius-sm": host("--border-radius-sm"),
+  "--radius-md": host("--border-radius-md"),
+  "--radius-lg": host("--border-radius-lg"),
+  "--radius-xl": host("--border-radius-xl"),
+  "--default-border-width": host("--border-width-regular"),
 } satisfies Record<string, string>;
 
 const css = [
@@ -170,8 +72,6 @@ const css = [
   ),
   // A container can force light inside a dark page too (the gallery's light column).
   block('[data-theme="light"]', tokens.color.light, "\n  color-scheme: light;"),
-  // Effects reference colours, so they re-resolve inside every themed container.
-  block("[data-theme]", tokens.effect),
   `@media (prefers-color-scheme: dark) {\n${block(
     ":root:not([data-theme])",
     tokens.color.dark,
@@ -179,67 +79,23 @@ const css = [
     .split("\n")
     .map((line) => (line ? `  ${line}` : line))
     .join("\n")}}\n`,
-  "/* shadcn's names, pointed at the host roles. */\n",
-  block(":root,\n[data-theme]", shadcn),
-  "/* Tailwind colours, fonts and radii for shadcn's classes. */\n",
-  block("@theme inline", shadcnTheme),
-  "/* The app's own colour roles, one namespace per utility, so bg and text can name different host variables. */\n",
-  block("@theme inline reference", colourTheme),
-  "/* Type, spacing, radius, borders, motion and effects as Tailwind theme namespaces, so each token is a class. */\n",
-  block("@theme inline reference", scaleTheme),
+  "/* shadcn's names, pointed at the host roles; declared on themed containers too, so they re-resolve there. */\n",
+  block(":root,\n[data-theme]", tokens.shadcn),
+  "/* Tailwind colours, fonts, type sizes, radii and the border width for shadcn's classes. */\n",
+  block("@theme inline", theme),
 ].join("\n");
 
-// The same names for tailwind-merge, so cn() knows p-km-5 is padding and border-hairline a width, not a colour.
-const names = (
-  theme: Record<string, string>,
-  prefix: string,
-  skip = "",
-): Array<string> =>
-  Object.keys(theme)
-    .filter((name) => name.startsWith(prefix) && !(skip && name.includes(skip)))
-    .map((name) => name.slice(prefix.length));
-const merge = {
-  spacing: names(scaleTheme, "--spacing-"),
-  text: names(scaleTheme, "--text-", "--line-height"),
-  leading: names(scaleTheme, "--leading-"),
-  radius: names(scaleTheme, "--radius-"),
-  shadow: names(scaleTheme, "--shadow-"),
-  tracking: names(scaleTheme, "--tracking-"),
-  animate: names(scaleTheme, "--animate-"),
-  opacity: names(scaleTheme, "--opacity-"),
-  borderWidth: names(scaleTheme, "--border-width-"),
-  color: [
-    ...new Set([
-      ...names(colourTheme, "--background-color-"),
-      ...names(colourTheme, "--text-color-"),
-      ...names(colourTheme, "--border-color-"),
-    ]),
-  ],
-};
-const ts = `// Generated from design/mcp-app/kmtokens.js by scripts/build-tokens.ts. Edit the tokens, not this file.
-// The token class names, for tailwind-merge's theme in lib/utils.ts.
-export const tokenClasses = ${JSON.stringify(merge, null, 2)} as const;
-`;
-
-const outputs: Array<[URL, string]> = [
-  [target, css],
-  [new URL("../src/generated/token-classes.auto.ts", import.meta.url), ts],
-];
 if (process.argv.includes("--check")) {
-  for (const [file, content] of outputs) {
-    let current = "";
-    try {
-      current = readFileSync(file, "utf8");
-    } catch {
-      // A missing file is out of date too.
-    }
-    if (current !== content) {
-      process.stderr.write(
-        `${file.pathname.split("/mcp-app/")[1]} is out of date. Run pnpm --filter mcp-app tokens.\n`,
-      );
-      process.exit(1);
-    }
+  let current = "";
+  try {
+    current = readFileSync(target, "utf8");
+  } catch {
+    // A missing file is out of date too.
   }
-} else {
-  for (const [file, content] of outputs) writeFileSync(file, content);
-}
+  if (current !== css) {
+    process.stderr.write(
+      "src/generated/tokens.auto.css is out of date. Run pnpm --filter mcp-app tokens.\n",
+    );
+    process.exit(1);
+  }
+} else writeFileSync(target, css);

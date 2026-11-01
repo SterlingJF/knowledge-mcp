@@ -1,3 +1,4 @@
+import { Button } from "@/component-core/button";
 import { render, screen } from "@testing-library/react";
 import type { App } from "@modelcontextprotocol/ext-apps/react";
 
@@ -93,7 +94,7 @@ describe("StaticCardHost", () => {
     const host = stubCardHost();
     function Sender() {
       const { send } = useCardHost();
-      return <button onClick={() => void send("Not now")}>Not now</button>;
+      return <Button onClick={() => void send("Not now")}>Not now</Button>;
     }
     render(
       <StaticCardHost host={host}>
@@ -120,15 +121,15 @@ describe("HostRoot", () => {
       ...stubCardHost(),
       safeAreaInsets: { top: 44, right: 8, bottom: 34, left: 12 },
     };
-    const { container } = render(
+    render(
       <StaticCardHost host={host}>
         <HostRoot>card</HostRoot>
       </StaticCardHost>,
     );
-    const root = container.querySelector<HTMLElement>("[data-km-root]")!;
+    const root = document.documentElement;
     expect(
       ["top", "right", "bottom", "left"].map((side) =>
-        root.style.getPropertyValue(`--km-safe-${side}`),
+        root.style.getPropertyValue(`--safe-area-${side}`),
       ),
     ).toEqual(["44px", "8px", "34px", "12px"]);
   });

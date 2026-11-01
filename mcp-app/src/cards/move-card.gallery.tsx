@@ -49,6 +49,11 @@ export default {
   name: "Move card",
   stories: {
     "M01 Plan": <Story />,
+    "M01 at 360px": (
+      <div className="w-90">
+        <Story />
+      </div>
+    ),
     "M02 Full view": <Story mode="fullscreen" />,
     "M02 Full view, Links": <Story mode="fullscreen" tab="links" />,
     "M03 Approved": (
@@ -56,6 +61,11 @@ export default {
     ),
     "M05 Blockers": <Story plan={m05} />,
     "M05F Answer the blockers": <Story plan={m05} mode="fullscreen" />,
+    "M05F at 360px": (
+      <div className="w-90">
+        <Story plan={m05} mode="fullscreen" />
+      </div>
+    ),
     "M05F Answered (link only)": (
       <Story plan={m05Link} mode="fullscreen" answers={{ b1: "1" }} />
     ),

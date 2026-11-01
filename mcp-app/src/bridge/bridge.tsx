@@ -3,7 +3,7 @@
 // between the inline card and the full view. Nothing here writes a file or calls a server tool.
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useApp, useHostStyles } from "@modelcontextprotocol/ext-apps/react";
 import type { App } from "@modelcontextprotocol/ext-apps/react";
 
@@ -79,33 +79,28 @@ export function cardHost(
   };
 }
 
-/** The app root: padded by the host's safe area so nothing sits under a notch or home bar. */
+const SIDES = ["top", "right", "bottom", "left"] as const;
+
+/**
+ * The app root: padded by the host's safe area so nothing sits under a notch or home bar.
+ * The insets go on <html> beside the host's style variables; styles.css pads the root by them.
+ */
 export function HostRoot({ children }: { children: ReactNode }) {
   const insets = useCardHost().safeAreaInsets;
-  return (
-    // The insets are the host's runtime values, so they arrive as custom properties for the padding classes.
-    <div
-      data-km-root=""
-      className="pt-(--km-safe-top) pr-(--km-safe-right) pb-(--km-safe-bottom) pl-(--km-safe-left)"
-      style={
-        insets &&
-        ({
-          "--km-safe-top": `${insets.top}px`,
-          "--km-safe-right": `${insets.right}px`,
-          "--km-safe-bottom": `${insets.bottom}px`,
-          "--km-safe-left": `${insets.left}px`,
-        } as CSSProperties)
-      }
-    >
-      {children}
-    </div>
-  );
+  useEffect(() => {
+    const style = document.documentElement.style;
+    for (const side of SIDES)
+      if (insets) style.setProperty(`--safe-area-${side}`, `${insets[side]}px`);
+      else style.removeProperty(`--safe-area-${side}`);
+  }, [insets]);
+  return <div data-app-root="">{children}</div>;
 }
 
 export function CardHostProvider({ children }: { children: ReactNode }) {
   const [result, setResult] = useState<ToolResult | null>(null);
-  const [displayMode, setDisplayMode] = useState<DisplayMode>("inline");
-  const [insets, setInsets] = useState<SafeAreaInsets | undefined>();
+  // What the host changed since connecting; until then its first context answers.
+  const [changedMode, setDisplayMode] = useState<DisplayMode>();
+  const [changedInsets, setInsets] = useState<SafeAreaInsets>();
   const { app } = useApp({
     appInfo: { name: "knowledge-mcp", version: "0.1.0" },
     capabilities: { availableDisplayModes: ["inline", "fullscreen"] },
@@ -124,13 +119,15 @@ export function CardHostProvider({ children }: { children: ReactNode }) {
     },
   });
   // Theme, Claude's style variables and fonts, re-applied whenever the host context changes.
-  useHostStyles(app, app?.getHostContext());
-  useEffect(() => {
-    const context = app?.getHostContext();
-    const mode = context?.displayMode;
-    if (mode === "inline" || mode === "fullscreen") setDisplayMode(mode);
-    if (context?.safeAreaInsets) setInsets(context.safeAreaInsets);
-  }, [app]);
+  const context = app?.getHostContext();
+  useHostStyles(app, context);
+  const firstMode = context?.displayMode;
+  const displayMode =
+    changedMode ??
+    (firstMode === "inline" || firstMode === "fullscreen"
+      ? firstMode
+      : "inline");
+  const insets = changedInsets ?? context?.safeAreaInsets;
   const host = useMemo(
     () => cardHost(app, result, displayMode, insets),
     [app, result, displayMode, insets],

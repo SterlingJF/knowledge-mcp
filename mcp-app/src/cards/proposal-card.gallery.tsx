@@ -66,7 +66,17 @@ export default {
   stories: {
     Inline: <Story />,
     "Absolute path, no label": <Story proposal={liveCheck} />,
+    "Inline at 360px": (
+      <div className="w-90">
+        <Story />
+      </div>
+    ),
     "Full view": <Story mode="fullscreen" />,
+    "Full view at 360px": (
+      <div className="w-90">
+        <Story mode="fullscreen" kept={new Set([2, 3, 4])} />
+      </div>
+    ),
     "Full view, C1 left out": (
       <Story mode="fullscreen" kept={new Set([2, 3, 4])} />
     ),

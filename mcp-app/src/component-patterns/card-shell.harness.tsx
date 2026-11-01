@@ -1,4 +1,4 @@
-// Gallery-only stand-in for Claude's inline frame (prefersBorder), so stories read like the frames.
+// Gallery-only stand-in for Claude's inline frame (prefersBorder), 760px wide like the chat column, so stories read like the frames.
 import type { ReactNode } from "react";
 
 import { PathChip } from "@/component-elements/chips";
@@ -6,7 +6,7 @@ import { meta } from "@/copy/en";
 
 export function HarnessFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-xl border-hairline border-dashed border-input p-km-6">
+    <div className="w-190 max-w-full rounded-xl border border-dashed border-input p-4">
       {children}
     </div>
   );

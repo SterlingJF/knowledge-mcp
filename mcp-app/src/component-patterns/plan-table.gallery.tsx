@@ -16,7 +16,6 @@ const file = (name: string, from: string) => (
 const moves = (
   <PlanTable
     headers={["File", "Goes to"]}
-    columns={[40, 60]}
     rows={[
       {
         id: "1",
@@ -77,7 +76,6 @@ const linkRows = [
 const links = (
   <PlanTable
     headers={["Note", "Link now", "After the move"]}
-    columns={[30, 27, 43]}
     rows={linkRows}
     limit={3}
   />

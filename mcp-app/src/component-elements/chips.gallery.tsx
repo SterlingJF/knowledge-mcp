@@ -1,6 +1,6 @@
 import { PathChip, SourceChip } from "./chips";
 
-const row = "flex flex-wrap items-center gap-km-gap-inline";
+const row = "flex flex-wrap items-center gap-2";
 
 export default {
   id: "K04",
@@ -8,7 +8,7 @@ export default {
   stories: {
     // A name with no space, "/" or room to fit: it breaks only because it is wider than the line.
     "Long name at 320px": (
-      <div className="w-80 border-hairline border-dashed border-input">
+      <div className="w-80 border border-dashed border-input">
         <PathChip path="quarterly-build-operations-retrospective-final.md" />
       </div>
     ),
@@ -16,7 +16,7 @@ export default {
       <SourceChip source={{ file: "meeting-notes.md", line_number: 15 }} />
     ),
     "Place source": (
-      <div className="grid justify-items-start gap-km-gap-inline">
+      <div className="grid justify-items-start gap-2">
         <SourceChip
           source={{ file: "build-timings.xlsx", place: "Evening!A2:D10" }}
         />

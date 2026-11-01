@@ -52,33 +52,40 @@ window.KMT = {
     },
   },
   // What each colour is for. A component names the role, never a value.
+  // What each host colour is for, by the shadcn name that carries it. A component names the shadcn role, never a value.
   roles: [
     [
       "--color-background-tertiary",
       "Host chat ground: the card is transparent, so this shows through",
     ],
-    ["--color-background-primary", "Chips, secondary buttons"],
-    ["--color-background-secondary", "Notes, neutral badges, skeletons"],
-    ["--color-background-inverse", "Primary button"],
-    ["--color-text-primary", "Titles, body, cell text"],
+    [
+      "--color-background-inverse",
+      "primary: the one filled action, ticked boxes, the chosen option",
+    ],
+    [
+      "--color-background-secondary",
+      "muted, secondary, accent: notes, neutral badges, hover, skeletons",
+    ],
+    ["--color-text-primary", "foreground: titles, body, cell text"],
     [
       "--color-text-tertiary",
-      "Eyebrows, meta, captions, current text, column heads",
+      "muted-foreground: eyebrows, meta, captions, current text, column heads",
     ],
-    ["--color-border-tertiary", "Row dividers, chips"],
-    ["--color-border-secondary", "Segmented choice outline"],
+    ["--color-border-tertiary", "border: row dividers, outline badges"],
     [
-      "--color-text-tertiary",
-      "Also the unticked box edge: 3:1 as a control boundary",
+      "--color-border-secondary",
+      "input: outline buttons, tick boxes, the option group",
     ],
-    ["--color-ring-primary", "Focus ring on every control"],
+    ["--color-ring-primary", "ring: the focus ring on every control"],
+    [
+      "--color-text-danger",
+      "destructive: refused or stopped, removed diff lines",
+    ],
+    [
+      "success",
+      "Done and recorded: Saved, Approved, Created, Moved, Applied; added diff lines",
+    ],
     ["warning", "Waiting on you: Needs your OK, Nothing saved, Your choice"],
-    ["success", "Done and recorded: Saved, Approved, Created, Moved, Applied"],
-    [
-      "danger",
-      "Refused or stopped, with the reason: Can’t undo safely, Checker refused",
-    ],
-    ["info", "Reserved: nothing uses it while loading is a skeleton"],
   ],
   font: {
     "--font-sans":
@@ -123,83 +130,44 @@ window.KMT = {
     "--border-radius-full": "9999px",
   },
   radiusUse: {
-    "--border-radius-xs": "Tick box",
-    "--border-radius-sm": "Chips, segmented choice",
-    "--border-radius-md": "Buttons",
-    "--border-radius-lg": "Notes, diff, skeleton blocks",
-    "--border-radius-xl": "Not ours: the host’s bordered frame",
-    "--border-radius-full": "Badges, evidence marks",
+    "--border-radius-xs": "Not used",
+    "--border-radius-sm": "rounded-sm: tick box",
+    "--border-radius-md":
+      "rounded-md, shadcn's --radius: buttons, option group",
+    "--border-radius-lg": "rounded-lg: notes, diff, skeleton blocks",
+    "--border-radius-xl": "Not ours: the host's bordered frame",
+    "--border-radius-full": "rounded-full: badges",
   },
+
   border: { "--border-width-regular": "0.5px" },
-  // Ours, not host variables: spacing has no host equivalent. A 4px base; 2px only inside badges and chips.
-  space: {
-    "--km-space-1": "2px",
-    "--km-space-2": "4px",
-    "--km-space-3": "6px",
-    "--km-space-4": "8px",
-    "--km-space-5": "12px",
-    "--km-space-6": "16px",
-    "--km-space-7": "24px",
-  },
-  spaceUse: {
-    "--km-space-1": "Block padding inside a badge or chip",
-    "--km-space-2": "Icon to its label",
-    "--km-space-3": "Block padding inside a button",
-    "--km-space-4": "Inline padding of a badge, row padding",
-    "--km-space-5": "Inline padding of a button or note",
-    "--km-space-6": "Gap from any edge (safe area)",
-    "--km-space-7": "Between sections of the full view",
-  },
-  // Spacing by role: components use these, never a bare step, so every card keeps one rhythm.
-  // A gap between groups is twice the gap inside one (proximity), and a group's header sits closer to what follows it.
-  gap: {
-    "--km-gap-tight": "var(--km-space-2)",
-    "--km-gap-inline": "var(--km-space-4)",
-    "--km-gap-row": "var(--km-space-4)",
-    "--km-gap-group": "var(--km-space-6)",
-    "--km-gap-section": "var(--km-space-7)",
-  },
-  // Padding of a box that holds text: a note, a diff line. Built from the scale, by role.
-  pad: {
-    "--km-pad-box": "var(--km-space-4) var(--km-space-5)",
-    "--km-pad-line": "var(--km-space-2) var(--km-space-5)",
-  },
-  gapUse: {
-    "--km-gap-tight":
-      "Inside one heading block: eyebrow to title, title to meta",
-    "--km-gap-inline":
-      "Between items on one line: chip and text, chip and chip, button and button",
-    "--km-gap-row":
-      "Between rows of one group: summary rows, table rows, list rows",
-    "--km-gap-group":
-      "Between groups of a card: header, summary, note, actions",
-    "--km-gap-section": "Between sections of the full view",
-  },
-  motion: {
-    "--km-pulse": "1.6s ease-out infinite",
-    "--km-shimmer": "1.4s ease-in-out infinite",
-  },
-  touch: { "--km-target": "44px" },
-  // Fixed sizes with no host variable: icons, the tick box, the pulse dot, the summary label column, a skeleton row.
-  size: {
-    "--km-icon": "13px",
-    "--km-icon-sm": "11px",
-    "--km-check": "15px",
-    "--km-check-border": "1.5px",
-    "--km-dot": "7px",
-    "--km-label-col": "max-content",
-    "--km-row": "28px",
-    "--km-underline": "2px",
-    "--km-full-max": "1080px",
-  },
-  // One focus ring, one tracking, four opacities: each used by more than one part.
-  effect: {
-    "--km-focus-ring":
-      "0 0 0 2px var(--color-background-primary), 0 0 0 4px var(--color-ring-primary)",
-    "--km-eyebrow-tracking": "0.07em",
-    "--km-opacity-hover": "0.88",
-    "--km-opacity-dim": "0.55",
-    "--km-opacity-disabled": "0.4",
+  // Everything without a host variable comes from Tailwind's defaults: spacing on its 4px scale
+  // (gap-1 4px, gap-2 8px, gap-4 16px, gap-6 24px), icon sizes, opacity, the focus ring and animate-pulse.
+  // shadcn's names point at the host roles below; nothing here is the app's own.
+  shadcn: {
+    "--background": "transparent",
+    "--foreground": "var(--color-text-primary)",
+    "--card": "transparent",
+    "--card-foreground": "var(--color-text-primary)",
+    "--popover": "var(--color-background-primary)",
+    "--popover-foreground": "var(--color-text-primary)",
+    "--primary": "var(--color-background-inverse)",
+    "--primary-foreground": "var(--color-text-inverse)",
+    "--secondary": "var(--color-background-secondary)",
+    "--secondary-foreground": "var(--color-text-primary)",
+    "--muted": "var(--color-background-secondary)",
+    "--muted-foreground": "var(--color-text-tertiary)",
+    "--accent": "var(--color-background-secondary)",
+    "--accent-foreground": "var(--color-text-primary)",
+    "--destructive": "var(--color-text-danger)",
+    "--border": "var(--color-border-tertiary)",
+    "--input": "var(--color-border-secondary)",
+    "--ring": "var(--color-ring-primary)",
+    "--radius": "var(--border-radius-md)",
+    // Status colours, added the way shadcn's theming adds a colour: a surface and its foreground.
+    "--success": "var(--color-background-success)",
+    "--success-foreground": "var(--color-text-success)",
+    "--warning": "var(--color-background-warning)",
+    "--warning-foreground": "var(--color-text-warning)",
   },
   layout: {
     min: "From 320px to fullscreen, by container queries, no fixed breakpoints",

@@ -87,10 +87,12 @@ test("the older card about the same subject stands down", async () => {
   });
   await waitFor(() =>
     expect(
-      document.querySelectorAll('section[data-state="replaced"]'),
+      document.querySelectorAll('[data-slot=card][data-state="replaced"]'),
     ).toHaveLength(1),
   );
-  const replaced = document.querySelector('section[data-state="replaced"]')!;
+  const replaced = document.querySelector(
+    '[data-slot=card][data-state="replaced"]',
+  )!;
   expect(replaced.textContent).toContain("older");
   expect(replaced.textContent).toContain(frozen.replaced);
 });
@@ -117,7 +119,8 @@ test("an older card mounting late learns it is already replaced", async () => {
   });
   await waitFor(() =>
     expect(
-      document.querySelector('section[data-state="replaced"]')?.textContent,
+      document.querySelector('[data-slot=card][data-state="replaced"]')
+        ?.textContent,
     ).toContain("older"),
   );
 });
@@ -154,7 +157,9 @@ test("a pressed card keeps its frozen line when a younger card arrives", async (
     );
   });
   await new Promise((resolve) => setTimeout(resolve, 20));
-  expect(document.querySelector('section[data-state="replaced"]')).toBeNull();
+  expect(
+    document.querySelector('[data-slot=card][data-state="replaced"]'),
+  ).toBeNull();
   expect(screen.getByText(frozen.approved)).toBeTruthy();
 });
 

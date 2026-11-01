@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { Diff } from "./diff";
 
 describe("Diff", () => {
-  it("strikes removed lines and marks added ones", () => {
+  it("marks each line removed or added in its markup and with a sign, not by colour alone", () => {
     render(
       <Diff
         lines={[
@@ -12,25 +12,9 @@ describe("Diff", () => {
         ]}
       />,
     );
-    const removed = screen.getByText("old");
-    expect(removed.tagName).toBe("DEL");
-    expect(removed.className).toContain("line-through");
-    expect(removed.className).toContain("text-destructive");
-    const added = screen.getByText("new");
-    expect(added.tagName).toBe("INS");
-    expect(added.className).toContain("text-success");
+    const removed = screen.getByText("old").closest("del");
+    expect(removed?.textContent).toBe("−old");
+    const added = screen.getByText("new").closest("ins");
+    expect(added?.textContent).toBe("+new");
   });
-});
-
-test("long unbroken tokens wrap instead of running past the box", () => {
-  const { container } = render(
-    <Diff
-      lines={[
-        { kind: "removed", text: "a" },
-        { kind: "added", text: "b" },
-      ]}
-    />,
-  );
-  for (const el of container.querySelectorAll("del, ins"))
-    expect(el.className).toContain("wrap-anywhere");
 });

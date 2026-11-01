@@ -1,23 +1,31 @@
-// P01 Card shell: eyebrow, title, meta and badge; the body; the why line; at most two actions.
-// The card paints no background, border or padding: Claude draws the frame inline (prefersBorder)
-// and its fullscreen chrome in the full view, so inline and flat differ only in context.
+// P01 Card shell: the eyebrow, title, meta and badge; the body; the why line; at most two actions.
+// It places the flat core Card: Claude draws the frame inline (prefersBorder) and its chrome in the full view.
 import type { ReactNode } from "react";
+import { ChevronDown, Maximize2 } from "lucide-react";
 
+import { Button } from "@/component-core/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/component-core/collapsible";
 import { Badge } from "@/component-elements/badge";
 import type { BadgeTone } from "@/component-elements/badge";
-import { Button } from "@/component-elements/button";
-import type { ButtonVariant } from "@/component-elements/button";
-import { FullViewButton } from "@/component-elements/full-view-button";
-import { LinkButton } from "@/component-elements/link-button";
 import {
-  Eyebrow,
-  FrozenLine,
-  Meta,
-  Title,
-  WhyLine,
-} from "@/component-elements/text-lines";
-import { badge as badgeCopy, frozen as frozenCopy } from "@/copy/en";
-import { cn } from "@/lib/utils";
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/component-elements/card";
+import { Caption, Eyebrow } from "@/component-elements/text-lines";
+import {
+  action as actionCopy,
+  badge as badgeCopy,
+  frozen as frozenCopy,
+} from "@/copy/en";
 
 export const MAX_CARD_ACTIONS = 2;
 
@@ -29,8 +37,8 @@ export type CardAction = {
   message: string;
   /** The line from `frozen` in src/copy/en.ts shown once this action was pressed. */
   frozenLine: string;
-  /** Defaults to ghost, the decline look; the first action is usually primary. */
-  variant?: ButtonVariant;
+  /** Defaults to ghost, the decline look; the first action is usually default, the one filled button. */
+  variant?: "default" | "outline" | "ghost";
   icon?: ReactNode;
   /** Shown but not pressable, e.g. Save with no change kept. */
   disabled?: boolean;
@@ -39,15 +47,14 @@ export type CardAction = {
 };
 
 /**
- * A show/hide control in the action row (R01/R02 "Show the change"). It sends nothing, never freezes
- * the card and is not one of the two actions. Hidden once the card is frozen or replaced.
+ * A show/hide control in the action row (R01/R02 "Show the change"): a core Collapsible whose panel is
+ * the card's body. It sends nothing, never freezes the card and is not one of the two actions.
+ * Hidden once the card is frozen or replaced.
  */
 export type CardDisclosure = {
   label: string;
-  expanded: boolean;
-  onToggle: () => void;
-  /** The id of the body content it opens. */
-  controls: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
 export type CardShellProps = {
@@ -65,7 +72,6 @@ export type CardShellProps = {
   state?: CardState;
   /** Shown when frozen. */
   frozenLine?: ReactNode;
-  flat?: boolean;
   className?: string;
 };
 
@@ -82,7 +88,6 @@ export function CardShell({
   disclosure,
   state = "live",
   frozenLine,
-  flat = false,
   className,
 }: CardShellProps) {
   if (actions.length > MAX_CARD_ACTIONS) {
@@ -96,60 +101,85 @@ export function CardShell({
       ? { tone: "neutral" as const, label: badgeCopy.neutral.replaced }
       : badge;
   const shownFrozen = state === "replaced" ? frozenCopy.replaced : frozenLine;
-  return (
-    <section
-      data-state={state}
-      data-flat={flat || undefined}
-      className={cn(
-        "@container border-0 bg-transparent p-0 text-foreground",
-        className,
-      )}
-    >
-      {/* Under 480px the title block takes the full width; badge and Full view follow it. */}
-      <header className="flex flex-row items-start justify-between gap-km-gap-group @max-[480px]:flex-col @max-[480px]:gap-km-gap-inline">
-        <div className="min-w-0 @max-[480px]:self-stretch">
+  const showActions = live && (actions.length > 0 || disclosure);
+  const cardProps = {
+    "data-state": state,
+    className,
+  };
+  const content = (
+    <>
+      <CardHeader>
+        {/* One block in the first column, so the action never takes a line of it. */}
+        <div className="flex min-w-0 flex-col gap-1">
           <Eyebrow>{eyebrow}</Eyebrow>
-          <Title>{title}</Title>
-          {meta != null && <Meta>{meta}</Meta>}
+          <CardTitle>{title}</CardTitle>
+          {meta != null && <CardDescription>{meta}</CardDescription>}
         </div>
         {(shownBadge || (onFullView && live)) && (
-          <span className="flex flex-none items-center gap-km-gap-inline">
+          <CardAction>
             {shownBadge && (
               <Badge tone={shownBadge.tone}>{shownBadge.label}</Badge>
             )}
             {onFullView && live && (
-              <FullViewButton onRequestFullView={onFullView} />
+              <Button variant="outline" size="xs" onClick={onFullView}>
+                <Maximize2 aria-hidden="true" data-icon="inline-start" />
+                {actionCopy.fullView}
+              </Button>
             )}
-          </span>
+          </CardAction>
         )}
-      </header>
-      {children}
-      {live && why != null && <WhyLine>{why}</WhyLine>}
-      {live && (actions.length > 0 || disclosure) && (
-        <div className="mt-km-gap-group flex flex-wrap items-center gap-km-gap-inline">
-          {actions.map((item) => (
-            <Button
-              key={item.label}
-              variant={item.variant ?? "ghost"}
-              icon={item.icon}
-              disabled={item.disabled}
-              onClick={() => onAction?.(item)}
-            >
-              {item.label}
-            </Button>
-          ))}
-          {disclosure && (
-            <LinkButton
-              aria-expanded={disclosure.expanded}
-              aria-controls={disclosure.controls}
-              onClick={disclosure.onToggle}
-            >
-              {disclosure.label}
-            </LinkButton>
+      </CardHeader>
+      {children != null &&
+        (disclosure ? (
+          <CollapsibleContent render={<CardContent />}>
+            {children}
+          </CollapsibleContent>
+        ) : (
+          <CardContent>{children}</CardContent>
+        ))}
+      {((live && why != null) ||
+        showActions ||
+        (!live && shownFrozen != null)) && (
+        <CardFooter>
+          {live && why != null && <Caption>{why}</Caption>}
+          {showActions && (
+            <div className="flex flex-wrap items-center gap-2">
+              {actions.map((item) => (
+                <Button
+                  key={item.label}
+                  variant={item.variant ?? "ghost"}
+                  disabled={item.disabled}
+                  onClick={() => onAction?.(item)}
+                >
+                  {item.icon}
+                  {item.label}
+                </Button>
+              ))}
+              {disclosure && live && (
+                <CollapsibleTrigger render={<Button variant="ghost" />}>
+                  {disclosure.label}
+                  <ChevronDown
+                    aria-hidden="true"
+                    data-icon="inline-end"
+                    className="transition-transform group-data-panel-open/button:rotate-180"
+                  />
+                </CollapsibleTrigger>
+              )}
+            </div>
           )}
-        </div>
+          {!live && shownFrozen != null && <Caption>{shownFrozen}</Caption>}
+        </CardFooter>
       )}
-      {!live && shownFrozen != null && <FrozenLine>{shownFrozen}</FrozenLine>}
-    </section>
+    </>
+  );
+  if (!disclosure) return <Card {...cardProps}>{content}</Card>;
+  return (
+    <Collapsible
+      open={disclosure.open}
+      onOpenChange={disclosure.onOpenChange}
+      render={<Card {...cardProps} />}
+    >
+      {content}
+    </Collapsible>
   );
 }

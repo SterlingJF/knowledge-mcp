@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 
+import { cn } from "@/lib/utils";
+
 import { badge } from "@/copy/en";
 
 import { countAccepted, DecisionRows } from "./decision-rows";
@@ -169,9 +171,17 @@ function Answers({ rows }: { rows: DecisionRow[] }) {
   );
 }
 
-const widths = ["816", "727", "360", "320"] as const;
+const widths = ["816", "720", "360", "320"] as const;
 const sized = (w: (typeof widths)[number], node: ReactNode) => (
-  <div style={{ width: `${w}px` }} className="max-w-full">
+  <div
+    className={cn(
+      "@container max-w-full",
+      w === "816" && "w-204",
+      w === "720" && "w-180",
+      w === "360" && "w-90",
+      w === "320" && "w-80",
+    )}
+  >
     {node}
   </div>
 );
@@ -207,42 +217,42 @@ export default {
   stories: {
     ...answerStories,
     "Move blockers at 727px": (
-      <div className="w-181.75 max-w-full">
+      <div className="@container w-181.75 max-w-full">
         <Blockers />
       </div>
     ),
     "Move blockers at 816px": (
-      <div className="w-204 max-w-full">
+      <div className="@container w-204 max-w-full">
         <Blockers />
       </div>
     ),
     "Move blockers at 320px": (
-      <div className="w-80 max-w-full">
+      <div className="@container w-80 max-w-full">
         <Blockers />
       </div>
     ),
     "Conventions at 816px": (
-      <div className="w-204 max-w-full">
+      <div className="@container w-204 max-w-full">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Conventions at 727px": (
-      <div className="w-181.75 max-w-full">
+      <div className="@container w-181.75 max-w-full">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Conventions at 360px": (
-      <div className="w-90 max-w-full">
+      <div className="@container w-90 max-w-full">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Conventions at 320px": (
-      <div className="w-80 max-w-full">
+      <div className="@container w-80 max-w-full">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Move blockers at 360px": (
-      <div className="w-90 max-w-full">
+      <div className="@container w-90 max-w-full">
         <Blockers />
       </div>
     ),
@@ -265,7 +275,7 @@ export default {
       />
     ),
     "Undecided at 360px": (
-      <div className="w-90">
+      <div className="@container w-90">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),

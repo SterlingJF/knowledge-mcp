@@ -1,10 +1,11 @@
 // C-Result: the card for a kb_record_edit result (knowledge-mcp/edit/2).
 // It says what was saved, created or undone, when and on whose OK, with Undo. Undo only sends a message:
 // the assistant checks the edit log and restores the file, and the undo comes back as its own card.
-import { useId, useState } from "react";
+import { useState } from "react";
 
 import type { ToolResult } from "@/bridge/bridge";
 import { Diff } from "@/component-elements/diff";
+import { Caption } from "@/component-elements/text-lines";
 import { useCardLifecycle } from "@/component-patterns/card-lifecycle";
 import type { CardLifecycle } from "@/component-patterns/card-lifecycle";
 import { ResultCard } from "@/component-patterns/result-card";
@@ -121,7 +122,6 @@ export function EditView({
   onOpenChange,
 }: EditViewProps) {
   const [ownOpen, setOwnOpen] = useState(false);
-  const diffId = useId();
   const open = fixedOpen ?? ownOpen;
   const setOpen = onOpenChange ?? setOwnOpen;
   const message = undoMessage(edit, timeZone);
@@ -163,26 +163,23 @@ export function EditView({
         changes
           ? {
               label: open ? action.hideChange : action.showChange,
-              expanded: open,
-              onToggle: () => setOpen(!open),
-              controls: diffId,
+              open,
+              onOpenChange: setOpen,
             }
           : undefined
       }
       frozenBadge={badge.neutral.undoRequested}
       lifecycle={tracked}
     >
-      {changes && open && (
-        <div id={diffId}>
+      {changes && (
+        <>
           <Diff
             lines={changes.lines.map((l) => ({ kind: l.change, text: l.text }))}
           />
           {changes.more > 0 && (
-            <p className="mt-km-3 text-xs text-secondary">
-              {editResult.moreLines(changes.more)}
-            </p>
+            <Caption>{editResult.moreLines(changes.more)}</Caption>
           )}
-        </div>
+        </>
       )}
     </ResultCard>
   );

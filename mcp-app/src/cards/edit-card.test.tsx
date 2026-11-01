@@ -88,11 +88,12 @@ test("R02: Show the change opens the diff without sending or freezing, then hide
   expect(show.getAttribute("aria-expanded")).toBe("false");
   expect(screen.queryByText("Title: Evening build retirement")).toBeNull();
   fireEvent.click(show);
-  expect(screen.getByText("Title: Evening build retirement").tagName).toBe(
-    "INS",
-  );
   expect(
-    screen.getByText("Title: Build schedule and cache rollout").tagName,
+    screen.getByText("Title: Evening build retirement").closest("ins")?.tagName,
+  ).toBe("INS");
+  expect(
+    screen.getByText("Title: Build schedule and cache rollout").closest("del")
+      ?.tagName,
   ).toBe("DEL");
   const hide = screen.getByRole("button", { name: action.hideChange });
   const panel = document.getElementById(

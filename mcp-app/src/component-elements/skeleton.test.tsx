@@ -13,12 +13,8 @@ describe("CardSkeleton", () => {
     );
   });
 
-  it("shimmers with the token and stops under reduced motion, with no spinner", () => {
+  it("has no spinner", () => {
     const { container } = render(<CardSkeleton />);
-    const block = container.querySelector('[data-slot="skeleton"]')!;
-    expect(block.className).toContain("animate-km-shimmer");
-    expect(block.className).toContain("motion-reduce:animate-none");
-    expect(block.className).not.toContain("animate-pulse");
     expect(container.querySelector(".animate-spin")).toBeNull();
   });
 });

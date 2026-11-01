@@ -1,5 +1,4 @@
-// K14 Tabs: switch between views of one card in the full view (M02). Underline on the active tab, a count after the label.
-// Places the K14 element's parts from data; the look is in component-elements/tabs.tsx.
+// K14 Tabs: switch between views of one card in the full view (M02). Core Tabs, line variant, a count after the label.
 import type { ReactNode } from "react";
 
 import {
@@ -7,7 +6,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/component-elements/tabs";
+} from "@/component-core/tabs";
 import { label as labels } from "@/copy/en";
 
 export type TabItem = {
@@ -20,26 +19,19 @@ export type TabItem = {
 
 export function Tabs({
   tabs,
-  value,
   defaultValue,
-  onValueChange,
   className,
 }: {
   tabs: TabItem[];
-  /** Controlled value; omit to let the tabs keep their own. */
-  value?: string;
   defaultValue?: string;
-  onValueChange?: (value: string) => void;
   className?: string;
 }) {
   return (
     <TabsRoot
-      value={value}
       defaultValue={defaultValue ?? tabs[0]?.value}
-      onValueChange={(v) => onValueChange?.(String(v))}
       className={className}
     >
-      <TabsList>
+      <TabsList variant="line">
         {tabs.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value}>
             {tab.count == null

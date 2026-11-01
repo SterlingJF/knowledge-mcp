@@ -43,7 +43,6 @@ export const action = {
   undo: "Undo",
   prepareAgain: "Prepare again",
   fullView: "Full view",
-  showWhy: "Show why",
   createFile: "Create the file",
   showChange: "Show the change",
   hideChange: "Hide the change",

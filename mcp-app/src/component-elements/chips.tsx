@@ -1,4 +1,5 @@
-// K04 Chips: exact places evidence came from, and the file or folder in scope. Mono text; paths never truncate.
+// K04 Chips: exact places evidence came from, and the file or folder in scope. An icon and mono text,
+// with no box: a source supports the text beside it and must not outweigh it. Paths never truncate.
 import { BookOpen, FileText, Folder, MessageSquare } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
@@ -15,9 +16,6 @@ export type {
   PlaceSource,
   Source,
 } from "@/contracts/proposal";
-
-const chipClass =
-  "inline-flex max-w-full items-center whitespace-nowrap gap-km-2 rounded-sm border-hairline border-border bg-secondary px-km-3 py-km-1 text-xs leading-xs text-foreground";
 
 /**
  * A name that may wrap only at a space or after "/": never at a hyphen or mid-name.
@@ -62,9 +60,15 @@ function Chip({
   children: ReactNode;
 }) {
   return (
-    <span className={cn(chipClass, className)} title={title}>
-      <Icon aria-hidden className="size-km-icon shrink-0" />
-      <span className={cn("min-w-0 whitespace-normal", mono && "font-mono")}>
+    <span
+      className={cn(
+        "inline-flex max-w-full items-start gap-1 text-xs text-muted-foreground",
+        className,
+      )}
+      title={title}
+    >
+      <Icon aria-hidden className="size-3 shrink-0 translate-y-0.5" />
+      <span className={cn("min-w-0", mono && "font-mono")}>
         {typeof children === "string" ? (
           <NoBreakName>{children}</NoBreakName>
         ) : (

@@ -4,6 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>mcp-app host harness</title>
+    <!-- The page plays Claude's chat, so it takes the host's chat ground. -->
+    <style>
+      [data-harness] {
+        background: var(--color-background-tertiary);
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

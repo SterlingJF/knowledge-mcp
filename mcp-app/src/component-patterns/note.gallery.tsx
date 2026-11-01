@@ -12,7 +12,7 @@ export default {
       </Note>
     ),
     "Left out": (
-      <Note kind="leftOut" fact={`${line.leftOut(2)}:`} onShowWhy={() => {}}>
+      <Note kind="leftOut" fact={line.leftOut(2)}>
         vendor-quote.xlsx, release-calendar.md.
       </Note>
     ),

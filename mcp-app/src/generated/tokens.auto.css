@@ -38,37 +38,6 @@
   --border-radius-xl: 12px;
   --border-radius-full: 9999px;
   --border-width-regular: 0.5px;
-  --km-space-1: 2px;
-  --km-space-2: 4px;
-  --km-space-3: 6px;
-  --km-space-4: 8px;
-  --km-space-5: 12px;
-  --km-space-6: 16px;
-  --km-space-7: 24px;
-  --km-gap-tight: var(--km-space-2);
-  --km-gap-inline: var(--km-space-4);
-  --km-gap-row: var(--km-space-4);
-  --km-gap-group: var(--km-space-6);
-  --km-gap-section: var(--km-space-7);
-  --km-pad-box: var(--km-space-4) var(--km-space-5);
-  --km-pad-line: var(--km-space-2) var(--km-space-5);
-  --km-pulse: 1.6s ease-out infinite;
-  --km-shimmer: 1.4s ease-in-out infinite;
-  --km-target: 44px;
-  --km-icon: 13px;
-  --km-icon-sm: 11px;
-  --km-check: 15px;
-  --km-check-border: 1.5px;
-  --km-dot: 7px;
-  --km-label-col: max-content;
-  --km-row: 28px;
-  --km-underline: 2px;
-  --km-full-max: 1080px;
-  --km-focus-ring: 0 0 0 2px var(--color-background-primary), 0 0 0 4px var(--color-ring-primary);
-  --km-eyebrow-tracking: 0.07em;
-  --km-opacity-hover: 0.88;
-  --km-opacity-dim: 0.55;
-  --km-opacity-disabled: 0.4;
   color-scheme: light dark;
 }
 
@@ -121,14 +90,6 @@
   color-scheme: light;
 }
 
-[data-theme] {
-  --km-focus-ring: 0 0 0 2px var(--color-background-primary), 0 0 0 4px var(--color-ring-primary);
-  --km-eyebrow-tracking: 0.07em;
-  --km-opacity-hover: 0.88;
-  --km-opacity-dim: 0.55;
-  --km-opacity-disabled: 0.4;
-}
-
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --color-background-primary: #30302E;
@@ -154,15 +115,19 @@
   }
 }
 
-/* shadcn's names, pointed at the host roles. */
+/* shadcn's names, pointed at the host roles; declared on themed containers too, so they re-resolve there. */
 
 :root,
 [data-theme] {
   --background: transparent;
   --foreground: var(--color-text-primary);
+  --card: transparent;
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-background-primary);
+  --popover-foreground: var(--color-text-primary);
   --primary: var(--color-background-inverse);
   --primary-foreground: var(--color-text-inverse);
-  --secondary: var(--color-background-primary);
+  --secondary: var(--color-background-secondary);
   --secondary-foreground: var(--color-text-primary);
   --muted: var(--color-background-secondary);
   --muted-foreground: var(--color-text-tertiary);
@@ -173,15 +138,23 @@
   --input: var(--color-border-secondary);
   --ring: var(--color-ring-primary);
   --radius: var(--border-radius-md);
+  --success: var(--color-background-success);
+  --success-foreground: var(--color-text-success);
+  --warning: var(--color-background-warning);
+  --warning-foreground: var(--color-text-warning);
 }
 
-/* Tailwind colours, fonts and radii for shadcn's classes. */
+/* Tailwind colours, fonts, type sizes, radii and the border width for shadcn's classes. */
 
 @theme inline {
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -194,79 +167,19 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: var(--border-radius-sm);
-  --radius-md: var(--border-radius-md);
-  --radius-lg: var(--border-radius-lg);
-  --radius-xl: var(--border-radius-xl);
-}
-
-/* The app's own colour roles, one namespace per utility, so bg and text can name different host variables. */
-
-@theme inline reference {
-  --background-color-inverse: var(--color-background-inverse);
-  --background-color-tertiary: var(--color-background-tertiary);
-  --background-color-info: var(--color-background-info);
-  --background-color-success: var(--color-background-success);
-  --background-color-warning: var(--color-background-warning);
-  --background-color-danger: var(--color-background-danger);
-  --text-color-inverse: var(--color-text-inverse);
-  --text-color-secondary: var(--color-text-secondary);
-  --text-color-info: var(--color-text-info);
-  --text-color-success: var(--color-text-success);
-  --text-color-warning: var(--color-text-warning);
-  --border-color-inverse: var(--color-background-inverse);
-}
-
-/* Type, spacing, radius, borders, motion and effects as Tailwind theme namespaces, so each token is a class. */
-
-@theme inline reference {
-  --font-weight-normal: var(--font-weight-normal);
-  --font-weight-semibold: var(--font-weight-semibold);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --text-xs: var(--font-text-xs-size);
   --text-xs--line-height: var(--font-text-xs-line-height);
-  --leading-xs: var(--font-text-xs-line-height);
   --text-sm: var(--font-text-sm-size);
   --text-sm--line-height: var(--font-text-sm-line-height);
-  --leading-sm: var(--font-text-sm-line-height);
   --text-base: var(--font-heading-md-size);
   --text-base--line-height: var(--font-heading-md-line-height);
-  --leading-base: var(--font-heading-md-line-height);
-  --spacing-km-1: var(--km-space-1);
-  --spacing-km-2: var(--km-space-2);
-  --spacing-km-3: var(--km-space-3);
-  --spacing-km-4: var(--km-space-4);
-  --spacing-km-5: var(--km-space-5);
-  --spacing-km-6: var(--km-space-6);
-  --spacing-km-7: var(--km-space-7);
-  --spacing-km-gap-tight: var(--km-gap-tight);
-  --spacing-km-gap-inline: var(--km-gap-inline);
-  --spacing-km-gap-row: var(--km-gap-row);
-  --spacing-km-gap-group: var(--km-gap-group);
-  --spacing-km-gap-section: var(--km-gap-section);
-  --spacing-km-pad-box: var(--km-pad-box);
-  --spacing-km-pad-line: var(--km-pad-line);
-  --spacing-km-target: var(--km-target);
-  --spacing-km-icon: var(--km-icon);
-  --spacing-km-icon-sm: var(--km-icon-sm);
-  --spacing-km-check: var(--km-check);
-  --spacing-km-dot: var(--km-dot);
-  --spacing-km-row: var(--km-row);
-  --spacing-km-underline: var(--km-underline);
-  --spacing-km-full-max: var(--km-full-max);
-  --radius-xs: var(--border-radius-xs);
   --radius-sm: var(--border-radius-sm);
   --radius-md: var(--border-radius-md);
   --radius-lg: var(--border-radius-lg);
   --radius-xl: var(--border-radius-xl);
-  --radius-full: var(--border-radius-full);
-  --radius-km-1: var(--km-space-1);
-  --border-width-hairline: var(--border-width-regular);
-  --border-width-km-check: var(--km-check-border);
-  --animate-km-pulse: km-pulse var(--km-pulse);
-  --animate-km-shimmer: km-shimmer var(--km-shimmer);
-  --shadow-km-focus-ring: var(--km-focus-ring);
-  --tracking-km-eyebrow: var(--km-eyebrow-tracking);
-  --opacity-km-hover: var(--km-opacity-hover);
-  --opacity-km-dim: var(--km-opacity-dim);
-  --opacity-km-disabled: var(--km-opacity-disabled);
+  --default-border-width: var(--border-width-regular);
 }

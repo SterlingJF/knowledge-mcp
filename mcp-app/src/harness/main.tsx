@@ -1,7 +1,7 @@
 // Dev-only host page: loads the built app (dist/index.html, the bytes served as
 // ui://knowledge-mcp/app.html) into sandboxed iframes and talks to it over an AppBridge.
 
-import { StrictMode, useEffect, useRef, useState } from "react";
+import { StrictMode, useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { PostMessageTransport } from "@modelcontextprotocol/ext-apps/app-bridge";
 import type {
@@ -9,13 +9,9 @@ import type {
   McpUiDisplayMode,
 } from "@modelcontextprotocol/ext-apps/app-bridge";
 
-import {
-  FULLSCREEN,
-  WIDTHS,
-  claudeStyles,
-  harnessBridge,
-  hostContext,
-} from "./host";
+import { Button } from "@/component-core/button";
+import "../styles.css";
+import { FULLSCREEN, WIDTHS, harnessBridge, hostContext } from "./host";
 import type { LogEntry, Theme, View } from "./host";
 import first from "./proposal.result.json";
 import younger from "./proposal.younger.result.json";
@@ -51,9 +47,7 @@ function Frame({
   const bridgeRef = useRef<AppBridge | null>(null);
   const [mode, setMode] = useState<McpUiDisplayMode>("inline");
   const [height, setHeight] = useState(120);
-  const view: View = { theme, width, displayMode: mode };
-  const viewRef = useRef(view);
-  viewRef.current = view;
+  const viewRef = useRef<View>({ theme, width, displayMode: mode });
 
   useEffect(() => {
     const iframe = ref.current;
@@ -96,6 +90,8 @@ function Frame({
   }, [html, card, result, onLog]);
 
   useEffect(() => {
+    const view: View = { theme, width, displayMode: mode };
+    viewRef.current = view;
     const context = hostContext(view);
     bridgeRef.current?.setHostContext(context);
     onLog({
@@ -108,7 +104,7 @@ function Frame({
       card,
       at: Date.now(),
     });
-  }, [theme, width, mode]);
+  }, [theme, width, mode, card, onLog]);
 
   const full = mode === "fullscreen";
   return (
@@ -116,16 +112,9 @@ function Frame({
       ref={ref}
       title={`card ${card}`}
       sandbox="allow-scripts allow-same-origin"
-      style={{
-        display: "block",
-        border: "none",
-        background: "transparent",
-        colorScheme: theme,
-        width: full ? FULLSCREEN.width : width,
-        height: full ? FULLSCREEN.height : height,
-        outline: "1px dashed GrayText",
-        marginBlock: 12,
-      }}
+      width={full ? FULLSCREEN.width : width}
+      height={full ? FULLSCREEN.height : height}
+      className="my-3 block border-0 bg-transparent outline-1 outline-muted-foreground outline-dashed"
     />
   );
 }
@@ -137,53 +126,44 @@ function Harness() {
   const [width, setWidth] = useState<number>(WIDTHS.wide);
   const [cards, setCards] = useState<Record<string, unknown>[]>([first]);
   const [log, setLog] = useState<Entry[]>([]);
-  const onLog = useRef((entry: Entry) =>
-    setLog((all) => [...all, entry]),
-  ).current;
+  const onLog = useCallback(
+    (entry: Entry) => setLog((all) => [...all, entry]),
+    [],
+  );
 
   useEffect(() => {
     loadApp().then(setHtml, (e: Error) => setError(e.message));
   }, []);
 
-  const ground = claudeStyles(theme)["--color-background-tertiary"];
-  const ink = claudeStyles(theme)["--color-text-primary"];
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "max-content",
-        minWidth: "100%",
-        gap: 16,
-        padding: 16,
-        minHeight: "100vh",
-        boxSizing: "border-box",
-        background: ground,
-        color: ink,
-        colorScheme: theme,
-        fontFamily: "system-ui, sans-serif",
-      }}
+      data-theme={theme}
+      data-harness
+      className="flex min-h-screen w-max min-w-full flex-col gap-4 p-4"
     >
-      <main style={{ width: "max-content" }}>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button
+      <main className="w-max">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
           >
             Theme: {theme}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
             onClick={() =>
               setWidth(width === WIDTHS.wide ? WIDTHS.narrow : WIDTHS.wide)
             }
           >
             Width: {width}px
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
             disabled={cards.length > 1}
             onClick={() => setCards([first, younger])}
           >
             Send a younger result for the same subject
-          </button>
+          </Button>
         </div>
         {error && <p role="alert">{error}</p>}
         {html &&
@@ -201,21 +181,16 @@ function Harness() {
       </main>
       <aside
         aria-label="Host log"
-        style={{
-          maxWidth: 760,
-          fontSize: 12,
-          overflow: "auto",
-          maxHeight: "95vh",
-        }}
+        className="max-h-screen max-w-190 overflow-auto text-xs"
       >
-        <h2 style={{ fontSize: 14 }}>Received and sent, in order</h2>
-        <ol data-testid="log" style={{ paddingInlineStart: 20 }}>
+        <h2 className="text-sm">Received and sent, in order</h2>
+        <ol data-testid="log" className="list-decimal ps-5">
           {log.map((entry, i) => (
             <li key={i}>
               <strong>
                 card {entry.card} · {entry.kind}
               </strong>
-              <pre style={{ whiteSpace: "pre-wrap", margin: 0 }}>
+              <pre className="m-0 whitespace-pre-wrap">
                 {JSON.stringify(entry.detail, null, 1)}
               </pre>
             </li>

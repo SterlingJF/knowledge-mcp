@@ -104,11 +104,12 @@ test("a minimal proposal draws with only its changes", () => {
   const { view } = renderCard(minimal);
   expect(screen.getByText("Fix a typo")).toBeTruthy();
   // No instance, type, reader or filing: no meta line at all.
-  const title = screen.getByText("Fix a typo");
-  expect(title.nextElementSibling).toBeNull();
-  expect(view.container.querySelector("header")?.textContent).not.toContain(
-    proposal.guess,
-  );
+  expect(
+    view.container.querySelector("[data-slot=card-description]"),
+  ).toBeNull();
+  expect(
+    view.container.querySelector("[data-slot=card-header]")?.textContent,
+  ).not.toContain(proposal.guess);
   expect(screen.getByText(line.waitsBecause(line.theDocument))).toBeTruthy();
   expect(fileName({ ...e02, instance: undefined })).toBe(line.theDocument);
   expect(

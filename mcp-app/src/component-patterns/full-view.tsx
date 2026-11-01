@@ -30,9 +30,8 @@ export function FullView({
   return (
     <CardShell
       {...shell}
-      // Lines stay readable on a wide window: the frames cap the full view at 1080px, left-aligned.
-      className="max-w-km-full-max"
-      flat
+      // Lines stay readable on a wide window: the full view is capped at 1024px, left-aligned.
+      className="max-w-5xl"
       {...lifecycleProps(lifecycle)}
       actions={actions}
       onAction={(item) => {
@@ -40,10 +39,7 @@ export function FullView({
         void host.requestInline();
       }}
     >
-      {/* The body: one group gap after the header and between its parts (E02F). */}
-      <div className="mt-km-gap-group flex flex-col gap-km-gap-group">
-        {children}
-      </div>
+      {children}
     </CardShell>
   );
 }

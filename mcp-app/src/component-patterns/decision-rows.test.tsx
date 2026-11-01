@@ -85,11 +85,7 @@ test("a row brings its own options: one is a tick box, five stack", () => {
   );
   fireEvent.click(screen.getByRole("checkbox", { name: "Skip this file" }));
   expect(onChoiceChange).toHaveBeenCalledWith("s", "skip");
-  expect(
-    screen
-      .getByRole("radiogroup", { name: "link" })
-      .getAttribute("data-layout"),
-  ).toBe("stacked");
+  expect(screen.getByRole("radiogroup", { name: "link" })).toBeTruthy();
   expect(
     screen.getByRole("radio", { name: "c" }).getAttribute("aria-checked"),
   ).toBe("true");
@@ -140,13 +136,11 @@ test("narrow layout marks the title, detail and hidden cells", () => {
     />,
   );
   expect(screen.getByText("Decision record").className).toContain(
-    "@max-[560px]:font-semibold",
+    "@max-xl:font-semibold",
   );
-  expect(screen.getByText("Decisions/").className).toContain(
-    "@max-[560px]:hidden",
-  );
+  expect(screen.getByText("Decisions/").className).toContain("@max-xl:hidden");
   expect(screen.getByText("x.md").className).toContain(
-    "@max-[560px]:text-secondary",
+    "@max-xl:text-muted-foreground",
   );
   expect(screen.getByText("Choice").tagName).toBe("TH");
 });
@@ -169,7 +163,7 @@ test("move blockers: no title, nothing hidden, choice at the start", () => {
     />,
   );
   const cell = screen.getByText("a.md already exists");
-  expect(cell.className).not.toContain("@max-[560px]:font-semibold");
+  expect(cell.className).not.toContain("@max-xl:font-semibold");
   expect(cell.className).not.toContain("hidden");
   expect(screen.getByText("Your choice").className).not.toContain("text-right");
 });

@@ -1,5 +1,5 @@
-// K08 Key–value grid: the inline summary's data points, label left, value right.
-// Claude limits inline cards to 4–5 data points, so more than five rows is refused.
+// K08 Key–value list: the inline summary's data points, label left, value right; under 384px of card,
+// each label sits above its value. Claude limits inline cards to 4–5 data points, so more than five rows is refused.
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -21,20 +21,15 @@ export function KeyValue({
     );
   }
   return (
-    <div className={cn("mt-km-gap-group", className)}>
-      {/* Wide: a label column. Under 420px of the card: each label above its value. */}
-      {/* Bracketed on purpose: the template mixes the label-column token with 1fr, which no token class names. */}
-      <dl className="m-0 grid grid-cols-[var(--km-label-col)_1fr] gap-x-km-gap-group gap-y-km-gap-row @max-[420px]:grid-cols-1 @max-[420px]:gap-y-km-gap-tight">
-        {rows.map((row, index) => (
-          <div
-            key={index}
-            className="contents @max-[420px]:[&:not(:first-child)>dt]:mt-km-gap-tight"
-          >
-            <dt className="text-muted-foreground">{row.label}</dt>
-            <dd className="m-0">{row.value}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+    <dl className={cn("flex flex-col gap-2", className)}>
+      {rows.map((row, index) => (
+        <div key={index} className="flex flex-col @sm:flex-row @sm:gap-4">
+          <dt className="shrink-0 text-muted-foreground @sm:w-24">
+            {row.label}
+          </dt>
+          <dd className="min-w-0">{row.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

@@ -19,34 +19,13 @@ const sheets = Object.values(modules)
 
 function Pane({ theme, sheet }: { theme: "light" | "dark"; sheet: Sheet }) {
   return (
-    <div
-      data-theme={theme}
-      style={{
-        colorScheme: theme,
-        background: "var(--color-background-tertiary)",
-        padding: 24,
-      }}
-    >
+    <div data-theme={theme} data-pane className="p-6">
       {Object.entries(sheet.stories).map(([label, story]) => (
-        <div
-          key={label}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "160px 1fr",
-            gap: 12,
-            alignItems: "center",
-            marginBottom: 12,
-          }}
-        >
-          <span
-            style={{
-              color: "var(--color-text-tertiary)",
-              fontSize: "var(--font-text-xs-size)",
-            }}
-          >
+        <div key={label} className="mb-3 flex items-center gap-3">
+          <span className="w-40 shrink-0 text-xs text-muted-foreground">
             {label}
           </span>
-          <div>{story}</div>
+          <div className="min-w-0 flex-1">{story}</div>
         </div>
       ))}
     </div>
@@ -55,28 +34,16 @@ function Pane({ theme, sheet }: { theme: "light" | "dark"; sheet: Sheet }) {
 
 function Gallery() {
   return (
-    <main style={{ padding: 32, display: "grid", gap: 32 }}>
+    <main className="grid gap-8 p-8">
       {sheets.length === 0 && (
         <p>No stories yet: add a *.gallery.tsx beside a component.</p>
       )}
       {sheets.map((sheet) => (
         <section key={sheet.id} id={sheet.id}>
-          <h2
-            style={{
-              fontSize: "var(--font-heading-md-size)",
-              margin: "0 0 12px",
-            }}
-          >
+          <h2 className="mb-3 text-base">
             {sheet.id} · {sheet.name}
           </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              borderRadius: 12,
-              overflow: "hidden",
-            }}
-          >
+          <div className="grid overflow-hidden rounded-xl">
             <Pane theme="light" sheet={sheet} />
             <Pane theme="dark" sheet={sheet} />
           </div>

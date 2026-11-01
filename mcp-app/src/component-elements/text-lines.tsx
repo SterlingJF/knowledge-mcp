@@ -1,20 +1,17 @@
-// K07 Text lines: the fixed text roles inside a card. Three sizes (xs, sm, heading-md) and two weights (normal, semibold) only (F02).
+// K07 Text lines: the text roles the card's core parts don't name. Title and meta are core CardTitle and
+// CardDescription; these are the eyebrow over the title, the caption under the body, and a change's current text.
 import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-const xs = "text-xs leading-xs";
-const tertiary = "text-muted-foreground";
-
 type LineProps = ComponentProps<"div">;
 
+/** What kind of card this is, above its title: `Proposed changes`. */
 export function Eyebrow({ className, ...props }: LineProps) {
   return (
     <div
       className={cn(
-        xs,
-        tertiary,
-        "font-semibold uppercase tracking-km-eyebrow",
+        "text-xs font-semibold tracking-wide text-muted-foreground uppercase",
         className,
       )}
       {...props}
@@ -22,45 +19,11 @@ export function Eyebrow({ className, ...props }: LineProps) {
   );
 }
 
-export function Title({ className, ...props }: LineProps) {
+/** A quiet line under the body: why the card waits, or what a press did. */
+export function Caption({ className, ...props }: LineProps) {
   return (
     <div
-      className={cn(
-        "mt-km-gap-tight font-semibold text-base leading-base",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-export function Meta({ className, ...props }: LineProps) {
-  return (
-    <div
-      className={cn(
-        xs,
-        tertiary,
-        "mt-km-gap-inline flex flex-wrap items-center gap-x-km-gap-inline gap-y-km-gap-tight",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-export function WhyLine({ className, ...props }: LineProps) {
-  return (
-    <div
-      className={cn(xs, tertiary, "mt-km-gap-group", className)}
-      {...props}
-    />
-  );
-}
-
-export function FrozenLine({ className, ...props }: LineProps) {
-  return (
-    <div
-      className={cn(xs, tertiary, "mt-km-gap-group", className)}
+      className={cn("text-xs text-muted-foreground", className)}
       {...props}
     />
   );
@@ -81,7 +44,7 @@ export function CurrentText({
   return (
     <span className={cn(struck && "line-through", className)} {...props}>
       <span className="font-semibold">{label}:</span>{" "}
-      <span className={tertiary}>{children}</span>
+      <span className="text-muted-foreground">{children}</span>
     </span>
   );
 }

@@ -4,7 +4,7 @@ import { badge } from "@/copy/en";
 import { Badge } from "./badge";
 
 const Row = ({ children }: { children: ReactNode }) => (
-  <span className="inline-flex gap-km-gap-inline">{children}</span>
+  <span className="inline-flex gap-2">{children}</span>
 );
 
 export default {

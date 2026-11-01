@@ -45,7 +45,7 @@ test("result: done badge, recorded when and by whom, Undo first", () => {
     label: action.undo,
     message: "Undo edit 12",
     frozenLine: frozen.undoRequested,
-    variant: "secondary",
+    variant: "outline",
     icon: expect.anything(),
   });
 });
@@ -77,7 +77,7 @@ test("refusal: refused badge, warning note, one next step", () => {
 
 test("result: the disclosure toggles the change without sending or freezing", () => {
   const life = lifecycle();
-  const onToggle = vi.fn<() => void>();
+  const onToggle = vi.fn<(open: boolean) => void>();
   render(
     <ResultCard
       kind="result"
@@ -88,9 +88,8 @@ test("result: the disclosure toggles the change without sending or freezing", ()
       undoMessage="Undo edit 12"
       disclosure={{
         label: action.hideChange,
-        expanded: true,
-        onToggle,
-        controls: "diff-12",
+        open: true,
+        onOpenChange: onToggle,
       }}
       lifecycle={life}
     >
@@ -138,25 +137,22 @@ test("result: the toggle shows and hides the change", () => {
         undoMessage="Undo"
         disclosure={{
           label: open ? action.hideChange : action.showChange,
-          expanded: open,
-          onToggle: () => setOpen(!open),
-          controls: "diff-x",
+          open,
+          onOpenChange: setOpen,
         }}
         lifecycle={lifecycle()}
       >
-        <div id="diff-x" hidden={!open}>
-          the diff
-        </div>
+        <div id="diff-x">the diff</div>
       </ResultCard>
     );
   }
   render(<Harness />);
-  const diff = () => document.getElementById("diff-x")!;
-  expect(diff().hidden).toBe(true);
+  const diff = () => document.getElementById("diff-x");
+  expect(diff()).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: action.showChange }));
-  expect(diff().hidden).toBe(false);
+  expect(diff()).toBeTruthy();
   const hide = screen.getByRole("button", { name: action.hideChange });
   expect(hide.getAttribute("aria-expanded")).toBe("true");
   fireEvent.click(hide);
-  expect(diff().hidden).toBe(true);
+  expect(diff()).toBeNull();
 });

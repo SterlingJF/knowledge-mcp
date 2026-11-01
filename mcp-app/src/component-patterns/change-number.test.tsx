@@ -26,11 +26,11 @@ test("left out is unticked", () => {
   );
 });
 
-test("All is mixed when some are left out, and selects every row", () => {
+test("All is clear when some are left out, and selects every row", () => {
   const onChange = vi.fn<(value: boolean) => void>();
   render(<SelectAll keptCount={2} total={3} onChange={onChange} />);
   expect(screen.getByRole("checkbox").getAttribute("aria-checked")).toBe(
-    "mixed",
+    "false",
   );
   fireEvent.click(screen.getByText("All"));
   expect(onChange).toHaveBeenCalledWith(true);

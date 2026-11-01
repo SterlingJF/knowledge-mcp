@@ -1,4 +1,5 @@
-// K03 Evidence mark: how well the sources back a proposed change. Neutral tone; a mark is not a status.
+// K03 Evidence mark: how well the sources back a proposed change. An icon and a word in the muted tone,
+// with no box, so it reads as a note on the change and never as a second status badge.
 import {
   ArrowRightLeft,
   CircleCheck,
@@ -32,11 +33,11 @@ export function EvidenceMark({
     <span
       data-mark={mark}
       className={cn(
-        "flex w-fit items-center gap-km-2 whitespace-nowrap rounded-full border-hairline border-border bg-secondary px-km-4 text-xs leading-xs font-semibold text-foreground",
+        "inline-flex w-fit items-center gap-1 text-xs whitespace-nowrap text-muted-foreground",
         className,
       )}
     >
-      <Icon aria-hidden className="size-km-icon shrink-0" />
+      <Icon aria-hidden className="size-3 shrink-0" />
       {evidence[mark]}
     </span>
   );
