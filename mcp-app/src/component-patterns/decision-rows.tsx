@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 import { Badge } from "@/component-elements/badge";
 import { TickBox } from "@/component-elements/change-number";
 import type { BadgeTone } from "@/component-elements/badge";
-import { SegmentedChoice } from "@/component-elements/segmented-choice";
-import type { SegmentOption } from "@/component-elements/segmented-choice";
+import { SegmentedChoice } from "@/component-patterns/segmented-choice";
+import type { SegmentOption } from "@/component-patterns/segmented-choice";
 import { decision } from "@/copy/en";
 import { cn } from "@/lib/utils";
 

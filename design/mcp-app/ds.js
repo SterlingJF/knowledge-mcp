@@ -731,12 +731,12 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
           ],
           [
             "<b>Elements</b>",
-            "K01 Badge · K02 Button · K03 Evidence mark · K04 Chips · K05 Change number · K06 Note · K07 Text lines · K08 Key–value grid · K09 Diff · K10 Skeleton · K11 Segmented choice · K13 Full view button",
+            'K01 Badge · K02 Button · K03 Evidence mark · K04 Chips · K05 Change number · K06 Note · K07 Text lines · K08 Key–value grid · K09 Diff · K10 Skeleton · K11 Segmented choice <span class="mu">(the look)</span> · K13 Full view button · K14 Tabs <span class="mu">(the look)</span>',
             "0–1 source, at least as many exports as imports.",
           ],
           [
             "<b>Patterns</b>",
-            "P01 Card shell · P02 Change table · P03 Left-out disclosure · P04 Decision rows · P05 Result and refusal · P06 Card lifecycle · P07 Summary and full view",
+            'P01 Card shell · P02 Change table · P03 Left-out disclosure · P04 Decision rows · P05 Result and refusal · P06 Card lifecycle · P07 Summary and full view · K11 Segmented choice <span class="mu">(options and stacking)</span> · K14 Tabs <span class="mu">(tabs with counts)</span>',
             "2+ sources, fewer exports than imports.",
           ],
           [
@@ -755,6 +755,7 @@ table.spec{width:100%;border-collapse:collapse;font-size:12.5px}
       rules: [
         "Dependencies flow down only: patterns → elements → core.",
         "A part not on this map does not exist yet: raise it before building.",
+        "K11 and K14 are split in two and keep their numbers: the element restyles every core part it uses; the pattern of the same name places those parts from data, with layout classes only.",
       ],
       uses: [],
     },

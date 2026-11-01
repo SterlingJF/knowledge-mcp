@@ -13,7 +13,7 @@ import type { CardAction } from "@/component-patterns/card-shell";
 import { useCardLifecycle } from "@/component-patterns/card-lifecycle";
 import type { CardLifecycle } from "@/component-patterns/card-lifecycle";
 import { Note } from "@/component-elements/note";
-import { Tabs } from "@/component-elements/tabs";
+import { Tabs } from "@/component-patterns/tabs";
 import { DecisionRows } from "@/component-patterns/decision-rows";
 import { FullView } from "@/component-patterns/full-view";
 import { PlanLines, PlanTable } from "@/component-patterns/plan-table";

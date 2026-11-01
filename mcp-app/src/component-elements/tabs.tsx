@@ -1,13 +1,13 @@
-// K14 Tabs: switch between views of one card in the full view (M02). Underline on the active tab, a count after the label.
-import type { ReactNode } from "react";
+// K14 Tabs, the look: core's tab parts restyled. Underline on the active tab; the list rules off the panels.
+// The data-driven tabs with counts are the K14 pattern in component-patterns/tabs.tsx.
+import type { ComponentProps } from "react";
 
 import {
   Tabs as CoreTabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
+  TabsContent as CoreTabsContent,
+  TabsList as CoreTabsList,
+  TabsTrigger as CoreTabsTrigger,
 } from "@/component-core/tabs";
-import { label as labels } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 // Base UI sets data-orientation and data-active; the underline is a ::after on the active tab.
@@ -20,56 +20,39 @@ const triggerClass = cn(
   "pointer-coarse:min-h-(--km-target)",
 );
 
-export type TabItem = {
-  value: string;
-  label: string;
-  /** Shown after the label: `Moves (3)`. */
-  count?: number;
-  content: ReactNode;
-};
-
-export function Tabs({
-  tabs,
-  value,
-  defaultValue,
-  onValueChange,
-  className,
-}: {
-  tabs: TabItem[];
-  /** Controlled value; omit to let the tabs keep their own. */
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  className?: string;
-}) {
+export function Tabs({ className, ...props }: ComponentProps<typeof CoreTabs>) {
   return (
     <CoreTabs
-      value={value}
-      defaultValue={defaultValue ?? tabs[0]?.value}
-      onValueChange={(v) => onValueChange?.(String(v))}
       className={cn("flex-col gap-(--km-gap-group)", className)}
-    >
-      <TabsList
-        variant="line"
-        className="h-auto w-full justify-start gap-(--km-gap-group) rounded-none border-b-(length:--border-width-regular) border-(--color-border-tertiary) p-0"
-      >
-        {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.value}
-            value={tab.value}
-            className={triggerClass}
-          >
-            {tab.count == null
-              ? tab.label
-              : labels.withCount(tab.label, tab.count)}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-      {tabs.map((tab) => (
-        <TabsContent key={tab.value} value={tab.value}>
-          {tab.content}
-        </TabsContent>
-      ))}
-    </CoreTabs>
+      {...props}
+    />
   );
+}
+
+export function TabsList({
+  variant = "line",
+  className,
+  ...props
+}: ComponentProps<typeof CoreTabsList>) {
+  return (
+    <CoreTabsList
+      variant={variant}
+      className={cn(
+        "h-auto w-full justify-start gap-(--km-gap-group) rounded-none border-b-(length:--border-width-regular) border-(--color-border-tertiary) p-0",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function TabsTrigger({
+  className,
+  ...props
+}: ComponentProps<typeof CoreTabsTrigger>) {
+  return <CoreTabsTrigger className={cn(triggerClass, className)} {...props} />;
+}
+
+export function TabsContent(props: ComponentProps<typeof CoreTabsContent>) {
+  return <CoreTabsContent {...props} />;
 }
