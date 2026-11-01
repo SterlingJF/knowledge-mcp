@@ -7,7 +7,14 @@
     "light": "#a0bbd3",
     "dark": "#000000"
   },
-  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/knowledge-mcp-mark-black.svg",
+    "dark": "/logo/knowledge-mcp-mark-white.svg"
+  },
+  "favicon": {
+    "light": "/logo/knowledge-mcp-squircle-dark.svg",
+    "dark": "/logo/knowledge-mcp-squircle-light.svg"
+  },
   "navigation": {
     "groups": [
       {
