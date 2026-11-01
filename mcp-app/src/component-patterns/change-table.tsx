@@ -13,7 +13,7 @@ import { tableLabel, tableRow } from "./table-classes";
 
 const headClass = cn(tableLabel, "@max-[560px]:sr-only");
 // A left-out row: its text is struck and tertiary; the tick box stays at full strength.
-const tertiary = "text-(--color-text-tertiary)";
+const tertiary = "text-muted-foreground";
 // Only text spans are struck: a strike on the cell would reach the evidence mark.
 const struck = "line-through";
 const editCols =
@@ -28,9 +28,7 @@ function Cell({
 }: ProposalCell & { className?: string }) {
   return (
     <span className={className}>
-      {label != null && (
-        <span className="font-(--font-weight-semibold)">{label}:</span>
-      )}
+      {label != null && <span className="font-semibold">{label}:</span>}
       {label != null && " "}
       {text}
     </span>
@@ -52,19 +50,17 @@ function Sources({ sources }: { sources: Source[] }) {
   return (
     <span
       data-testid="sources"
-      className="flex min-w-0 flex-col items-start gap-(--km-gap-tight)"
+      className="flex min-w-0 flex-col items-start gap-km-gap-tight"
     >
       {sources.map((source, i) => {
         const short = sameFileAsPrevious(sources, i);
         return (
           <span
             key={i}
-            className="flex max-w-full min-w-0 items-center gap-(--km-gap-inline)"
+            className="flex max-w-full min-w-0 items-center gap-km-gap-inline"
           >
             {short && (
-              <span className="text-(--color-text-tertiary)">
-                {sourceCopy.versus}
-              </span>
+              <span className="text-muted-foreground">{sourceCopy.versus}</span>
             )}
             <SourceChip
               source={source}
@@ -103,7 +99,7 @@ export function ChangeTable({
   const rowClass = cn(
     tableRow,
     "col-span-full grid-cols-subgrid",
-    !frozen && "pointer-coarse:min-h-(--km-target)",
+    !frozen && "pointer-coarse:min-h-km-target",
   );
   const keptSet = kept ?? new Set(rows.map((_, i) => i + 1));
   // A frozen table given `kept` still shows what was left out; without it every row reads as kept.
@@ -132,12 +128,12 @@ export function ChangeTable({
     <div
       role="table"
       className={cn(
-        "grid gap-x-(--km-gap-group) text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary) @max-[560px]:grid-cols-1",
+        "grid gap-x-km-gap-group text-sm leading-sm text-foreground @max-[560px]:grid-cols-1",
         draft ? draftCols : editCols,
         className,
       )}
     >
-      <div role="row" className={cn(rowClass, "pt-0 pb-(--km-gap-row)")}>
+      <div role="row" className={cn(rowClass, "pt-0 pb-km-gap-row")}>
         <span role="columnheader">{head}</span>
         <span role="columnheader" className={headClass}>
           {draft ? labels.section : labels.current}
@@ -182,7 +178,7 @@ export function ChangeTable({
                     {/* The header names the column; stacked, the header row is hidden, so the cell says it. */}
                     <span
                       data-narrow-label
-                      className="hidden font-(--font-weight-semibold) @max-[560px]:inline"
+                      className="hidden font-semibold @max-[560px]:inline"
                     >
                       {labels.current}:{" "}
                     </span>
@@ -198,9 +194,9 @@ export function ChangeTable({
             <span
               role="cell"
               className={cn(
-                "flex flex-col gap-(--km-gap-tight)",
+                "flex flex-col gap-km-gap-tight",
                 out && tertiary,
-                out && "[&_[data-mark]]:text-(--color-text-tertiary)",
+                out && "[&_[data-mark]]:text-muted-foreground",
               )}
             >
               {row.mark && <EvidenceMark mark={row.mark} />}
@@ -213,8 +209,7 @@ export function ChangeTable({
             <span
               role="cell"
               className={cn(
-                out &&
-                  "text-(--color-text-tertiary) [&_*]:text-(--color-text-tertiary)",
+                out && "text-muted-foreground [&_*]:text-muted-foreground",
               )}
             >
               <Sources sources={row.sources} />

@@ -106,8 +106,8 @@ test("actions sit one group gap below the body, the meta parts in a wrapping row
   const acts = screen.getByRole("button", {
     name: approve.label,
   }).parentElement!;
-  expect(acts.className).toContain("mt-[var(--km-gap-group)]");
-  expect(acts.className).toContain("gap-[var(--km-gap-inline)]");
+  expect(acts.className).toContain("mt-km-gap-group");
+  expect(acts.className).toContain("gap-km-gap-inline");
   const meta = screen.getByText("chip").parentElement!;
   expect(meta.className).toContain("flex-wrap");
   expect(meta.className).toContain("gap-y-km-gap-tight");

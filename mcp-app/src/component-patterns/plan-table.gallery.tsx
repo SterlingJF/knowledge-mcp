@@ -8,7 +8,7 @@ const mono = (t: string) => (
 
 const file = (name: string, from: string) => (
   <PlanLines
-    primary={<b className="font-(--font-weight-semibold)">{name}</b>}
+    primary={<b className="font-semibold">{name}</b>}
     secondary={from}
   />
 );

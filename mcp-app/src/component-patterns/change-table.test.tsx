@@ -102,9 +102,9 @@ test("draft mode: no boxes, no Current column, Section and Draft headers", () =>
 test("columns sit a group gap apart, chips in a cell a tight gap", () => {
   render(<ChangeTable rows={rows} />);
   const row = screen.getAllByTestId("sources")[1].closest("[role=row]");
-  expect(row?.className).toContain("gap-x-(--km-gap-group)");
+  expect(row?.className).toContain("gap-x-km-gap-group");
   expect(screen.getAllByTestId("sources")[1].className).toContain(
-    "gap-(--km-gap-tight)",
+    "gap-km-gap-tight",
   );
 });
 
@@ -113,8 +113,8 @@ test("on touch, every row with a tick box is at least the target tall", () => {
     <ChangeTable rows={rows} kept={new Set([1])} onKeptChange={() => {}} />,
   );
   const [header, first] = screen.getAllByRole("row");
-  expect(header.className).toContain("pointer-coarse:min-h-(--km-target)");
-  expect(first.className).toContain("pointer-coarse:min-h-(--km-target)");
+  expect(header.className).toContain("pointer-coarse:min-h-km-target");
+  expect(first.className).toContain("pointer-coarse:min-h-km-target");
 });
 
 test("a current text without its own label shows the column label only when stacked", () => {

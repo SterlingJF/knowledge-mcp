@@ -101,19 +101,19 @@ export function CardShell({
       data-state={state}
       data-flat={flat || undefined}
       className={cn(
-        "@container border-0 bg-transparent p-0 text-[color:var(--color-text-primary)]",
+        "@container border-0 bg-transparent p-0 text-foreground",
         className,
       )}
     >
       {/* Under 480px the title block takes the full width; badge and Full view follow it. */}
-      <header className="flex flex-row items-start justify-between gap-[var(--km-gap-group)] @max-[480px]:flex-col @max-[480px]:gap-[var(--km-gap-inline)]">
+      <header className="flex flex-row items-start justify-between gap-km-gap-group @max-[480px]:flex-col @max-[480px]:gap-km-gap-inline">
         <div className="min-w-0 @max-[480px]:self-stretch">
           <Eyebrow>{eyebrow}</Eyebrow>
           <Title>{title}</Title>
           {meta != null && <Meta>{meta}</Meta>}
         </div>
         {(shownBadge || (onFullView && live)) && (
-          <span className="flex flex-none items-center gap-[var(--km-gap-inline)]">
+          <span className="flex flex-none items-center gap-km-gap-inline">
             {shownBadge && (
               <Badge tone={shownBadge.tone}>{shownBadge.label}</Badge>
             )}
@@ -126,7 +126,7 @@ export function CardShell({
       {children}
       {live && why != null && <WhyLine>{why}</WhyLine>}
       {live && (actions.length > 0 || disclosure) && (
-        <div className="mt-[var(--km-gap-group)] flex flex-wrap items-center gap-[var(--km-gap-inline)]">
+        <div className="mt-km-gap-group flex flex-wrap items-center gap-km-gap-inline">
           {actions.map((item) => (
             <Button
               key={item.label}

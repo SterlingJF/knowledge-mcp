@@ -81,7 +81,7 @@ function Choice({
   // No answer the card can offer: it is answered in chat, and the row stays unanswered.
   if (options.length === 0)
     return (
-      <span className="whitespace-nowrap text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-secondary)">
+      <span className="whitespace-nowrap text-xs leading-xs text-secondary">
         {decision.answerInChat}
       </span>
     );
@@ -136,25 +136,25 @@ export function DecisionRows({
   const cellCount = rows[0]?.cells.length ?? headers.length;
   const part = (i: number) =>
     cn(
-      i === narrow.title && "@max-[560px]:font-(--font-weight-semibold)",
+      i === narrow.title && "@max-[560px]:font-semibold",
       i === narrow.detail &&
-        "@max-[560px]:font-(family-name:--font-mono) @max-[560px]:text-(--color-text-secondary)",
+        "@max-[560px]:font-(family-name:--font-mono) @max-[560px]:text-secondary",
       narrow.hide?.includes(i) && "@max-[560px]:hidden",
     );
-  const cell = "py-(--km-gap-row) pr-(--km-gap-group) align-top";
+  const cell = "py-km-gap-row pr-km-gap-group align-top";
   return (
     <table
       className={cn(
-        "w-full border-collapse @max-[560px]:block @max-[560px]:[&_tbody]:block text-(length:--font-text-sm-size) leading-(--font-text-sm-line-height) text-(--color-text-primary)",
+        "w-full border-collapse @max-[560px]:block @max-[560px]:[&_tbody]:block text-sm leading-sm text-foreground",
         className,
       )}
     >
       <thead className="@max-[560px]:sr-only">
-        <tr className="border-b-(length:--border-width-regular) border-(--color-border-tertiary) text-left text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) font-(--font-weight-semibold) text-(--color-text-secondary)">
+        <tr className="border-b-hairline border-border text-left text-xs leading-xs font-semibold text-secondary">
           {headers.slice(0, cellCount).map((h, i) => (
             <th
               key={i}
-              className={cn(cell, "pt-0 pb-(--km-gap-row) font-[inherit]")}
+              className={cn(cell, "pt-0 pb-km-gap-row font-[inherit]")}
             >
               {h}
             </th>
@@ -163,7 +163,7 @@ export function DecisionRows({
             className={cn(
               cell,
               // The choice header never wraps; the column grows to it.
-              "pt-0 pr-0 pb-(--km-gap-row) font-[inherit] whitespace-nowrap",
+              "pt-0 pr-0 pb-km-gap-row font-[inherit] whitespace-nowrap",
               align === "end" && "text-right",
             )}
           >
@@ -175,7 +175,7 @@ export function DecisionRows({
         {rows.map((row) => (
           <tr
             key={row.id}
-            className="border-b-(length:--border-width-regular) border-(--color-border-tertiary) last:border-b-0 @max-[560px]:flex @max-[560px]:flex-col @max-[560px]:py-(--km-gap-row) @max-[560px]:[&>td]:py-0 @max-[560px]:[&>td]:pr-0"
+            className="border-b-hairline border-border last:border-b-0 @max-[560px]:flex @max-[560px]:flex-col @max-[560px]:py-km-gap-row @max-[560px]:[&>td]:py-0 @max-[560px]:[&>td]:pr-0"
           >
             {row.cells.map((c, i) => (
               <td key={i} className={cn(cell, "break-words", part(i))}>
@@ -185,7 +185,7 @@ export function DecisionRows({
             <td
               className={cn(
                 cell,
-                "w-px pr-0 @max-[560px]:mt-(--km-gap-row) @max-[560px]:w-auto",
+                "w-px pr-0 @max-[560px]:mt-km-gap-row @max-[560px]:w-auto",
                 align === "end" && "text-right @max-[560px]:text-left",
               )}
             >

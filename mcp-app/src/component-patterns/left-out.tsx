@@ -43,7 +43,7 @@ export function LeftOut({
 
   return (
     <Note kind="leftOut" fact={count} className={className}>
-      <div className="mt-(--km-gap-row) grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-(--km-gap-group) gap-y-(--km-gap-row)">
+      <div className="mt-km-gap-row grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-km-gap-group gap-y-km-gap-row">
         {files.map((f) => (
           <div key={f.file} className="contents">
             <PathChip path={f.file} />

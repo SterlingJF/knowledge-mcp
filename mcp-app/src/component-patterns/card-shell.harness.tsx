@@ -6,7 +6,7 @@ import { meta } from "@/copy/en";
 
 export function HarnessFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-[var(--border-radius-xl)] border-[length:var(--border-width-regular)] border-dashed border-[var(--color-border-secondary)] p-[var(--km-space-6)]">
+    <div className="rounded-xl border-hairline border-dashed border-input p-km-6">
       {children}
     </div>
   );

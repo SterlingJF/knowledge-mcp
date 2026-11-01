@@ -50,6 +50,6 @@ test("the full view caps its width for readable lines", () => {
     </StaticCardHost>,
   );
   expect(container.querySelector("section")?.className).toContain(
-    "max-w-(--km-full-max)",
+    "max-w-km-full-max",
   );
 });

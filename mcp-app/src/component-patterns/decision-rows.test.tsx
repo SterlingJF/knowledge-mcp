@@ -140,13 +140,13 @@ test("narrow layout marks the title, detail and hidden cells", () => {
     />,
   );
   expect(screen.getByText("Decision record").className).toContain(
-    "@max-[560px]:font-(--font-weight-semibold)",
+    "@max-[560px]:font-semibold",
   );
   expect(screen.getByText("Decisions/").className).toContain(
     "@max-[560px]:hidden",
   );
   expect(screen.getByText("x.md").className).toContain(
-    "@max-[560px]:text-(--color-text-secondary)",
+    "@max-[560px]:text-secondary",
   );
   expect(screen.getByText("Choice").tagName).toBe("TH");
 });
@@ -169,9 +169,7 @@ test("move blockers: no title, nothing hidden, choice at the start", () => {
     />,
   );
   const cell = screen.getByText("a.md already exists");
-  expect(cell.className).not.toContain(
-    "@max-[560px]:font-(--font-weight-semibold)",
-  );
+  expect(cell.className).not.toContain("@max-[560px]:font-semibold");
   expect(cell.className).not.toContain("hidden");
   expect(screen.getByText("Your choice").className).not.toContain("text-right");
 });

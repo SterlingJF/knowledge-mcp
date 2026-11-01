@@ -59,7 +59,7 @@ function Live({
         choices={choices}
         onChoiceChange={(id, v) => setChoices({ ...choices, [id]: v })}
       />
-      <p className="text-(length:--font-text-xs-size) text-(--color-text-tertiary)">
+      <p className="text-xs text-muted-foreground">
         {countAccepted(choices)} / {base.length}
       </p>
     </div>
@@ -73,7 +73,7 @@ const blockers: DecisionRow[] = [
     name: "Name taken",
     cells: [
       <span>
-        <b className="font-(--font-weight-semibold)">
+        <b className="font-semibold">
           Decisions/2026-10-28 retire evening build.md
         </b>{" "}
         already exists
@@ -117,8 +117,7 @@ const blockers: DecisionRow[] = [
     name: "No document type",
     cells: [
       <span>
-        <b className="font-(--font-weight-semibold)">scan-0412.md</b> has no
-        document type
+        <b className="font-semibold">scan-0412.md</b> has no document type
       </span>,
     ],
     options: [],
@@ -127,7 +126,7 @@ const blockers: DecisionRow[] = [
 
 const problem = (file: string, rest: string) => (
   <span>
-    <b className="font-(--font-weight-semibold)">{file}</b> {rest}
+    <b className="font-semibold">{file}</b> {rest}
   </span>
 );
 const onlyInChat: DecisionRow[] = [

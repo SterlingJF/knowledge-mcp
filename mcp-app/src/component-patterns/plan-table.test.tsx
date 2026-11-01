@@ -66,6 +66,6 @@ test("columns sit a group gap apart, rows a row gap", () => {
     <PlanTable headers={["File", "Goes to"]} columns={[40, 60]} rows={rows} />,
   );
   const row = screen.getByText("a.md").closest("[role=row]");
-  expect(row?.className).toContain("gap-x-(--km-gap-group)");
-  expect(row?.className).toContain("py-(--km-gap-row)");
+  expect(row?.className).toContain("gap-x-km-gap-group");
+  expect(row?.className).toContain("py-km-gap-row");
 });
