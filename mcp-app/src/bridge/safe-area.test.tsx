@@ -24,11 +24,16 @@ vi.mock("@modelcontextprotocol/ext-apps/react", () => ({
 test("the root padding follows the host's safe area when it changes", () => {
   const { container } = render(<CardHostProvider>card</CardHostProvider>);
   const root = container.querySelector<HTMLElement>("[data-km-root]")!;
-  expect(root.style.padding).toBe("0px");
+  const insets = () =>
+    ["top", "right", "bottom", "left"].map((side) =>
+      root.style.getPropertyValue(`--km-safe-${side}`),
+    );
+  expect(root.className).toContain("pt-(--km-safe-top)");
+  expect(insets()).toEqual(["0px", "0px", "0px", "0px"]);
   act(() => {
     (app.onhostcontextchanged as (p: unknown) => void)({
       safeAreaInsets: { top: 44, right: 0, bottom: 34, left: 0 },
     });
   });
-  expect(root.style.padding).toBe("44px 0px 34px");
+  expect(insets()).toEqual(["44px", "0px", "34px", "0px"]);
 });

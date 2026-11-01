@@ -3,7 +3,7 @@
 // between the inline card and the full view. Nothing here writes a file or calls a server tool.
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useApp, useHostStyles } from "@modelcontextprotocol/ext-apps/react";
 import type { App } from "@modelcontextprotocol/ext-apps/react";
 
@@ -83,15 +83,18 @@ export function cardHost(
 export function HostRoot({ children }: { children: ReactNode }) {
   const insets = useCardHost().safeAreaInsets;
   return (
+    // The insets are the host's runtime values, so they arrive as custom properties for the padding classes.
     <div
       data-km-root=""
+      className="pt-(--km-safe-top) pr-(--km-safe-right) pb-(--km-safe-bottom) pl-(--km-safe-left)"
       style={
-        insets && {
-          paddingTop: insets.top,
-          paddingRight: insets.right,
-          paddingBottom: insets.bottom,
-          paddingLeft: insets.left,
-        }
+        insets &&
+        ({
+          "--km-safe-top": `${insets.top}px`,
+          "--km-safe-right": `${insets.right}px`,
+          "--km-safe-bottom": `${insets.bottom}px`,
+          "--km-safe-left": `${insets.left}px`,
+        } as CSSProperties)
       }
     >
       {children}

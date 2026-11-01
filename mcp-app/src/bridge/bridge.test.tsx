@@ -126,6 +126,10 @@ describe("HostRoot", () => {
       </StaticCardHost>,
     );
     const root = container.querySelector<HTMLElement>("[data-km-root]")!;
-    expect(root.style.padding).toBe("44px 8px 34px 12px");
+    expect(
+      ["top", "right", "bottom", "left"].map((side) =>
+        root.style.getPropertyValue(`--km-safe-${side}`),
+      ),
+    ).toEqual(["44px", "8px", "34px", "12px"]);
   });
 });
