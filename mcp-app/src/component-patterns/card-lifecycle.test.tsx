@@ -234,3 +234,96 @@ describe("press with context and disabled actions", () => {
     expect(result.current.state).toBe("live");
   });
 });
+
+describe("persistence across remounts", () => {
+  const withInstance = {
+    schema: "x",
+    instance: { subject: "a.md", created_at: "2026-10-28T10:00:00Z", seq: 1 },
+  };
+
+  function Remembering() {
+    const life = useCardLifecycle();
+    return (
+      <>
+        <CardShell
+          eyebrow="a"
+          title="a"
+          actions={[save]}
+          state={life.state}
+          frozenLine={life.frozenLine}
+          onAction={(a) => life.press(a, { kept: [1, 3] })}
+        />
+        <output role="status">{JSON.stringify(life.restored ?? null)}</output>
+      </>
+    );
+  }
+
+  function mount(result: unknown) {
+    return render(
+      <StaticCardHost host={stubCardHost({ result: result as never })}>
+        <Remembering />
+      </StaticCardHost>,
+    );
+  }
+
+  test("a frozen card renders frozen after a remount with the same result, with its extra", () => {
+    const first = mount(withInstance);
+    fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+    first.unmount();
+    mount(withInstance);
+    expect(screen.queryByRole("button")).toBeNull();
+    expect(screen.getByText(frozen.approved)).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toBe('{"kept":[1,3]}');
+  });
+
+  test("a result without an instance is keyed by a hash of its content", () => {
+    const first = mount({ schema: "y", rows: [1, 2] });
+    fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+    first.unmount();
+    mount({ schema: "y", rows: [1, 2] });
+    expect(screen.getByText(frozen.approved)).toBeTruthy();
+  });
+
+  test("a different result is not affected", () => {
+    const first = mount(withInstance);
+    fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+    first.unmount();
+    mount({ ...withInstance, instance: { subject: "b.md", seq: 1 } });
+    expect(screen.getByRole("button", { name: "Save C1" })).toBeTruthy();
+  });
+
+  test("blocked storage falls back to memory with no error", () => {
+    const get = vi
+      .spyOn(Storage.prototype, "getItem")
+      .mockImplementation(() => {
+        throw new Error("blocked");
+      });
+    const set = vi
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new Error("blocked");
+      });
+    const first = mount(withInstance);
+    fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+    expect(screen.getByText(frozen.approved)).toBeTruthy();
+    first.unmount();
+    mount(withInstance);
+    expect(screen.getByRole("button", { name: "Save C1" })).toBeTruthy();
+    get.mockRestore();
+    set.mockRestore();
+  });
+
+  test("entries older than 30 days are swept", () => {
+    localStorage.setItem(
+      "km-card:old",
+      JSON.stringify({ state: "frozen", at: Date.now() - 31 * 864e5 }),
+    );
+    localStorage.setItem(
+      "km-card:new",
+      JSON.stringify({ state: "frozen", at: Date.now() }),
+    );
+    mount(withInstance);
+    expect(localStorage.getItem("km-card:old")).toBeNull();
+    expect(localStorage.getItem("km-card:new")).not.toBeNull();
+  });
+});
