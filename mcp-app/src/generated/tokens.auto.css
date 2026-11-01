@@ -200,7 +200,7 @@
   --radius-xl: var(--border-radius-xl);
 }
 
-/* The app's own colour roles, by utility: bg-inverse, text-inverse, bg-tertiary, text-secondary, bg-success, text-success. */
+/* The app's own colour roles, one namespace per utility, so bg and text can name different host variables. */
 
 @theme inline reference {
   --background-color-inverse: var(--color-background-inverse);
@@ -217,7 +217,7 @@
   --border-color-inverse: var(--color-background-inverse);
 }
 
-/* Type, spacing, radius, borders, motion and effects: text-sm, p-km-5, gap-km-gap-group, rounded-sm, border-hairline, animate-km-pulse, shadow-km-focus-ring. */
+/* Type, spacing, radius, borders, motion and effects as Tailwind theme namespaces, so each token is a class. */
 
 @theme inline reference {
   --font-weight-normal: var(--font-weight-normal);

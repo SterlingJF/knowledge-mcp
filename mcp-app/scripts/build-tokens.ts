@@ -183,9 +183,9 @@ const css = [
   block(":root,\n[data-theme]", shadcn),
   "/* Tailwind colours, fonts and radii for shadcn's classes. */\n",
   block("@theme inline", shadcnTheme),
-  "/* The app's own colour roles, by utility: bg-inverse, text-inverse, bg-tertiary, text-secondary, bg-success, text-success. */\n",
+  "/* The app's own colour roles, one namespace per utility, so bg and text can name different host variables. */\n",
   block("@theme inline reference", colourTheme),
-  "/* Type, spacing, radius, borders, motion and effects: text-sm, p-km-5, gap-km-gap-group, rounded-sm, border-hairline, animate-km-pulse, shadow-km-focus-ring. */\n",
+  "/* Type, spacing, radius, borders, motion and effects as Tailwind theme namespaces, so each token is a class. */\n",
   block("@theme inline reference", scaleTheme),
 ].join("\n");
 

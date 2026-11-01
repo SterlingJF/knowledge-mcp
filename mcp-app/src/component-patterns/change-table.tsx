@@ -167,10 +167,7 @@ export function ChangeTable({
                 <span className="whitespace-nowrap">{row.proposed.label}</span>
               ) : row.current ? (
                 row.current.label != null ? (
-                  <CurrentText
-                    label={row.current.label}
-                    className={cn(out && struck)}
-                  >
+                  <CurrentText label={row.current.label} struck={out}>
                     {row.current.text}
                   </CurrentText>
                 ) : (

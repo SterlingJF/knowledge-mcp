@@ -32,5 +32,5 @@ test("long unbroken tokens wrap instead of running past the box", () => {
     />,
   );
   for (const el of container.querySelectorAll("del, ins"))
-    expect(el.className).toContain("[overflow-wrap:anywhere]");
+    expect(el.className).toContain("wrap-anywhere");
 });

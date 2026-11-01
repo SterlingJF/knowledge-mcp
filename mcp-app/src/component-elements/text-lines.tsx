@@ -14,7 +14,7 @@ export function Eyebrow({ className, ...props }: LineProps) {
       className={cn(
         xs,
         tertiary,
-        "font-semibold uppercase tracking-[0.07em]",
+        "font-semibold uppercase tracking-km-eyebrow",
         className,
       )}
       {...props}
@@ -69,14 +69,17 @@ export function FrozenLine({ className, ...props }: LineProps) {
 export function CurrentText({
   label,
   children,
+  struck = false,
   className,
   ...props
 }: Omit<ComponentProps<"span">, "children"> & {
   label: ReactNode;
   children: ReactNode;
+  /** Left out: the text is struck through. */
+  struck?: boolean;
 }) {
   return (
-    <span className={className} {...props}>
+    <span className={cn(struck && "line-through", className)} {...props}>
       <span className="font-semibold">{label}:</span>{" "}
       <span className={tertiary}>{children}</span>
     </span>

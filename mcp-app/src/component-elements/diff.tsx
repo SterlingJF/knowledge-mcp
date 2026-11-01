@@ -21,14 +21,14 @@ export function Diff({
         line.kind === "removed" ? (
           <del
             key={index}
-            className="block bg-danger p-km-pad-line text-destructive line-through [overflow-wrap:anywhere]"
+            className="block bg-danger p-km-pad-line text-destructive line-through wrap-anywhere"
           >
             {line.text}
           </del>
         ) : (
           <ins
             key={index}
-            className="block bg-success p-km-pad-line text-success no-underline [overflow-wrap:anywhere]"
+            className="block bg-success p-km-pad-line text-success no-underline wrap-anywhere"
           >
             {line.text}
           </ins>
