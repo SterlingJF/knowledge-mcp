@@ -189,19 +189,57 @@ const css = [
   block("@theme inline reference", scaleTheme),
 ].join("\n");
 
+// The same names for tailwind-merge, so cn() knows p-km-5 is padding and border-hairline a width, not a colour.
+const names = (
+  theme: Record<string, string>,
+  prefix: string,
+  skip = "",
+): Array<string> =>
+  Object.keys(theme)
+    .filter((name) => name.startsWith(prefix) && !(skip && name.includes(skip)))
+    .map((name) => name.slice(prefix.length));
+const merge = {
+  spacing: names(scaleTheme, "--spacing-"),
+  text: names(scaleTheme, "--text-", "--line-height"),
+  leading: names(scaleTheme, "--leading-"),
+  radius: names(scaleTheme, "--radius-"),
+  shadow: names(scaleTheme, "--shadow-"),
+  tracking: names(scaleTheme, "--tracking-"),
+  animate: names(scaleTheme, "--animate-"),
+  opacity: names(scaleTheme, "--opacity-"),
+  borderWidth: names(scaleTheme, "--border-width-"),
+  color: [
+    ...new Set([
+      ...names(colourTheme, "--background-color-"),
+      ...names(colourTheme, "--text-color-"),
+      ...names(colourTheme, "--border-color-"),
+    ]),
+  ],
+};
+const ts = `// Generated from design/mcp-app/kmtokens.js by scripts/build-tokens.ts. Edit the tokens, not this file.
+// The token class names, for tailwind-merge's theme in lib/utils.ts.
+export const tokenClasses = ${JSON.stringify(merge, null, 2)} as const;
+`;
+
+const outputs: Array<[URL, string]> = [
+  [target, css],
+  [new URL("../src/generated/token-classes.auto.ts", import.meta.url), ts],
+];
 if (process.argv.includes("--check")) {
-  let current = "";
-  try {
-    current = readFileSync(target, "utf8");
-  } catch {
-    // A missing file is out of date too.
-  }
-  if (current !== css) {
-    process.stderr.write(
-      "src/generated/tokens.auto.css is out of date. Run pnpm --filter mcp-app tokens.\n",
-    );
-    process.exit(1);
+  for (const [file, content] of outputs) {
+    let current = "";
+    try {
+      current = readFileSync(file, "utf8");
+    } catch {
+      // A missing file is out of date too.
+    }
+    if (current !== content) {
+      process.stderr.write(
+        `${file.pathname.split("/mcp-app/")[1]} is out of date. Run pnpm --filter mcp-app tokens.\n`,
+      );
+      process.exit(1);
+    }
   }
 } else {
-  writeFileSync(target, css);
+  for (const [file, content] of outputs) writeFileSync(file, content);
 }
