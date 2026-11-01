@@ -139,3 +139,17 @@ test("a current text without its own label shows the column label only when stac
   expect(cells[2].textContent).toBe("Status: Proposed.");
   expect(cells[3].textContent).toBe("notes.md:3");
 });
+
+test("a frozen table given kept strikes the rows left out", () => {
+  render(<ChangeTable rows={rows} kept={new Set([2])} />);
+  expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
+  const c1 = screen.getByText("C1").closest("[role=row]");
+  const c2 = screen.getByText("C2").closest("[role=row]");
+  expect(c1?.getAttribute("data-left-out")).toBe("true");
+  expect(c2?.hasAttribute("data-left-out")).toBe(false);
+});
+
+test("a frozen table without kept shows every row kept", () => {
+  render(<ChangeTable rows={rows} />);
+  expect(document.querySelector("[data-left-out]")).toBeNull();
+});

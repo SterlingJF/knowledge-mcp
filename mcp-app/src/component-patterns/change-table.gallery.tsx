@@ -62,6 +62,11 @@ export default {
         <ChangeTable rows={rows} draft />
       </div>
     ),
+    "Frozen, C1 left out": (
+      <div className={wide}>
+        <ChangeTable rows={rows} kept={new Set([2, 3])} />
+      </div>
+    ),
     "Narrow (under 560px)": (
       <div className="@container max-w-[24rem]">
         <Live initial={[1]} />

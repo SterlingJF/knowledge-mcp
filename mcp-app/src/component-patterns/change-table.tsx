@@ -106,7 +106,8 @@ export function ChangeTable({
     !frozen && "pointer-coarse:min-h-(--km-target)",
   );
   const keptSet = kept ?? new Set(rows.map((_, i) => i + 1));
-  const isKept = (n: number) => frozen || keptSet.has(n);
+  // A frozen table given `kept` still shows what was left out; without it every row reads as kept.
+  const isKept = (n: number) => draft || keptSet.has(n);
 
   const setOne = (n: number, keep: boolean) => {
     const next = new Set(keptSet);
