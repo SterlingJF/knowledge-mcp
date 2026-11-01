@@ -16492,9 +16492,9 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://knowledge-mcp/app.html"
+          "resourceUri": "ui://knowledge-mcp/app-{hash}.html"
         },
-        "ui/resourceUri": "ui://knowledge-mcp/app.html"
+        "ui/resourceUri": "ui://knowledge-mcp/app-{hash}.html"
       }
     },
     {
@@ -23090,9 +23090,9 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://knowledge-mcp/app.html"
+          "resourceUri": "ui://knowledge-mcp/app-{hash}.html"
         },
-        "ui/resourceUri": "ui://knowledge-mcp/app.html"
+        "ui/resourceUri": "ui://knowledge-mcp/app-{hash}.html"
       }
     },
     {
@@ -24997,9 +24997,9 @@
       },
       "_meta": {
         "ui": {
-          "resourceUri": "ui://knowledge-mcp/app.html"
+          "resourceUri": "ui://knowledge-mcp/app-{hash}.html"
         },
-        "ui/resourceUri": "ui://knowledge-mcp/app.html"
+        "ui/resourceUri": "ui://knowledge-mcp/app-{hash}.html"
       }
     },
     {

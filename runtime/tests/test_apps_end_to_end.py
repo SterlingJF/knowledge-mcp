@@ -10,7 +10,7 @@ from knowledge_mcp import apps
 from tests.harness import server_parameters, session
 from tests.test_proposal_end_to_end import DEMO, TABLE
 
-URI = "ui://knowledge-mcp/app.html"
+URI = apps.URI
 MIME = "text/html;profile=mcp-app"
 
 
@@ -18,15 +18,32 @@ def test_server_lists_the_app_resource_with_its_ui_meta(tmp_path):
     async def steps(client):
         return (await client.list_resources()).resources
 
-    (resource,) = session(server_parameters(tmp_path), steps)
-    assert str(resource.uri) == URI
-    assert resource.mime_type == MIME
-    assert resource.meta == {
-        "ui": {
-            "prefersBorder": True,
-            "csp": {"resourceDomains": ["https://assets.claude.ai"]},
+    resources = session(server_parameters(tmp_path), steps)
+    assert sorted(str(resource.uri) for resource in resources) == sorted(
+        [URI, apps.BARE_URI]
+    )
+    for resource in resources:
+        assert resource.mime_type == MIME
+        assert resource.meta == {
+            "ui": {
+                "prefersBorder": True,
+                "csp": {"resourceDomains": ["https://assets.claude.ai"]},
+            }
         }
-    }
+
+
+def test_each_build_of_the_view_gets_its_own_uri():
+    # Hosts cache by URI: the tools point at a URI that changes with app.html.
+    assert apps.URI != apps.BARE_URI
+    assert apps.URI.startswith("ui://knowledge-mcp/app-")
+
+
+def test_the_bare_uri_still_serves_the_current_view(tmp_path):
+    async def steps(client):
+        return (await client.read_resource(apps.BARE_URI)).contents
+
+    (content,) = session(server_parameters(tmp_path), steps)
+    assert content.text == apps.HTML.read_text(encoding="utf-8")
 
 
 def test_server_reads_the_packaged_app_html(tmp_path):

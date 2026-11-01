@@ -11,6 +11,7 @@ import pytest
 import yaml
 from mcp.client import Client
 
+from knowledge_mcp import apps
 from knowledge_mcp import document_types as records
 from knowledge_mcp.main import build_server
 from knowledge_mcp.scope import Workspace
@@ -88,7 +89,9 @@ def listed_tools(tmp_path: Path) -> str:
             for tool in tools
         ]
     }
-    return json.dumps(listing, indent=2, ensure_ascii=False) + "\n"
+    # The view's URI carries a hash of app.html; the snapshot keeps a placeholder for it.
+    text = json.dumps(listing, indent=2, ensure_ascii=False) + "\n"
+    return text.replace(apps.URI, "ui://knowledge-mcp/app-{hash}.html")
 
 
 def test_tools_json_is_the_listed_tools(tmp_path, write_snapshots):
