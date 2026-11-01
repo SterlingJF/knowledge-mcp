@@ -102,11 +102,23 @@ export function saveContext(p: Proposal, kept: Set<number>) {
   };
 }
 
-/** A change's name: the section it touches, else its proposed text. */
+const HEAD_CHARS = 24;
+
+/** Text cut at a word to a short head, with an ellipsis when cut. */
+function head(text: string): string {
+  if (text.length <= HEAD_CHARS) return text;
+  const cut = text.slice(0, HEAD_CHARS + 1);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > 0 ? cut.slice(0, space) : cut.slice(0, HEAD_CHARS)).replace(/[\s.,;:]+$/, "")}${proposalCopy.ellipsis}`;
+}
+
+/** A change's label, from the document or the proposal, when either has one. */
+const rowLabelOnly = (p: Proposal, i: number) =>
+  p.rows[i].current?.label ?? p.rows[i].proposed.label;
+
+/** A change's name: the section it touches, else a short head of its proposed text. */
 const rowName = (p: Proposal, i: number) =>
-  p.rows[i].current?.label ??
-  p.rows[i].proposed.label ??
-  p.rows[i].proposed.text;
+  rowLabelOnly(p, i) ?? head(p.rows[i].proposed.text);
 const rowLabel = (p: Proposal, i: number) =>
   `${change.number(i + 1)} ${rowName(p, i)}`;
 
@@ -153,7 +165,11 @@ export function summaryRows(p: Proposal): KeyValueRow[] {
       label: label.needsYou,
       value: (
         <>
-          <b>{rowLabel(p, first)}</b>
+          <b>
+            {[change.number(first + 1), rowLabelOnly(p, first)]
+              .filter(Boolean)
+              .join(" ")}
+          </b>
           {line.summaryJoin}
           {p.rows[first].proposed.text}
           {conflicts.length > 1 &&
@@ -200,7 +216,9 @@ function MetaLine({ p, full }: { p: Proposal; full: boolean }) {
   ].filter((w): w is string => w != null);
   return (
     <>
-      {where && <PathChip path={where} />}
+      {where && (
+        <PathChip path={where.split("/").at(-1) || where} title={where} />
+      )}
       {words.length > 0 && <span>{words.join(line.summaryJoin)}</span>}
       {p.reader && !p.reader.confirmed && (
         <Badge tone="neutral">

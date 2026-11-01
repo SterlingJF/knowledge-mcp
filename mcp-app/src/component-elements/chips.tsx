@@ -51,15 +51,18 @@ function Chip({
   icon: Icon,
   mono = true,
   className,
+  title,
   children,
 }: {
   icon: LucideIcon;
   mono?: boolean;
   className?: string;
+  /** Shown on hover, such as the full path behind a file name. */
+  title?: string;
   children: ReactNode;
 }) {
   return (
-    <span className={cn(chipClass, className)}>
+    <span className={cn(chipClass, className)} title={title}>
       <Icon aria-hidden className="size-(--km-icon) shrink-0" />
       <span
         className={cn(
@@ -126,16 +129,19 @@ export function PathChip({
   path,
   folder = false,
   className,
+  title,
 }: {
   path: string;
   folder?: boolean;
   className?: string;
+  title?: string;
 }) {
   return (
     <Chip
       icon={folder ? Folder : FileText}
       mono={!folder}
       className={className}
+      title={title}
     >
       {path}
     </Chip>

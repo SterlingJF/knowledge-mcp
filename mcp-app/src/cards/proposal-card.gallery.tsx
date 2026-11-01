@@ -7,6 +7,25 @@ import { ProposalView } from "./proposal-card";
 import type { Pressed } from "./proposal-card";
 import { e02, newDocument } from "./proposal-card.fixture";
 
+// What Claude Desktop sent in the live check: an absolute path and a row with no label.
+const liveCheck: Proposal = {
+  ...e02,
+  rows: [
+    {
+      proposed: { text: "Status: Draft. Approval is disputed." },
+      mark: "conflicting",
+      sources: [{ file: "meeting-notes.md", line_number: 11 }],
+    },
+    ...e02.rows.slice(1),
+  ],
+  instance: {
+    subject:
+      "/Users/someone/Desktop/side_projects/knowledge-mcp-live-check/cache-proposal.md",
+    created_at: "2026-11-01T09:00:00.000Z",
+    seq: 3,
+  },
+};
+
 const lifecycle = (
   state: CardLifecycle["state"],
   frozenLine?: string,
@@ -46,6 +65,7 @@ export default {
   name: "Proposal card",
   stories: {
     Inline: <Story />,
+    "Absolute path, no label": <Story proposal={liveCheck} />,
     "Full view": <Story mode="fullscreen" />,
     "Full view, C1 left out": (
       <Story mode="fullscreen" kept={new Set([2, 3, 4])} />

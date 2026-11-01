@@ -294,3 +294,32 @@ test("D05F full view: filing note, open questions, whole-file chip", () => {
   ).toBeTruthy();
   expect(screen.getByText("vendor-quote.xlsx")).toBeTruthy();
 });
+
+test("a label-less row names its change once, with a short head", () => {
+  const text = "Status: Draft. Approval is disputed.";
+  const p: Proposal = {
+    ...e02,
+    rows: [{ proposed: { text }, mark: "conflicting", sources: [] }],
+  };
+  const rows = summaryRows(p);
+  expect(rows[0].value).toBe("C1 Status: Draft. Approval…");
+  render(<>{rows.find((r) => r.label === label.needsYou)?.value}</>);
+  expect(screen.getByText("C1").tagName).toBe("B");
+  expect(document.body.textContent).toBe(["C1", text].join(line.summaryJoin));
+});
+
+test("an absolute subject shows its file name, the full path on hover", () => {
+  const path =
+    "/Users/someone/Desktop/side_projects/knowledge-mcp-live-check/cache-proposal.md";
+  const p = {
+    ...e02,
+    instance: { ...e02.instance, subject: path },
+  } as Proposal;
+  for (const mode of ["inline", "fullscreen"] as const) {
+    const { view } = renderCard(p, mode);
+    const chip = screen.getByText("cache-proposal.md").closest("[title]");
+    expect(chip?.getAttribute("title")).toBe(path);
+    expect(screen.queryByText(path)).toBeNull();
+    view.unmount();
+  }
+});

@@ -212,6 +212,8 @@ export const proposal = {
   unsourced: (question: string) => `${question}${line.summaryJoin}no source`,
   /** Open questions listed in a note: `Rollout owner · no source, Budget · no source.` */
   openList: (items: Array<string>) => `${items.join(", ")}.`,
+  /** Ends a change's text cut short to a head: `Draft. Approval is…`. */
+  ellipsis: "…",
   toAnswer: (count: number) =>
     count === 1 ? "One thing to answer." : `${count} things to answer.`,
   staysOpen: (count: number) =>
