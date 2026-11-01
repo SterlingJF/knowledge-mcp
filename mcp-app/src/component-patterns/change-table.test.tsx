@@ -116,3 +116,26 @@ test("on touch, every row with a tick box is at least the target tall", () => {
   expect(header.className).toContain("pointer-coarse:min-h-(--km-target)");
   expect(first.className).toContain("pointer-coarse:min-h-(--km-target)");
 });
+
+test("a current text without its own label shows the column label only when stacked", () => {
+  render(
+    <ChangeTable
+      rows={[
+        {
+          current: { text: "Status: Draft." },
+          proposed: { text: "Status: Proposed." },
+          sources: [{ file: "notes.md", line_number: 3 }],
+        },
+      ]}
+    />,
+  );
+  const cell = screen.getByText("Status: Draft.").closest("[role=cell]")!;
+  const narrow = cell.querySelector("[data-narrow-label]")!;
+  expect(narrow.textContent).toBe("Current: ");
+  expect(narrow.className).toContain("hidden");
+  expect(narrow.className).toContain("@max-[560px]:inline");
+  // Proposed and Source cells carry no column label of their own.
+  const cells = cell.closest("[role=row]")!.querySelectorAll("[role=cell]");
+  expect(cells[2].textContent).toBe("Status: Proposed.");
+  expect(cells[3].textContent).toBe("notes.md:3");
+});

@@ -42,3 +42,14 @@ test("flat, no Full view button, and a press sends then returns inline", () => {
   expect(host.requested).toEqual(["inline"]);
   expect(screen.getByText(frozen.approved)).toBeTruthy();
 });
+
+test("the full view caps its width for readable lines", () => {
+  const { container } = render(
+    <StaticCardHost host={stubCardHost({ displayMode: "fullscreen" })}>
+      <Full />
+    </StaticCardHost>,
+  );
+  expect(container.querySelector("section")?.className).toContain(
+    "max-w-(--km-full-max)",
+  );
+});

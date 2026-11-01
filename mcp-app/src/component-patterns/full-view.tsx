@@ -30,6 +30,8 @@ export function FullView({
   return (
     <CardShell
       {...shell}
+      // Lines stay readable on a wide window: the frames cap the full view at 1080px, left-aligned.
+      className="max-w-(--km-full-max)"
       flat
       {...lifecycleProps(lifecycle)}
       actions={actions}

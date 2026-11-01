@@ -169,12 +169,25 @@ export function ChangeTable({
               {draft ? (
                 <span className="whitespace-nowrap">{row.proposed.label}</span>
               ) : row.current ? (
-                <CurrentText
-                  label={row.current.label ?? labels.current}
-                  className={cn(out && struck)}
-                >
-                  {row.current.text}
-                </CurrentText>
+                row.current.label != null ? (
+                  <CurrentText
+                    label={row.current.label}
+                    className={cn(out && struck)}
+                  >
+                    {row.current.text}
+                  </CurrentText>
+                ) : (
+                  <span className={cn(out && struck)}>
+                    {/* The header names the column; stacked, the header row is hidden, so the cell says it. */}
+                    <span
+                      data-narrow-label
+                      className="hidden font-(--font-weight-semibold) @max-[560px]:inline"
+                    >
+                      {labels.current}:{" "}
+                    </span>
+                    <span className={tertiary}>{row.current.text}</span>
+                  </span>
+                )
               ) : (
                 <span className={cn(tertiary, out && struck)}>
                   {line.addition}
