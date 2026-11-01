@@ -178,7 +178,7 @@ export function EditView({
             lines={changes.lines.map((l) => ({ kind: l.change, text: l.text }))}
           />
           {changes.more > 0 && (
-            <p className="mt-[var(--km-space-3)] text-[length:var(--font-text-xs-size)] text-[color:var(--color-text-secondary)]">
+            <p className="mt-km-3 text-xs text-secondary">
               {editResult.moreLines(changes.more)}
             </p>
           )}

@@ -360,7 +360,7 @@ export function MoveView({
 function MovesTable({ plan: p }: { plan: DocumentMoves }) {
   const stays = p.stays ?? [];
   return (
-    <div className="flex flex-col gap-(--km-gap-group)">
+    <div className="flex flex-col gap-km-gap-group">
       <PlanTable
         headers={[moves.label.file, moves.label.goesTo]}
         columns={[45, 55]}
