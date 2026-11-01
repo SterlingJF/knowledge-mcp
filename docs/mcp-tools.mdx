@@ -62,31 +62,31 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 
 ### `kb_get_document_type`
 
-| Argument                | Type                                         | Required | Meaning                                                                                                                                                                                                                                                                                                             |
-| ----------------------- | -------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string                                       | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                     |
-| `name`                  | string                                       | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `folders`               | list of string                               | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                     |
-| `knowledge_bus_folders` | list of object                               | yes      | Every folder containing .knowledge-bus/, including peer folders. Include empty configuration folders. Classification uses the ancestors of the subject document; filing compares peers under the applicable universe specs.                                                                                         |
-| `role`                  | string                                       | no       | The reader's role, such as maintainer. Put document types for that role first.                                                                                                                                                                                                                                      |
-| `record`                | string                                       | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
-| `record_digest`         | string, pattern `^sha256:[0-9a-f]{64}$`      | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
-| `changes`               | list of object or object or object or object | no       | Files changed since the document-types file was last saved. Send them with `record` or `record_digest`. knowledge-mcp applies the changes to the entries for this answer only.                                                                                                                                      |
-| `listing`               | list of object                               | no       |                                                                                                                                                                                                                                                                                                                     |
-| `conventions`           | string                                       | no       | Current target conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                      |
-| `conventions_digest`    | string                                       | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                                                                                                                                                                                                                                |
-| `filing_values`         | list of object                               | no       |                                                                                                                                                                                                                                                                                                                     |
-| `conventions_files`     | list of object or object                     | no       |                                                                                                                                                                                                                                                                                                                     |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                     |
+| `name`                  | string                                            | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                     |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | Every folder containing .knowledge-bus/, including peer folders. Include empty configuration folders. Classification uses the ancestors of the subject document; filing compares peers under the applicable universe specs.                                                                                         |
+| `role`                  | string or null                                    | no       | The reader's role, such as maintainer. Put document types for that role first.                                                                                                                                                                                                                                      |
+| `record`                | string or null                                    | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
+| `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
+| `changes`               | list of [FileChange](#filechange) or null         | no       | Files changed since the document-types file was last saved. Send them with `record` or `record_digest`. knowledge-mcp applies the changes to the entries for this answer only.                                                                                                                                      |
+| `listing`               | list of [ListedFile](#listedfile) or null         | no       |                                                                                                                                                                                                                                                                                                                     |
+| `conventions`           | string or null                                    | no       | Current target conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                      |
+| `conventions_digest`    | string or null                                    | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                                                                                                                                                                                                                                |
+| `filing_values`         | list of [FilingValue](#filingvalue) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
+| `conventions_files`     | list of [ConventionFile](#conventionfile) or null | no       |                                                                                                                                                                                                                                                                                                                     |
 
 ### `kb_list_audiences`
 
-| Argument                | Type           | Required | Meaning                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | -------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string         | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
-| `folders`               | list of string | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
-| `knowledge_bus_folders` | list of object | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
-| `document_type`         | string         | yes      | A document type id, such as `design-doc`.                                                                                                                                                                                                                                                                      |
-| `universe_spec`         | string         | no       | Id of the universe spec to use when the document type appears in more than one universe spec that applies.                                                                                                                                                                                                     |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `document_type`         | string                                            | yes      | A document type id, such as `design-doc`.                                                                                                                                                                                                                                                                      |
+| `universe_spec`         | string or null                                    | no       | Id of the universe spec to use when the document type appears in more than one universe spec that applies.                                                                                                                                                                                                     |
 
 ### `kb_list_convention_templates`
 
@@ -96,12 +96,12 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 
 ### `kb_list_conventions`
 
-| Argument                | Type                     | Required | Meaning                                                                                                         |
-| ----------------------- | ------------------------ | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `location`              | string                   | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
-| `folder`                | string                   | yes      |                                                                                                                 |
-| `knowledge_bus_folders` | list of object           | yes      |                                                                                                                 |
-| `conventions_files`     | list of object or object | yes      |                                                                                                                 |
+| Argument                | Type                                              | Required | Meaning                                                                                                         |
+| ----------------------- | ------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
+| `folder`                | string                                            | yes      |                                                                                                                 |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      |                                                                                                                 |
+| `conventions_files`     | list of [ConventionFile](#conventionfile)         | yes      |                                                                                                                 |
 
 ### `kb_list_edits`
 
@@ -111,161 +111,161 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 
 ### `kb_prepare_conventions`
 
-| Argument                | Type                     | Required | Meaning                                                                                                         |
-| ----------------------- | ------------------------ | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `location`              | string                   | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
-| `conventions`           | string                   | no       | Current target conventions file text. Send empty text when the file is absent.                                  |
-| `conventions_digest`    | string                   | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                            |
-| `knowledge_bus_folders` | list of object           | no       |                                                                                                                 |
-| `changes`               | list of object or object | no       |                                                                                                                 |
-| `allowed_by`            | object                   | no       | The person's permission for the save or the edit.                                                               |
-| `folder`                | string                   | no       |                                                                                                                 |
-| `conventions_files`     | list of object or object | no       |                                                                                                                 |
-| `from_parent`           | list of object           | no       |                                                                                                                 |
+| Argument                | Type                                                        | Required | Meaning                                                                                                         |
+| ----------------------- | ----------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                                      | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
+| `conventions`           | string or null                                              | no       | Current target conventions file text. Send empty text when the file is absent.                                  |
+| `conventions_digest`    | string or null                                              | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                            |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder)           | no       |                                                                                                                 |
+| `changes`               | list of [Change](#change)                                   | no       |                                                                                                                 |
+| `allowed_by`            | [AllowedBy](#allowedby) or null                             | no       |                                                                                                                 |
+| `folder`                | string                                                      | no       |                                                                                                                 |
+| `conventions_files`     | list of [ConventionFile](#conventionfile) or null           | no       |                                                                                                                 |
+| `from_parent`           | list of [ConventionReference](#conventionreference) or null | no       |                                                                                                                 |
 
 ### `kb_prepare_document_move`
 
-| Argument                | Type                                                 | Required | Meaning                                                                                                                                                                                                                                                                                                             |
-| ----------------------- | ---------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string                                               | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `old_path`              | string, pattern `^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$` | yes      | Path relative to the knowledge-base root, with forward slashes between folders.                                                                                                                                                                                                                                     |
-| `path`                  | string, pattern `^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$` | yes      | Path relative to the knowledge-base root, with forward slashes between folders.                                                                                                                                                                                                                                     |
-| `listing`               | list of object                                       | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `documents`             | list of object                                       | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `case_mode`             | `sensitive` or `insensitive`                         | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `allowed_by`            | object                                               | yes      | The person's permission for the save or the edit.                                                                                                                                                                                                                                                                   |
-| `knowledge_bus_folders` | list of object                                       | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `record`                | string                                               | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
-| `record_digest`         | string, pattern `^sha256:[0-9a-f]{64}$`              | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
-| `searched`              | boolean                                              | no       |                                                                                                                                                                                                                                                                                                                     |
-| `search`                | list of string                                       | no       |                                                                                                                                                                                                                                                                                                                     |
-| `bindings`              | list of object                                       | no       |                                                                                                                                                                                                                                                                                                                     |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `old_path`              | [MovePath](#movepath)                             | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `path`                  | [MovePath](#movepath)                             | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `listing`               | list of [ListedFile](#listedfile)                 | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `documents`             | list of [MoveDocument](#movedocument)             | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `case_mode`             | `sensitive` or `insensitive`                      | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `allowed_by`            | [AllowedBy](#allowedby)                           | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `record`                | string or null                                    | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
+| `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
+| `searched`              | boolean                                           | no       |                                                                                                                                                                                                                                                                                                                     |
+| `search`                | list of string or null                            | no       |                                                                                                                                                                                                                                                                                                                     |
+| `bindings`              | list of [LinkBinding](#linkbinding) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
 
 ### `kb_prepare_document_moves`
 
-| Argument                | Type                                    | Required | Meaning                                                                                                                                                                                                                                                                                                             |
-| ----------------------- | --------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string                                  | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `moves`                 | list of object                          | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `listing`               | list of object                          | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `documents`             | list of object                          | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `case_mode`             | `sensitive` or `insensitive`            | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `knowledge_bus_folders` | list of object                          | yes      |                                                                                                                                                                                                                                                                                                                     |
-| `record`                | string                                  | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
-| `record_digest`         | string, pattern `^sha256:[0-9a-f]{64}$` | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
-| `allowed_by`            | object                                  | no       | The person's permission for the save or the edit.                                                                                                                                                                                                                                                                   |
-| `searched`              | boolean                                 | no       |                                                                                                                                                                                                                                                                                                                     |
-| `search`                | list of string                          | no       |                                                                                                                                                                                                                                                                                                                     |
-| `bindings`              | list of object                          | no       |                                                                                                                                                                                                                                                                                                                     |
-| `summary`               | string                                  | no       | What the moves are for, in one line, such as `File the new files`. The answer echoes it.                                                                                                                                                                                                                            |
-| `folder`                | string                                  | no       | The folder the moved files come from, such as `Inbox`. The answer echoes it.                                                                                                                                                                                                                                        |
-| `stays`                 | list of object                          | no       | Files you leave where they are, each with the reason the person sees, such as `no document type` from a filing review. The answer echoes them.                                                                                                                                                                      |
-| `naming`                | list of object                          | no       | For a move's destination `path`, the naming rule or convention that produced its name, such as `date + title`. The answer echoes them.                                                                                                                                                                              |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `moves`                 | list of [DocumentMove](#documentmove)             | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `listing`               | list of [ListedFile](#listedfile)                 | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `documents`             | list of [MoveDocument](#movedocument)             | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `case_mode`             | `sensitive` or `insensitive`                      | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      |                                                                                                                                                                                                                                                                                                                     |
+| `record`                | string or null                                    | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
+| `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
+| `allowed_by`            | [AllowedBy](#allowedby) or null                   | no       |                                                                                                                                                                                                                                                                                                                     |
+| `searched`              | boolean                                           | no       |                                                                                                                                                                                                                                                                                                                     |
+| `search`                | list of string or null                            | no       |                                                                                                                                                                                                                                                                                                                     |
+| `bindings`              | list of [LinkBinding](#linkbinding) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
+| `summary`               | string or null                                    | no       | What the moves are for, in one line, such as `File the new files`. The answer echoes it.                                                                                                                                                                                                                            |
+| `folder`                | string or null                                    | no       | The folder the moved files come from, such as `Inbox`. The answer echoes it.                                                                                                                                                                                                                                        |
+| `stays`                 | list of [MoveStay](#movestay) or null             | no       | Files you leave where they are, each with the reason the person sees, such as `no document type` from a filing review. The answer echoes them.                                                                                                                                                                      |
+| `naming`                | list of [MoveNaming](#movenaming) or null         | no       | For a move's destination `path`, the naming rule or convention that produced its name, such as `date + title`. The answer echoes them.                                                                                                                                                                              |
 
 ### `kb_prepare_document_types`
 
-| Argument                | Type                                         | Required | Meaning                                                                                                                                                                                                                                                                                                             |
-| ----------------------- | -------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string                                       | yes      | The knowledge base root folder as plain text, such as a local path, a Drive folder link or a Notion page. knowledge-mcp logs this text and never opens the location.                                                                                                                                                |
-| `record`                | string                                       | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
-| `record_digest`         | string, pattern `^sha256:[0-9a-f]{64}$`      | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
-| `knowledge_bus_folders` | list of object                               | no       | Every knowledge base folder that holds a `.knowledge-bus/` folder, even one with no `*.kbp.yaml` file. The bundled universe specs apply to a file when no `.knowledge-bus/` folder between the root and the file holds a `*.kbp.yaml` file or `workspace.yaml`.                                                     |
-| `listing`               | list of object                               | no       | Every knowledge-base file, including attachments and files in nested folders. Exclude files beneath every `.knowledge-bus/` folder. Send the listing after complete enumeration; an incomplete listing can produce false deletion claims.                                                                           |
-| `changes`               | list of object or object or object or object | no       | Files changed since the document-types file was last saved.                                                                                                                                                                                                                                                         |
-| `entries`               | list of object                               | no       | Send your document type choices and any document types or readers specified by the person.                                                                                                                                                                                                                          |
-| `recheck`               | boolean                                      | no       | True to put every file with an entry back in `to_settle`, except files with a `set_by: person` entry.                                                                                                                                                                                                               |
-| `allowed_by`            | object                                       | no       | The person's permission for the save or the edit.                                                                                                                                                                                                                                                                   |
-| `conventions`           | string                                       | no       | Current target conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                      |
-| `conventions_digest`    | string                                       | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                                                                                                                                                                                                                                |
-| `filing_values`         | list of object                               | no       |                                                                                                                                                                                                                                                                                                                     |
-| `conventions_files`     | list of object or object                     | no       |                                                                                                                                                                                                                                                                                                                     |
-| `filing_review`         | object                                       | no       |                                                                                                                                                                                                                                                                                                                     |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | The knowledge base root folder as plain text, such as a local path, a Drive folder link or a Notion page. knowledge-mcp logs this text and never opens the location.                                                                                                                                                |
+| `record`                | string or null                                    | no       | The unedited text of `.knowledge-bus/plugins/knowledge-mcp/document-types.yaml` under the knowledge base root folder. When that file is missing, send the text of `.knowledge-bus/plugins/knowledge-mcp/record.yaml`, which knowledge-mcp 0.2.1 and earlier used. Send an empty string when both files are missing. |
+| `record_digest`         | [Digest](#digest) or null                         | no       | Send the document-types digest from an earlier result in this session in place of `record` while the file remains unchanged.                                                                                                                                                                                        |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | no       | Every knowledge base folder that holds a `.knowledge-bus/` folder, even one with no `*.kbp.yaml` file. The bundled universe specs apply to a file when no `.knowledge-bus/` folder between the root and the file holds a `*.kbp.yaml` file or `workspace.yaml`.                                                     |
+| `listing`               | list of [ListedFile](#listedfile) or null         | no       | Every knowledge-base file, including attachments and files in nested folders. Exclude files beneath every `.knowledge-bus/` folder. Send the listing after complete enumeration; an incomplete listing can produce false deletion claims.                                                                           |
+| `changes`               | list of [FileChange](#filechange) or null         | no       | Files changed since the document-types file was last saved.                                                                                                                                                                                                                                                         |
+| `entries`               | list of [EntryItem](#entryitem) or null           | no       | Send your document type choices and any document types or readers specified by the person.                                                                                                                                                                                                                          |
+| `recheck`               | boolean or null                                   | no       | True to put every file with an entry back in `to_settle`, except files with a `set_by: person` entry.                                                                                                                                                                                                               |
+| `allowed_by`            | [AllowedBy](#allowedby) or null                   | no       |                                                                                                                                                                                                                                                                                                                     |
+| `conventions`           | string or null                                    | no       | Current target conventions file text. Send empty text when the file is absent.                                                                                                                                                                                                                                      |
+| `conventions_digest`    | string or null                                    | no       | Conventions digest received in this session. Reuse while the file remains unchanged.                                                                                                                                                                                                                                |
+| `filing_values`         | list of [FilingValue](#filingvalue) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
+| `conventions_files`     | list of [ConventionFile](#conventionfile) or null | no       |                                                                                                                                                                                                                                                                                                                     |
+| `filing_review`         | [FilingReview](#filingreview) or null             | no       |                                                                                                                                                                                                                                                                                                                     |
 
 ### `kb_prepare_import`
 
-| Argument                | Type           | Required | Meaning                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | -------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string         | yes      | The source document's location as plain text, such as a local path, a Drive link, a Notion page or `pasted in chat`. knowledge-mcp logs this text and never opens the location.                                                                                                                                |
-| `text`                  | string         | yes      | The document's text, as read from its source or pasted by the person.                                                                                                                                                                                                                                          |
-| `folders`               | list of string | yes      | Folder names from the knowledge base root folder down to the destination folder. Empty for the root folder or when the person named no folder.                                                                                                                                                                 |
-| `knowledge_bus_folders` | list of object | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | The source document's location as plain text, such as a local path, a Drive link, a Notion page or `pasted in chat`. knowledge-mcp logs this text and never opens the location.                                                                                                                                |
+| `text`                  | string                                            | yes      | The document's text, as read from its source or pasted by the person.                                                                                                                                                                                                                                          |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge base root folder down to the destination folder. Empty for the root folder or when the person named no folder.                                                                                                                                                                 |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
 
 ### `kb_prepare_proposal`
 
-| Argument          | Type                                    | Required | Meaning                                                                                                                                                                                                                                        |
-| ----------------- | --------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`        | string                                  | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                |
-| `summary`         | string                                  | yes      | What the proposal changes, in one line.                                                                                                                                                                                                        |
-| `rows`            | list of object                          | yes      | One row per change, in display order. The card names row n change Cn.                                                                                                                                                                          |
-| `left_out`        | list of object                          | no       | Files you read but didn't cite.                                                                                                                                                                                                                |
-| `document_type`   | object                                  | no       | The document's type, from kb_get_document_type.                                                                                                                                                                                                |
-| `reader`          | object                                  | no       | Who the document is for, from kb_list_audiences, and whether the person confirmed it.                                                                                                                                                          |
-| `filing`          | object                                  | no       | For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document.                                                                                                                                |
-| `open_questions`  | list of object                          | no       | Questions no source answers, apart from conflicting rows.                                                                                                                                                                                      |
-| `layout`          | `list` or `table`                       | no       | `list` in a terminal, which can't scroll a wide table sideways.                                                                                                                                                                                |
-| `document_digest` | string, pattern `^sha256:[0-9a-f]{64}$` | no       | The SHA-256 of the document's current text as UTF-8, written `sha256:` plus 64 lowercase hex digits. Send it whenever you've read the document, so the card can refuse a save after the document changes. The answer returns it in `based_on`. |
+| Argument          | Type                                                  | Required | Meaning                                                                                                                                                                                                                                        |
+| ----------------- | ----------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`        | string                                                | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                |
+| `summary`         | string                                                | yes      | What the proposal changes, in one line.                                                                                                                                                                                                        |
+| `rows`            | list of [ProposalRow](#proposalrow)                   | yes      | One row per change, in display order. The card names row n change Cn.                                                                                                                                                                          |
+| `left_out`        | list of [LeftOutFile](#leftoutfile) or null           | no       | Files you read but didn't cite.                                                                                                                                                                                                                |
+| `document_type`   | [ProposalDocumentType](#proposaldocumenttype) or null | no       | The document's type, from kb_get_document_type.                                                                                                                                                                                                |
+| `reader`          | [ProposalReader](#proposalreader) or null             | no       | Who the document is for, from kb_list_audiences, and whether the person confirmed it.                                                                                                                                                          |
+| `filing`          | [FilingNote](#filingnote) or null                     | no       | For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document.                                                                                                                                |
+| `open_questions`  | list of [ProposalCell](#proposalcell) or null         | no       | Questions no source answers, apart from conflicting rows.                                                                                                                                                                                      |
+| `layout`          | [Layout](#layout)                                     | no       | `list` in a terminal, which can't scroll a wide table sideways.                                                                                                                                                                                |
+| `document_digest` | [Digest](#digest) or null                             | no       | The SHA-256 of the document's current text as UTF-8, written `sha256:` plus 64 lowercase hex digits. Send it whenever you've read the document, so the card can refuse a save after the document changes. The answer returns it in `based_on`. |
 
 ### `kb_record_edit`
 
-| Argument       | Type                             | Required | Meaning                                                                                                                           |
-| -------------- | -------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `location`     | string                           | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                   |
-| `allowed_by`   | object                           | yes      | The person's permission for the save or the edit.                                                                                 |
-| `before`       | string                           | yes      | The replaced text. Send an empty string for a new file.                                                                           |
-| `after`        | string                           | no       | The text that replaced `before`. Omit it only for a whole-file edit sent with `after_digest`.                                     |
-| `after_digest` | string                           | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
-| `whole_file`   | boolean                          | no       | True when `before` is the whole file.                                                                                             |
-| `operation`    | object                           | no       |                                                                                                                                   |
-| `undoes`       | string, pattern `^[0-9a-f]{32}$` | no       | The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits.                                       |
+| Argument       | Type                                    | Required | Meaning                                                                                                                           |
+| -------------- | --------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `location`     | string                                  | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                   |
+| `allowed_by`   | [AllowedBy](#allowedby)                 | yes      |                                                                                                                                   |
+| `before`       | string                                  | yes      | The replaced text. Send an empty string for a new file.                                                                           |
+| `after`        | string or null                          | no       | The text that replaced `before`. Omit it only for a whole-file edit sent with `after_digest`.                                     |
+| `after_digest` | string or null                          | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
+| `whole_file`   | boolean or null                         | no       | True when `before` is the whole file.                                                                                             |
+| `operation`    | [EditOperation](#editoperation) or null | no       |                                                                                                                                   |
+| `undoes`       | [EditId](#editid) or null               | no       | The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits.                                       |
 
 ### `kbp_card`
 
-| Argument                | Type                 | Required | Meaning                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | -------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string               | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
-| `folders`               | list of string       | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
-| `knowledge_bus_folders` | list of object       | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
-| `kind`                  | string               | yes      | The document type id, such as `design-doc`.                                                                                                                                                                                                                                                                    |
-| `universe`              | string               | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
-| `format`                | `json` or `markdown` | no       | Defaults to `markdown`.                                                                                                                                                                                                                                                                                        |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `kind`                  | string                                            | yes      | The document type id, such as `design-doc`.                                                                                                                                                                                                                                                                    |
+| `universe`              | string or null                                    | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
+| `format`                | `json` or `markdown` or null                      | no       | Defaults to `markdown`.                                                                                                                                                                                                                                                                                        |
 
 ### `kbp_explore`
 
-| Argument                | Type           | Required | Meaning                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | -------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string         | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
-| `folders`               | list of string | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
-| `knowledge_bus_folders` | list of object | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
-| `universe`              | string         | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `universe`              | string or null                                    | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
 
 ### `kbp_inspect`
 
-| Argument                | Type           | Required | Meaning                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | -------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string         | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
-| `folders`               | list of string | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
-| `knowledge_bus_folders` | list of object | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
-| `universe`              | string         | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `universe`              | string or null                                    | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
 
 ### `kbp_kinds`
 
-| Argument                | Type                 | Required | Meaning                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | -------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string               | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
-| `folders`               | list of string       | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
-| `knowledge_bus_folders` | list of object       | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
-| `universe`              | string               | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
-| `format`                | `json` or `markdown` | no       | Defaults to `json`.                                                                                                                                                                                                                                                                                            |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `universe`              | string or null                                    | no       | Id of the universe spec to use when several universe specs apply.                                                                                                                                                                                                                                              |
+| `format`                | `json` or `markdown` or null                      | no       | Defaults to `json`.                                                                                                                                                                                                                                                                                            |
 
 ### `kbp_mint`
 
-| Argument                | Type                                       | Required | Meaning                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | ------------------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string                                     | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
-| `folders`               | list of string                             | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
-| `knowledge_bus_folders` | list of object                             | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
-| `kind`                  | `element`, `artifact`, `frame` or `factor` | yes      |                                                                                                                                                                                                                                                                                                                |
-| `count`                 | integer                                    | no       | Number of codes to mint, one by default.                                                                                                                                                                                                                                                                       |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| `kind`                  | `element`, `artifact`, `frame` or `factor`        | yes      |                                                                                                                                                                                                                                                                                                                |
+| `count`                 | integer or null                                   | no       | Number of codes to mint, one by default.                                                                                                                                                                                                                                                                       |
 
 ### `kbp_self_check`
 
@@ -273,11 +273,11 @@ No arguments.
 
 ### `kbp_validate`
 
-| Argument                | Type           | Required | Meaning                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | -------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location`              | string         | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
-| `folders`               | list of string | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
-| `knowledge_bus_folders` | list of object | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
+| Argument                | Type                                              | Required | Meaning                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`              | string                                            | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                                                                                |
+| `folders`               | list of string                                    | yes      | Folder names from the knowledge-base root down to the folder whose universe specs apply, such as `["docs", "rfcs"]`. Empty for the root folder.                                                                                                                                                                |
+| `knowledge_bus_folders` | list of [KnowledgeBusFolder](#knowledgebusfolder) | yes      | One entry per folder that holds a `.knowledge-bus/` folder, from the root folder down to the target folder. Include `.knowledge-bus/` folders with no `*.kbp.yaml` file. If no entry has a `*.kbp.yaml` file or `workspace.yaml`, tools use the bundled universe specs. kbp_validate returns an error instead. |
 
 ### `kbp_version`
 
@@ -289,7 +289,408 @@ No arguments.
 
 {/* BEGIN AUTO-GENERATED shapes */}
 
+### AllowedBy
 
+The person's permission for the save or the edit.
+
+| Field      | Type                                          | Required | Meaning                                                                                                                                                                                                |
+| ---------- | --------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `basis`    | `request`, `instruction` or `accepted_change` | yes      | `request` means the person asked in this session. `instruction` means the person wrote an instruction for agents, such as in AGENTS.md. `accepted_change` means the person accepted a proposed change. |
+| `text`     | string                                        | yes      | The request, instruction or accepted change, quoted.                                                                                                                                                   |
+| `location` | string or null                                | no       | The file holding the instruction or the accepted change.                                                                                                                                               |
+
+### Audience
+
+The document's reader, and whether the person confirmed the value.
+
+| Field    | Type                     | Required | Meaning |
+| -------- | ------------------------ | -------- | ------- |
+| `value`  | string                   | yes      |         |
+| `status` | `confirmed` or `guessed` | yes      |         |
+
+### Change
+
+Type: [UpsertConvention](#upsertconvention) or [RemoveConvention](#removeconvention).
+
+### ConventionContent
+
+| Field         | Type   | Required | Meaning |
+| ------------- | ------ | -------- | ------- |
+| `label`       | string | yes      |         |
+| `instruction` | string | yes      |         |
+
+### ConventionContentPart
+
+| Field  | Type      | Required | Meaning |
+| ------ | --------- | -------- | ------- |
+| `part` | `content` | yes      |         |
+
+### ConventionDatePart
+
+| Field      | Type                              | Required | Meaning |
+| ---------- | --------------------------------- | -------- | ------- |
+| `part`     | `date`                            | yes      |         |
+| `property` | string                            | yes      |         |
+| `format`   | `YYYY-MM-DD`, `YYYY-MM` or `YYYY` | yes      |         |
+
+### ConventionDocumentTypePart
+
+| Field  | Type            | Required | Meaning |
+| ------ | --------------- | -------- | ------- |
+| `part` | `document_type` | yes      |         |
+
+### ConventionFile
+
+Type: [ConventionFile1](#conventionfile1) or [ConventionFile2](#conventionfile2).
+
+### ConventionFile1
+
+| Field    | Type                                    | Required | Meaning                                                                       |
+| -------- | --------------------------------------- | -------- | ----------------------------------------------------------------------------- |
+| `folder` | [ConventionsFolder](#conventionsfolder) | yes      | The declaring folder relative to the knowledge-base root; empty for the root. |
+| `text`   | string                                  | yes      | Complete conventions text, or an empty string to report an absent file.       |
+| `digest` | [Digest](#digest) or null               | no       | A digest from this session, in place of unchanged conventions text.           |
+
+### ConventionFile2
+
+| Field    | Type                                    | Required | Meaning                                                                       |
+| -------- | --------------------------------------- | -------- | ----------------------------------------------------------------------------- |
+| `folder` | [ConventionsFolder](#conventionsfolder) | yes      | The declaring folder relative to the knowledge-base root; empty for the root. |
+| `text`   | string or null                          | no       | Complete conventions text, or an empty string to report an absent file.       |
+| `digest` | [Digest](#digest)                       | yes      | A digest from this session, in place of unchanged conventions text.           |
+
+### ConventionLiteralPart
+
+| Field   | Type                                    | Required | Meaning |
+| ------- | --------------------------------------- | -------- | ------- |
+| `part`  | `literal`                               | yes      |         |
+| `value` | [ConventionSegment](#conventionsegment) | yes      |         |
+
+### ConventionName
+
+| Field       | Type                            | Required | Meaning |
+| ----------- | ------------------------------- | -------- | ------- |
+| `separator` | ` `, `-` or `_`                 | yes      |         |
+| `case`      | `as-written` or `lower` or null | no       |         |
+| `parts`     | list of [Part](#part)           | yes      |         |
+
+### ConventionPropertyPart
+
+| Field      | Type       | Required | Meaning |
+| ---------- | ---------- | -------- | ------- |
+| `part`     | `property` | yes      |         |
+| `property` | string     | yes      |         |
+
+### ConventionReference
+
+| Field           | Type   | Required | Meaning |
+| --------------- | ------ | -------- | ------- |
+| `universe_spec` | string | yes      |         |
+| `document_type` | string | yes      |         |
+
+### ConventionSegment
+
+Type: string, pattern `^[^#|^:/\\\[\]\u0000-\u001f\u007f-\u009f]+$`.
+
+### ConventionsFolder
+
+Type: string, pattern `^(?:[^/\\\u0000]+(?:/[^/\\\u0000]+)*)?$`.
+
+### Digest
+
+The SHA-256 of the text's UTF-8 bytes.
+
+Type: string, pattern `^sha256:[0-9a-f]{64}$`.
+
+### DocumentMove
+
+| Field      | Type                  | Required | Meaning |
+| ---------- | --------------------- | -------- | ------- |
+| `old_path` | [MovePath](#movepath) | yes      |         |
+| `path`     | [MovePath](#movepath) | yes      |         |
+
+### EditId
+
+Type: string, pattern `^[0-9a-f]{32}$`.
+
+### EditOperation
+
+| Field      | Type          | Required | Meaning                                                                                  |
+| ---------- | ------------- | -------- | ---------------------------------------------------------------------------------------- |
+| `id`       | string        | yes      | An opaque id shared by every edit in the same operation.                                 |
+| `index`    | integer       | yes      | The edit's unique one-based position within the operation.                               |
+| `count`    | integer       | yes      | Total edits in the operation, including referring documents and the document-types file. |
+| `old_path` | [Path](#path) | yes      | Original path; equal to `path` for a stationary referring document.                      |
+| `path`     | [Path](#path) | yes      | Final path after the operation.                                                          |
+
+### EntryItem
+
+| Field              | Type                          | Required | Meaning                                                                                                                                                               |
+| ------------------ | ----------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `path`             | string                        | yes      | Path from the knowledge-base root, folders joined by `/`, such as `docs/rfcs/0042-cache.md`.                                                                          |
+| `set_by`           | [SetBy](#setby)               | yes      | `agent` when you chose the document type or reader. `person` when the person stated the document type or reader.                                                      |
+| `universe_spec`    | string or null                | no       | Id of the universe spec that declares `document_type`.                                                                                                                |
+| `document_type`    | string or null                | no       |                                                                                                                                                                       |
+| `no_document_type` | boolean                       | no       |                                                                                                                                                                       |
+| `audience`         | [Audience](#audience) or null | no       | The document's reader. `value` is one of the `choices` or the `actor` from `kb_list_audiences`. Set `status` to `confirmed` only after the person confirms the value. |
+
+### EvidenceMark
+
+How well the sources back the proposed text. `suggested` marks your own wording.
+
+Type: `supported`, `partly`, `conflicting` or `suggested`.
+
+### FileChange
+
+Type: [FileCreated](#filecreated) or [FileDeleted](#filedeleted) or [FileMoved](#filemoved) or [FileEdited](#fileedited).
+
+### FileCreated
+
+| Field         | Type                                | Required | Meaning |
+| ------------- | ----------------------------------- | -------- | ------- |
+| `change`      | `created`                           | yes      |         |
+| `path`        | [Path](#path)                       | yes      |         |
+| `fingerprint` | [Fingerprint](#fingerprint) or null | no       |         |
+
+### FileDeleted
+
+| Field    | Type          | Required | Meaning |
+| -------- | ------------- | -------- | ------- |
+| `change` | `deleted`     | yes      |         |
+| `path`   | [Path](#path) | yes      |         |
+
+### FileEdited
+
+| Field         | Type                        | Required | Meaning |
+| ------------- | --------------------------- | -------- | ------- |
+| `change`      | `edited`                    | yes      |         |
+| `path`        | [Path](#path)               | yes      |         |
+| `fingerprint` | [Fingerprint](#fingerprint) | yes      |         |
+
+### FileMoved
+
+| Field         | Type                                | Required | Meaning                  |
+| ------------- | ----------------------------------- | -------- | ------------------------ |
+| `change`      | `moved`                             | yes      |                          |
+| `path`        | [Path](#path)                       | yes      | The path after the move. |
+| `old_path`    | [Path](#path)                       | yes      |                          |
+| `fingerprint` | [Fingerprint](#fingerprint) or null | no       |                          |
+
+### FileSource
+
+A whole file, with no line or place, such as a sheet you read in full.
+
+| Field  | Type   | Required | Meaning                                                       |
+| ------ | ------ | -------- | ------------------------------------------------------------- |
+| `file` | string | yes      | The file's path as you read it, such as `build-timings.xlsx`. |
+
+### FilingNote
+
+Where a new document will be saved and why. Omit it for an existing document.
+
+| Field         | Type           | Required | Meaning                                                         |
+| ------------- | -------------- | -------- | --------------------------------------------------------------- |
+| `path`        | [Path](#path)  | yes      |                                                                 |
+| `naming_rule` | string or null | yes      | The naming rule that named the file, or null when none applied. |
+| `reason`      | string or null | no       | Why you chose the path. Required when `naming_rule` is null.    |
+
+### FilingReview
+
+| Field       | Type            | Required | Meaning                                                          |
+| ----------- | --------------- | -------- | ---------------------------------------------------------------- |
+| `folder`    | string          | yes      | Folder relative to the knowledge-base root; empty for the root.  |
+| `recursive` | boolean or null | no       | Include descendants; false limits the review to direct children. |
+
+### FilingValue
+
+| Field           | Type           | Required | Meaning |
+| --------------- | -------------- | -------- | ------- |
+| `path`          | [Path](#path)  | yes      |         |
+| `universe_spec` | string         | yes      |         |
+| `document_type` | string         | yes      |         |
+| `properties`    | object or null | no       |         |
+| `content`       | string or null | no       |         |
+
+### Fingerprint
+
+A value that changes only when the file content changes, such as SHA-256 or Drive's `md5Checksum`. kb_prepare_document_types uses fingerprints to find files in `listing` that moved.
+
+Type: string.
+
+### KnowledgeBusFolder
+
+| Field            | Type                          | Required | Meaning                                                                             |
+| ---------------- | ----------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `folder`         | string                        | yes      | Path from the knowledge-base root, such as `team/notes`. Empty for the root folder. |
+| `files`          | list of [SpecFile](#specfile) | no       | Every `*.kbp.yaml` file directly inside the `.knowledge-bus/` folder.               |
+| `workspace_yaml` | string or null                | no       | The text of `.knowledge-bus/workspace.yaml`.                                        |
+
+### Layout
+
+Type: `list` or `table`.
+
+### LeftOutFile
+
+| Field    | Type   | Required | Meaning                                      |
+| -------- | ------ | -------- | -------------------------------------------- |
+| `file`   | string | yes      | The path of a file you read but didn't cite. |
+| `reason` | string | yes      | Why you left the file out, in one line.      |
+
+### LineSource
+
+A line in a text file.
+
+| Field         | Type    | Required | Meaning                                                     |
+| ------------- | ------- | -------- | ----------------------------------------------------------- |
+| `file`        | string  | yes      | The file's path as you read it, such as `meeting-notes.md`. |
+| `line_number` | integer | yes      | The 1-based line number in that file.                       |
+
+### LinkBinding
+
+An independently verified original target for a complete internal link token.
+
+| Field         | Type                  | Required | Meaning                                                                                                                                                                                                        |
+| ------------- | --------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source_path` | [MovePath](#movepath) | yes      | The document containing the link, at its original path.                                                                                                                                                        |
+| `start`       | integer               | yes      | Zero-based Unicode code-point offset of the complete link token's first character in the original supplied text, including any embed marker.                                                                   |
+| `end`         | integer               | yes      | Exclusive Unicode code-point offset after the complete original link token, including its label, fragment and title when present. The range `start:end` covers the whole token, not just the destination path. |
+| `target_path` | [MovePath](#movepath) | yes      | The link's established target in the original inventory, before any move.                                                                                                                                      |
+
+### ListedFile
+
+| Field         | Type                                | Required | Meaning |
+| ------------- | ----------------------------------- | -------- | ------- |
+| `path`        | [Path](#path)                       | yes      |         |
+| `fingerprint` | [Fingerprint](#fingerprint) or null | no       |         |
+
+### MoveDocument
+
+| Field  | Type                  | Required | Meaning |
+| ------ | --------------------- | -------- | ------- |
+| `path` | [MovePath](#movepath) | yes      |         |
+| `text` | string                | yes      |         |
+
+### MoveNaming
+
+The naming rule or convention that produced a move's destination name.
+
+| Field  | Type                  | Required | Meaning                                          |
+| ------ | --------------------- | -------- | ------------------------------------------------ |
+| `path` | [MovePath](#movepath) | yes      | The destination `path` of one move in `moves`.   |
+| `rule` | string                | yes      | The rule in a few words, such as `date + title`. |
+
+### MovePath
+
+Path relative to the knowledge-base root, with forward slashes between folders.
+
+Type: string, pattern `^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$`.
+
+### MoveStay
+
+A file the assistant leaves where it is, with the reason the person sees.
+
+| Field    | Type                  | Required | Meaning                                         |
+| -------- | --------------------- | -------- | ----------------------------------------------- |
+| `path`   | [MovePath](#movepath) | yes      |                                                 |
+| `reason` | string                | yes      | Why the file stays, such as `no document type`. |
+
+### Part
+
+Type: [ConventionDocumentTypePart](#conventiondocumenttypepart) or [ConventionDatePart](#conventiondatepart) or [ConventionPropertyPart](#conventionpropertypart) or [ConventionContentPart](#conventioncontentpart) or [ConventionLiteralPart](#conventionliteralpart).
+
+### Path
+
+Path from the knowledge base's root folder, with `/` between folders, such as `docs/rfcs/0042-cache.md`.
+
+Type: string.
+
+### PersonSource
+
+The person's words in this conversation.
+
+| Field  | Type   | Required | Meaning                                              |
+| ------ | ------ | -------- | ---------------------------------------------------- |
+| `said` | string | yes      | What the person said, quoted or closely paraphrased. |
+
+### PlaceSource
+
+A place in a sheet or deck.
+
+| Field   | Type   | Required | Meaning                                                                |
+| ------- | ------ | -------- | ---------------------------------------------------------------------- |
+| `file`  | string | yes      | The sheet or deck's path as you read it, such as `build-timings.xlsx`. |
+| `place` | string | yes      | Such as `Evening!A2:D10` or `slide 7`.                                 |
+
+### ProposalCell
+
+| Field   | Type           | Required | Meaning                                |
+| ------- | -------------- | -------- | -------------------------------------- |
+| `label` | string or null | no       | The field or section, such as `Title`. |
+| `text`  | string         | yes      | Plain words, without markdown syntax.  |
+
+### ProposalDocumentType
+
+The document's type, from kb_get_document_type. Send it whenever you know it.
+
+| Field   | Type   | Required | Meaning                    |
+| ------- | ------ | -------- | -------------------------- |
+| `id`    | string | yes      | Such as `design-proposal`. |
+| `label` | string | yes      | Such as `Design proposal`. |
+
+### ProposalReader
+
+The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.
+
+| Field       | Type    | Required | Meaning                                                                |
+| ----------- | ------- | -------- | ---------------------------------------------------------------------- |
+| `id`        | string  | yes      | The audience's id, as kb_list_audiences returned it.                   |
+| `label`     | string  | yes      | Such as `maintainers deciding whether to accept it`.                   |
+| `confirmed` | boolean | yes      | True when the person confirmed the reader, false when it's your guess. |
+
+### ProposalRow
+
+| Field      | Type                                                                                                                           | Required | Meaning                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------- |
+| `current`  | [ProposalCell](#proposalcell) or null                                                                                          | no       | The document's text now. Omit it for an addition.                     |
+| `proposed` | [ProposalCell](#proposalcell)                                                                                                  | yes      | The text you propose, in place of `current`.                          |
+| `mark`     | [EvidenceMark](#evidencemark) or null                                                                                          | no       |                                                                       |
+| `sources`  | list of [LineSource](#linesource) or [PlaceSource](#placesource) or [PersonSource](#personsource) or [FileSource](#filesource) | yes      | Where the proposed text comes from. Cite at least one source per row. |
+
+### RemoveConvention
+
+| Field           | Type     | Required | Meaning |
+| --------------- | -------- | -------- | ------- |
+| `change`        | `remove` | yes      |         |
+| `universe_spec` | string   | yes      |         |
+| `document_type` | string   | yes      |         |
+
+### SetBy
+
+`person` when the person stated the document type or reader. An entry the person set wins over any later entry by the agent.
+
+Type: `agent` or `person`.
+
+### SpecFile
+
+| Field     | Type           | Required | Meaning                                                                                                                                                                                          |
+| --------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`    | string         | yes      | The file name, such as `universe.kbp.yaml`.                                                                                                                                                      |
+| `id`      | string         | yes      | The `id` value in the file's `universe:` or `guidance:` block.                                                                                                                                   |
+| `version` | string         | yes      | The `version` value in the file's `universe:` or `guidance:` block, as written.                                                                                                                  |
+| `text`    | string or null | no       | The full file text. Send fresh text whenever the file changes. Reuse `digest` while the text stays unchanged. Leave it out when `id` and `version` match a bundled file, except in kbp_validate. |
+| `digest`  | string or null | no       | File SHA-256 (`sha256:…`); send exact text if unknown. kbp_validate requires previously sent text.                                                                                               |
+
+### UpsertConvention
+
+| Field           | Type                                                             | Required | Meaning |
+| --------------- | ---------------------------------------------------------------- | -------- | ------- |
+| `change`        | `upsert`                                                         | yes      |         |
+| `universe_spec` | string                                                           | yes      |         |
+| `document_type` | string                                                           | yes      |         |
+| `folder`        | list of [ConventionSegment](#conventionsegment) or [Part](#part) | yes      |         |
+| `name`          | [ConventionName](#conventionname)                                | yes      |         |
+| `content`       | [ConventionContent](#conventioncontent) or null                  | no       |         |
+| `set_by`        | [SetBy](#setby)                                                  | yes      |         |
 
 {/* END AUTO-GENERATED shapes */}
 
