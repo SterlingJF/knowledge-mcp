@@ -3,15 +3,7 @@ import { Skeleton as CoreSkeleton } from "@/component-core/skeleton";
 import { status } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
-const shapes = {
-  line: "h-km-5",
-  short: "h-km-5 w-2/5",
-  title: "h-km-6 w-3/5",
-  row: "h-km-row",
-  action: "h-km-target w-1/4",
-} as const;
-
-export type SkeletonShape = keyof typeof shapes;
+export type SkeletonShape = "line" | "short" | "title" | "row" | "action";
 
 export function SkeletonBlock({
   shape = "line",
@@ -25,7 +17,11 @@ export function SkeletonBlock({
       aria-hidden
       className={cn(
         "mt-km-gap-row block rounded-lg bg-muted animate-km-shimmer motion-reduce:animate-none",
-        shapes[shape],
+        shape === "line" && "h-km-5",
+        shape === "short" && "h-km-5 w-2/5",
+        shape === "title" && "h-km-6 w-3/5",
+        shape === "row" && "h-km-row",
+        shape === "action" && "h-km-target w-1/4",
         className,
       )}
     />

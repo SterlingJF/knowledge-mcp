@@ -6,13 +6,6 @@ import { cn } from "@/lib/utils";
 
 export type BadgeTone = "waiting" | "done" | "refused" | "neutral";
 
-const toneClass: Record<BadgeTone, string> = {
-  waiting: "bg-warning text-warning",
-  done: "bg-success text-success",
-  refused: "bg-danger text-destructive",
-  neutral: "bg-muted text-secondary",
-};
-
 /** Waiting on the person: a dot whose ring pulses; static when motion is reduced. */
 function PulseDot() {
   return (
@@ -37,7 +30,10 @@ export function Badge({ tone, children, className }: BadgeProps) {
       data-tone={tone}
       className={cn(
         "h-auto gap-km-2 rounded-full border-0 px-km-4 py-km-1 text-xs leading-xs font-semibold [&>svg]:size-km-icon!",
-        toneClass[tone],
+        tone === "waiting" && "bg-warning text-warning",
+        tone === "done" && "bg-success text-success",
+        tone === "refused" && "bg-danger text-destructive",
+        tone === "neutral" && "bg-muted text-secondary",
         className,
       )}
     >
