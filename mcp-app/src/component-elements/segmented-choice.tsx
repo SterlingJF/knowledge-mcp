@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 const groupClass =
   "gap-0 overflow-hidden has-focus-visible:shadow-km-focus-ring rounded-sm border-hairline border-solid border-input";
 
+// The inset focus ring stays bracketed on purpose: it is the focus ring drawn inside a joined control, and no token holds it.
 const itemClass =
   "h-auto min-w-0 rounded-none! px-km-5 py-km-2 text-xs font-semibold text-muted-foreground hover:bg-muted focus-visible:ring-0 focus-visible:shadow-[inset_0_0_0_2px_var(--color-ring-primary),inset_0_0_0_4px_var(--color-background-primary)] focus-visible:relative focus-visible:z-10 pointer-coarse:min-h-km-target pointer-coarse:min-w-km-target [&+&]:border-solid [&+&]:border-input aria-checked:bg-inverse aria-checked:text-inverse";
 

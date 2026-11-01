@@ -60,6 +60,7 @@ export function TickBox({
         className,
       )}
     >
+      {/* Bracketed on purpose: centring the box on the first line is a calc over a token, and no token holds it. */}
       <Checkbox
         className={cn(boxClass, "mt-[calc((1lh-var(--km-check))/2)] shrink-0")}
         checked={checked}
