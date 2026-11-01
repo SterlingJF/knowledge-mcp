@@ -414,9 +414,13 @@ def test_mcp_tool_titles_are_a_verb_and_a_noun(server):
     assert tool(server, "kb_get_document_type").title == "Get the document type"
 
 
-def test_mcp_tool_descriptions_open_with_the_verb_of_the_action(server):
+def test_mcp_tool_descriptions_open_with_when_then_the_verb_of_the_action(server):
     for name, listed in server["tools"].items():
-        first = (listed.description or "").split()[0]
+        description = listed.description or ""
+        if name.startswith("kb_"):
+            assert description.startswith("Use "), (name, description)
+            description = description.split(". ", 1)[1]
+        first = description.split()[0]
         assert first == NAMED_VERBS.get(name, first), (name, listed.description)
         assert first in VERBS, (name, listed.description)
 

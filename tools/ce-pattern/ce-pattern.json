@@ -1,0 +1,13 @@
+{
+  "tooling": "tools/ce-pattern",
+  "packageManager": "pnpm",
+  "library": {
+    "dir": "mcp-app",
+    "alias": "@",
+    "preset": "react-shadcn",
+    "style": "base-vega"
+  },
+  "consumers": [],
+  "roots": ["mcp-app"],
+  "supportSuffixes": ["gallery", "harness"]
+}

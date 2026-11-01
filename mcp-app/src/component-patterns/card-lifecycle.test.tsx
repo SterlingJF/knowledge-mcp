@@ -1,0 +1,340 @@
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { useEffect } from "react";
+import { vi } from "vitest";
+
+import { frozen } from "@/copy/en";
+import { CardShell } from "./card-shell";
+import type { CardAction } from "./card-shell";
+import { isYounger, lifecycleProps, useCardLifecycle } from "./card-lifecycle";
+import type { CardLifecycle } from "./card-lifecycle";
+import { StaticCardHost, stubCardHost } from "@/bridge/static";
+
+const save: CardAction = {
+  label: "Save C1",
+  message: "Save C1 to a.md",
+  frozenLine: frozen.approved,
+};
+
+function Card({ name }: { name: string }) {
+  const life = useCardLifecycle();
+  return (
+    <CardShell
+      eyebrow={name}
+      title={name}
+      actions={[save]}
+      {...lifecycleProps(life)}
+    />
+  );
+}
+
+test("a press freezes at once and sends the exact message, once", () => {
+  const host = stubCardHost();
+  render(
+    <StaticCardHost host={host}>
+      <Card name="a" />
+    </StaticCardHost>,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+  expect(screen.queryByRole("button")).toBeNull();
+  expect(screen.getByText(frozen.approved)).toBeTruthy();
+  expect(host.sent).toEqual(["Save C1 to a.md"]);
+});
+
+test("isYounger compares created_at as strings, then seq when equal or missing", () => {
+  const a = { subject: "a.md", created_at: "2026-10-28T10:00:00Z", seq: 1 };
+  expect(
+    isYounger({ ...a, created_at: "2026-10-28T10:00:01Z", seq: 0 }, a),
+  ).toBe(true);
+  expect(isYounger({ ...a, seq: 2 }, a)).toBe(true);
+  expect(isYounger({ subject: "a.md", seq: 2 }, a)).toBe(true);
+  expect(isYounger(a, a)).toBe(false);
+});
+
+test("the older card about the same subject stands down", async () => {
+  const at = "2026-10-28T10:00:00Z";
+  const older = stubCardHost({
+    result: { instance: { subject: "a.md", created_at: at, seq: 1 } },
+  });
+  const younger = stubCardHost({
+    result: { instance: { subject: "a.md", created_at: at, seq: 2 } },
+  });
+  const other = stubCardHost({
+    result: { instance: { subject: "b.md", created_at: at, seq: 0 } },
+  });
+  render(
+    <>
+      <StaticCardHost host={older}>
+        <Card name="older" />
+      </StaticCardHost>
+      <StaticCardHost host={other}>
+        <Card name="other" />
+      </StaticCardHost>
+    </>,
+  );
+  await act(async () => {
+    render(
+      <StaticCardHost host={younger}>
+        <Card name="younger" />
+      </StaticCardHost>,
+    );
+  });
+  await waitFor(() =>
+    expect(
+      document.querySelectorAll('[data-slot=card][data-state="replaced"]'),
+    ).toHaveLength(1),
+  );
+  const replaced = document.querySelector(
+    '[data-slot=card][data-state="replaced"]',
+  )!;
+  expect(replaced.textContent).toContain("older");
+  expect(replaced.textContent).toContain(frozen.replaced);
+});
+
+test("an older card mounting late learns it is already replaced", async () => {
+  const at = "2026-10-28T10:00:00Z";
+  const younger = stubCardHost({
+    result: { instance: { subject: "a.md", created_at: at, seq: 2 } },
+  });
+  const older = stubCardHost({
+    result: { instance: { subject: "a.md", created_at: at, seq: 1 } },
+  });
+  render(
+    <StaticCardHost host={younger}>
+      <Card name="younger" />
+    </StaticCardHost>,
+  );
+  await act(async () => {
+    render(
+      <StaticCardHost host={older}>
+        <Card name="older" />
+      </StaticCardHost>,
+    );
+  });
+  await waitFor(() =>
+    expect(
+      document.querySelector('[data-slot=card][data-state="replaced"]')
+        ?.textContent,
+    ).toContain("older"),
+  );
+});
+
+test("without an instance key nothing is announced", () => {
+  const post = vi.spyOn(BroadcastChannel.prototype, "postMessage");
+  render(
+    <StaticCardHost host={stubCardHost()}>
+      <Card name="a" />
+    </StaticCardHost>,
+  );
+  expect(post).not.toHaveBeenCalled();
+  post.mockRestore();
+});
+
+const at = "2026-10-28T10:00:00Z";
+const key = (seq: number) => ({
+  result: { instance: { subject: "a.md", created_at: at, seq } },
+});
+
+test("a pressed card keeps its frozen line when a younger card arrives", async () => {
+  const older = stubCardHost(key(1));
+  render(
+    <StaticCardHost host={older}>
+      <Card name="older" />
+    </StaticCardHost>,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+  await act(async () => {
+    render(
+      <StaticCardHost host={stubCardHost(key(2))}>
+        <Card name="younger" />
+      </StaticCardHost>,
+    );
+  });
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  expect(
+    document.querySelector('[data-slot=card][data-state="replaced"]'),
+  ).toBeNull();
+  expect(screen.getByText(frozen.approved)).toBeTruthy();
+});
+
+test("a replaced card ignores a press", async () => {
+  const older = stubCardHost(key(1));
+  let life: CardLifecycle | undefined;
+  function Probe({ onLife }: { onLife: (seen: CardLifecycle) => void }) {
+    const seen = useCardLifecycle();
+    useEffect(() => onLife(seen));
+    return null;
+  }
+  render(
+    <StaticCardHost host={older}>
+      <Probe
+        onLife={(seen) => {
+          life = seen;
+        }}
+      />
+    </StaticCardHost>,
+  );
+  await act(async () => {
+    render(
+      <StaticCardHost host={stubCardHost(key(2))}>
+        <Card name="younger" />
+      </StaticCardHost>,
+    );
+  });
+  await waitFor(() => expect(life?.state).toBe("replaced"));
+  act(() => life?.press(save));
+  expect(older.sent).toEqual([]);
+  expect(life?.state).toBe("replaced");
+});
+
+test("the channel is closed on unmount", () => {
+  const close = vi.spyOn(BroadcastChannel.prototype, "close");
+  const { unmount } = render(
+    <StaticCardHost host={stubCardHost(key(1))}>
+      <Card name="a" />
+    </StaticCardHost>,
+  );
+  expect(close).not.toHaveBeenCalled();
+  unmount();
+  expect(close).toHaveBeenCalledOnce();
+  close.mockRestore();
+});
+
+describe("press with context and disabled actions", () => {
+  it("sends an action's context with its message", async () => {
+    const host = stubCardHost();
+    const { result } = renderHook(() => useCardLifecycle(), {
+      wrapper: ({ children }) => (
+        <StaticCardHost host={host}>{children}</StaticCardHost>
+      ),
+    });
+    await act(async () => {
+      result.current.press({
+        label: "Save C1",
+        message: "Save C1 to a.md",
+        frozenLine: "You approved this.",
+        context: { proposal: { kept: [1] } },
+      });
+    });
+    expect(host.sent).toEqual(["Save C1 to a.md"]);
+    expect(host.contexts).toEqual([{ proposal: { kept: [1] } }]);
+  });
+
+  it("ignores a disabled action", async () => {
+    const host = stubCardHost();
+    const { result } = renderHook(() => useCardLifecycle(), {
+      wrapper: ({ children }) => (
+        <StaticCardHost host={host}>{children}</StaticCardHost>
+      ),
+    });
+    await act(async () => {
+      result.current.press({
+        label: "Save",
+        message: "Save",
+        frozenLine: "x",
+        disabled: true,
+      });
+    });
+    expect(host.sent).toEqual([]);
+    expect(result.current.state).toBe("live");
+  });
+});
+
+describe("persistence across remounts", () => {
+  const withInstance = {
+    schema: "x",
+    instance: { subject: "a.md", created_at: "2026-10-28T10:00:00Z", seq: 1 },
+  };
+
+  function Remembering() {
+    const life = useCardLifecycle();
+    return (
+      <>
+        <CardShell
+          eyebrow="a"
+          title="a"
+          actions={[save]}
+          state={life.state}
+          frozenLine={life.frozenLine}
+          onAction={(a) => life.press(a, { kept: [1, 3] })}
+        />
+        <output role="status">{JSON.stringify(life.restored ?? null)}</output>
+      </>
+    );
+  }
+
+  function mount(result: unknown) {
+    return render(
+      <StaticCardHost host={stubCardHost({ result: result as never })}>
+        <Remembering />
+      </StaticCardHost>,
+    );
+  }
+
+  test("a frozen card renders frozen after a remount with the same result, with its extra", () => {
+    const first = mount(withInstance);
+    fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+    first.unmount();
+    mount(withInstance);
+    expect(screen.queryByRole("button")).toBeNull();
+    expect(screen.getByText(frozen.approved)).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toBe('{"kept":[1,3]}');
+  });
+
+  test("a result without an instance is keyed by a hash of its content", () => {
+    const first = mount({ schema: "y", rows: [1, 2] });
+    fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+    first.unmount();
+    mount({ schema: "y", rows: [1, 2] });
+    expect(screen.getByText(frozen.approved)).toBeTruthy();
+  });
+
+  test("a different result is not affected", () => {
+    const first = mount(withInstance);
+    fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+    first.unmount();
+    mount({ ...withInstance, instance: { subject: "b.md", seq: 1 } });
+    expect(screen.getByRole("button", { name: "Save C1" })).toBeTruthy();
+  });
+
+  test("blocked storage falls back to memory with no error", () => {
+    const get = vi
+      .spyOn(Storage.prototype, "getItem")
+      .mockImplementation(() => {
+        throw new Error("blocked");
+      });
+    const set = vi
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new Error("blocked");
+      });
+    const first = mount(withInstance);
+    fireEvent.click(screen.getByRole("button", { name: "Save C1" }));
+    expect(screen.getByText(frozen.approved)).toBeTruthy();
+    first.unmount();
+    mount(withInstance);
+    expect(screen.getByRole("button", { name: "Save C1" })).toBeTruthy();
+    get.mockRestore();
+    set.mockRestore();
+  });
+
+  test("entries older than 30 days are swept", () => {
+    localStorage.setItem(
+      "km-card:old",
+      JSON.stringify({ state: "frozen", at: Date.now() - 31 * 864e5 }),
+    );
+    localStorage.setItem(
+      "km-card:new",
+      JSON.stringify({ state: "frozen", at: Date.now() }),
+    );
+    mount(withInstance);
+    expect(localStorage.getItem("km-card:old")).toBeNull();
+    expect(localStorage.getItem("km-card:new")).not.toBeNull();
+  });
+});

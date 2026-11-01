@@ -23,7 +23,7 @@ from knowledge_mcp.tools.kbp import READS, Folders, Location
 from knowledge_mcp.type_scope import Scopes
 
 DESCRIPTION = """\
-Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing. Return saved classification or candidate document types. Appends the answer to `log.jsonl` and opens no knowledge-base file.
+Use when you orient in a folder or before you write, revise or move a non-code file ("what is this", "where does this go"). Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing. Return saved classification or candidate document types. Appends the answer to `log.jsonl` and opens no knowledge-base file.
 """
 
 

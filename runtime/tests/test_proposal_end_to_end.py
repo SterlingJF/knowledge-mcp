@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 
 from knowledge_mcp.views.markdown import PLACE
 from tests.harness import server_parameters, session
@@ -208,6 +209,137 @@ def test_revised_card_cites_the_person(tmp_path):
 def test_a_cited_file_is_not_left_out(tmp_path):
     left_out = [{"file": "meeting-notes.md", "reason": "line 11 conflicts"}]
     result = call(tmp_path, {**DEMO, "left_out": left_out})
+
+    assert result.is_error
+    assert result.structured_content["errors"][0]["pointer"] == "#/left_out/0/file"
+
+
+DIGEST = "sha256:" + "ab" * 32
+
+
+def test_proposal_returns_the_digest_it_was_prepared_against(tmp_path):
+    result = call(tmp_path, {**DEMO, "document_digest": DIGEST})
+
+    assert not result.is_error, result.content
+    assert result.structured_content["based_on"] == {"document_digest": DIGEST}
+    assert result.structured_content["card"] == TABLE
+
+
+def test_proposal_without_a_digest_omits_based_on(tmp_path):
+    result = call(tmp_path, DEMO)
+
+    assert "based_on" not in result.structured_content
+
+
+def test_proposal_refuses_a_malformed_digest(tmp_path):
+    result = call(tmp_path, {**DEMO, "document_digest": "abc"})
+
+    assert result.is_error
+
+
+def test_proposal_instance_names_the_document_and_counts_up(tmp_path):
+    async def steps(client):
+        first = await client.call_tool("kb_prepare_proposal", DEMO)
+        second = await client.call_tool("kb_prepare_proposal", REVISED)
+        return first, second
+
+    first, second = session(server_parameters(tmp_path), steps)
+    one = first.structured_content["instance"]
+    two = second.structured_content["instance"]
+
+    assert one["subject"] == DEMO["location"]
+    assert re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z", one["created_at"])
+    assert two["seq"] > one["seq"]
+    assert two["created_at"] >= one["created_at"]
+    assert second.structured_content["card"] == REVISED_TABLE
+
+
+# A new document (D05, D05F): type, guessed reader, filing note, open question.
+NEW = {
+    "location": "~/notes/Proposals/cache-rollout.md",
+    "summary": "Cache rollout",
+    "document_type": {"id": "design-proposal", "label": "Design proposal"},
+    "reader": {
+        "id": "maintainers",
+        "label": "maintainers deciding whether to accept it",
+        "confirmed": False,
+    },
+    "filing": {
+        "path": "Proposals/cache-rollout.md",
+        "naming_rule": None,
+        "reason": "none for Design proposals, so it goes beside cache-proposal.md",
+    },
+    "rows": [
+        {
+            "proposed": {
+                "label": "Motivation",
+                "text": "Cache misses add 40 minutes to each evening run",
+            },
+            "mark": "supported",
+            "sources": [{"file": "build-timings.xlsx", "place": "Cache!B2:B9"}],
+        },
+        {
+            "proposed": {
+                "label": "Alternatives",
+                "text": "A hosted build service, priced but not compared",
+            },
+            "mark": "partly",
+            "sources": [{"file": "vendor-quote.xlsx"}],
+        },
+    ],
+    "open_questions": [{"label": "Rollout owner", "text": "Who owns the rollout?"}],
+}
+
+NEW_TABLE = f"""\
+`PROPOSED CHANGES` · `Nothing saved`
+
+**Cache rollout**
+
+Design proposal · for maintainers deciding whether to accept it (reader is a guess)
+
+Saved as `Proposals/cache-rollout.md` · no naming rule: none for Design proposals, so it goes beside cache-proposal.md
+
+| ID | Current | Proposed | Source |
+| --- | --- | --- | --- |
+| C1 | — | ● Supported · **Motivation:** Cache misses add 40 minutes to each evening run | `build-timings.xlsx{PLACE}Cache!B2:B9` |
+| C2 | — | ◐ Partly answered · **Alternatives:** A hosted build service, priced but not compared | `vendor-quote.xlsx` |
+
+? Needs you · **Rollout owner** · no source: Who owns the rollout?
+"""
+
+
+def test_new_document_fields_round_trip_and_show_in_the_card(tmp_path):
+    result = call(tmp_path, NEW)
+
+    assert not result.is_error, result.content
+    data = result.structured_content
+    for name in ("document_type", "reader", "filing", "open_questions", "rows"):
+        assert data[name] == NEW[name]
+    assert data["card"] == NEW_TABLE
+
+
+def test_confirmed_reader_and_named_file_drop_the_guess(tmp_path):
+    reader = {**NEW["reader"], "confirmed": True}
+    filing = {"path": "Proposals/0042-cache.md", "naming_rule": "NNNN-slug"}
+    result = call(tmp_path, {**NEW, "reader": reader, "filing": filing})
+
+    card = result.structured_content["card"]
+    assert "for maintainers deciding whether to accept it\n" in card
+    assert "Saved as `Proposals/0042-cache.md` · named by NNNN-slug\n" in card
+    assert result.structured_content["filing"] == filing
+
+
+def test_filing_without_a_rule_needs_a_reason(tmp_path):
+    filing = {"path": "Proposals/cache-rollout.md", "naming_rule": None}
+    result = call(tmp_path, {**NEW, "filing": filing})
+
+    assert result.is_error
+    assert result.structured_content["errors"][0]["pointer"] == "#/filing/reason"
+
+
+def test_a_whole_file_source_is_cited(tmp_path):
+    left_out = [{"file": "vendor-quote.xlsx", "reason": "x"}]
+    result = call(tmp_path, {**NEW, "left_out": left_out})
 
     assert result.is_error
     assert result.structured_content["errors"][0]["pointer"] == "#/left_out/0/file"

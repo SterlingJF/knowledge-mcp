@@ -106,24 +106,32 @@ links:
     target_before: B.md
     target_after: A.md
     replacement: "[[A#Heading]]"
+    line: 1
+    text: "[[B#Heading]]"
   - source_path: B.md
     start: 0
     end: 12
     target_before: A.md
     target_after: B.md
     replacement: "[[B#^block]]"
+    line: 1
+    text: "[[A#^block]]"
   - source_path: Index.md
     start: 0
     end: 5
     target_before: A.md
     target_after: B.md
     replacement: "[[B]]"
+    line: 1
+    text: "[[A]]"
   - source_path: Index.md
     start: 6
     end: 11
     target_before: B.md
     target_after: A.md
     replacement: "[[A]]"
+    line: 1
+    text: "[[B]]"
 issues: []
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/document-types.yaml
@@ -147,3 +155,19 @@ record_changes:
     path: A.md
   - old_path: Index.md
     path: Index.md
+card: |
+  `PROPOSED MOVES` · `Approved`
+
+  **2 moves · 2 renames · 4 links repaired · 3 notes**
+
+  **Moves (2)**
+
+  1. `A.md` → / as `B.md`
+  2. `B.md` → / as `A.md`
+
+  **Links (4)**
+
+  1. `A.md:1` · `[[B#Heading]]` → `[[A#Heading]]`
+  2. `B.md:1` · `[[A#^block]]` → `[[B#^block]]`
+  3. `Index.md:1` · `[[A]]` → `[[B]]`
+  4. `Index.md:1` · `[[B]]` → `[[A]]`

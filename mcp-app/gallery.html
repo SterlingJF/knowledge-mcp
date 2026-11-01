@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>mcp-app gallery</title>
+    <!-- Each pane stands in for Claude's chat, so it takes the host's chat ground. -->
+    <style>
+      [data-pane] {
+        background: var(--color-background-tertiary);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/gallery/main.tsx"></script>
+  </body>
+</html>

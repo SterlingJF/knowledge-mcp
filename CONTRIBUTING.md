@@ -40,6 +40,7 @@ Use the recipe for the area you changed while developing; run the full checks be
 | YAML                         | yamllint, Prettier                                         | `just check_root`            |
 | GitHub workflows             | actionlint, yamllint, Prettier                             | `just check_root`            |
 | Contract schemas and samples | JSON Schema lint, conformance and bundle checks            | `just check_contracts`       |
+| MCP App                      | Token staleness, lint, types, tests, single-file build     | `just check_mcp_app`         |
 | `renovate.json`              | Renovate config validator                                  | `just check_renovate_config` |
 | Staged files                 | Pre-commit checks, including the 5,120 KB added-file limit | `just check_staged`          |
 
@@ -52,13 +53,14 @@ Edit YAML schemas in `contracts/extensions/mcp/v1/`, then run `just generate_con
 Keep these boundaries when editing:
 
 - Preserve exact bytes in `runtime/tests/fixtures/`; tests depend on them.
+- Leave `mcp-app/src/component-core/` as shadcn wrote it; wrap a change in an element. Regenerate `mcp-app/src/generated/` with `pnpm --filter mcp-app tokens`, and `runtime/knowledge_mcp/ui/app.html` with `just generate_mcp_app_html`.
 - Refresh bundled universe specs and the six knowledge-bus skills through `just refresh_knowledge_model <tag>`, following the [upgrade steps](runtime/README.md#upgrade-knowledge-bus). Their hashes are recorded in [UPSTREAM.md](runtime/knowledge-bus/UPSTREAM.md).
 - Replace vendored anti-slop rules from their source, following [their provenance instructions](tools/oxlint/anti-slop/UPSTREAM.md).
 - Update copied module maps from their source READMEs as described below.
 
 ## Project map
 
-Edit module maps in [contracts/README.md](contracts/README.md#layout) and [runtime/README.md](runtime/README.md#layout). Run `just generate_readme_maps` to update this guide.
+Edit module maps in [contracts/README.md](contracts/README.md#layout), [mcp-app/README.md](mcp-app/README.md#layout) and [runtime/README.md](runtime/README.md#layout). Run `just generate_readme_maps` to update this guide.
 
 Modules are packages in `pnpm-workspace.yaml`, uv workspace members in `pyproject.toml`, and top-level folders with a README `## Layout` section.
 
@@ -70,12 +72,14 @@ Give each module a README.md, a CI job and a map region under Project map. Add a
 .
 ├── runtime/                         # MCP server, kb CLI and skills
 ├── contracts/                       # Tool results and document-types file schemas
+├── mcp-app/                         # MCP App cards for Claude
 ├── tools/                           # Repository maintenance tools
 │   ├── modules/                     # Module wiring checks
 │   ├── readme-regions/              # Module maps for CONTRIBUTING.md
 │   ├── formula/                     # Release, bottle and Homebrew formula scripts
 │   └── ...                          # conformance, dependencies, knowledge-model, oxlint
 ├── docs/                            # Docs site
+├── design/mcp-app/                  # MCP App tokens and storyboard generators
 ├── .github/workflows/               # CI jobs and release workflow
 ├── .github/assets/                  # README assets
 ├── .husky/                          # Git hooks
@@ -101,6 +105,26 @@ contracts/
 ```
 
 <!-- END AUTO-GENERATED contracts/README.md#layout -->
+
+### mcp-app
+
+<!-- BEGIN AUTO-GENERATED mcp-app/README.md#layout -->
+
+```text
+mcp-app/
+├── src/
+│   ├── component-core/              # shadcn base-vega components, never edited by hand
+│   ├── component-elements/          # K01–K13: badge, button, chips, tick box, note and the rest
+│   ├── component-patterns/          # P01–P07: card shell, change table, summary and full view
+│   ├── cards/                       # One card per tool result schema
+│   ├── bridge/                      # Harness connection, theme, display mode, ui/message
+│   ├── copy/                        # Every user-facing string
+│   └── generated/                   # tokens.auto.css from design/mcp-app/kmtokens.js
+├── scripts/                         # Token generator
+└── vite.config.ts                   # Single-file build
+```
+
+<!-- END AUTO-GENERATED mcp-app/README.md#layout -->
 
 ### runtime
 

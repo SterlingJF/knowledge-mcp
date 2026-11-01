@@ -18,7 +18,20 @@ operation:
   count: 4
   old_path: Index.md
   path: Index.md
+changes:
+  hunks: 1
+  lines:
+    - change: removed
+      text: "[[A]] [[B]]"
+    - change: added
+      text: "[[Alpha]] [[Beta]]"
+  more: 0
 card: |
   `Saved` · **Edit saved**
 
   The edit to `batch-vault` is recorded.
+
+  `batch-vault` · 1 change
+
+  - ~~[[A]] [[B]]~~
+  - [[Alpha]] [[Beta]]

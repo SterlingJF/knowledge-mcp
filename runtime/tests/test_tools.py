@@ -48,6 +48,17 @@ def test_server_registers_exact_expected_tool_names(tmp_path):
     assert {tool.name for tool in listed(tmp_path)} == TOOLS
 
 
+def titled(node, title):
+    if isinstance(node, dict):
+        if node.get("title") == title:
+            yield node
+        for value in node.values():
+            yield from titled(value, title)
+    elif isinstance(node, list):
+        for item in node:
+            yield from titled(item, title)
+
+
 def test_authorization_meanings_reach_the_listed_input_schemas(tmp_path):
     root = Path(__file__).resolve().parents[2]
     schema = yaml.safe_load(
@@ -62,11 +73,15 @@ def test_authorization_meanings_reach_the_listed_input_schemas(tmp_path):
             "kb_prepare_document_moves",
             "kb_prepare_conventions",
         }:
-            fields = tool.input_schema["$defs"]["AllowedBy"]["properties"]
-            for name in ("basis", "text", "location"):
-                assert fields[name].get("description") == source[name]["description"], (
-                    f"{tool.name}: {name} must preserve the shared authorization meaning"
-                )
+            found = list(titled(tool.input_schema, "AllowedBy"))
+            assert found, f"{tool.name}: no AllowedBy in the listed input schema"
+            for fields in (node["properties"] for node in found):
+                for name in ("basis", "text", "location"):
+                    assert (
+                        fields[name].get("description") == source[name]["description"]
+                    ), (
+                        f"{tool.name}: {name} must preserve the shared authorization meaning"
+                    )
 
 
 def test_tool_metadata_matches_local_operation_policy(
@@ -97,7 +112,15 @@ def test_server_instructions_name_the_three_skills_and_the_no_commit_rule(tmp_pa
         )
     )
     assert "commit nothing" in instructions
-    assert len(instructions.split()) <= 80
+    assert len(instructions.split()) <= 170
+
+
+def test_server_instructions_name_review_orient_and_non_code(tmp_path):
+    async def steps(client):
+        return client.instructions
+
+    instructions = session(server_parameters(tmp_path), steps)
+    assert all(word in instructions for word in ("review", "orient", "non-code"))
 
 
 def test_tool_descriptions_stay_within_80_words(tmp_path):
@@ -115,6 +138,10 @@ def test_tool_descriptions_stay_within_80_words(tmp_path):
     }
     for tool in listed(tmp_path):
         description = tool.description or ""
-        assert description.split()[0] in verbs, tool.name
+        action = description
+        if tool.name.startswith("kb_"):
+            assert description.startswith("Use "), tool.name
+            action = description.split(". ", 1)[1]
+        assert action.split()[0] in verbs, tool.name
         assert len(description.split()) <= 80, tool.name
         assert "log.jsonl" in description, tool.name

@@ -33,6 +33,20 @@ $defs:
         minItems: 1
         items:
           $ref: "#/$defs/row"
+      document_type:
+        $ref: "#/$defs/document_type"
+        description: The document's type, from kb_get_document_type.
+      reader:
+        $ref: "#/$defs/reader"
+        description: Who the document is for, from kb_list_audiences, and whether the person confirmed it.
+      filing:
+        $ref: "#/$defs/filing"
+        description: For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document.
+      open_questions:
+        description: Questions no source answers, apart from conflicting rows.
+        type: array
+        items:
+          $ref: "#/$defs/cell"
       left_out:
         description: Files you read but didn't cite.
         type: array
@@ -42,6 +56,19 @@ $defs:
         description: The proposal as markdown. Show it in your reply unchanged.
         type: string
         minLength: 1
+      based_on:
+        description: The input digest to recheck before saving. Present when
+          `document_digest` was sent.
+        title: Proposal inputs
+        type: object
+        additionalProperties: false
+        required:
+          - document_digest
+        properties:
+          document_digest:
+            $ref: common.schema.yaml#/$defs/digest
+      instance:
+        $ref: "#/$defs/instance"
   row:
     title: Proposal row
     type: object
@@ -54,10 +81,12 @@ $defs:
         $ref: "#/$defs/cell"
         description: The document's text now. Omit it for an addition.
       proposed:
+        description: The text you propose, in place of `current`.
         $ref: "#/$defs/cell"
       mark:
         $ref: "#/$defs/mark"
       sources:
+        description: Where the proposed text comes from. Cite at least one source per row.
         type: array
         minItems: 1
         items:
@@ -65,6 +94,7 @@ $defs:
             - $ref: "#/$defs/line_source"
             - $ref: "#/$defs/place_source"
             - $ref: "#/$defs/person_source"
+            - $ref: "#/$defs/file_source"
   cell:
     title: Proposal cell
     type: object
@@ -98,9 +128,11 @@ $defs:
       - line_number
     properties:
       file:
+        description: The file's path as you read it, such as `meeting-notes.md`.
         type: string
         minLength: 1
       line_number:
+        description: The 1-based line number in that file.
         type: integer
         minimum: 1
   place_source:
@@ -113,10 +145,23 @@ $defs:
       - place
     properties:
       file:
+        description: The sheet or deck's path as you read it, such as `build-timings.xlsx`.
         type: string
         minLength: 1
       place:
         description: Such as `Evening!A2:D10` or `slide 7`.
+        type: string
+        minLength: 1
+  file_source:
+    title: File source
+    description: A whole file, with no line or place, such as a sheet you read in full.
+    type: object
+    additionalProperties: false
+    required:
+      - file
+    properties:
+      file:
+        description: The file's path as you read it, such as `build-timings.xlsx`.
         type: string
         minLength: 1
   person_source:
@@ -128,6 +173,76 @@ $defs:
       - said
     properties:
       said:
+        description: What the person said, quoted or closely paraphrased.
+        type: string
+        minLength: 1
+  document_type:
+    title: Proposal document type
+    description: The document's type, from kb_get_document_type. Send it whenever you know it.
+    type: object
+    additionalProperties: false
+    required:
+      - id
+      - label
+    properties:
+      id:
+        description: Such as `design-proposal`.
+        type: string
+        minLength: 1
+      label:
+        description: Such as `Design proposal`.
+        type: string
+        minLength: 1
+  reader:
+    title: Proposal reader
+    description: The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.
+    type: object
+    additionalProperties: false
+    required:
+      - id
+      - label
+      - confirmed
+    properties:
+      id:
+        description: The audience's id, as kb_list_audiences returned it.
+        type: string
+        minLength: 1
+      label:
+        description: Such as `maintainers deciding whether to accept it`.
+        type: string
+        minLength: 1
+      confirmed:
+        description: True when the person confirmed the reader, false when it's your guess.
+        type: boolean
+  filing:
+    title: Filing note
+    description: Where a new document will be saved and why. Omit it for an existing document.
+    type: object
+    additionalProperties: false
+    required:
+      - path
+      - naming_rule
+    if:
+      type: object
+      properties:
+        naming_rule:
+          type: "null"
+    then:
+      type: object
+      required:
+        - reason
+      properties:
+        reason:
+          type: string
+    properties:
+      path:
+        $ref: common.schema.yaml#/$defs/path
+      naming_rule:
+        description: The naming rule that named the file, or null when none applied.
+        type: [string, "null"]
+        minLength: 1
+      reason:
+        description: Why you chose the path. Required when `naming_rule` is null.
         type: string
         minLength: 1
   left_out_file:
@@ -139,8 +254,33 @@ $defs:
       - reason
     properties:
       file:
+        description: The path of a file you read but didn't cite.
         type: string
         minLength: 1
       reason:
+        description: Why you left the file out, in one line.
         type: string
         minLength: 1
+  instance:
+    title: Proposal instance
+    description:
+      Identifies this card among earlier cards for the same document. A card
+      with a later `created_at`, then a higher `seq`, supersedes it. Ordering uses
+      server wall-clock time, then `seq`.
+    type: object
+    additionalProperties: false
+    required:
+      - subject
+      - created_at
+      - seq
+    properties:
+      subject:
+        description: The document the proposal is about, as sent in `location`.
+        type: string
+        minLength: 1
+      created_at:
+        $ref: common.schema.yaml#/$defs/time
+      seq:
+        description: Counts up with each proposal this server process prepares.
+        type: integer
+        minimum: 1

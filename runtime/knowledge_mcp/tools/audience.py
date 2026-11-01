@@ -15,7 +15,7 @@ from knowledge_mcp.tools.kbp import READS, Folders, KnowledgeBusFolders, Locatio
 from knowledge_mcp.type_scope import scope_specs
 
 DESCRIPTION = """\
-List the readers you can choose for a document type. Returns the document type's `actor`, plus the audience question and its `choices` from the universe spec. Appends the answer to `log.jsonl` and opens no knowledge-base file.
+Use when you choose or check who a document is for ("who reads this"). List the readers you can choose for a document type. Returns the document type's `actor`, plus the audience question and its `choices` from the universe spec. Appends the answer to `log.jsonl` and opens no knowledge-base file.
 """
 
 UniverseSpec = Annotated[

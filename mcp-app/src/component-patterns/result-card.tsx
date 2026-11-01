@@ -1,0 +1,96 @@
+// P05 Result and refusal. A result says what was done, when and by whom, with Undo and one other
+// step. A refusal says why and that nothing changed, with one next step.
+import type { ReactNode } from "react";
+import { Undo2 } from "lucide-react";
+
+import { Note } from "@/component-patterns/note";
+import { action as actionCopy, frozen, line, meta } from "@/copy/en";
+import { CardShell } from "./card-shell";
+import type { CardAction, CardDisclosure } from "./card-shell";
+import { lifecycleProps } from "./card-lifecycle";
+import type { CardLifecycle } from "./card-lifecycle";
+
+type Common = {
+  eyebrow: ReactNode;
+  title: ReactNode;
+  /** A label from `badge.done` or `badge.refused`. */
+  badgeLabel: ReactNode;
+  children?: ReactNode;
+  why?: ReactNode;
+  lifecycle: CardLifecycle;
+};
+
+export type ResultCardProps =
+  | (Common & {
+      kind: "result";
+      /** When it was recorded: `Oct 28, 09:41`. */
+      when: string;
+      /** Whose OK; defaults to `meta.approvedByYou`. */
+      who?: string;
+      /** The message Undo sends. Absent: no Undo (an undone change is redone through chat, R03). */
+      undoMessage?: string;
+      secondary?: CardAction;
+      /** A neutral badge once Undo froze the card, like the shell's Replaced: `badge.neutral.undoRequested`. */
+      frozenBadge?: ReactNode;
+      /** "Show the change" beside Undo; it opens the children (the Diff). */
+      disclosure?: CardDisclosure;
+    })
+  | (Common & {
+      kind: "refusal";
+      /** Why it was refused; the card adds that nothing was changed. */
+      reason: ReactNode;
+      nextStep: CardAction;
+    });
+
+export function ResultCard(props: ResultCardProps) {
+  const { eyebrow, title, badgeLabel, children, why, lifecycle } = props;
+  if (props.kind === "result") {
+    const actions: CardAction[] = [];
+    if (props.undoMessage != null)
+      actions.push({
+        label: actionCopy.undo,
+        message: props.undoMessage,
+        frozenLine: frozen.undoRequested,
+        variant: "outline",
+        icon: <Undo2 aria-hidden="true" data-icon="inline-start" />,
+      });
+    if (props.secondary) actions.push(props.secondary);
+    return (
+      <CardShell
+        eyebrow={eyebrow}
+        title={title}
+        meta={
+          meta.recorded(props.when) +
+          meta.join +
+          (props.who ?? meta.approvedByYou)
+        }
+        badge={
+          lifecycle.state === "frozen" && props.frozenBadge != null
+            ? { tone: "neutral", label: props.frozenBadge }
+            : { tone: "done", label: badgeLabel }
+        }
+        why={why}
+        actions={actions}
+        disclosure={props.disclosure}
+        {...lifecycleProps(lifecycle)}
+      >
+        {children}
+      </CardShell>
+    );
+  }
+  return (
+    <CardShell
+      eyebrow={eyebrow}
+      title={title}
+      badge={{ tone: "refused", label: badgeLabel }}
+      why={why}
+      actions={[props.nextStep]}
+      {...lifecycleProps(lifecycle)}
+    >
+      <Note kind="warning">
+        {props.reason} {line.nothingChanged}
+      </Note>
+      {children}
+    </CardShell>
+  );
+}

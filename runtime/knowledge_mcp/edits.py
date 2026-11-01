@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import difflib
 import json
 import re
 import uuid
@@ -15,6 +16,7 @@ from knowledge_mcp.models_auto.edits_schema import Edit
 SCHEMA = "knowledge-mcp/edit/2"
 LISTING = "knowledge-mcp/edits/2"
 NAME = "edits.jsonl"
+CHANGED_LINES = 12
 
 DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
 
@@ -103,12 +105,59 @@ def record(
     return entry
 
 
-def receipt(entry: dict[str, Any]) -> dict[str, Any]:
-    """Return the entry with `schema` and without `before` and `after`, which the agent already has."""
+def changes(before: str, after: str) -> dict[str, Any]:
+    """Return the removed and added lines in document order, capped at CHANGED_LINES."""
+    old, new = before.splitlines(), after.splitlines()
+    matcher = difflib.SequenceMatcher(a=old, b=new, autojunk=False)
+    lines: list[dict[str, str]] = []
+    hunks = 0
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            continue
+        hunks += 1
+        lines += [{"change": "removed", "text": text} for text in old[i1:i2]]
+        lines += [{"change": "added", "text": text} for text in new[j1:j2]]
+    return {
+        "hunks": hunks,
+        "lines": lines[:CHANGED_LINES],
+        "more": max(0, len(lines) - CHANGED_LINES),
+    }
+
+
+def check_undoes(location: str, undoes: str) -> dict[str, str]:
+    """Return the id and time of the undone edit. Raise EditError when no valid edit recorded for `location` has the id `undoes`.
+
+    A grouped undo is recorded under the group's root, like the edits it undoes.
+    """
+    for edit in listing(location)["edits"]:
+        if edit["id"] == undoes:
+            return {"id": edit["id"], "time": edit["time"]}
+    msg = (
+        f"No edit recorded for {location!r} has the id {undoes!r}. Call `kb_list_edits` "
+        "with the same `location` and send the id of the edit this one undoes, or leave "
+        "`undoes` out."
+    )
+    raise EditError(msg, pointer=problems.pointer("undoes"))
+
+
+def receipt(
+    entry: dict[str, Any], undoes: dict[str, str] | None = None
+) -> dict[str, Any]:
+    """Return the entry with `schema` and without `before` and `after`, which the agent already has.
+
+    Add `changes`, a capped excerpt of the changed lines, so the receipt stays small.
+    """
     kept = {
         name: value for name, value in entry.items() if name not in ("before", "after")
     }
-    return {"schema": SCHEMA, **kept}
+    found: dict[str, Any] = {"schema": SCHEMA, **kept}
+    if entry["before"] == "" and entry.get("whole_file"):
+        found["created"] = True
+    if undoes is not None:
+        found["undoes"] = undoes
+    if "after" in entry:
+        found["changes"] = changes(entry["before"], entry["after"])
+    return found
 
 
 def _current(line: dict[str, Any]) -> dict[str, Any]:

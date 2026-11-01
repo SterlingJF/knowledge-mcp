@@ -12,5 +12,6 @@
     "verbatimModuleSyntax": true,
     "erasableSyntaxOnly": true
   },
-  "include": ["tools/**/*.ts"]
+  "include": ["tools/**/*.ts"],
+  "exclude": ["tools/ce-pattern/**"]
 }

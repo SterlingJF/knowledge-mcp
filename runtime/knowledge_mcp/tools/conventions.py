@@ -19,6 +19,7 @@ from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import respond
 from knowledge_mcp.tools.kbp import READS, Location
 from knowledge_mcp.type_scope import Scopes
+from knowledge_mcp.views import markdown
 
 ConventionsText = Annotated[
     str | None,
@@ -38,7 +39,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
     @mcp.tool(
         name="kb_list_conventions",
         title="List folder conventions",
-        description="List naming and filing conventions that apply in a folder, with their source folders and parent marks. Report inactive declarations. Append the answer to log.jsonl and open no knowledge-base file.",
+        description='Use before you name, move or rename a file ("where does this go", "what should I call it"). List naming and filing conventions that apply in a folder, with their source folders and parent marks. Report inactive declarations. Append the answer to log.jsonl and open no knowledge-base file.',
         annotations=READS,
     )
     def kb_list_conventions(
@@ -73,7 +74,7 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
     @mcp.tool(
         name="kb_prepare_conventions",
         title="Prepare naming and filing conventions",
-        description="Prepare conventions text from supplied configuration and proposed changes. Include permission to receive replacement text. Append the answer to log.jsonl and open no knowledge-base file.",
+        description="Use when the person asks to set or change a folder's naming or filing rules. Prepare conventions text from supplied configuration and proposed changes. Include permission to receive replacement text. Append the answer to log.jsonl and open no knowledge-base file.",
         annotations=READS,
     )
     def kb_prepare_conventions(
@@ -120,4 +121,5 @@ def register(mcp: MCPServer, workspace: Workspace) -> None:
                     ),
                 ),
             },
+            view=markdown.conventions,
         )

@@ -347,6 +347,10 @@ def _reference(
     return stem
 
 
+def _line(text: str, offset: int) -> int:
+    return text.count("\n", 0, offset) + 1
+
+
 def _issue(
     code: str, source: str | None, token: Token | None, detail: str
 ) -> dict[str, Any]:
@@ -485,9 +489,17 @@ class Plan:
         return self.sent.path if path == self.sent.old_path else path
 
     def issue(
-        self, code: str, source: str | None, token: Token | None, detail: str
+        self,
+        code: str,
+        source: str | None,
+        token: Token | None,
+        detail: str,
+        choices: list[dict[str, str]] | None = None,
     ) -> None:
-        self.result["issues"].append(_issue(code, source, token, detail))
+        found = _issue(code, source, token, detail)
+        if choices:
+            found["choices"] = choices
+        self.result["issues"].append(found)
 
     def target(self, token: Token, source: str) -> str | None:
         target, problem = self.resolve(token, source, self.paths)
@@ -515,7 +527,11 @@ class Plan:
                 if problem == "link-ambiguous"
                 else "The existing link has no listed target."
             )
-            self.issue(problem, source, token, detail)
+            choices = None
+            if problem == "link-ambiguous" and isinstance(self.sent, BatchRequest):
+                candidates, _ = _candidates(token, source, self.paths)
+                choices = [dict(action="bind_link", path=p) for p in candidates]
+            self.issue(problem, source, token, detail, choices)
         return target
 
     def replacement(self, token: Token, source: str, target: str) -> str | None:
@@ -538,6 +554,24 @@ class Plan:
         )
 
     def document(self, source: str, text: str) -> None:
+        first = len(self.result["issues"])
+        self._document(source, text)
+        if not isinstance(self.sent, BatchRequest):
+            return
+        for found in self.result["issues"][first:]:
+            start, end = found.get("start"), found.get("end")
+            if (
+                found["code"].startswith("link-")
+                and found["code"] != "link-unpreserved"
+                and found["source_path"] == source
+                and start is not None
+                and end is not None
+                and end > start
+            ):
+                found["line"] = _line(text, start)
+                found["text"] = text[start:end]
+
+    def _document(self, source: str, text: str) -> None:
         parsed, unsupported = tokens(text)
         for start, end in unsupported:
             self.result["issues"].append(
@@ -565,16 +599,18 @@ class Plan:
                     + reference
                     + text[token.path_end : token.end]
                 )
-            self.result["links"].append(
-                dict(
-                    source_path=source,
-                    start=token.start,
-                    end=token.end,
-                    target_before=target,
-                    target_after=self.after(target),
-                    replacement=replacement,
-                )
+            link = dict(
+                source_path=source,
+                start=token.start,
+                end=token.end,
+                target_before=target,
+                target_after=self.after(target),
+                replacement=replacement,
             )
+            if isinstance(self.sent, BatchRequest):
+                link["line"] = _line(text, token.start)
+                link["text"] = text[token.start : token.end]
+            self.result["links"].append(link)
         for start, end, reference in sorted(edits, reverse=True):
             text = text[:start] + reference + text[end:]
         self.verify(source, text, expected)
@@ -789,6 +825,11 @@ def _batch_destinations(
                 None,
                 f"Destination {plan.after(old)} for {old} conflicts with "
                 f"{plan.after(occupant)} from {occupant}. Choose another destination or revise the conflicting row.",
+                [
+                    dict(action="skip_move", path=p)
+                    for p in sorted({old, occupant})
+                    if p in sent.mapping
+                ],
             )
     for old, new in sorted(sent.mapping.items()):
         entry = files.get(old)

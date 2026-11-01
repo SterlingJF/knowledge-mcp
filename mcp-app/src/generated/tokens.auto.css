@@ -1,0 +1,185 @@
+/* Generated from design/mcp-app/kmtokens.js by scripts/build-tokens.ts. Edit the tokens, not this file. */
+
+:root {
+  --color-background-primary: #FFFFFF;
+  --color-background-secondary: #F5F4ED;
+  --color-background-tertiary: #FAF9F5;
+  --color-background-inverse: #141413;
+  --color-background-info: #D6E4F6;
+  --color-background-success: #E9F1DC;
+  --color-background-warning: #F6EEDF;
+  --color-background-danger: #F7ECEC;
+  --color-text-primary: #141413;
+  --color-text-secondary: #3D3D3A;
+  --color-text-tertiary: #73726C;
+  --color-text-inverse: #FFFFFF;
+  --color-text-info: #3266AD;
+  --color-text-success: #265B19;
+  --color-text-warning: #5A4815;
+  --color-text-danger: #7F2C28;
+  --color-border-primary: rgba(31,30,29,.4);
+  --color-border-secondary: rgba(31,30,29,.3);
+  --color-border-tertiary: rgba(31,30,29,.15);
+  --color-ring-primary: rgba(20,20,19,.7);
+  --font-sans: "Anthropic Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, monospace;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+  --font-text-xs-size: 12px;
+  --font-text-xs-line-height: 1.4;
+  --font-text-sm-size: 14px;
+  --font-text-sm-line-height: 1.4;
+  --font-heading-md-size: 16px;
+  --font-heading-md-line-height: 1.4;
+  --border-radius-xs: 4px;
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 10px;
+  --border-radius-xl: 12px;
+  --border-radius-full: 9999px;
+  --border-width-regular: 0.5px;
+  color-scheme: light dark;
+}
+
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  --color-background-primary: #30302E;
+  --color-background-secondary: #262624;
+  --color-background-tertiary: #141413;
+  --color-background-inverse: #FAF9F5;
+  --color-background-info: #253E5F;
+  --color-background-success: #1B4614;
+  --color-background-warning: #483A0F;
+  --color-background-danger: #602A28;
+  --color-text-primary: #FAF9F5;
+  --color-text-secondary: #C2C0B6;
+  --color-text-tertiary: #9C9A92;
+  --color-text-inverse: #141413;
+  --color-text-info: #80AADD;
+  --color-text-success: #7AB948;
+  --color-text-warning: #D1A041;
+  --color-text-danger: #EE8884;
+  --color-border-primary: rgba(222,220,209,.4);
+  --color-border-secondary: rgba(222,220,209,.3);
+  --color-border-tertiary: rgba(222,220,209,.15);
+  --color-ring-primary: rgba(250,249,245,.7);
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --color-background-primary: #FFFFFF;
+  --color-background-secondary: #F5F4ED;
+  --color-background-tertiary: #FAF9F5;
+  --color-background-inverse: #141413;
+  --color-background-info: #D6E4F6;
+  --color-background-success: #E9F1DC;
+  --color-background-warning: #F6EEDF;
+  --color-background-danger: #F7ECEC;
+  --color-text-primary: #141413;
+  --color-text-secondary: #3D3D3A;
+  --color-text-tertiary: #73726C;
+  --color-text-inverse: #FFFFFF;
+  --color-text-info: #3266AD;
+  --color-text-success: #265B19;
+  --color-text-warning: #5A4815;
+  --color-text-danger: #7F2C28;
+  --color-border-primary: rgba(31,30,29,.4);
+  --color-border-secondary: rgba(31,30,29,.3);
+  --color-border-tertiary: rgba(31,30,29,.15);
+  --color-ring-primary: rgba(20,20,19,.7);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-background-primary: #30302E;
+    --color-background-secondary: #262624;
+    --color-background-tertiary: #141413;
+    --color-background-inverse: #FAF9F5;
+    --color-background-info: #253E5F;
+    --color-background-success: #1B4614;
+    --color-background-warning: #483A0F;
+    --color-background-danger: #602A28;
+    --color-text-primary: #FAF9F5;
+    --color-text-secondary: #C2C0B6;
+    --color-text-tertiary: #9C9A92;
+    --color-text-inverse: #141413;
+    --color-text-info: #80AADD;
+    --color-text-success: #7AB948;
+    --color-text-warning: #D1A041;
+    --color-text-danger: #EE8884;
+    --color-border-primary: rgba(222,220,209,.4);
+    --color-border-secondary: rgba(222,220,209,.3);
+    --color-border-tertiary: rgba(222,220,209,.15);
+    --color-ring-primary: rgba(250,249,245,.7);
+  }
+}
+
+/* shadcn's names, pointed at the host roles; declared on themed containers too, so they re-resolve there. */
+
+:root,
+[data-theme] {
+  --background: transparent;
+  --foreground: var(--color-text-primary);
+  --card: transparent;
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-background-primary);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-background-inverse);
+  --primary-foreground: var(--color-text-inverse);
+  --secondary: var(--color-background-secondary);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: var(--color-background-secondary);
+  --muted-foreground: var(--color-text-tertiary);
+  --accent: var(--color-background-secondary);
+  --accent-foreground: var(--color-text-primary);
+  --destructive: var(--color-text-danger);
+  --border: var(--color-border-tertiary);
+  --input: var(--color-border-secondary);
+  --ring: var(--color-ring-primary);
+  --radius: var(--border-radius-md);
+  --success: var(--color-background-success);
+  --success-foreground: var(--color-text-success);
+  --warning: var(--color-background-warning);
+  --warning-foreground: var(--color-text-warning);
+}
+
+/* Tailwind colours, fonts, type sizes, radii and the border width for shadcn's classes. */
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --text-xs: var(--font-text-xs-size);
+  --text-xs--line-height: var(--font-text-xs-line-height);
+  --text-sm: var(--font-text-sm-size);
+  --text-sm--line-height: var(--font-text-sm-line-height);
+  --text-base: var(--font-heading-md-size);
+  --text-base--line-height: var(--font-heading-md-line-height);
+  --radius-sm: var(--border-radius-sm);
+  --radius-md: var(--border-radius-md);
+  --radius-lg: var(--border-radius-lg);
+  --radius-xl: var(--border-radius-xl);
+  --default-border-width: var(--border-width-regular);
+}

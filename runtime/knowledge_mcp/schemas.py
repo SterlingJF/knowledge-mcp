@@ -96,3 +96,41 @@ def convention_issues(data: Any) -> list[str]:
         f"{'/'.join(map(str, e.absolute_path))}: {e.message}"
         for e in Draft202012Validator(listed("conventions")).iter_errors(data)
     ]
+
+
+_NULL = {"type": "null"}
+
+
+def inlined(schema: dict[str, Any]) -> dict[str, Any]:
+    """The schema with every local `$ref` replaced by its target and no `$defs`.
+
+    An optional field that defaults to null becomes a plain optional property.
+    Some clients drop `$defs` before the model sees the schema.
+    """
+    defs: dict[str, Any] = schema.get("$defs", {})
+
+    def resolve(node: Any) -> Any:
+        if isinstance(node, list):
+            return [resolve(item) for item in node]
+        if not isinstance(node, dict):
+            return node
+        rest = {key: value for key, value in node.items() if key != "$defs"}
+        if "$ref" in rest:
+            target = rest.pop("$ref").removeprefix("#/$defs/")
+            # The use site's description and default win over the definition's.
+            return {**resolve(defs[target]), **resolve(rest)}
+        options = rest.get("anyOf")
+        if (
+            "default" in rest
+            and rest["default"] is None
+            and isinstance(options, list)
+            and len(options) == 2  # noqa: PLR2004 - a value or null.
+            and _NULL in options
+        ):
+            (kept,) = [option for option in options if option != _NULL]
+            del rest["anyOf"], rest["default"]
+            return {**resolve(kept), **resolve(rest)}
+        return {key: resolve(value) for key, value in rest.items()}
+
+    resolved: dict[str, Any] = resolve(schema)
+    return resolved

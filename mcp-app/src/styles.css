@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "./generated/tokens.auto.css";
+
+/* shadcn's names, the host mapping and every token class are generated into tokens.auto.css from kmtokens.js. */
+
+/* shadcn's base: borders and outlines take the theme's colours, not currentColor. */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+}
+
+/* The host's safe area, set on <html> by the bridge from hostContext.safeAreaInsets. */
+[data-app-root] {
+  padding: var(--safe-area-top, 0) var(--safe-area-right, 0)
+    var(--safe-area-bottom, 0) var(--safe-area-left, 0);
+}
+
+/* A themed container sets its own text colour, so nested text follows its theme, not the page's. */
+[data-theme] {
+  color: var(--color-text-primary);
+}
+
+/* Transparent theming: Claude's chat shows through the frame. */
+html,
+body {
+  background: transparent;
+  margin: 0;
+}
+
+/* Body text size on body, not html, so rem keeps the browser's 16px and rem-based sizes stay true. */
+body {
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-text-sm-size);
+  line-height: var(--font-text-sm-line-height);
+}

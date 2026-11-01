@@ -47,7 +47,7 @@ from mcp_types import (
 from mcp_types.jsonrpc import INVALID_PARAMS
 from pydantic import ValidationError
 
-from knowledge_mcp import problems, schemas, version
+from knowledge_mcp import apps, problems, schemas, version
 from knowledge_mcp.kbp import KbpMissing
 from knowledge_mcp.scope import Workspace
 from knowledge_mcp.tools import (
@@ -66,7 +66,16 @@ from knowledge_mcp.tools import (
 )
 
 INSTRUCTIONS = """\
-Use the kb-write-document skill before you propose changes to, write or edit a document. Use the kb-track-document-types skill at the start of a session and after you create, move or delete a file. Use the kb-import-document skill to import a document written elsewhere. knowledge-mcp opens no knowledge-base file. You read the files and pass their content in the tool arguments. While you use knowledge-mcp, commit nothing, push nothing, open no issue or pull request, and post no comment.
+knowledge-mcp is for any change to a non-code file, wherever it lives: a knowledge base, a codebase's docs and records, or a local or remote drive. Use it to orient, review a change, work through incoming material, write or revise, organize and check history. Code stays out.
+
+Start with:
+- Orient ("what is this folder", "where do I start"): the kb-track-document-types skill.
+- Review ("review this change", "check this before I save", "is this right"), write or revise: the kb-write-document skill, then kb_prepare_proposal before anything is saved.
+- Incoming notes, transcripts or documents ("bring these notes into that file"): the kb-import-document skill.
+- Organize (file, move, rename): kb-write-document, then kb_prepare_document_moves.
+- History ("what changed", "undo that"): kb_list_edits.
+
+Also use kb-track-document-types at session start and after you create, move or delete a file. knowledge-mcp opens none of your files. You read the files and pass their content in the tool arguments. While you use knowledge-mcp, commit nothing, push nothing, open no issue or pull request, and post no comment.
 """
 
 
@@ -106,6 +115,7 @@ class Server(MCPServer):
         # Registration, schemas and invocation share the SDK's native metadata.
         self.tools = ToolManager()
         self.subscriptions = InMemorySubscriptionBus()
+        self.extensions: dict[str, dict[str, Any]] = {}
 
     def add_tool(  # noqa: PLR0913, PLR0917 - native SDK registration signature.
         self,
@@ -159,6 +169,7 @@ class Server(MCPServer):
             on_get_prompt=self.prompt_handler,
             on_subscriptions_listen=ListenHandler(self.subscriptions),
         )
+        server.extensions = self.extensions
         stdin = Stdin() if sys.platform != "win32" else None
         async with stdio_server(stdin=stdin) as (read_stream, write_stream):
             await server.run(
@@ -208,15 +219,10 @@ class Server(MCPServer):
 
     async def read_handler(
         self,
-        _ctx: ServerRequestContext[Any],
+        ctx: ServerRequestContext[Any],
         params: ReadResourceRequestParams,
     ) -> Any:
-        # This application registers no resources, matching the native empty registry.
-        raise MCPError(
-            code=INVALID_PARAMS,
-            message=f"Unknown resource: {params.uri}",
-            data={"uri": str(params.uri)},
-        )
+        return await self._handle_read_resource(ctx, params)
 
     async def prompts_handler(
         self,
@@ -238,7 +244,9 @@ class Server(MCPServer):
                 name=info.name,
                 title=info.title,
                 description=info.description,
-                input_schema={**info.parameters, "additionalProperties": False},
+                input_schema=schemas.inlined(
+                    {**info.parameters, "additionalProperties": False}
+                ),
                 output_schema=(
                     schemas.listed(schemas.RESULTS[info.name])
                     if info.name in schemas.RESULTS
@@ -349,6 +357,7 @@ def build_server(workspace: Workspace | None = None) -> MCPServer:
     importing.register(mcp, workspace)
     kbp.register(mcp, workspace)
     proposal.register(mcp, workspace)
+    mcp.extensions = apps.register(mcp)
     # App registration must stay in sync with the canonical contract registry.
     missing = {tool.name for tool in mcp.tools.list_tools()} - schemas.RESULTS.keys()
     if missing:

@@ -51,8 +51,16 @@ record: |
       text: Keep the document types in .knowledge-bus/plugins/knowledge-mcp/ up to date
         as you work.
       location: AGENTS.md
-    time: '2026-10-18T17:42:08.472251Z'
-digest: sha256:56453ac08b1f7449e94e876e36a677a39ab0ff0a66de5882579c94d887f7ef93
+    time: '2026-10-28T07:24:55.292916Z'
+digest: sha256:a9a3e8a701a19a09914014a5daf7b9753ae9fd56d30a22fc87ec156cd9c256e2
 received:
   - name: .knowledge-bus/plugins/knowledge-mcp/conventions.yaml
     digest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+card: |
+  `PROPOSED CONVENTIONS` · `Approved`
+
+  **Naming and filing for notes**
+
+  1. `design-proposal` · `Proposals/` · title
+
+  Existing files unchanged until a move.

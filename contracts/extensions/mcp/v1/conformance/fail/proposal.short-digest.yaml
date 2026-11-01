@@ -1,0 +1,13 @@
+---
+# A digest is sha256: and 64 lowercase hex digits.
+schema: knowledge-mcp/proposal/1
+summary: Focus proposal on retiring the evening build
+card: "`PROPOSED CHANGES`"
+based_on:
+  document_digest: sha256:abc
+rows:
+  - proposed:
+      text: Evening build retirement
+    sources:
+      - file: meeting-notes.md
+        line_number: 15

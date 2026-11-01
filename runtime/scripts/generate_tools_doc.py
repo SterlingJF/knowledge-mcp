@@ -10,6 +10,8 @@ import unicodedata
 from pathlib import Path
 from typing import Any
 
+from knowledge_mcp.main import build_server
+
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACTS = ROOT / "contracts" / "extensions" / "mcp" / "v1"
 RECIPE = "just generate_mcp_tools_doc"
@@ -144,6 +146,14 @@ def regions(tools: list[dict[str, Any]]) -> dict[str, str]:
     }
 
 
+def declared_inputs() -> dict[str, dict[str, Any]]:
+    """Each tool's input schema with its named shapes, before tools/list inlines them."""
+    return {
+        info.name: {**info.parameters, "additionalProperties": False}
+        for info in build_server().tools.list_tools()
+    }
+
+
 def main() -> int:
     """With --check, write nothing and exit 1 when the doc is stale.
 
@@ -158,7 +168,11 @@ def main() -> int:
     )
     args = parser.parse_args()
     listed = json.loads((CONTRACTS / "tools.json").read_text())
-    tools = listed["tools"] if isinstance(listed, dict) else listed
+    declared = declared_inputs()
+    tools = [
+        {**tool, "inputSchema": declared[tool["name"]]}
+        for tool in (listed["tools"] if isinstance(listed, dict) else listed)
+    ]
     text = args.doc.read_text()
     updated = text
     for name, body in regions(tools).items():

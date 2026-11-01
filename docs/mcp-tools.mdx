@@ -22,18 +22,18 @@ The included [writing skill](https://github.com/SterlingJF/knowledge-mcp/blob/ma
 
 | Tool                           | Purpose                                                                                                                                                       | Result                                                                                                                                                   |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `kb_get_document_type`         | Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing.                                             | [document-type.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-type.schema.yaml)                 |
-| `kb_list_audiences`            | List the readers you can choose for a document type.                                                                                                          | [audiences.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/audiences.schema.yaml)                         |
-| `kb_list_convention_templates` | List bundled ACE, PARA and Johnny.Decimal definitions for notes, with folder purposes, naming suggestions and sources.                                        | [convention-templates.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/convention-templates.schema.yaml)   |
-| `kb_list_conventions`          | List naming and filing conventions that apply in a folder, with their source folders and parent marks.                                                        | [folder-conventions.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/folder-conventions.schema.yaml)       |
-| `kb_list_edits`                | List the edits recorded for `location`, oldest first, to check or undo an edit or to pick up earlier work.                                                    | [edits.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/edits.schema.yaml)                                 |
-| `kb_prepare_conventions`       | Prepare conventions text from supplied configuration and proposed changes.                                                                                    | [conventions-update.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/conventions-update.schema.yaml)       |
-| `kb_prepare_document_move`     | Prepare a document move from supplied text, a complete listing and permission.                                                                                | [document-move.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-move.schema.yaml)                 |
-| `kb_prepare_document_moves`    | Prepare moves together from supplied text and a complete listing.                                                                                             | [document-moves.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-moves.schema.yaml)               |
-| `kb_prepare_document_types`    | Prepare document-types text by comparing a complete listing with saved entries.                                                                               | [document-types-update.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
-| `kb_prepare_import`            | Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`.                                    | [import.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/import.schema.yaml)                               |
-| `kb_prepare_proposal`          | Prepare the proposed-changes card whenever you propose changes to a document, before any edit.                                                                | [proposal.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/proposal.schema.yaml)                           |
-| `kb_record_edit`               | Record an edit right after you make it, so the person can check or undo the change.                                                                           | [edit.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/edit.schema.yaml)                                   |
+| `kb_get_document_type`         | Use when you orient in a folder or before you write, revise or move a non-code file ("what is this", "where does this go").                                   | [document-type.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-type.schema.yaml)                 |
+| `kb_list_audiences`            | Use when you choose or check who a document is for ("who reads this").                                                                                        | [audiences.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/audiences.schema.yaml)                         |
+| `kb_list_convention_templates` | Use when the person wants a folder system for notes ("set up PARA", "how should I organize this").                                                            | [convention-templates.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/convention-templates.schema.yaml)   |
+| `kb_list_conventions`          | Use before you name, move or rename a file ("where does this go", "what should I call it").                                                                   | [folder-conventions.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/folder-conventions.schema.yaml)       |
+| `kb_list_edits`                | Use when the person asks "what changed", "undo that" or where they left off.                                                                                  | [edits.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/edits.schema.yaml)                                 |
+| `kb_prepare_conventions`       | Use when the person asks to set or change a folder's naming or filing rules.                                                                                  | [conventions-update.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/conventions-update.schema.yaml)       |
+| `kb_prepare_document_move`     | Use when the person asks to move or rename one file ("move this", "rename that").                                                                             | [document-move.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-move.schema.yaml)                 |
+| `kb_prepare_document_moves`    | Use when the person asks to file, move or rename several files ("tidy my Inbox").                                                                             | [document-moves.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-moves.schema.yaml)               |
+| `kb_prepare_document_types`    | Use at the start of a session, to orient ("what is this folder", "where do I start"), and after you create, move or delete a file.                            | [document-types-update.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/document-types-update.schema.yaml) |
+| `kb_prepare_import`            | Use when the person brings in notes, a transcript or a document from elsewhere ("go through these notes", "bring this into that file").                       | [import.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/import.schema.yaml)                               |
+| `kb_prepare_proposal`          | Use whenever you propose, or are asked to review, a change to a non-code file ("review this change", "is this right"), before anything is saved.              | [proposal.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/proposal.schema.yaml)                           |
+| `kb_record_edit`               | Use right after you save a change to a non-code file, so the person can check or undo it.                                                                     | [edit.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/edit.schema.yaml)                                   |
 | `kbp_card`                     | Read the card for a document type before you draft or edit a document of that type.                                                                           | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
 | `kbp_explore`                  | Write an offline HTML viewer for a universe spec under `explorer/` beside `log.jsonl`.                                                                        | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
 | `kbp_inspect`                  | Get a universe spec and its type guidance as kbp's JSON model.                                                                                                | [kbp-output.schema.yaml](https://github.com/SterlingJF/knowledge-mcp/blob/main/contracts/extensions/mcp/v1/kbp-output.schema.yaml)                       |
@@ -157,6 +157,10 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 | `searched`              | boolean                                           | no       |                                                                                                                                                                                                                                                                                                                     |
 | `search`                | list of string or null                            | no       |                                                                                                                                                                                                                                                                                                                     |
 | `bindings`              | list of [LinkBinding](#linkbinding) or null       | no       |                                                                                                                                                                                                                                                                                                                     |
+| `summary`               | string or null                                    | no       | What the moves are for, in one line, such as `File the new files`. The answer echoes it.                                                                                                                                                                                                                            |
+| `folder`                | string or null                                    | no       | The folder the moved files come from, such as `Inbox`. The answer echoes it.                                                                                                                                                                                                                                        |
+| `stays`                 | list of [MoveStay](#movestay) or null             | no       | Files you leave where they are, each with the reason the person sees, such as `no document type` from a filing review. The answer echoes them.                                                                                                                                                                      |
+| `naming`                | list of [MoveNaming](#movenaming) or null         | no       | For a move's destination `path`, the naming rule or convention that produced its name, such as `date + title`. The answer echoes them.                                                                                                                                                                              |
 
 ### `kb_prepare_document_types`
 
@@ -188,13 +192,18 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 
 ### `kb_prepare_proposal`
 
-| Argument   | Type                                        | Required | Meaning                                                                                                         |
-| ---------- | ------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `location` | string                                      | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location. |
-| `summary`  | string                                      | yes      | What the proposal changes, in one line.                                                                         |
-| `rows`     | list of [ProposalRow](#proposalrow)         | yes      | One row per change, in display order. The card names row n change Cn.                                           |
-| `left_out` | list of [LeftOutFile](#leftoutfile) or null | no       | Files you read but didn't cite.                                                                                 |
-| `layout`   | [Layout](#layout)                           | no       | `list` in a terminal, which can't scroll a wide table sideways.                                                 |
+| Argument          | Type                                                  | Required | Meaning                                                                                                                                                                                                                                        |
+| ----------------- | ----------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location`        | string                                                | yes      | A knowledge-base or document location as plain text. knowledge-mcp logs this text and never opens the location.                                                                                                                                |
+| `summary`         | string                                                | yes      | What the proposal changes, in one line.                                                                                                                                                                                                        |
+| `rows`            | list of [ProposalRow](#proposalrow)                   | yes      | One row per change, in display order. The card names row n change Cn.                                                                                                                                                                          |
+| `left_out`        | list of [LeftOutFile](#leftoutfile) or null           | no       | Files you read but didn't cite.                                                                                                                                                                                                                |
+| `document_type`   | [ProposalDocumentType](#proposaldocumenttype) or null | no       | The document's type, from kb_get_document_type.                                                                                                                                                                                                |
+| `reader`          | [ProposalReader](#proposalreader) or null             | no       | Who the document is for, from kb_list_audiences, and whether the person confirmed it.                                                                                                                                                          |
+| `filing`          | [FilingNote](#filingnote) or null                     | no       | For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document.                                                                                                                                |
+| `open_questions`  | list of [ProposalCell](#proposalcell) or null         | no       | Questions no source answers, apart from conflicting rows.                                                                                                                                                                                      |
+| `layout`          | [Layout](#layout)                                     | no       | `list` in a terminal, which can't scroll a wide table sideways.                                                                                                                                                                                |
+| `document_digest` | [Digest](#digest) or null                             | no       | The SHA-256 of the document's current text as UTF-8, written `sha256:` plus 64 lowercase hex digits. Send it whenever you've read the document, so the card can refuse a save after the document changes. The answer returns it in `based_on`. |
 
 ### `kb_record_edit`
 
@@ -207,6 +216,7 @@ Failures in `kb_*` tools and errors before kbp runs return a problem object in `
 | `after_digest` | string or null                          | no       | The SHA-256 of `after` as UTF-8, written `sha256:` plus 64 lowercase hex digits. Replaces `after` only when `whole_file` is true. |
 | `whole_file`   | boolean or null                         | no       | True when `before` is the whole file.                                                                                             |
 | `operation`    | [EditOperation](#editoperation) or null | no       |                                                                                                                                   |
+| `undoes`       | [EditId](#editid) or null               | no       | The id of the earlier edit this edit undoes, from `kb_list_edits`. Omit it for other edits.                                       |
 
 ### `kbp_card`
 
@@ -399,6 +409,10 @@ Type: string, pattern `^sha256:[0-9a-f]{64}$`.
 | `old_path` | [MovePath](#movepath) | yes      |         |
 | `path`     | [MovePath](#movepath) | yes      |         |
 
+### EditId
+
+Type: string, pattern `^[0-9a-f]{32}$`.
+
 ### EditOperation
 
 | Field      | Type          | Required | Meaning                                                                                  |
@@ -462,6 +476,24 @@ Type: [FileCreated](#filecreated) or [FileDeleted](#filedeleted) or [FileMoved](
 | `old_path`    | [Path](#path)                       | yes      |                          |
 | `fingerprint` | [Fingerprint](#fingerprint) or null | no       |                          |
 
+### FileSource
+
+A whole file, with no line or place, such as a sheet you read in full.
+
+| Field  | Type   | Required | Meaning                                                       |
+| ------ | ------ | -------- | ------------------------------------------------------------- |
+| `file` | string | yes      | The file's path as you read it, such as `build-timings.xlsx`. |
+
+### FilingNote
+
+Where a new document will be saved and why. Omit it for an existing document.
+
+| Field         | Type           | Required | Meaning                                                         |
+| ------------- | -------------- | -------- | --------------------------------------------------------------- |
+| `path`        | [Path](#path)  | yes      |                                                                 |
+| `naming_rule` | string or null | yes      | The naming rule that named the file, or null when none applied. |
+| `reason`      | string or null | no       | Why you chose the path. Required when `naming_rule` is null.    |
+
 ### FilingReview
 
 | Field       | Type            | Required | Meaning                                                          |
@@ -499,19 +531,19 @@ Type: `list` or `table`.
 
 ### LeftOutFile
 
-| Field    | Type   | Required | Meaning |
-| -------- | ------ | -------- | ------- |
-| `file`   | string | yes      |         |
-| `reason` | string | yes      |         |
+| Field    | Type   | Required | Meaning                                      |
+| -------- | ------ | -------- | -------------------------------------------- |
+| `file`   | string | yes      | The path of a file you read but didn't cite. |
+| `reason` | string | yes      | Why you left the file out, in one line.      |
 
 ### LineSource
 
 A line in a text file.
 
-| Field         | Type    | Required | Meaning |
-| ------------- | ------- | -------- | ------- |
-| `file`        | string  | yes      |         |
-| `line_number` | integer | yes      |         |
+| Field         | Type    | Required | Meaning                                                     |
+| ------------- | ------- | -------- | ----------------------------------------------------------- |
+| `file`        | string  | yes      | The file's path as you read it, such as `meeting-notes.md`. |
+| `line_number` | integer | yes      | The 1-based line number in that file.                       |
 
 ### LinkBinding
 
@@ -538,11 +570,29 @@ An independently verified original target for a complete internal link token.
 | `path` | [MovePath](#movepath) | yes      |         |
 | `text` | string                | yes      |         |
 
+### MoveNaming
+
+The naming rule or convention that produced a move's destination name.
+
+| Field  | Type                  | Required | Meaning                                          |
+| ------ | --------------------- | -------- | ------------------------------------------------ |
+| `path` | [MovePath](#movepath) | yes      | The destination `path` of one move in `moves`.   |
+| `rule` | string                | yes      | The rule in a few words, such as `date + title`. |
+
 ### MovePath
 
 Path relative to the knowledge-base root, with forward slashes between folders.
 
 Type: string, pattern `^[^/\\\u0000]+(?:/[^/\\\u0000]+)*$`.
+
+### MoveStay
+
+A file the assistant leaves where it is, with the reason the person sees.
+
+| Field    | Type                  | Required | Meaning                                         |
+| -------- | --------------------- | -------- | ----------------------------------------------- |
+| `path`   | [MovePath](#movepath) | yes      |                                                 |
+| `reason` | string                | yes      | Why the file stays, such as `no document type`. |
 
 ### Part
 
@@ -558,18 +608,18 @@ Type: string.
 
 The person's words in this conversation.
 
-| Field  | Type   | Required | Meaning |
-| ------ | ------ | -------- | ------- |
-| `said` | string | yes      |         |
+| Field  | Type   | Required | Meaning                                              |
+| ------ | ------ | -------- | ---------------------------------------------------- |
+| `said` | string | yes      | What the person said, quoted or closely paraphrased. |
 
 ### PlaceSource
 
 A place in a sheet or deck.
 
-| Field   | Type   | Required | Meaning                                |
-| ------- | ------ | -------- | -------------------------------------- |
-| `file`  | string | yes      |                                        |
-| `place` | string | yes      | Such as `Evening!A2:D10` or `slide 7`. |
+| Field   | Type   | Required | Meaning                                                                |
+| ------- | ------ | -------- | ---------------------------------------------------------------------- |
+| `file`  | string | yes      | The sheet or deck's path as you read it, such as `build-timings.xlsx`. |
+| `place` | string | yes      | Such as `Evening!A2:D10` or `slide 7`.                                 |
 
 ### ProposalCell
 
@@ -578,14 +628,33 @@ A place in a sheet or deck.
 | `label` | string or null | no       | The field or section, such as `Title`. |
 | `text`  | string         | yes      | Plain words, without markdown syntax.  |
 
+### ProposalDocumentType
+
+The document's type, from kb_get_document_type. Send it whenever you know it.
+
+| Field   | Type   | Required | Meaning                    |
+| ------- | ------ | -------- | -------------------------- |
+| `id`    | string | yes      | Such as `design-proposal`. |
+| `label` | string | yes      | Such as `Design proposal`. |
+
+### ProposalReader
+
+The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.
+
+| Field       | Type    | Required | Meaning                                                                |
+| ----------- | ------- | -------- | ---------------------------------------------------------------------- |
+| `id`        | string  | yes      | The audience's id, as kb_list_audiences returned it.                   |
+| `label`     | string  | yes      | Such as `maintainers deciding whether to accept it`.                   |
+| `confirmed` | boolean | yes      | True when the person confirmed the reader, false when it's your guess. |
+
 ### ProposalRow
 
-| Field      | Type                                                                                              | Required | Meaning                                           |
-| ---------- | ------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------- |
-| `current`  | [ProposalCell](#proposalcell) or null                                                             | no       | The document's text now. Omit it for an addition. |
-| `proposed` | [ProposalCell](#proposalcell)                                                                     | yes      |                                                   |
-| `mark`     | [EvidenceMark](#evidencemark) or null                                                             | no       |                                                   |
-| `sources`  | list of [LineSource](#linesource) or [PlaceSource](#placesource) or [PersonSource](#personsource) | yes      |                                                   |
+| Field      | Type                                                                                                                           | Required | Meaning                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------- |
+| `current`  | [ProposalCell](#proposalcell) or null                                                                                          | no       | The document's text now. Omit it for an addition.                     |
+| `proposed` | [ProposalCell](#proposalcell)                                                                                                  | yes      | The text you propose, in place of `current`.                          |
+| `mark`     | [EvidenceMark](#evidencemark) or null                                                                                          | no       |                                                                       |
+| `sources`  | list of [LineSource](#linesource) or [PlaceSource](#placesource) or [PersonSource](#personsource) or [FileSource](#filesource) | yes      | Where the proposed text comes from. Cite at least one source per row. |
 
 ### RemoveConvention
 

@@ -2,7 +2,8 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignore": [
     "tools/oxlint/anti-slop/rules/**",
-    "tools/oxlint/anti-slop/shared/**"
+    "tools/oxlint/anti-slop/shared/**",
+    "tools/ce-pattern/test-fixtures/**"
   ],
   "ignoreBinaries": ["just", "ruby", "uv"],
   "workspaces": {

@@ -21,7 +21,7 @@ install_unlock:
   pnpm install --no-frozen-lockfile
 
 # Run the CI checks without changing files.
-check: check_root check_contracts check_runtime
+check: check_root check_contracts check_runtime check_mcp_app
 
 # Check justfile formatting.
 check_justfile_format:
@@ -38,8 +38,8 @@ format:
   pnpm run format
   pnpm run format:markdown
   just --fmt --indentation '  '
-  uv run --locked ruff check --fix --exit-zero --quiet runtime
-  uv run --locked ruff format runtime
+  uv run --locked ruff check --fix --exit-zero --quiet runtime mcp-app/src/harness
+  uv run --locked ruff format runtime mcp-app/src/harness
 
 # Run the pre-commit hooks on the staged files.
 check_staged:
@@ -192,10 +192,28 @@ _contract_bundles MODE:
     fi
   done
 
+# Check mcp-app/: component layers, core against the registry, token staleness, lint, types, tests and the single-file build.
+check_mcp_app: check_component_layers check_shadcn_core
+  pnpm --filter mcp-app run check
+  cmp -s mcp-app/dist/index.html runtime/knowledge_mcp/ui/app.html || { printf 'runtime/knowledge_mcp/ui/app.html is out of date. Run just generate_mcp_app_html.\n' >&2; exit 1; }
+
+# Test the CE pattern layer checker, then classify the mcp-app component layers.
+check_component_layers:
+  pnpm run check:component-layers
+
+# Compare the mcp-app component-core with the pinned shadcn registry release.
+check_shadcn_core:
+  node tools/ce-pattern/check-shadcn-core.mjs
+
+# Build mcp-app and copy the single HTML file into the runtime, which serves it as ui://knowledge-mcp/app.html.
+generate_mcp_app_html:
+  pnpm --filter mcp-app run build
+  cp mcp-app/dist/index.html runtime/knowledge_mcp/ui/app.html
+
 # Lint, type-check and test runtime/, and scan runtime/ for dead code. Check that models_auto and docs/mcp-tools.mdx are current.
 check_runtime: check_mcp_tools_doc (_contract_models '--check')
-  uv run --locked ruff check runtime
-  uv run --locked ruff format --check runtime
+  uv run --locked ruff check runtime mcp-app/src/harness
+  uv run --locked ruff format --check runtime mcp-app/src/harness
   uv run --locked mypy
   uv run --locked vulture
   cd runtime && uv run --locked pytest -n auto --maxprocesses 4 --dist loadfile

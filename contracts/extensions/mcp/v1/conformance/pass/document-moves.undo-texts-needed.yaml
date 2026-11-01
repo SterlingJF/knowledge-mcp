@@ -152,3 +152,12 @@ moves:
     path: B.md
 affected_documents: []
 record_changes: []
+card: |
+  `PROPOSED MOVES` · `Nothing saved`
+
+  **2 moves · 2 renames · 0 links repaired**
+
+  **Moves (2)**
+
+  1. `Decisions/Alpha.md` → / as `A.md`
+  2. `Decisions/Beta.md` → / as `B.md`
