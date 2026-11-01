@@ -1,3 +1,10 @@
+<!-- markdownlint-disable MD033 -->
+<p align="center">
+  <a href=".github/assets/knowledge-mcp-mark-black.svg#gh-light-mode-only"><img src=".github/assets/knowledge-mcp-mark-black.svg" alt="knowledge-mcp logo" width="120" /></a>
+  <a href=".github/assets/knowledge-mcp-squircle-light.svg#gh-dark-mode-only"><img src=".github/assets/knowledge-mcp-squircle-light.svg" alt="knowledge-mcp logo" width="120" /></a>
+</p>
+<!-- markdownlint-enable MD033 -->
+
 # knowledge-mcp
 
 Plain, structured thinking while you work. It's free, open, and local-first.
