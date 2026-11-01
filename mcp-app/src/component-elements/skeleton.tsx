@@ -4,11 +4,11 @@ import { status } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 const shapes = {
-  line: "h-[var(--km-space-5)]",
-  short: "h-[var(--km-space-5)] w-2/5",
-  title: "h-[var(--km-space-6)] w-3/5",
-  row: "h-[var(--km-row)]",
-  action: "h-[var(--km-target)] w-1/4",
+  line: "h-km-5",
+  short: "h-km-5 w-2/5",
+  title: "h-km-6 w-3/5",
+  row: "h-km-row",
+  action: "h-km-target w-1/4",
 } as const;
 
 export type SkeletonShape = keyof typeof shapes;
@@ -24,7 +24,7 @@ export function SkeletonBlock({
     <CoreSkeleton
       aria-hidden
       className={cn(
-        "mt-[var(--km-gap-row)] block rounded-[var(--border-radius-lg)] bg-[var(--color-background-secondary)] animate-[km-shimmer_var(--km-shimmer)] motion-reduce:animate-none",
+        "mt-km-gap-row block rounded-lg bg-muted animate-km-shimmer motion-reduce:animate-none",
         shapes[shape],
         className,
       )}
@@ -56,7 +56,7 @@ export function CardSkeleton({
         <SkeletonBlock key={i} shape="row" />
       ))}
       {actions > 0 && (
-        <div className="flex gap-[var(--km-gap-inline)]">
+        <div className="flex gap-km-gap-inline">
           {Array.from({ length: actions }, (_, i) => (
             <SkeletonBlock key={i} shape="action" />
           ))}

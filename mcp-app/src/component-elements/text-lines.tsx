@@ -3,9 +3,8 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-const xs =
-  "text-[length:var(--font-text-xs-size)] leading-[var(--font-text-xs-line-height)]";
-const tertiary = "text-[color:var(--color-text-tertiary)]";
+const xs = "text-xs leading-xs";
+const tertiary = "text-muted-foreground";
 
 type LineProps = ComponentProps<"div">;
 
@@ -15,7 +14,7 @@ export function Eyebrow({ className, ...props }: LineProps) {
       className={cn(
         xs,
         tertiary,
-        "font-[weight:var(--font-weight-semibold)] uppercase tracking-[0.07em]",
+        "font-semibold uppercase tracking-[0.07em]",
         className,
       )}
       {...props}
@@ -27,7 +26,7 @@ export function Title({ className, ...props }: LineProps) {
   return (
     <div
       className={cn(
-        "mt-[var(--km-gap-tight)] font-[weight:var(--font-weight-semibold)] text-[length:var(--font-heading-md-size)] leading-[var(--font-heading-md-line-height)]",
+        "mt-km-gap-tight font-semibold text-base leading-base",
         className,
       )}
       {...props}
@@ -41,7 +40,7 @@ export function Meta({ className, ...props }: LineProps) {
       className={cn(
         xs,
         tertiary,
-        "mt-[var(--km-gap-inline)] flex flex-wrap items-center gap-x-[var(--km-gap-inline)] gap-y-[var(--km-gap-tight)]",
+        "mt-km-gap-inline flex flex-wrap items-center gap-x-km-gap-inline gap-y-km-gap-tight",
         className,
       )}
       {...props}
@@ -52,7 +51,7 @@ export function Meta({ className, ...props }: LineProps) {
 export function WhyLine({ className, ...props }: LineProps) {
   return (
     <div
-      className={cn(xs, tertiary, "mt-[var(--km-gap-group)]", className)}
+      className={cn(xs, tertiary, "mt-km-gap-group", className)}
       {...props}
     />
   );
@@ -61,7 +60,7 @@ export function WhyLine({ className, ...props }: LineProps) {
 export function FrozenLine({ className, ...props }: LineProps) {
   return (
     <div
-      className={cn(xs, tertiary, "mt-[var(--km-gap-group)]", className)}
+      className={cn(xs, tertiary, "mt-km-gap-group", className)}
       {...props}
     />
   );
@@ -78,9 +77,7 @@ export function CurrentText({
 }) {
   return (
     <span className={className} {...props}>
-      <span className="font-[weight:var(--font-weight-semibold)]">
-        {label}:
-      </span>{" "}
+      <span className="font-semibold">{label}:</span>{" "}
       <span className={tertiary}>{children}</span>
     </span>
   );

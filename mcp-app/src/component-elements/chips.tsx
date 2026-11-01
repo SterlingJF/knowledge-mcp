@@ -17,7 +17,7 @@ export type {
 } from "@/contracts/proposal";
 
 const chipClass =
-  "inline-flex max-w-full items-center whitespace-nowrap gap-(--km-space-2) rounded-(--border-radius-sm) border-(length:--border-width-regular) border-(--color-border-tertiary) bg-(--color-background-primary) px-(--km-space-3) py-(--km-space-1) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary)";
+  "inline-flex max-w-full items-center whitespace-nowrap gap-km-2 rounded-sm border-hairline border-border bg-secondary px-km-3 py-km-1 text-xs leading-xs text-foreground";
 
 /**
  * A name that may wrap only at a space or after "/": never at a hyphen or mid-name.
@@ -63,7 +63,7 @@ function Chip({
 }) {
   return (
     <span className={cn(chipClass, className)} title={title}>
-      <Icon aria-hidden className="size-(--km-icon) shrink-0" />
+      <Icon aria-hidden className="size-km-icon shrink-0" />
       <span
         className={cn(
           "min-w-0 whitespace-normal",

@@ -21,17 +21,15 @@ export function KeyValue({
     );
   }
   return (
-    <div className={cn("mt-[var(--km-gap-group)]", className)}>
+    <div className={cn("mt-km-gap-group", className)}>
       {/* Wide: a label column. Under 420px of the card: each label above its value. */}
-      <dl className="m-0 grid grid-cols-[var(--km-label-col)_1fr] gap-x-[var(--km-gap-group)] gap-y-[var(--km-gap-row)] @max-[420px]:grid-cols-1 @max-[420px]:gap-y-[var(--km-gap-tight)]">
+      <dl className="m-0 grid grid-cols-[var(--km-label-col)_1fr] gap-x-km-gap-group gap-y-km-gap-row @max-[420px]:grid-cols-1 @max-[420px]:gap-y-km-gap-tight">
         {rows.map((row, index) => (
           <div
             key={index}
-            className="contents @max-[420px]:[&:not(:first-child)>dt]:mt-[var(--km-gap-tight)]"
+            className="contents @max-[420px]:[&:not(:first-child)>dt]:mt-km-gap-tight"
           >
-            <dt className="text-[color:var(--color-text-tertiary)]">
-              {row.label}
-            </dt>
+            <dt className="text-muted-foreground">{row.label}</dt>
             <dd className="m-0">{row.value}</dd>
           </div>
         ))}

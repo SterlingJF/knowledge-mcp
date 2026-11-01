@@ -11,10 +11,10 @@ import {
 import { cn } from "@/lib/utils";
 
 const groupClass =
-  "gap-0 overflow-hidden has-focus-visible:shadow-(--km-focus-ring) rounded-(--border-radius-sm) border-(length:--border-width-regular) border-solid border-(--color-border-secondary)";
+  "gap-0 overflow-hidden has-focus-visible:shadow-km-focus-ring rounded-sm border-hairline border-solid border-input";
 
 const itemClass =
-  "h-auto min-w-0 rounded-none! px-(--km-space-5) py-(--km-space-2) text-(length:--font-text-xs-size) font-(--font-weight-semibold) text-(--color-text-tertiary) hover:bg-(--color-background-secondary) focus-visible:ring-0 focus-visible:shadow-[inset_0_0_0_2px_var(--color-ring-primary),inset_0_0_0_4px_var(--color-background-primary)] focus-visible:relative focus-visible:z-10 pointer-coarse:min-h-(--km-target) pointer-coarse:min-w-(--km-target) [&+&]:border-solid [&+&]:border-(--color-border-secondary) aria-checked:bg-(--color-background-inverse) aria-checked:text-(--color-text-inverse)";
+  "h-auto min-w-0 rounded-none! px-km-5 py-km-2 text-xs font-semibold text-muted-foreground hover:bg-muted focus-visible:ring-0 focus-visible:shadow-[inset_0_0_0_2px_var(--color-ring-primary),inset_0_0_0_4px_var(--color-background-primary)] focus-visible:relative focus-visible:z-10 pointer-coarse:min-h-km-target pointer-coarse:min-w-km-target [&+&]:border-solid [&+&]:border-input aria-checked:bg-inverse aria-checked:text-inverse";
 
 const Stacked = createContext(false);
 
@@ -51,8 +51,8 @@ export function ToggleGroupItem({
       className={cn(
         itemClass,
         stacked
-          ? "w-full justify-start text-left whitespace-normal wrap-anywhere [&+&]:border-t-(length:--border-width-regular)"
-          : "[&+&]:border-l-(length:--border-width-regular)",
+          ? "w-full justify-start text-left whitespace-normal wrap-anywhere [&+&]:border-t-hairline"
+          : "[&+&]:border-l-hairline",
         className,
       )}
       {...props}

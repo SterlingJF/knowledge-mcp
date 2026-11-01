@@ -14,17 +14,13 @@ function Group({ orientation }: { orientation: "horizontal" | "vertical" }) {
 test("side by side, items join with a left rule", () => {
   render(<Group orientation="horizontal" />);
   const item = screen.getByRole("button", { name: "B" });
-  expect(item.className).toContain(
-    "[&+&]:border-l-(length:--border-width-regular)",
-  );
+  expect(item.className).toContain("[&+&]:border-l-hairline");
   expect(item.className).not.toContain("justify-start");
 });
 
 test("stacked, items fill the width and join with a top rule", () => {
   render(<Group orientation="vertical" />);
   const item = screen.getByRole("button", { name: "B" });
-  expect(item.className).toContain(
-    "[&+&]:border-t-(length:--border-width-regular)",
-  );
+  expect(item.className).toContain("[&+&]:border-t-hairline");
   expect(item.className).toContain("justify-start");
 });

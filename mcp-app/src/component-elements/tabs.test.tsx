@@ -15,7 +15,7 @@ test("the parts compose into tabs with the line look", () => {
   );
   const first = screen.getByRole("tab", { name: "A" });
   expect(first.getAttribute("aria-selected")).toBe("true");
-  expect(first.className).toContain("after:h-(--km-underline)");
+  expect(first.className).toContain("after:h-km-underline");
   expect(screen.getByRole("tablist").getAttribute("data-variant")).toBe("line");
   expect(screen.getByText("panel a")).toBeTruthy();
 });

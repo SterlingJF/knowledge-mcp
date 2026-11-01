@@ -7,13 +7,10 @@ import { cn } from "@/lib/utils";
 export type BadgeTone = "waiting" | "done" | "refused" | "neutral";
 
 const toneClass: Record<BadgeTone, string> = {
-  waiting:
-    "bg-[var(--color-background-warning)] text-[var(--color-text-warning)]",
-  done: "bg-[var(--color-background-success)] text-[var(--color-text-success)]",
-  refused:
-    "bg-[var(--color-background-danger)] text-[var(--color-text-danger)]",
-  neutral:
-    "bg-[var(--color-background-secondary)] text-[var(--color-text-secondary)]",
+  waiting: "bg-warning text-warning",
+  done: "bg-success text-success",
+  refused: "bg-danger text-destructive",
+  neutral: "bg-muted text-secondary",
 };
 
 /** Waiting on the person: a dot whose ring pulses; static when motion is reduced. */
@@ -22,7 +19,7 @@ function PulseDot() {
     <span
       aria-hidden="true"
       data-testid="pulse-dot"
-      className="relative size-[var(--km-dot)] flex-none rounded-full bg-current after:absolute after:inset-0 after:rounded-full after:bg-current after:content-[''] after:[animation:km-pulse_var(--km-pulse)] motion-reduce:after:animate-none"
+      className="relative size-km-dot flex-none rounded-full bg-current after:absolute after:inset-0 after:rounded-full after:bg-current after:content-[''] after:animate-km-pulse motion-reduce:after:animate-none"
     />
   );
 }
@@ -39,7 +36,7 @@ export function Badge({ tone, children, className }: BadgeProps) {
     <CoreBadge
       data-tone={tone}
       className={cn(
-        "h-auto gap-[var(--km-space-2)] rounded-[var(--border-radius-full)] border-0 px-[var(--km-space-4)] py-[var(--km-space-1)] text-[length:var(--font-text-xs-size)] leading-[var(--font-text-xs-line-height)] font-[var(--font-weight-semibold)] [&>svg]:size-[var(--km-icon)]!",
+        "h-auto gap-km-2 rounded-full border-0 px-km-4 py-km-1 text-xs leading-xs font-semibold [&>svg]:size-km-icon!",
         toneClass[tone],
         className,
       )}

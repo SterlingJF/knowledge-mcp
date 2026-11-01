@@ -7,16 +7,14 @@ export type ButtonVariant = "primary" | "secondary" | "ghost";
 
 const variantClass: Record<ButtonVariant, string> = {
   primary:
-    "border-[var(--color-background-inverse)] bg-[var(--color-background-inverse)] text-[var(--color-text-inverse)] hover:bg-[var(--color-background-inverse)] hover:opacity-[var(--km-opacity-hover)]",
-  secondary:
-    "border-[var(--color-border-tertiary)] bg-[var(--color-background-primary)] text-[var(--color-text-primary)] hover:bg-[var(--color-background-secondary)]",
-  ghost:
-    "border-transparent bg-transparent text-[var(--color-text-primary)] hover:bg-[var(--color-background-secondary)]",
+    "border-inverse bg-inverse text-inverse hover:bg-inverse hover:opacity-km-hover",
+  secondary: "border-border bg-secondary text-foreground hover:bg-muted",
+  ghost: "border-transparent bg-transparent text-foreground hover:bg-muted",
 };
 
 /** Shared look of every km button: tokens only, visible focus ring, 44pt on touch. */
 export const kmButtonBase =
-  "h-auto gap-[var(--km-space-3)] rounded-[var(--border-radius-md)] border-[length:var(--border-width-regular)] border-solid px-[var(--km-space-5)] py-[var(--km-space-3)] text-[length:var(--font-text-sm-size)] leading-[var(--font-text-sm-line-height)] font-[var(--font-weight-semibold)] focus-visible:border-[var(--color-ring-primary)] focus-visible:ring-0 focus-visible:shadow-[var(--km-focus-ring)] disabled:opacity-[var(--km-opacity-disabled)] pointer-coarse:min-h-[var(--km-target)] [&_svg:not([class*='size-'])]:size-[var(--km-icon)]";
+  "h-auto gap-km-3 rounded-md border-hairline border-solid px-km-5 py-km-3 text-sm leading-sm font-semibold focus-visible:border-ring focus-visible:ring-0 focus-visible:shadow-km-focus-ring disabled:opacity-km-disabled pointer-coarse:min-h-km-target [&_svg:not([class*='size-'])]:size-km-icon";
 
 export type ButtonProps = Omit<
   ComponentProps<typeof CoreButton>,

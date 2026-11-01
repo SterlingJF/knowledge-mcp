@@ -20,7 +20,7 @@ export function FullViewButton({
       autoFocus={autoFocus}
       onClick={onRequestFullView}
       icon={<Maximize2 aria-hidden="true" />}
-      className="gap-[var(--km-space-2)] border-[var(--color-border-secondary)] px-[var(--km-space-4)] py-[var(--km-space-1)] text-[length:var(--font-text-xs-size)] leading-[var(--font-text-xs-line-height)]"
+      className="gap-km-2 border-input px-km-4 py-km-1 text-xs leading-xs"
     >
       {action.fullView}
     </Button>

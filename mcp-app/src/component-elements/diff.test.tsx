@@ -15,10 +15,10 @@ describe("Diff", () => {
     const removed = screen.getByText("old");
     expect(removed.tagName).toBe("DEL");
     expect(removed.className).toContain("line-through");
-    expect(removed.className).toContain("--color-text-danger");
+    expect(removed.className).toContain("text-destructive");
     const added = screen.getByText("new");
     expect(added.tagName).toBe("INS");
-    expect(added.className).toContain("--color-text-success");
+    expect(added.className).toContain("text-success");
   });
 });
 

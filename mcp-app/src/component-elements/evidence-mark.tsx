@@ -32,11 +32,11 @@ export function EvidenceMark({
     <span
       data-mark={mark}
       className={cn(
-        "flex w-fit items-center gap-(--km-space-2) whitespace-nowrap rounded-(--border-radius-full) border-(length:--border-width-regular) border-(--color-border-tertiary) bg-(--color-background-primary) px-(--km-space-4) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) font-(--font-weight-semibold) text-(--color-text-primary)",
+        "flex w-fit items-center gap-km-2 whitespace-nowrap rounded-full border-hairline border-border bg-secondary px-km-4 text-xs leading-xs font-semibold text-foreground",
         className,
       )}
     >
-      <Icon aria-hidden className="size-(--km-icon) shrink-0" />
+      <Icon aria-hidden className="size-km-icon shrink-0" />
       {evidence[mark]}
     </span>
   );

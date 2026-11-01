@@ -14,7 +14,7 @@ test("a plain button that passes aria and clicks through", () => {
   expect(b.getAttribute("type")).toBe("button");
   expect(b.getAttribute("aria-expanded")).toBe("false");
   expect(b.getAttribute("aria-controls")).toBe("d");
-  expect(b.className).toContain("pointer-coarse:before:h-(--km-target)");
+  expect(b.className).toContain("pointer-coarse:before:h-km-target");
   fireEvent.click(b);
   expect(onClick).toHaveBeenCalledOnce();
 });

@@ -38,6 +38,6 @@ test("Base UI marks orientation and the active tab, which drive the layout and u
   expect(first.getAttribute("data-orientation")).toBe("horizontal");
   expect(first.hasAttribute("data-active")).toBe(true);
   expect(first.className).toContain("data-active:after:opacity-100");
-  expect(first.className).toContain("focus-visible:shadow-(--km-focus-ring)!");
+  expect(first.className).toContain("focus-visible:shadow-km-focus-ring!");
   expect(first.closest("[data-slot=tabs]")?.className).toContain("flex-col");
 });

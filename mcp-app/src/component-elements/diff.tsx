@@ -13,7 +13,7 @@ export function Diff({
   return (
     <div
       className={cn(
-        "mt-[var(--km-gap-group)] overflow-hidden rounded-[var(--border-radius-lg)] border-[length:var(--border-width-regular)] border-solid border-[color:var(--color-border-tertiary)] text-[length:var(--font-text-xs-size)]",
+        "mt-km-gap-group overflow-hidden rounded-lg border-hairline border-solid border-border text-xs",
         className,
       )}
     >
@@ -21,14 +21,14 @@ export function Diff({
         line.kind === "removed" ? (
           <del
             key={index}
-            className="block bg-[var(--color-background-danger)] p-[var(--km-pad-line)] text-[color:var(--color-text-danger)] line-through [overflow-wrap:anywhere]"
+            className="block bg-danger p-km-pad-line text-destructive line-through [overflow-wrap:anywhere]"
           >
             {line.text}
           </del>
         ) : (
           <ins
             key={index}
-            className="block bg-[var(--color-background-success)] p-[var(--km-pad-line)] text-[color:var(--color-text-success)] no-underline [overflow-wrap:anywhere]"
+            className="block bg-success p-km-pad-line text-success no-underline [overflow-wrap:anywhere]"
           >
             {line.text}
           </ins>

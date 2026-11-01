@@ -36,18 +36,13 @@ export function Note({
       role={kind === "warning" ? "alert" : "note"}
       data-kind={kind}
       className={cn(
-        "flex items-start gap-(--km-gap-inline) rounded-(--border-radius-lg) bg-(--color-background-secondary) p-(--km-pad-box) text-(length:--font-text-xs-size) leading-(--font-text-xs-line-height) text-(--color-text-primary)",
+        "flex items-start gap-km-gap-inline rounded-lg bg-muted p-km-pad-box text-xs leading-xs text-foreground",
         className,
       )}
     >
-      <Icon
-        aria-hidden
-        className="mt-(--km-space-1) size-(--km-icon) shrink-0"
-      />
+      <Icon aria-hidden className="mt-km-1 size-km-icon shrink-0" />
       <div className="min-w-0">
-        {fact != null && (
-          <b className="font-(--font-weight-semibold)">{fact}</b>
-        )}
+        {fact != null && <b className="font-semibold">{fact}</b>}
         {fact != null && children != null && " "}
         {children}
         {onShowWhy && (
