@@ -4,7 +4,10 @@ import { PlanLines, PlanTable } from "./plan-table";
 
 const rows = ["a", "b", "c", "d", "e"].map((id) => ({
   id,
-  cells: [<PlanLines primary={`${id}.md`} secondary="Notes/" />, `${id} goes`],
+  cells: [
+    <PlanLines key="file" primary={`${id}.md`} secondary="Notes/" />,
+    `${id} goes`,
+  ],
 }));
 
 test("headers and cells render", () => {

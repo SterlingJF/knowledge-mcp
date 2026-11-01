@@ -80,6 +80,6 @@ export default {
   stories: {
     Summary: framed(card),
     // The narrowest phone: the header stacks and each label sits above its value.
-    "Summary at 360px": framed(<div className="w-[360px]">{card}</div>),
+    "Summary at 360px": framed(<div className="w-90">{card}</div>),
   },
 };

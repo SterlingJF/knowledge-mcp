@@ -6,6 +6,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import { useEffect } from "react";
 import { vi } from "vitest";
 
 import { frozen } from "@/copy/en";
@@ -160,13 +161,18 @@ test("a pressed card keeps its frozen line when a younger card arrives", async (
 test("a replaced card ignores a press", async () => {
   const older = stubCardHost(key(1));
   let life: CardLifecycle | undefined;
-  function Probe() {
-    life = useCardLifecycle();
+  function Probe({ onLife }: { onLife: (seen: CardLifecycle) => void }) {
+    const seen = useCardLifecycle();
+    useEffect(() => onLife(seen));
     return null;
   }
   render(
     <StaticCardHost host={older}>
-      <Probe />
+      <Probe
+        onLife={(seen) => {
+          life = seen;
+        }}
+      />
     </StaticCardHost>,
   );
   await act(async () => {

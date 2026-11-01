@@ -23,6 +23,7 @@ const moves = (
         cells: [
           file("build-review-notes.md", "Inbox"),
           <PlanLines
+            key="to"
             primary="Meetings/"
             secondary="as 2026-10-27 build review.md"
           />,
@@ -33,6 +34,7 @@ const moves = (
         cells: [
           file("retire-evening.md", "Inbox"),
           <PlanLines
+            key="to"
             primary="Decisions/"
             secondary="as 2026-10-28 retire evening build.md"
           />,
@@ -42,7 +44,7 @@ const moves = (
         id: "3",
         cells: [
           file("timings-notes.md", "Inbox"),
-          <PlanLines primary="Proposals/" />,
+          <PlanLines key="to" primary="Proposals/" />,
         ],
       },
     ]}
@@ -69,7 +71,7 @@ const linkRows = [
   ["roadmap.md:21", "[[timings-notes]]", "[[Proposals/timings-notes]]"],
 ].map(([note, now, after], i) => ({
   id: String(i),
-  cells: [<PathChip path={note} />, mono(now), mono(after)],
+  cells: [<PathChip key="note" path={note} />, mono(now), mono(after)],
 }));
 
 const links = (
@@ -86,16 +88,12 @@ export default {
   name: "Plan table",
   stories: {
     "Moves at 727px": (
-      <div className="@container w-[727px] max-w-full">{moves}</div>
+      <div className="@container w-181.75 max-w-full">{moves}</div>
     ),
-    "Moves at 360px": (
-      <div className="@container w-[360px] max-w-full">{moves}</div>
-    ),
+    "Moves at 360px": <div className="@container w-90 max-w-full">{moves}</div>,
     "Links at 727px": (
-      <div className="@container w-[727px] max-w-full">{links}</div>
+      <div className="@container w-181.75 max-w-full">{links}</div>
     ),
-    "Links at 360px": (
-      <div className="@container w-[360px] max-w-full">{links}</div>
-    ),
+    "Links at 360px": <div className="@container w-90 max-w-full">{links}</div>,
   },
 };

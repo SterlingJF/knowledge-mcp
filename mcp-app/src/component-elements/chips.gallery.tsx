@@ -8,7 +8,7 @@ export default {
   stories: {
     // A name with no space, "/" or room to fit: it breaks only because it is wider than the line.
     "Long name at 320px": (
-      <div className="w-[320px] border-hairline border-dashed border-input">
+      <div className="w-80 border-hairline border-dashed border-input">
         <PathChip path="quarterly-build-operations-retrospective-final.md" />
       </div>
     ),

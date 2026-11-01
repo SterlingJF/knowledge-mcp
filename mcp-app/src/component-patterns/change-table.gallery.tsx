@@ -36,7 +36,7 @@ function Live({ initial }: { initial: number[] }) {
 }
 
 // Wide enough for the four-column layout.
-const wide = "@container w-[760px] max-w-full";
+const wide = "@container w-190 max-w-full";
 
 export default {
   id: "P02",
@@ -53,12 +53,12 @@ export default {
       </div>
     ),
     "Full view at 727px": (
-      <div className="@container w-[727px] max-w-full">
+      <div className="@container w-181.75 max-w-full">
         <Live initial={[1, 2, 3]} />
       </div>
     ),
     "Draft at 727px": (
-      <div className="@container w-[727px] max-w-full">
+      <div className="@container w-181.75 max-w-full">
         <ChangeTable rows={rows} draft />
       </div>
     ),
@@ -68,7 +68,7 @@ export default {
       </div>
     ),
     "Narrow (under 560px)": (
-      <div className="@container max-w-[24rem]">
+      <div className="@container max-w-96">
         <Live initial={[1]} />
       </div>
     ),

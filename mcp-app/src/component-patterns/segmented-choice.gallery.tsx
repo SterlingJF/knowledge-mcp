@@ -37,9 +37,7 @@ function Live({ set, start = null }: { set: string; start?: string | null }) {
 }
 
 const at = (w: "727" | "360", set: string, start?: string) => (
-  <div
-    className={w === "727" ? "w-[727px] max-w-full" : "w-[360px] max-w-full"}
-  >
+  <div className={w === "727" ? "w-181.75 max-w-full" : "w-90 max-w-full"}>
     <Live set={set} start={start} />
   </div>
 );

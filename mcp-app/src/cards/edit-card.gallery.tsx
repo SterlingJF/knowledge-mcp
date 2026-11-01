@@ -24,7 +24,7 @@ function Story({
 }) {
   return (
     <StaticCardHost host={stubCardHost()}>
-      <div className={width ? "w-[360px] max-w-full" : undefined}>
+      <div className={width ? "w-90 max-w-full" : undefined}>
         <HarnessFrame>
           <EditView edit={edit} lifecycle={life} timeZone="UTC" open={open} />
         </HarnessFrame>

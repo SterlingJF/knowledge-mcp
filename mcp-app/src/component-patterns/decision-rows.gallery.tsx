@@ -70,7 +70,7 @@ const blockers: DecisionRow[] = [
     id: "exists",
     name: "Name taken",
     cells: [
-      <span>
+      <span key="fact">
         <b className="font-semibold">
           Decisions/2026-10-28 retire evening build.md
         </b>{" "}
@@ -83,7 +83,9 @@ const blockers: DecisionRow[] = [
     id: "link",
     name: "Ambiguous link",
     cells: [
-      <span>{mono("[[proposal]]")} in weekly-2026-43.md matches 2 notes</span>,
+      <span key="fact">
+        {mono("[[proposal]]")} in weekly-2026-43.md matches 2 notes
+      </span>,
     ],
     options: [
       { value: "a", label: "Link to Proposals/cache-proposal" },
@@ -94,7 +96,7 @@ const blockers: DecisionRow[] = [
     id: "long",
     name: "Ambiguous link",
     cells: [
-      <span>
+      <span key="fact">
         {mono("[[build review]]")} in weekly-2026-43.md matches 3 notes
       </span>,
     ],
@@ -114,7 +116,7 @@ const blockers: DecisionRow[] = [
     id: "notype",
     name: "No document type",
     cells: [
-      <span>
+      <span key="fact">
         <b className="font-semibold">scan-0412.md</b> has no document type
       </span>,
     ],
@@ -205,42 +207,42 @@ export default {
   stories: {
     ...answerStories,
     "Move blockers at 727px": (
-      <div className="w-[727px] max-w-full">
+      <div className="w-181.75 max-w-full">
         <Blockers />
       </div>
     ),
     "Move blockers at 816px": (
-      <div className="w-[816px] max-w-full">
+      <div className="w-204 max-w-full">
         <Blockers />
       </div>
     ),
     "Move blockers at 320px": (
-      <div className="w-[320px] max-w-full">
+      <div className="w-80 max-w-full">
         <Blockers />
       </div>
     ),
     "Conventions at 816px": (
-      <div className="w-[816px] max-w-full">
+      <div className="w-204 max-w-full">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Conventions at 727px": (
-      <div className="w-[727px] max-w-full">
+      <div className="w-181.75 max-w-full">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Conventions at 360px": (
-      <div className="w-[360px] max-w-full">
+      <div className="w-90 max-w-full">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Conventions at 320px": (
-      <div className="w-[320px] max-w-full">
+      <div className="w-80 max-w-full">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Move blockers at 360px": (
-      <div className="w-[360px] max-w-full">
+      <div className="w-90 max-w-full">
         <Blockers />
       </div>
     ),
@@ -263,12 +265,12 @@ export default {
       />
     ),
     "Undecided at 360px": (
-      <div className="w-[360px]">
+      <div className="w-90">
         <Live initial={{ mn: "accept", dp: "drop" }} />
       </div>
     ),
     "Undecided at 320px": (
-      <div className="w-[320px]">
+      <div className="w-80">
         <Live initial={{ mn: "accept" }} />
       </div>
     ),

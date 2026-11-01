@@ -70,9 +70,7 @@ const undone = (
 );
 
 const at = (w: "760" | "360", node: ReactNode) => (
-  <div
-    className={w === "760" ? "w-[760px] max-w-full" : "w-[360px] max-w-full"}
-  >
+  <div className={w === "760" ? "w-190 max-w-full" : "w-90 max-w-full"}>
     <HarnessFrame>{node}</HarnessFrame>
   </div>
 );
