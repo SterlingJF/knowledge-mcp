@@ -5,6 +5,11 @@ packages:
 
 # One week, in minutes.
 minimumReleaseAge: 10080
+# minimatch 11.0.1 fixes GHSA-g3hv-75wg-m249; it and its new dependency are younger than a week.
+# Drop this after 2026-11-03.
+minimumReleaseAgeExclude:
+  - minimatch@11.0.1
+  - "@isaacs/nonrecursive-glob-match@1.0.1"
 
 # Skip the esbuild install script, because esbuild's optional dependencies already ship the binary.
 allowBuilds:
@@ -19,6 +24,8 @@ overrides:
   micromark-extension-math>katex: 0.18.7
   # @modelcontextprotocol/core 2.3.1 resolves zod 4.6.5. zod 4.6.6 fixes GHSA-mrhx-c7xc-m3w5.
   zod@^4: 4.6.6
+  # eslint 10.12.0 allows minimatch ^10. minimatch 11.0.1 fixes GHSA-g3hv-75wg-m249.
+  minimatch@^10: 11.0.1
   # fast-uri 3.1.9 fixes GHSA-333x-w4r6-6crp, GHSA-w74x-v6f9-j3xg, GHSA-wjr9-j795-jxcr
   # and GHSA-xhq7-xmqj-769h.
   fast-uri@^3: 3.1.9
