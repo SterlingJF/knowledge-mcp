@@ -43,11 +43,18 @@ def test_only_the_card_tools_point_at_the_app(tmp_path):
     async def steps(client):
         return (await client.list_tools()).tools
 
+    tools = session(server_parameters(tmp_path), steps)
     bound = {
         tool.name: (tool.meta or {}).get("ui")
-        for tool in session(server_parameters(tmp_path), steps)
+        for tool in tools
         if (tool.meta or {}).get("ui")
     }
+    # Hosts that read only the flat key find the same app.
+    assert {
+        tool.name: (tool.meta or {}).get("ui/resourceUri")
+        for tool in tools
+        if (tool.meta or {}).get("ui/resourceUri")
+    } == {name: URI for name in bound}
     assert bound == {
         "kb_prepare_proposal": {"resourceUri": URI},
         "kb_record_edit": {"resourceUri": URI},

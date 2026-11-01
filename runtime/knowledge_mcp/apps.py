@@ -12,6 +12,8 @@ from mcp.server import MCPServer
 from mcp.server.apps import EXTENSION_ID, Apps, ResourceCsp
 
 URI = "ui://knowledge-mcp/app.html"
+# The ext-apps SDK writes both keys so every host finds the app; some read only the flat one.
+LEGACY_KEY = "ui/resourceUri"
 HTML = Path(__file__).parent / "ui" / "app.html"
 TOOLS = ("kb_prepare_proposal", "kb_record_edit", "kb_prepare_document_moves")
 # Claude serves the host fonts from this origin.
@@ -35,5 +37,5 @@ def register(mcp: MCPServer) -> dict[str, dict[str, Any]]:
         if tool is None:
             message = f"Apps tool not registered: {name}"
             raise ValueError(message)
-        tool.meta = {**(tool.meta or {}), "ui": {"resourceUri": URI}}
+        tool.meta = {**(tool.meta or {}), "ui": {"resourceUri": URI}, LEGACY_KEY: URI}
     return {EXTENSION_ID: apps.settings()}

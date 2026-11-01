@@ -16493,7 +16493,8 @@
       "_meta": {
         "ui": {
           "resourceUri": "ui://knowledge-mcp/app.html"
-        }
+        },
+        "ui/resourceUri": "ui://knowledge-mcp/app.html"
       }
     },
     {
@@ -23090,7 +23091,8 @@
       "_meta": {
         "ui": {
           "resourceUri": "ui://knowledge-mcp/app.html"
-        }
+        },
+        "ui/resourceUri": "ui://knowledge-mcp/app.html"
       }
     },
     {
@@ -24996,7 +24998,8 @@
       "_meta": {
         "ui": {
           "resourceUri": "ui://knowledge-mcp/app.html"
-        }
+        },
+        "ui/resourceUri": "ui://knowledge-mcp/app.html"
       }
     },
     {
