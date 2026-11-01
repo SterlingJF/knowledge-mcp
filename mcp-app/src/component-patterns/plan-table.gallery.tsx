@@ -1,6 +1,6 @@
 import { PathChip } from "@/component-elements/chips";
 
-import { PlanLines, PlanTable } from "../plan-table";
+import { PlanLines, PlanTable } from "./plan-table";
 
 const mono = (t: string) => (
   <span className="font-(family-name:--font-mono) wrap-anywhere">{t}</span>

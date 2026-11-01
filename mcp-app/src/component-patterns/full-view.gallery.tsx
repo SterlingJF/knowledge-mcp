@@ -1,9 +1,9 @@
 import { StaticCardHost, stubCardHost } from "@/bridge/static";
 import { action, badge, frozen, line } from "@/copy/en";
-import type { CardAction } from "../card-shell";
-import type { CardLifecycle } from "../card-lifecycle";
-import { exampleMeta } from "../card-shell.harness";
-import { FullView } from "../full-view";
+import type { CardAction } from "./card-shell";
+import type { CardLifecycle } from "./card-lifecycle";
+import { exampleMeta } from "./card-shell.harness";
+import { FullView } from "./full-view";
 
 const live: CardLifecycle = {
   state: "live",

@@ -3,9 +3,9 @@ import type { ReactNode } from "react";
 
 import { Diff } from "@/component-elements/diff";
 import { action, badge, eyebrow, frozen } from "@/copy/en";
-import type { CardLifecycle } from "../card-lifecycle";
-import { HarnessFrame } from "../card-shell.harness";
-import { ResultCard } from "../result-card";
+import type { CardLifecycle } from "./card-lifecycle";
+import { HarnessFrame } from "./card-shell.harness";
+import { ResultCard } from "./result-card";
 
 const live: CardLifecycle = {
   state: "live",

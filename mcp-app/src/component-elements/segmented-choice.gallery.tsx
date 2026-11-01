@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { decision, evidence, label } from "@/copy/en";
 
-import { SegmentedChoice } from "../segmented-choice";
-import type { SegmentOption } from "../segmented-choice";
+import { SegmentedChoice } from "./segmented-choice";
+import type { SegmentOption } from "./segmented-choice";
 
 const sets: Record<string, SegmentOption<string>[]> = {
   two: [

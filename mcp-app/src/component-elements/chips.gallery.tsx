@@ -1,4 +1,4 @@
-import { PathChip, SourceChip } from "../chips";
+import { PathChip, SourceChip } from "./chips";
 
 const row = {
   display: "flex",

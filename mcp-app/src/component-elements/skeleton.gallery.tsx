@@ -1,4 +1,4 @@
-import { CardSkeleton, SkeletonBlock } from "../skeleton";
+import { CardSkeleton, SkeletonBlock } from "./skeleton";
 
 export default {
   id: "K10",

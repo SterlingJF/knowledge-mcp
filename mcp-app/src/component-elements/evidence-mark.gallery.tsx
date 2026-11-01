@@ -1,4 +1,4 @@
-import { EvidenceMark } from "../evidence-mark";
+import { EvidenceMark } from "./evidence-mark";
 
 export default {
   id: "K03",

@@ -1,4 +1,4 @@
-import { KeyValue } from "../key-value";
+import { KeyValue } from "./key-value";
 
 export default {
   id: "K08",

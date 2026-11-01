@@ -1,9 +1,9 @@
 import { StaticCardHost, stubCardHost } from "@/bridge/static";
 import { action, badge, frozen } from "@/copy/en";
-import { lifecycleProps, useCardLifecycle } from "../card-lifecycle";
-import { HarnessFrame, exampleMeta } from "../card-shell.harness";
-import { CardShell } from "../card-shell";
-import type { CardAction } from "../card-shell";
+import { lifecycleProps, useCardLifecycle } from "./card-lifecycle";
+import { HarnessFrame, exampleMeta } from "./card-shell.harness";
+import { CardShell } from "./card-shell";
+import type { CardAction } from "./card-shell";
 
 const actions: CardAction[] = [
   {

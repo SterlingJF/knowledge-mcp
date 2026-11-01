@@ -5,7 +5,7 @@ import {
   Meta,
   Title,
   WhyLine,
-} from "../text-lines";
+} from "./text-lines";
 
 export default {
   id: "K07",

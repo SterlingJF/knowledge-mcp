@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { ProposalRow } from "@/contracts/proposal";
 
-import { ChangeTable } from "../change-table";
+import { ChangeTable } from "./change-table";
 
 const rows: ProposalRow[] = [
   {

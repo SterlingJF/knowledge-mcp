@@ -1,6 +1,6 @@
 import { badge } from "@/copy/en";
-import { Badge } from "../badge";
-import { FullViewButton } from "../full-view-button";
+import { Badge } from "./badge";
+import { FullViewButton } from "./full-view-button";
 
 export default {
   id: "K13",

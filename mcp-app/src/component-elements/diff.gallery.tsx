@@ -1,4 +1,4 @@
-import { Diff } from "../diff";
+import { Diff } from "./diff";
 
 export default {
   id: "K09",

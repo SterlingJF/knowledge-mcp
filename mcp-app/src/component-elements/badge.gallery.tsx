@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { badge } from "@/copy/en";
-import { Badge } from "../badge";
+import { Badge } from "./badge";
 
 const Row = ({ children }: { children: ReactNode }) => (
   <span style={{ display: "inline-flex", gap: "var(--km-gap-inline)" }}>

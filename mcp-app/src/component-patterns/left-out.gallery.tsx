@@ -1,4 +1,4 @@
-import { LeftOut } from "../left-out";
+import { LeftOut } from "./left-out";
 
 const files = [
   {

@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { StaticCardHost, stubCardHost } from "@/bridge/static";
 import { action, badge, frozen, label, line } from "@/copy/en";
-import type { CardAction } from "../card-shell";
-import type { CardLifecycle } from "../card-lifecycle";
-import { HarnessFrame, exampleMeta } from "../card-shell.harness";
-import { SummaryCard } from "../summary-card";
+import type { CardAction } from "./card-shell";
+import type { CardLifecycle } from "./card-lifecycle";
+import { HarnessFrame, exampleMeta } from "./card-shell.harness";
+import { SummaryCard } from "./summary-card";
 
 const live: CardLifecycle = {
   state: "live",

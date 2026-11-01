@@ -1,4 +1,4 @@
-import { ChangeNumber, SelectAll, TickBox } from "../change-number";
+import { ChangeNumber, SelectAll, TickBox } from "./change-number";
 
 const noop = () => {};
 

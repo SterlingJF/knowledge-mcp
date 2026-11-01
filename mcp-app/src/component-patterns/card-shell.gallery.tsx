@@ -1,7 +1,7 @@
 import { action, badge, frozen, line } from "@/copy/en";
-import { HarnessFrame, exampleMeta } from "../card-shell.harness";
-import { CardShell } from "../card-shell";
-import type { CardAction, CardShellProps } from "../card-shell";
+import { HarnessFrame, exampleMeta } from "./card-shell.harness";
+import { CardShell } from "./card-shell";
+import type { CardAction, CardShellProps } from "./card-shell";
 
 const actions: CardAction[] = [
   {

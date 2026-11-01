@@ -1,6 +1,6 @@
 import { line } from "@/copy/en";
 
-import { Note } from "../note";
+import { Note } from "./note";
 
 export default {
   id: "K06",

@@ -2,7 +2,7 @@ import { Undo2 } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { action, change } from "@/copy/en";
-import { Button, type ButtonVariant } from "../button";
+import { Button, type ButtonVariant } from "./button";
 
 const kinds: { variant: ButtonVariant; label: string; icon?: ReactNode }[] = [
   { variant: "primary", label: action.save(change.range(1, 4)) },

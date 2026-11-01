@@ -8,5 +8,6 @@
     "style": "base-vega"
   },
   "consumers": [],
-  "roots": ["mcp-app"]
+  "roots": ["mcp-app"],
+  "supportSuffixes": ["gallery", "harness"]
 }

@@ -1,6 +1,6 @@
 import { action } from "@/copy/en";
 
-import { LinkButton } from "../link-button";
+import { LinkButton } from "./link-button";
 
 export default {
   id: "K15",
