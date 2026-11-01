@@ -1,6 +1,6 @@
 ---
 name: kb-write-document
-description: Use before proposing changes to, writing or editing a document, locally or through a connector.
+description: 'Use before you write, revise, move or rename any non-code file, or review a proposed change to one, wherever it lives: a knowledge base, a codebase''s docs and records, or a local or remote drive, locally or through a connector. Covers "review this change", "check this before I save", "is this right", "what changed" and "undo that".'
 ---
 
 # Write a Document

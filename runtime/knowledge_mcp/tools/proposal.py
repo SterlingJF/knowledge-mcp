@@ -26,7 +26,7 @@ from knowledge_mcp.tools.kbp import READS, Location
 from knowledge_mcp.views import markdown
 
 PREPARE = """\
-Prepare the proposed-changes card whenever you propose changes to a document, before any edit. Send each change as a row with its sources and evidence mark, and each file you read but didn't cite. Returns the card as markdown in `card` and saves nothing. Show `card` in your reply unchanged, then add your own lines. Appends the answer to `log.jsonl` and opens no knowledge-base file.
+Use whenever you propose, or are asked to review, a change to a non-code file ("review this change", "is this right"), before anything is saved. Prepare the proposed-changes card. Send each change as a row with its sources and evidence mark, and each file you read but didn't cite. Returns the card as markdown in `card` and saves nothing. Show `card` in your reply unchanged, then add your own lines. Appends the answer to `log.jsonl` and opens no knowledge-base file.
 """
 FIELDS = Proposal.model_fields
 DOCUMENT_DIGEST = Field(

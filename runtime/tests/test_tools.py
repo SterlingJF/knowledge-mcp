@@ -112,7 +112,15 @@ def test_server_instructions_name_the_three_skills_and_the_no_commit_rule(tmp_pa
         )
     )
     assert "commit nothing" in instructions
-    assert len(instructions.split()) <= 80
+    assert len(instructions.split()) <= 170
+
+
+def test_server_instructions_name_review_orient_and_non_code(tmp_path):
+    async def steps(client):
+        return client.instructions
+
+    instructions = session(server_parameters(tmp_path), steps)
+    assert all(word in instructions for word in ("review", "orient", "non-code"))
 
 
 def test_tool_descriptions_stay_within_80_words(tmp_path):
@@ -130,6 +138,10 @@ def test_tool_descriptions_stay_within_80_words(tmp_path):
     }
     for tool in listed(tmp_path):
         description = tool.description or ""
-        assert description.split()[0] in verbs, tool.name
+        action = description
+        if tool.name.startswith("kb_"):
+            assert description.startswith("Use "), tool.name
+            action = description.split(". ", 1)[1]
+        assert action.split()[0] in verbs, tool.name
         assert len(description.split()) <= 80, tool.name
         assert "log.jsonl" in description, tool.name

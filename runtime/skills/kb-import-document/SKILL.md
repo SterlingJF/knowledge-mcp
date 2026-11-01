@@ -1,6 +1,6 @@
 ---
 name: kb-import-document
-description: Use when the person asks to import a document written elsewhere into a knowledge base.
+description: "Use when the person brings in notes, a transcript or a document written elsewhere, to work it into their non-code files or import it as a new document."
 ---
 
 # Import a Document

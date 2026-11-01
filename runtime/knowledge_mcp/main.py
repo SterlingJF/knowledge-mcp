@@ -66,7 +66,16 @@ from knowledge_mcp.tools import (
 )
 
 INSTRUCTIONS = """\
-Use the kb-write-document skill before you propose changes to, write or edit a document. Use the kb-track-document-types skill at the start of a session and after you create, move or delete a file. Use the kb-import-document skill to import a document written elsewhere. knowledge-mcp opens no knowledge-base file. You read the files and pass their content in the tool arguments. While you use knowledge-mcp, commit nothing, push nothing, open no issue or pull request, and post no comment.
+knowledge-mcp is for any change to a non-code file, wherever it lives: a knowledge base, a codebase's docs and records, or a local or remote drive. Use it to orient, review a change, work through incoming material, write or revise, organize and check history. Code stays out.
+
+Start with:
+- Orient ("what is this folder", "where do I start"): the kb-track-document-types skill.
+- Review ("review this change", "check this before I save", "is this right"), write or revise: the kb-write-document skill, then kb_prepare_proposal before anything is saved.
+- Incoming notes, transcripts or documents ("bring these notes into that file"): the kb-import-document skill.
+- Organize (file, move, rename): kb-write-document, then kb_prepare_document_moves.
+- History ("what changed", "undo that"): kb_list_edits.
+
+Also use kb-track-document-types at session start and after you create, move or delete a file. knowledge-mcp opens none of your files. You read the files and pass their content in the tool arguments. While you use knowledge-mcp, commit nothing, push nothing, open no issue or pull request, and post no comment.
 """
 
 

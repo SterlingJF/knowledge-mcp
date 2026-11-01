@@ -15,7 +15,7 @@ from knowledge_mcp.tools.kbp import READS, KnowledgeBusFolders
 from knowledge_mcp.type_scope import scope_specs
 
 DESCRIPTION = """\
-Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`. Label each passage by following the `kb-import-document` skill. Appends the answer to `log.jsonl` and opens no knowledge-base file.
+Use when the person brings in notes, a transcript or a document from elsewhere ("go through these notes", "bring this into that file"). Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`. Label each passage by following the `kb-import-document` skill. Appends the answer to `log.jsonl` and opens no knowledge-base file.
 """
 
 # Imports often share a destination folder, so `cards` caches cards by `Rebuilt.key`.

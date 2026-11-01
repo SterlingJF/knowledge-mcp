@@ -3,7 +3,7 @@
     {
       "name": "kb_get_document_type",
       "title": "Get the document type",
-      "description": "Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing. Return saved classification or candidate document types. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
+      "description": "Use when you orient in a folder or before you write, revise or move a non-code file (\"what is this\", \"where does this go\"). Get a file's document type and proposed name and folder from saved entries, conventions and the complete listing. Return saved classification or candidate document types. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -2096,7 +2096,7 @@
     {
       "name": "kb_list_audiences",
       "title": "List reader choices",
-      "description": "List the readers you can choose for a document type. Returns the document type's `actor`, plus the audience question and its `choices` from the universe spec. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
+      "description": "Use when you choose or check who a document is for (\"who reads this\"). List the readers you can choose for a document type. Returns the document type's `actor`, plus the audience question and its `choices` from the universe spec. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -3946,7 +3946,7 @@
     {
       "name": "kb_list_convention_templates",
       "title": "List convention templates",
-      "description": "List bundled ACE, PARA and Johnny.Decimal definitions for notes, with folder purposes, naming suggestions and sources. Append the answer to log.jsonl.",
+      "description": "Use when the person wants a folder system for notes (\"set up PARA\", \"how should I organize this\"). List bundled ACE, PARA and Johnny.Decimal definitions for notes, with folder purposes, naming suggestions and sources. Append the answer to log.jsonl.",
       "inputSchema": {
         "properties": {
           "location": {
@@ -5821,7 +5821,7 @@
     {
       "name": "kb_list_conventions",
       "title": "List folder conventions",
-      "description": "List naming and filing conventions that apply in a folder, with their source folders and parent marks. Report inactive declarations. Append the answer to log.jsonl and open no knowledge-base file.",
+      "description": "Use before you name, move or rename a file (\"where does this go\", \"what should I call it\"). List naming and filing conventions that apply in a folder, with their source folders and parent marks. Report inactive declarations. Append the answer to log.jsonl and open no knowledge-base file.",
       "inputSchema": {
         "properties": {
           "location": {
@@ -7645,7 +7645,7 @@
     {
       "name": "kb_list_edits",
       "title": "List recorded edits",
-      "description": "List the edits recorded for `location`, oldest first, to check or undo an edit or to pick up earlier work. Returns the latest edit, if any, as markdown in `card`. The `kb-write-document` skill gives the undo steps. Reads `edits.jsonl`, appends the answer to `log.jsonl`, and opens no knowledge-base file.\n",
+      "description": "Use when the person asks \"what changed\", \"undo that\" or where they left off. List the edits recorded for `location`, oldest first, to check or undo an edit or to pick up earlier work. Returns the latest edit, if any, as markdown in `card`. The `kb-write-document` skill gives the undo steps. Reads `edits.jsonl`, appends the answer to `log.jsonl`, and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -9392,7 +9392,7 @@
     {
       "name": "kb_prepare_conventions",
       "title": "Prepare naming and filing conventions",
-      "description": "Prepare conventions text from supplied configuration and proposed changes. Include permission to receive replacement text. Append the answer to log.jsonl and open no knowledge-base file.",
+      "description": "Use when the person asks to set or change a folder's naming or filing rules. Prepare conventions text from supplied configuration and proposed changes. Include permission to receive replacement text. Append the answer to log.jsonl and open no knowledge-base file.",
       "inputSchema": {
         "properties": {
           "location": {
@@ -11914,7 +11914,7 @@
     {
       "name": "kb_prepare_document_move",
       "title": "Prepare a document move",
-      "description": "Prepare a document move from supplied text, a complete listing and permission. Return search strings for referring documents, then replacement text and link target checks after the confirmed search. Follow `kb-write-document` to apply the move and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file.",
+      "description": "Use when the person asks to move or rename one file (\"move this\", \"rename that\"). Prepare a document move from supplied text, a complete listing and permission. Return search strings for referring documents, then replacement text and link target checks after the confirmed search. Follow `kb-write-document` to apply the move and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file.",
       "inputSchema": {
         "properties": {
           "location": {
@@ -14088,7 +14088,7 @@
     {
       "name": "kb_prepare_document_moves",
       "title": "Prepare document moves",
-      "description": "Prepare moves together from supplied text and a complete listing. Return search strings, affected documents and link target checks; include `allowed_by` to receive replacement text after the confirmed search. Follow `kb-write-document` to apply the moves and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file.",
+      "description": "Use when the person asks to file, move or rename several files (\"tidy my Inbox\"). Prepare moves together from supplied text and a complete listing. Return search strings, affected documents and link target checks; include `allowed_by` to receive replacement text after the confirmed search. Follow `kb-write-document` to apply the moves and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file.",
       "inputSchema": {
         "properties": {
           "location": {
@@ -16500,7 +16500,7 @@
     {
       "name": "kb_prepare_document_types",
       "title": "Prepare the document-types file",
-      "description": "Prepare document-types text by comparing a complete listing with saved entries. Return observed events, pending classifications and filing assessments. Include `allowed_by` to receive changed text for the agent to save through `kb-track-document-types`. Append the answer to `log.jsonl` and open no knowledge-base file.\n",
+      "description": "Use at the start of a session, to orient (\"what is this folder\", \"where do I start\"), and after you create, move or delete a file. Prepare document-types text by comparing a complete listing with saved entries. Return observed events, pending classifications and filing assessments. Include `allowed_by` to receive changed text for the agent to save through `kb-track-document-types`. Append the answer to `log.jsonl` and open no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -18851,7 +18851,7 @@
     {
       "name": "kb_prepare_import",
       "title": "Prepare a document import",
-      "description": "Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`. Label each passage by following the `kb-import-document` skill. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
+      "description": "Use when the person brings in notes, a transcript or a document from elsewhere (\"go through these notes\", \"bring this into that file\"). Prepare an import by splitting `text` into passages and listing questions for document types in the destination `folders`. Label each passage by following the `kb-import-document` skill. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -20740,7 +20740,7 @@
     {
       "name": "kb_prepare_proposal",
       "title": "Prepare a proposal card",
-      "description": "Prepare the proposed-changes card whenever you propose changes to a document, before any edit. Send each change as a row with its sources and evidence mark, and each file you read but didn't cite. Returns the card as markdown in `card` and saves nothing. Show `card` in your reply unchanged, then add your own lines. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
+      "description": "Use whenever you propose, or are asked to review, a change to a non-code file (\"review this change\", \"is this right\"), before anything is saved. Prepare the proposed-changes card. Send each change as a row with its sources and evidence mark, and each file you read but didn't cite. Returns the card as markdown in `card` and saves nothing. Show `card` in your reply unchanged, then add your own lines. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -23098,7 +23098,7 @@
     {
       "name": "kb_record_edit",
       "title": "Record an edit",
-      "description": "Record an edit right after you make it, so the person can check or undo the change. Send `undoes` when the edit undoes an earlier one. Returns the edit's id, the digests of `before` and `after`, a capped list of the changed lines in `changes`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.\n",
+      "description": "Use right after you save a change to a non-code file, so the person can check or undo it. Record the edit. Send `undoes` when the edit undoes an earlier one. Returns the edit's id, the digests of `before` and `after`, a capped list of the changed lines in `changes`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {

@@ -25,7 +25,7 @@ from knowledge_mcp.tools.document_type import RecordDigest, RecordText
 from knowledge_mcp.tools.kbp import READS
 from knowledge_mcp.views import markdown
 
-DESCRIPTION = "Prepare moves together from supplied text and a complete listing. Return search strings, affected documents and link target checks; include `allowed_by` to receive replacement text after the confirmed search. Follow `kb-write-document` to apply the moves and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file."
+DESCRIPTION = 'Use when the person asks to file, move or rename several files ("tidy my Inbox"). Prepare moves together from supplied text and a complete listing. Return search strings, affected documents and link target checks; include `allowed_by` to receive replacement text after the confirmed search. Follow `kb-write-document` to apply the moves and verify links in the saved files. Append the answer to log.jsonl and open no knowledge-base file.'
 
 SUMMARY = "What the moves are for, in one line, such as `File the new files`. The answer echoes it."
 FOLDER = "The folder the moved files come from, such as `Inbox`. The answer echoes it."

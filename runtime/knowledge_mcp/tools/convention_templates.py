@@ -15,7 +15,7 @@ def register(mcp: MCPServer) -> None:
     @mcp.tool(
         name="kb_list_convention_templates",
         title="List convention templates",
-        description="List bundled ACE, PARA and Johnny.Decimal definitions for notes, with folder purposes, naming suggestions and sources. Append the answer to log.jsonl.",
+        description='Use when the person wants a folder system for notes ("set up PARA", "how should I organize this"). List bundled ACE, PARA and Johnny.Decimal definitions for notes, with folder purposes, naming suggestions and sources. Append the answer to log.jsonl.',
         annotations=READS,
     )
     def kb_list_convention_templates(location: Location) -> CallToolResult:

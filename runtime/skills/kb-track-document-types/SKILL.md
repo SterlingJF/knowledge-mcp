@@ -1,6 +1,6 @@
 ---
 name: kb-track-document-types
-description: Use at session start and after creating, moving or deleting a knowledge-base file.
+description: 'Use at session start, to orient ("what is this folder", "where do I start"), and after creating, moving or deleting any non-code file.'
 ---
 
 # Track Document Types
