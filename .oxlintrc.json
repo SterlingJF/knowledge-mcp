@@ -21,7 +21,8 @@
     "**/build/**",
     "**/dist/**",
     "tools/oxlint/anti-slop/rules/**",
-    "tools/oxlint/anti-slop/shared/**"
+    "tools/oxlint/anti-slop/shared/**",
+    "tools/ce-pattern/**"
   ],
   "overrides": [
     {

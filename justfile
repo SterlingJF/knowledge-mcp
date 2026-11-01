@@ -192,10 +192,18 @@ _contract_bundles MODE:
     fi
   done
 
-# Check mcp-app/: token staleness, lint, types, tests and the single-file build.
-check_mcp_app:
+# Check mcp-app/: component layers, core against the registry, token staleness, lint, types, tests and the single-file build.
+check_mcp_app: check_component_layers check_shadcn_core
   pnpm --filter mcp-app run check
   cmp -s mcp-app/dist/index.html runtime/knowledge_mcp/ui/app.html || { printf 'runtime/knowledge_mcp/ui/app.html is out of date. Run just generate_mcp_app_html.\n' >&2; exit 1; }
+
+# Test the CE pattern layer checker, then classify the mcp-app component layers.
+check_component_layers:
+  pnpm run check:component-layers
+
+# Compare the mcp-app component-core with the pinned shadcn registry release.
+check_shadcn_core:
+  node tools/ce-pattern/check-shadcn-core.mjs
 
 # Build mcp-app and copy the single HTML file into the runtime, which serves it as ui://knowledge-mcp/app.html.
 generate_mcp_app_html:
