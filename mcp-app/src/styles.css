@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import "./vendor/shadcn-tailwind.css";
 @import "./generated/tokens.auto.css";
 
 /* shadcn's names, the host mapping and every token class are generated into tokens.auto.css from kmtokens.js. */

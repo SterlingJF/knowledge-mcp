@@ -22,5 +22,6 @@ contracts/extensions/mcp/v1/tools.json
 
 # shadcn vendor code stays as generated; the token CSS is compared byte for byte.
 mcp-app/src/component-core/
+mcp-app/src/vendor/
 mcp-app/src/generated/
 runtime/knowledge_mcp/ui/app.html
