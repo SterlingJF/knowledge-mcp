@@ -63,6 +63,7 @@
   --km-label-col: max-content;
   --km-row: 28px;
   --km-underline: 2px;
+  --km-full-max: 1080px;
   --km-focus-ring: 0 0 0 2px var(--color-background-primary), 0 0 0 4px var(--color-ring-primary);
   --km-eyebrow-tracking: 0.07em;
   --km-opacity-hover: 0.88;

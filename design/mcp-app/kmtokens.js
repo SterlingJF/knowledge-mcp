@@ -190,6 +190,7 @@ window.KMT = {
     "--km-label-col": "max-content",
     "--km-row": "28px",
     "--km-underline": "2px",
+    "--km-full-max": "1080px",
   },
   // One focus ring, one tracking, four opacities: each used by more than one part.
   effect: {
