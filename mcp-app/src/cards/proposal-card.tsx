@@ -122,15 +122,17 @@ const rowName = (p: Proposal, i: number) =>
 const rowLabel = (p: Proposal, i: number) =>
   `${change.number(i + 1)} ${rowName(p, i)}`;
 
-export function summaryRows(p: Proposal): KeyValueRow[] {
+/** `saved`: the changes a frozen Save kept; the Changes row then names only those. */
+export function summaryRows(p: Proposal, saved?: Set<number>): KeyValueRow[] {
   const isNew = isNewDocument(p);
+  const named = numbers(p).filter((n) => !saved || saved.has(n));
   const rows: KeyValueRow[] = [
     {
       label: isNew ? label.sections : label.changes,
       value:
-        p.rows.length > MAX_NAMED
-          ? change.count(p.rows.length)
-          : p.rows.map((_, i) => rowLabel(p, i)).join(line.summaryJoin),
+        named.length > MAX_NAMED
+          ? change.count(named.length)
+          : named.map((n) => rowLabel(p, n - 1)).join(line.summaryJoin),
     },
   ];
   const counts = MARKS.map(
@@ -290,9 +292,11 @@ export function ProposalView({
   const tracked: CardLifecycle = {
     ...lifecycle,
     press: (a) => {
-      if (lifecycle.state === "live" && !a.disabled)
-        onPressed?.(a === notNow ? "notNow" : "save");
-      lifecycle.press(a);
+      const kind: Pressed = a === notNow ? "notNow" : "save";
+      if (lifecycle.state === "live" && !a.disabled) onPressed?.(kind);
+      // Saved with the frozen state, so a remount redraws what the person kept.
+      const extra: PressedState = { kept: [...kept], pressed: kind };
+      lifecycle.press(a, extra);
     },
   };
   const card = { ...shell, lifecycle: tracked, actions };
@@ -326,14 +330,41 @@ export function ProposalView({
         {p.left_out && p.left_out.length > 0 && <LeftOut files={p.left_out} />}
       </FullView>
     );
-  return <SummaryCard {...card} rows={summaryRows(p)} />;
+  return (
+    <SummaryCard
+      {...card}
+      rows={summaryRows(p, pressed === "save" ? kept : undefined)}
+    />
+  );
+}
+
+/** What a press saves with the frozen state, given back as `lifecycle.restored`. */
+type PressedState = { kept: number[]; pressed: Pressed };
+
+function isPressedState(value: unknown): value is PressedState {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "kept" in value &&
+    Array.isArray(value.kept) &&
+    value.kept.every((n) => typeof n === "number") &&
+    "pressed" in value &&
+    (value.pressed === "save" || value.pressed === "notNow")
+  );
 }
 
 function LiveProposal({ proposal }: { proposal: Proposal }) {
   const host = useCardHost();
-  const [kept, setKept] = useState(() => new Set(numbers(proposal)));
-  const [pressed, setPressed] = useState<Pressed>();
   const lifecycle = useCardLifecycle();
+  const restored = isPressedState(lifecycle.restored)
+    ? lifecycle.restored
+    : undefined;
+  const [kept, setKept] = useState(
+    () => new Set(restored?.kept ?? numbers(proposal)),
+  );
+  const [pressed, setPressed] = useState<Pressed | undefined>(
+    restored?.pressed,
+  );
   return (
     <ProposalView
       proposal={proposal}

@@ -323,3 +323,21 @@ test("an absolute subject shows its file name, the full path on hover", () => {
     view.unmount();
   }
 });
+
+test("a remounted frozen card shows what was kept", () => {
+  const { host, view } = renderCard(e02, "fullscreen");
+  fireEvent.click(rowCheckbox(1));
+  fireEvent.click(screen.getByRole("button", { name: action.save("C2–C4") }));
+  view.unmount();
+  render(
+    <StaticCardHost host={{ ...host, displayMode: "inline" }}>
+      <ProposalCard result={asResult(e02)} />
+    </StaticCardHost>,
+  );
+  expect(screen.getByText(frozen.approved)).toBeTruthy();
+  expect(screen.getByText(badge.done.approved)).toBeTruthy();
+  expect(document.body.textContent).toContain(
+    joined("C2 Motivation · C3 Status · C4 Open question"),
+  );
+  expect(document.body.textContent).not.toContain("C1 Title");
+});
