@@ -41,7 +41,9 @@ $defs:
         description: Who the document is for, from kb_list_audiences, and whether the person confirmed it.
       filing:
         $ref: "#/$defs/filing"
-        description: For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing document.
+        description: >-
+          For a new document, where it will be saved and whether a naming rule applied. Omit it for an existing
+          document.
       open_questions:
         description: Questions no source answers, apart from conflicting rows.
         type: array
@@ -195,7 +197,8 @@ $defs:
         minLength: 1
   reader:
     title: Proposal reader
-    description: The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.
+    description: >-
+      The audience choice the document is for, from kb_list_audiences. Set `confirmed` false when you guessed it.
     type: object
     additionalProperties: false
     required:

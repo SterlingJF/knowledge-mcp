@@ -17,3 +17,5 @@ overrides:
   # markdownlint pulls in micromark-extension-math 3.1.0, which allows katex ^0.16.0.
   # katex 0.18.2 fixes GHSA-238p-pmpm-9mq7.
   micromark-extension-math>katex: 0.18.7
+  # @modelcontextprotocol/core 2.3.1 resolves zod 4.6.5. zod 4.6.6 fixes GHSA-mrhx-c7xc-m3w5.
+  zod@^4: 4.6.6

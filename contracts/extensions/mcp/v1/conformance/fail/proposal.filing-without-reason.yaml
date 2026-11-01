@@ -5,14 +5,14 @@ summary: Cache rollout
 rows:
   - proposed:
       label: Motivation
-      text: Cache misses add 40 minutes to each evening run
+      text: Cache misses add 40 minutes a run
     mark: supported
     sources:
       - file: build-timings.xlsx
         place: Cache!B2:B9
   - proposed:
       label: Alternatives
-      text: A hosted build service, priced but not compared
+      text: A hosted build service, not compared
     mark: partly
     sources:
       - file: vendor-quote.xlsx
@@ -40,8 +40,8 @@ card: |
 
   | ID | Current | Proposed | Source |
   | --- | --- | --- | --- |
-  | C1 | — | ● Supported · **Motivation:** Cache misses add 40 minutes to each evening run | `build-timings.xlsx › Cache!B2:B9` |
-  | C2 | — | ◐ Partly answered · **Alternatives:** A hosted build service, priced but not compared | `vendor-quote.xlsx` |
+  | C1 | — | ● Supported · **Motivation:** Cache misses add 40 minutes a run | `build-timings.xlsx › Cache!B2:B9` |
+  | C2 | — | ◐ Partly answered · **Alternatives:** A hosted build service, not compared | `vendor-quote.xlsx` |
 
   ? Needs you · **Rollout owner** · no source: Who owns the rollout?
 instance:

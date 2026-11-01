@@ -219,11 +219,14 @@ $defs:
           - string
           - "null"
       line:
-        description: One-based line number of the link token in its source note. Present when the source text was supplied.
+        description: >-
+          One-based line number of the link token in its source note. Present when the source text was supplied.
         type: integer
         minimum: 1
       text:
-        description: The original link token exactly as written, such as `[[retire-evening]]`. Present when the source text was supplied.
+        description: >-
+          The original link token exactly as written, such as `[[retire-evening]]`. Present when the source text
+          was supplied.
         type: string
         minLength: 1
   issue:
@@ -254,7 +257,8 @@ $defs:
         minimum: 0
       detail: *id001
       line:
-        description: One-based line number of the link token for a `link-*` issue. Present when the source text was supplied.
+        description: >-
+          One-based line number of the link token for a `link-*` issue. Present when the source text was supplied.
         type: integer
         minimum: 1
       text:
