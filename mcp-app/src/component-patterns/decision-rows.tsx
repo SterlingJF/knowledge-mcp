@@ -138,7 +138,7 @@ export function DecisionRows({
     cn(
       i === narrow.title && "@max-[560px]:font-semibold",
       i === narrow.detail &&
-        "@max-[560px]:font-(family-name:--font-mono) @max-[560px]:text-secondary",
+        "@max-[560px]:font-mono @max-[560px]:text-secondary",
       narrow.hide?.includes(i) && "@max-[560px]:hidden",
     );
   const cell = "py-km-gap-row pr-km-gap-group align-top";

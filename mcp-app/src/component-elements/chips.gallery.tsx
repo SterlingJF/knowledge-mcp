@@ -1,11 +1,6 @@
 import { PathChip, SourceChip } from "./chips";
 
-const row = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: "var(--km-gap-inline)",
-  alignItems: "center",
-} as const;
+const row = "flex flex-wrap items-center gap-km-gap-inline";
 
 export default {
   id: "K04",
@@ -21,13 +16,7 @@ export default {
       <SourceChip source={{ file: "meeting-notes.md", line_number: 15 }} />
     ),
     "Place source": (
-      <div
-        style={{
-          display: "grid",
-          gap: "var(--km-gap-inline)",
-          justifyItems: "start",
-        }}
-      >
+      <div className="grid justify-items-start gap-km-gap-inline">
         <SourceChip
           source={{ file: "build-timings.xlsx", place: "Evening!A2:D10" }}
         />
@@ -40,7 +29,7 @@ export default {
       <SourceChip source={{ said: "a proposal … on its own" }} />
     ),
     "Same file, another line": (
-      <div style={row}>
+      <div className={row}>
         <SourceChip source={{ file: "meeting-notes.md", line_number: 11 }} />
         <SourceChip
           continuation

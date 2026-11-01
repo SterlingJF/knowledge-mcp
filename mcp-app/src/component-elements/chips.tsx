@@ -64,12 +64,7 @@ function Chip({
   return (
     <span className={cn(chipClass, className)} title={title}>
       <Icon aria-hidden className="size-km-icon shrink-0" />
-      <span
-        className={cn(
-          "min-w-0 whitespace-normal",
-          mono && "font-(family-name:--font-mono)",
-        )}
-      >
+      <span className={cn("min-w-0 whitespace-normal", mono && "font-mono")}>
         {typeof children === "string" ? (
           <NoBreakName>{children}</NoBreakName>
         ) : (

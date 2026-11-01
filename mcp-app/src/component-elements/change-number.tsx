@@ -4,7 +4,7 @@ import { action, change } from "@/copy/en";
 import { cn } from "@/lib/utils";
 
 const rowClass =
-  "inline-flex items-center gap-km-gap-inline whitespace-nowrap font-(family-name:--font-mono) text-xs leading-xs font-semibold text-muted-foreground relative pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-0 pointer-coarse:before:h-km-target pointer-coarse:before:w-full pointer-coarse:before:min-w-km-target pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']";
+  "inline-flex items-center gap-km-gap-inline whitespace-nowrap font-mono text-xs leading-xs font-semibold text-muted-foreground relative pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-0 pointer-coarse:before:h-km-target pointer-coarse:before:w-full pointer-coarse:before:min-w-km-target pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']";
 
 const boxClass =
   "size-km-check rounded-xs border-km-check border-muted-foreground bg-transparent shadow-none after:hidden data-checked:border-transparent data-checked:bg-inverse data-checked:text-inverse data-indeterminate:border-transparent data-indeterminate:bg-inverse data-indeterminate:text-inverse data-indeterminate:[&_svg]:hidden data-indeterminate:before:h-km-1 data-indeterminate:before:w-km-4 data-indeterminate:before:rounded-km-1 data-indeterminate:before:bg-current data-indeterminate:before:content-[''] focus-visible:border-transparent focus-visible:ring-0 focus-visible:shadow-km-focus-ring [&_svg]:size-km-icon-sm";
@@ -56,7 +56,7 @@ export function TickBox({
       className={cn(
         rowClass,
         // A long label wraps; the box stays on the first line.
-        "cursor-pointer items-start whitespace-normal font-(family-name:--font-sans) text-foreground",
+        "cursor-pointer items-start whitespace-normal font-sans text-foreground",
         className,
       )}
     >

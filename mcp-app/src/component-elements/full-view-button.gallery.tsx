@@ -7,13 +7,7 @@ export default {
   name: "Full view button",
   stories: {
     "Beside the badge": (
-      <span
-        style={{
-          display: "inline-flex",
-          gap: "var(--km-gap-inline)",
-          alignItems: "center",
-        }}
-      >
+      <span className="inline-flex items-center gap-km-gap-inline">
         <Badge tone="waiting">{badge.waiting.nothingSaved}</Badge>
         <FullViewButton onRequestFullView={() => {}} />
       </span>

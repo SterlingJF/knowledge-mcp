@@ -6,9 +6,7 @@ import { badge } from "@/copy/en";
 import { countAccepted, DecisionRows } from "./decision-rows";
 import type { DecisionKind, DecisionRow } from "./decision-rows";
 
-const mono = (t: string) => (
-  <span className="font-(family-name:--font-mono)">{t}</span>
-);
+const mono = (t: string) => <span className="font-mono">{t}</span>;
 const base = [
   {
     id: "dr",

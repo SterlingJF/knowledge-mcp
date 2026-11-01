@@ -396,7 +396,7 @@ function MovesTable({ plan: p }: { plan: DocumentMoves }) {
 }
 
 function LinksTable({ plan: p }: { plan: DocumentMoves }) {
-  const mono = "font-(family-name:--font-mono) wrap-anywhere";
+  const mono = "font-mono wrap-anywhere";
   return (
     <PlanTable
       headers={[moves.label.note, moves.label.linkNow, moves.label.afterMove]}
