@@ -170,6 +170,12 @@ def test_both_manifests_name_the_same_plugin_and_skills():
     assert not (ROOT / ".mcp.json").exists()
 
 
+def readme_tagline() -> str:
+    """The line after the README's title, whatever sits above the title."""
+    lines = (MODULE.parent / "README.md").read_text().splitlines()
+    return lines[lines.index("# knowledge-mcp") + 2]
+
+
 def test_every_description_copy_is_the_package_description():
     marketplace = json.loads(
         (MODULE.parent / ".claude-plugin/marketplace.json").read_text()
@@ -181,7 +187,7 @@ def test_every_description_copy_is_the_package_description():
         CODEX["interface"]["longDescription"],
         marketplace["metadata"]["description"],
         marketplace["plugins"][0]["description"],
-        (MODULE.parent / "README.md").read_text().splitlines()[2],
+        readme_tagline(),
     ]
     assert (
         PROJECT["description"]
