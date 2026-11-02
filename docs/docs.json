@@ -9,12 +9,9 @@
   },
   "logo": {
     "light": "/logo/knowledge-mcp-mark-black.svg",
-    "dark": "/logo/knowledge-mcp-mark-white.svg"
-  },
-  "favicon": {
-    "light": "/logo/knowledge-mcp-squircle-dark.svg",
     "dark": "/logo/knowledge-mcp-squircle-light.svg"
   },
+  "favicon": "/logo/knowledge-mcp-squircle-light.svg",
   "navigation": {
     "groups": [
       {
