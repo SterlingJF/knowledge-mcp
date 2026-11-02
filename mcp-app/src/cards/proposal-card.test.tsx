@@ -289,7 +289,13 @@ test("D05F full view: filing note, open questions, whole-file chip", () => {
   renderCard(newDocument, "fullscreen");
   expect(screen.getByText(proposal.readerGuess)).toBeTruthy();
   expect(screen.getByText(proposal.noRuleFor("Design proposal"))).toBeTruthy();
-  expect(screen.getByText(proposal.toAnswer(1))).toBeTruthy();
+  // Open questions are asked as a question, not marked as left out.
+  expect(
+    screen
+      .getByText(proposal.toAnswer(1))
+      .closest("[data-kind]")
+      ?.getAttribute("data-kind"),
+  ).toBe("question");
   expect(
     screen.getByText(/Rollout owner · no source\. It stays an open question/),
   ).toBeTruthy();

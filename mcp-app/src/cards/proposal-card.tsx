@@ -320,7 +320,7 @@ export function ProposalView({
         )}
         {p.open_questions && p.open_questions.length > 0 && (
           <Note
-            kind="leftOut"
+            kind="question"
             fact={proposalCopy.toAnswer(p.open_questions.length)}
           >
             {proposalCopy.openList(p.open_questions.map(unsourced))}{" "}

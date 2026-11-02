@@ -11,6 +11,11 @@ export default {
         (dropped in conventions), so it goes beside cache-proposal.md.
       </Note>
     ),
+    Question: (
+      <Note kind="question" fact="One thing to answer.">
+        Rollout owner · no source. It stays an open question unless you say.
+      </Note>
+    ),
     "Left out": (
       <Note kind="leftOut" fact={line.leftOut(2)}>
         vendor-quote.xlsx, release-calendar.md.
