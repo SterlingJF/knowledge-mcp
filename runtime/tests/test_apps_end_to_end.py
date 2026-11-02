@@ -3,6 +3,7 @@ from __future__ import annotations
 import anyio
 import pytest
 from mcp.client import Client
+from mcp.client.extension import advertise
 from mcp.client.stdio import stdio_client
 from mcp.shared.exceptions import MCPError
 
@@ -106,3 +107,23 @@ def test_server_advertises_the_apps_extension_where_the_protocol_carries_it(
             return client.server_capabilities.extensions
 
     assert anyio.run(main) == {"io.modelcontextprotocol/ui": {}}
+
+
+DRAWS_APPS = advertise("io.modelcontextprotocol/ui", {"mimeTypes": [MIME]})
+
+
+@pytest.mark.parametrize("mode", ["legacy", "modern"])
+def test_a_client_that_draws_the_app_gets_no_second_card_in_text(tmp_path, mode):
+    # The card stays in structured content for the view; the text says it is already shown.
+    async def main():
+        modes = {"mode": "legacy"} if mode == "legacy" else {}
+        async with Client(
+            stdio_client(server_parameters(tmp_path)), extensions=[DRAWS_APPS], **modes
+        ) as client:
+            return await client.call_tool("kb_prepare_proposal", DEMO)
+
+    result = anyio.run(main)
+    assert not result.is_error, result.content
+    assert result.content[0].text == apps.DRAWN
+    assert TABLE not in [block.text for block in result.content]
+    assert result.structured_content["card"] == TABLE

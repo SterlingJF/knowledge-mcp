@@ -170,6 +170,8 @@ class Server(MCPServer):
             on_subscriptions_listen=ListenHandler(self.subscriptions),
         )
         server.extensions = self.extensions
+        # Built here rather than by MCPServer, so it needs the app's middleware too.
+        server.middleware.append(apps.drawn_card)
         stdin = Stdin() if sys.platform != "win32" else None
         async with stdio_server(stdin=stdin) as (read_stream, write_stream):
             await server.run(
