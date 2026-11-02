@@ -234,7 +234,7 @@ class DocumentMovesAnswer(BaseModel):
     card: Annotated[
         str | None,
         Field(
-            description="The move plan as markdown. Show it in your reply unchanged.",
+            description="The move plan as markdown. Show it in your reply unchanged, unless your app already draws it as a card.",
             min_length=1,
         ),
     ] = None

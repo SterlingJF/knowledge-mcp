@@ -53,7 +53,9 @@ $defs:
         items:
           $ref: "#/$defs/left_out_file"
       card:
-        description: The proposal as markdown. Show it in your reply unchanged.
+        description: >-
+          The proposal as markdown. Show it in your reply unchanged, unless your app already draws it
+          as a card.
         type: string
         minLength: 1
       based_on:

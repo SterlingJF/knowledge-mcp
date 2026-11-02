@@ -14670,7 +14670,7 @@
                 }
               },
               "card": {
-                "description": "The move plan as markdown. Show it in your reply unchanged.",
+                "description": "The move plan as markdown. Show it in your reply unchanged, unless your app already draws it as a card.",
                 "type": "string",
                 "minLength": 1
               }
@@ -20740,7 +20740,7 @@
     {
       "name": "kb_prepare_proposal",
       "title": "Prepare a proposal card",
-      "description": "Use whenever you propose, or are asked to review, a change to a non-code file (\"review this change\", \"is this right\"), before anything is saved. Prepare the proposed-changes card. Send each change as a row with its sources and evidence mark, and each file you read but didn't cite. Returns the card as markdown in `card` and saves nothing. Show `card` in your reply unchanged, then add your own lines. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
+      "description": "Use whenever you propose, or are asked to review, a change to a non-code file (\"review this change\", \"is this right\"), before anything is saved. Prepare the proposed-changes card. Send each change with its sources and evidence mark, and each file you read but didn't cite. Returns the card as markdown in `card` and saves nothing. Show it unchanged unless your app already draws it, then add your own lines. Appends the answer to `log.jsonl` and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -21159,7 +21159,7 @@
                 }
               },
               "card": {
-                "description": "The proposal as markdown. Show it in your reply unchanged.",
+                "description": "The proposal as markdown. Show it in your reply unchanged, unless your app already draws it as a card.",
                 "type": "string",
                 "minLength": 1
               },
@@ -23098,7 +23098,7 @@
     {
       "name": "kb_record_edit",
       "title": "Record an edit",
-      "description": "Use right after you save a change to a non-code file, so the person can check or undo it. Record the edit. Send `undoes` when the edit undoes an earlier one. Returns the edit's id, the digests of `before` and `after`, a capped list of the changed lines in `changes`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.\n",
+      "description": "Use right after you save a change to a non-code file, so the person can check or undo it. Record the edit. Send `undoes` when the edit undoes an earlier one. Returns the edit's id, digests, changed lines and the saved card as markdown in `card`. Show `card` in your reply unchanged, unless your app already draws it as a card. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.\n",
       "inputSchema": {
         "properties": {
           "location": {
@@ -23373,7 +23373,7 @@
                 "$ref": "#/$defs/edit_changes"
               },
               "card": {
-                "description": "The saved edit as markdown. Show it in your reply unchanged.",
+                "description": "The saved edit as markdown. Show it in your reply unchanged, unless your app already draws it as a card.",
                 "type": "string",
                 "minLength": 1
               }

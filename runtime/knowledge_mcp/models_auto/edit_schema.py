@@ -80,7 +80,7 @@ class EditReceipt(BaseModel):
     card: Annotated[
         str,
         Field(
-            description="The saved edit as markdown. Show it in your reply unchanged.",
+            description="The saved edit as markdown. Show it in your reply unchanged, unless your app already draws it as a card.",
             min_length=1,
         ),
     ]

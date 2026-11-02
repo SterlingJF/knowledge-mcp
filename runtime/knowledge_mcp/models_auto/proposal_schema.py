@@ -284,7 +284,7 @@ class Proposal(BaseModel):
     card: Annotated[
         str,
         Field(
-            description="The proposal as markdown. Show it in your reply unchanged.",
+            description="The proposal as markdown. Show it in your reply unchanged, unless your app already draws it as a card.",
             min_length=1,
         ),
     ]

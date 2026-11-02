@@ -55,7 +55,7 @@ Keep the complete peer-folder inventory for document-type lookup, tracking and m
 Don't stop to ask about the document type or reader first.
 
 1. Call `kb_prepare_proposal` with one row per change, its sources and evidence mark, and each file you read but didn't cite. Send plain words, without markdown syntax, in `text`. Send `layout: "list"` when you run in a terminal.
-2. Show `card` from the result in your reply unchanged, then add your own lines. Mark a guessed document type or reader with "(guess)" and ask about it there. Name each change by its ID, such as C2, never by its position.
+2. Show `card` from the result in your reply unchanged, unless your app already draws it as a card, then add your own lines. Mark a guessed document type or reader with "(guess)" and ask about it there. Name each change by its ID, such as C2, never by its position.
 3. When the person changes or decides something, prepare the card again with the rows that still apply. Cite their words in a `said` source.
 4. Nothing is saved until the person approves. Then follow Edits.
 
@@ -187,7 +187,7 @@ A content edit authorizes a move only when the permission also covers the move.
 2. **Record each edit.** Immediately call `kb_record_edit` with `location`, `allowed_by`, `before` and `after`.
    Quote the person's words in `allowed_by.text` and select `allowed_by.basis`.
    For `instruction`, put the instruction file's path in `allowed_by.location`.
-   Show `card` from the result in your reply unchanged, then add your own lines.
+   Show `card` from the result in your reply unchanged, unless your app already draws it as a card, then add your own lines.
 3. **Pick up earlier work.** When the person returns to a document, call `kb_list_edits` with its `location`. Show `card` from the result in your reply unchanged, then write "Still open:" and what the document leaves open.
 4. **Check or undo an edit.** Call `kb_list_edits` with `location`.
    Restore `before` only where the document still contains `after`.

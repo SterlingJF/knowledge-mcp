@@ -167,7 +167,9 @@ $defs:
         items:
           $ref: "#/$defs/move_naming"
       card:
-        description: The move plan as markdown. Show it in your reply unchanged.
+        description: >-
+          The move plan as markdown. Show it in your reply unchanged, unless your app already draws it
+          as a card.
         type: string
         minLength: 1
     additionalProperties: false

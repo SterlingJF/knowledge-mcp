@@ -17,7 +17,7 @@ from knowledge_mcp.tools.kbp import READS, Location
 from knowledge_mcp.views import markdown
 
 RECORD = """\
-Use right after you save a change to a non-code file, so the person can check or undo it. Record the edit. Send `undoes` when the edit undoes an earlier one. Returns the edit's id, the digests of `before` and `after`, a capped list of the changed lines in `changes`, and the saved card as markdown in `card`. Show `card` in your reply unchanged. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.
+Use right after you save a change to a non-code file, so the person can check or undo it. Record the edit. Send `undoes` when the edit undoes an earlier one. Returns the edit's id, digests, changed lines and the saved card as markdown in `card`. Show `card` in your reply unchanged, unless your app already draws it as a card. Appends the edit to `edits.jsonl` and the answer to `log.jsonl`, and opens no knowledge-base file.
 """
 
 LIST = """\
