@@ -35,7 +35,7 @@
     "oxlint": "1.85.0",
     "oxlint-tsgolint": "7.0.2002",
     "prettier": "3.9.9",
-    "prettier-plugin-toml": "3.0.2",
+    "prettier-plugin-toml": "4.1.0",
     "smol-toml": "1.9.0",
     "tsx": "4.23.12",
     "typescript": "7.0.2",
