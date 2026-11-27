@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@oxlint/plugins": "1.85.0",
-    "@stylistic/eslint-plugin": "5.10.0",
+    "@stylistic/eslint-plugin": "6.0.1",
     "@types/node": "26.6.4",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
